@@ -1,0 +1,15 @@
+2024-09-18 13:48.49 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 13:48.52 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 13:48.57 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 13:49.45 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 13:56.59 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 13:57.03 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 13:59.12 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 13:59.15 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 14:05.04 --- partially initialized module 'Test_PING' has no attribute 'testNetworkConn' (most likely due to a circular import)
+2024-09-18 14:42.06 --- module 'Test_PING' has no attribute 'testNetworkConn'
+2024-09-18 14:45.49 --- module 'Test_PING' has no attribute 'testNetworkConn'
+2024-09-18 14:45.53 --- module 'Test_PING' has no attribute 'testNetworkConn'
+2024-09-18 14:48.10 --- module 'Test_PING' has no attribute 'testNetworkConn'
+2024-09-18 14:51.20 --- module 'Test_PING' has no attribute 'testNetworkConn'
+2024-09-18 15:09.30 --- module 'Test_PING' has no attribute 'testNetworkConn'

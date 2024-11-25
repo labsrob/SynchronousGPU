@@ -1,0 +1,1 @@
+2024-09-19 08:07.47 --- module 'Test_PING' has no attribute 'testNetworkConn'
