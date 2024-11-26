@@ -8,9 +8,9 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 
 
 def validCols(pParam):
-    # print('Detected RingHead Combo:', configH)
+    # print('Detected RingHead Combo:', configH) 1 Mpa = 1 (N/mm2)
     if pParam == 'CT':
-        columns = ['CellTension A', 'CellTension B', 'PipeDirection']
+        columns = ['CellTensionA (Mpa)', 'CellTensionB (Mpa)', 'PipeDirection']
     else:
         print('Invalid Columns or Query error...')
 

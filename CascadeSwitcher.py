@@ -9,6 +9,7 @@ import time
 import os
 import sys
 from datetime import datetime
+
 from time import gmtime, strftime
 import numpy as np
 import pandas as pd
@@ -24,6 +25,26 @@ import matplotlib.patches as patches
 import loadSPCConfig as ty
 import qParamsHL as mq
 
+# -------PLC/SQL Query -------#
+import selDataColsOEE as qo
+import selDataColsCT as qc
+import selDataColsRF as qf
+# ----- DNV Params ------
+import selDataColsTG as qg
+import selDataColsWS as qw
+import selDataColsST as qs
+import selDataColsTT as qt
+import selDataColsRP as qp
+# -----------------------------#
+
+import subprocess
+try:
+    subprocess.check_output('nvidia-smi')
+    print('Nvidia GPU detected!')
+except Exception:
+    print('No Nvidia GPU in system!')
+
+
 pPos = str(3345)
 layer = str(10)
 
@@ -37,7 +58,172 @@ countE = '05'
 # ---------------------------------------------- Common to all Process Procedures -------------------------[]
 cpTapeW, cpLayerNo, runType = [], [], []
 UsePLC_DBS = True
+runStatus = 0
+hostConn = 0
 # ---------------------------------------------------------------------------------------------------------[]
+
+
+class common_OEE(ttk.Frame):
+    def __init__(self, master=None):
+        ttk.Frame.__init__(self, master)
+        self.place(x=2010, y=20)
+        self.createWidgets()
+
+    def createWidgets(self):
+        # -----------------------------------
+        f = Figure(figsize=(5, 4), dpi=100)
+        f.subplots_adjust(left=0.045, bottom=0, right=0.988, top=0.929, wspace=0.202)
+        a3 = f.add_subplot(1, 1, 1)
+
+        # Model data --------------------------------------------------[]
+        a3.cla()
+        a3.get_yaxis().set_visible(False)
+        a3.get_xaxis().set_visible(False)
+        if not runStatus:
+            a3.pie([1, 7, 0, 5, 9, 6], shadow=True)
+
+        # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
+        def synchronousOEE(smp_Sz, smp_St, fetchT):
+            fetch_no = str(fetchT)  # entry value in string sql syntax
+            # Obtain SQL Data Host Server ---------------------------[]
+            qRP = conn.cursor()
+
+            # Evaluate conditions for SQL Data Fetch ---------------[A]
+            """
+            Load watchdog function with synchronous function every seconds
+            """
+            # Initialise RT variables ---[]
+            autoSpcRun = True
+            autoSpcPause = False
+            import keyboard  # for temporary use
+
+            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+            # Define PLC/SMC error state -------------------------------------------#
+
+            while True:
+                # print('Indefinite looping...')
+                import sqlArrayRLmethodOE as oe                             # DrLabs optimization method
+                inProgress = True                                           # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+
+                # Get list of relevant SQL Tables using conn() ---------[TODO] Data fetch only at unique stoppages
+                oeData = oe.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)     # perform DB connections
+                if keyboard.is_pressed("Alt+Q"):                            # Terminate file-fetch
+                    qRP.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
+
+            return oeData
+
+        # ================== End of synchronous Method ==========================
+        def asynchronousOEE(db_freq):
+
+            timei = time.time()                                 # start timing the entire loop
+            # Call data loader Method---------------------------#
+            oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
+
+            import oeVarSQL as qoe                              # load SQL variables column names | rfVarSQL
+            viz_cycle = 150
+            g1 = qo.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
+            df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe
+            OE = qoe.loadProcesValues(df3)                      # Join data values under dataframe
+            print('\nDataFrame Content', df3.head(10))          # Preview Data frame head
+            print("Memory Usage:", df3.info(verbose=False))     # Check memory utilization
+
+            # --------------------------------
+            # Allow the following code to run despite not on DNV condition ----------------#
+            # TODO replace with process variable
+            cLayer = OE[1]
+            status = OE[3]
+            curLayer = list(set(cLayer))            # shuffle list to obtain unique layer number at a time
+            if len(curLayer) > 1:
+                lastE = len(curLayer)
+                curLayer = curLayer[lastE - 1]      # print the last index element
+            # ---------------------------------
+            # if VarPerHeadA or VarPerHeadB or VariProcess:
+            OTlayr.append(curLayer[0])              # Post values into static array
+            EPpos.append('N/A')                     # Insert pipe position is available
+            pStatus.append(status)
+            print('\nTP05[Layer/Status]:', curLayer[0], status)
+            # ----------------------------------------------------------------------------#
+            print('\nTesting loop...')
+            # Obtain current local time string ------------------------[]
+            cTime = strftime("%H:%M:%S")
+
+            # Convert current time string to datetime object ----------[]
+            currentTime = str(datetime.strptime(cTime, "%H:%M:%S").time())
+            print('\nCurrent Time:', currentTime)
+
+            # Compute essential variables ------------------------------- TODO verify filter *****
+            dayShiftTime = df3[(df3['TimeLine'] >= sStart) & (df3['TimeLine'] <= currentTime)]
+
+            totalRun = dayShiftTime.copy()
+            totalRun = totalRun.drop_duplicates(subset='TimeLine', keep='first')
+            # print('Total Run:', totalRun)
+
+            # Convert Shift start time to string format -----------------
+            shiftStartTime = str(datetime.strptime(sStart, "%H:%M:%S").time())
+            shiftEndTime = str(datetime.strptime(sStops, "%H:%M:%S").time())
+            print("Shift Starts:", shiftStartTime)
+            print("Shift Ends @:", shiftEndTime)
+
+            # Compute production lapse time -----------------------------
+            TShiftSec = datetime.strptime(sStops, '%H:%M:%S') - datetime.strptime(shiftStartTime, '%H:%M:%S')
+            ShiftinSec = TShiftSec.total_seconds()  # Convert values into seconds
+            print('=' * 22)
+            print('Shift Hours:', ShiftinSec, '(Sec)')
+
+            deltaT = datetime.strptime(str(currentTime), '%H:%M:%S') - datetime.strptime(shiftStartTime, '%H:%M:%S')
+            opTime = deltaT.total_seconds()  # Convert values into seconds
+            print('\n********* SUMMARY **********')
+            print('Operation Time:', opTime, '(Sec)')
+
+            # Compute downtime in seconds -------------------------------
+            downtime = totalRun['Duration(Sec)'].sum()
+            print('TCP1 Down Time:', float(downtime), '(Sec)')
+
+            # Computer work time relative to total shift hours ----------
+            prodTime = (opTime - downtime)
+            print('Net Production:', prodTime, '(Sec)')
+            print('-' * 28)
+
+            endShiftHour = (ShiftinSec - prodTime)
+            pieData = np.array([endShiftHour, prodTime, downtime])
+            segexplode = [0, 0, 0.1]
+
+            ind_metric = ['Current Shift', 'Production Time', 'OEE Time']
+            # Pie Chart Plot ---------------------
+            mycol = ['#4c72b0', 'green', 'orange']          # add colors
+            a3.pie(pieData, labels=ind_metric, startangle=90, explode=segexplode, shadow=True, autopct='%1.1f%%',
+                    colors=mycol, textprops={'fontsize': 10})
+            if not HeadA:   # if HeadA (synchronous)
+                a3.set_title('Post Production Status', fontsize=12, fontweight='bold')
+            else:
+                a3.set_title('Machine Live Status Analysis', fontsize=12, fontweight='bold')
+
+            # No trigger module processing - Production parameter is for monitoring purposes only.
+            timef = time.time()
+            lapsedT = timef - timei
+            print(f"\nProcess Interval: {lapsedT} sec\n")
+
+            ani = FuncAnimation(f, asynchronousOEE, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
+                                blit=False)
+            plt.tight_layout()
+            plt.show()
+
+        # -------------------------------------------------------------[]
+        canvas = FigureCanvasTkAgg(f, self)
+        canvas.get_tk_widget().pack(expand=False)
+
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        # toolbar = NavigationToolbar2Tk(canvas, self)
+        # toolbar.update()
+        # canvas._tkcanvas.pack(expand=True)
 
 
 def RollerPressure(vCounter, pType):

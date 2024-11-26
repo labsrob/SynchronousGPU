@@ -11,11 +11,11 @@ import numpy as np
 import pandas as pd
 import spcWatchDog as wd
 
-# -------SQL Query ------------#
+# -------PLC/SQL Query -------#
 import selDataColsOEE as qo
 import selDataColsCT as qc
 import selDataColsRF as qf
-
+# ----- DNV Params ------
 import selDataColsTG as qg
 import selDataColsWS as qw
 import selDataColsST as qs
@@ -33,6 +33,7 @@ import signal
 import tkinter as tk
 from tkinter import *
 from threading import *
+from multiprocessing import Process
 from tkinter import messagebox, ttk
 from tkinter.simpledialog import askstring
 from matplotlib.figure import Figure
@@ -50,12 +51,12 @@ import qParamsHL as mq
 import pWON_finder as sqld
 import qParameterLP as hla
 # ------------------------------------------------------------------------[]
-runStatus = 0
 
 cpTapeW, cpLayerNo, runType = [], [], []
 OTlayr, EPpos, pStatus = [], [], []
 HeadA, HeadB, vTFM = 0, 0, 0
 hostConn = 0
+runStatus = 0
 optm = True
 
 import subprocess
@@ -1204,6 +1205,7 @@ class common_PD(ttk.Frame):  # -- Defines tabbed production params common to QA 
         # toolbar.update()
         # canvas._tkcanvas.pack(expand=True
 # ------------------------------------------------------------------------------------------------------------------#
+
 
 class rollerPressure(ttk.Frame):            # -- Defines the tabbed region for QA params - Roller Pressure --[]
     """ This application calculates the Mean/Std Dev and returns a value. """
@@ -3232,51 +3234,57 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
 
 
 # --------------------------------------------- CASCADE VIEW CLASSES -----------------------------------------------[]
+# FIXME -----------------------------------------------------------------------------------------------------[]
 
-class cascadeViews(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
+class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.createWidgets()
+        self.createWidgetsRF()
 
-    def createWidgets(self):
+    def createWidgetsRF(self):
         label = ttk.Label(self, text="Monitoring: Critical Production Parameters", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
         # Define Axes ---------------------#
-        fig = Figure(figsize=(25, 12), dpi=100)   # 13
+        # fig = Figure(figsize=(25, 12), dpi=100)   # 13
+        fig = Figure(figsize=(13, 7), dpi=100)      # 13
+
         # Attempt to auto screen size ---
-        # fig = Figure(figsize=(self.winfo_screenwidth(), self.winfo_screenheight()), dpi=100)
         fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+
+        # Declare Plots attributes --------------------------------[]
+        plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
+        # Calibrate limits for X-moving Axis -----------------------#
+        YScale_minRF, YScale_maxRF = hLSLa - 8.5, hUSLa + 8.5
+        window_Xmin, window_Xmax = 0, (int(sSize) + 3)  # windows view = visible data points
+        # ----------------------------------------------------------#
+
         if pMinMax:
-            a1 = fig.add_subplot(1, 6, (1, 3))  # Roller Force X plot
-            a2 = fig.add_subplot(1, 6, (4, 6))  # Cell Tension X plot
+            a1 = fig.add_subplot(1, 1, 1)
 
             # Declare Plots attributes -----------------------------------------[]
             a1.set_title('Roller Force [Min/Max Curve]', fontsize=12, fontweight='bold')
-            a2.set_title('Cell Tension [Min/Max Curve]', fontsize=12, fontweight='bold')
+            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+            a1.legend(loc='upper left')
+            # Initialise runtime limits
+            a1.set_ylabel("Min/Max Value Plot - N/mm2")
+            a1.axhline(y=hMeanA, color="red", linestyle="-", linewidth=1)
 
         elif pContrl:
-            a1 = fig.add_subplot(2, 5, (1, 2))          # Roller Force X plot
-            a2 = fig.add_subplot(2, 5, (3, 4))          # Cell Tension X plot
-            a3 = fig.add_subplot(2, 5, (6, 7))          # Roller Force S plot
-            a4 = fig.add_subplot(2, 5, (8, 9))          # Cell Tension S plot
-            a5 = fig.add_subplot(4, 5, (5, 20))         # Statistics Feed
+            a1 = fig.add_subplot(2, 2, (1, 2))          # Roller Force X Plot
+            a2 = fig.add_subplot(2, 2, (3, 4))          # Roller Force S Plot
 
-            # Declare Plots attributes -----------------------------------------[]
-            a1.set_title('Roller Force [XBar Plot]', fontsize=12, fontweight='bold')
-            a3.set_title('Roller Force [SBar Plot]', fontsize=12, fontweight='bold')
-            a2.set_title('Cell Tension [XBar Plot]', fontsize=12, fontweight='bold')
-            a4.set_title('Cell Tension [SBar Plot]', fontsize=12, fontweight='bold')
+            # Declare Plots attributes Hide S Plot ------------------------------------[]
+            a1.set_title('Roller Force [Control Plot]', fontsize=12, fontweight='bold')
+            a2.set_title('Roller Force [SBar Plot]', fontsize=12, fontweight='bold')
             # Apply grid lines -----
             a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a3.grid(color="0.5", linestyle='-', linewidth=0.5)
             a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a4.grid(color="0.5", linestyle='-', linewidth=0.5)
 
             # Common properties -------------------------------------------------#
             a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-            a3.set_ylabel("Sample Deviation [" + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+            a2.set_ylabel("Sample Deviation [" + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
             # ----------------------------
             # a1.legend(loc='upper left')
             # axp.legend(loc='upper left')
@@ -3292,75 +3300,250 @@ class cascadeViews(ttk.Frame):          # Load common Cascade and all object in 
             a1.axhspan(hLSLa - 10, hLSLa, facecolor='#FFFFFF', edgecolor='#FFFFFF')
 
             # Define limits for Cell Tension Control Plots -----------------------#
-            a2.axhline(y=hMeanB, color="green", linestyle="-", linewidth=1)
-            a2.axhspan(hLCLb, hUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
+            a2.axhline(y=hDevA, color="green", linestyle="-", linewidth=1)
+            a2.axhspan(dLCLa, dUCLa, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
+            a2.axhspan(dUCLa, dUCLa + 0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+            a2.axhspan(dLCLa - 0.05, dLCLa, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+
+        # Initialise runtime limits --------------------------------#
+        a1.set_ylim([YScale_minRF, YScale_maxRF], auto=True)
+        a1.set_xlim([window_Xmin, window_Xmax])
+        # Model data -----------------------------------------------[]
+        a1.plot([172, 48, 64, 59, 50, 136, 112, 223, 91, 320])
+
+        # ----------------------------------------------------------[]
+        # Define Plot area and axes -
+        # ----------------------------------------------------------#
+        im10, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R1H1)')
+        im11, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R1H2)')
+        im12, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R1H3)')
+        im13, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R1H4)')
+        im14, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R2H1)')
+        im15, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R2H2)')
+        im16, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R2H3)')
+        im17, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R2H4)')
+        im18, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R3H1)')
+        im19, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R3H2)')
+        im20, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R3H3)')
+        im21, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R3H4)')
+        im22, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R4H1)')
+        im23, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R4H2)')
+        im24, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R4H3)')
+        im25, = a1.plot([], [], 'o-', label='Roller Force (Nm) - (R4H4)')
+
+        # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
+        def synchronousRF(smp_Sz, smp_St, fetchT):
+            fetch_no = str(fetchT)  # entry value in string sql syntax
+            # Obtain SQL Data Host Server ---------------------------[]
+            qRP = conn.cursor()
+
+            # Evaluate conditions for SQL Data Fetch ---------------[A]
+            """
+            Load watchdog function with synchronous function every seconds
+            """
+            # Initialise RT variables ---[]
+            autoSpcRun = True
+            autoSpcPause = False
+            import keyboard  # for temporary use
+
+            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+            # Define PLC/SMC error state -------------------------------------------#
+
+            while True:
+                # print('Indefinite looping...')
+                import sqlArrayRLmethodRF as rf  # DrLabs optimization method
+                inProgress = True  # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+
+                # Get list of relevant SQL Tables using conn() --------------------[]
+                rfData = rf.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)  # perform DB connections
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    qRP.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
+
+            return rfData
+
+        # ================== End of synchronous Method ==========================
+
+        def asynchronousRF(db_freq):
+
+            timei = time.time()  # start timing the entire loop
+            # declare asynchronous variables ------------------[]
+            # Call data loader Method---------------------------#
+            rfSQL = synchronousRF(smp_Sz, stp_Sz, db_freq)  # data loading functions
+
+            import rfVarSQL as qrf  # load SQL variables column names | rfVarSQL
+            viz_cycle = 150
+            g1 = qf.validCols('RF')  # Construct Data Column selSqlColumnsTFM.py
+            df1 = pd.DataFrame(rfSQL, columns=g1)  # Import into python Dataframe
+            RF = qrf.loadProcesValues(df1)  # Join data values under dataframe
+            print('\nDataFrame Content', df1.head(10))  # Preview Data frame head
+            print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
+
+            # Declare Plots attributes ------------------------------------------------------------[]
+            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+            a1.legend(loc='upper left', title='XBar Plot')
+            # -------------------------------------------------------------------------------------[]
+            # Plot X-Axis data points -------- X Plot
+            im10.set_xdata(np.arange(db_freq))
+            im11.set_xdata(np.arange(db_freq))
+            im12.set_xdata(np.arange(db_freq))
+            im13.set_xdata(np.arange(db_freq))
+            im14.set_xdata(np.arange(db_freq))
+            im15.set_xdata(np.arange(db_freq))
+            im16.set_xdata(np.arange(db_freq))
+            im17.set_xdata(np.arange(db_freq))
+
+            # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
+            im10.set_ydata((RF[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+            im11.set_ydata((RF[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+            im12.set_ydata((RF[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+            im13.set_ydata((RF[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+            # No computation for PPk / Cpk
+            im14.set_ydata((RF[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+            im15.set_ydata((RF[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+            im16.set_ydata((RF[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+            im17.set_ydata((RF[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+            # No computation for PPk / Cpk
+            im18.set_ydata((RF[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+            im19.set_ydata((RF[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+            im20.set_ydata((RF[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+            im21.set_ydata((RF[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+            # No computation for PPk / Cpk
+            im22.set_ydata((RF[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+            im23.set_ydata((RF[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+            im24.set_ydata((RF[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+            im25.set_ydata((RF[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+            # No computation for PPk / Cpk
+
+            if not useHL and not pMinMax:  # switch to control plot on shewhart model
+                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(smp_Sz, mnA,
+                                                                                                      mnB,
+                                                                                                      0, 0, sdA,
+                                                                                                      sdB, 0, 0)
+            else:  # switch to historical limits
+                xline, sline = hMeanA, hDevA
+
+            # # Declare Plots attributes ------------------------------------------------------------[]
+            # XBar Mean Plot
+            a1.axhline(y=xline, color="red", linestyle="--", linewidth=0.8)
+            a1.axhspan(xlcT, xucT, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 3 Sigma span (Purple)
+            a1.axhspan(xucT, xusT, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
+            a1.axhspan(xlcT, xlsT, facecolor='#8d8794', edgecolor='#8d8794')
+            # ---------------------- sBar_minTG, sBar_maxTG -------[]
+
+            # Setting up the parameters for moving windows Axes ---[]
+            if db_freq > window_Xmax:
+                a1.set_xlim(db_freq - window_Xmax, db_freq)
+            else:
+                a1.set_xlim(0, window_Xmax)
+
+            # Set trip line for individual time-series plot -----[R1]
+            # No trigger module processing - Production parameter is for monitoring purposes only.
+            timef = time.time()
+            lapsedT = timef - timei
+            print(f"\nProcess Interval: {lapsedT} sec\n")
+
+            ani = FuncAnimation(f, asynchronousRF, frames=None, save_count=100, repeat_delay=None,
+                                interval=viz_cycle,
+                                blit=False)
+            plt.tight_layout()
+            plt.show()
+
+        # Update Canvas -----------------------------------------------------[]
+        canvas = FigureCanvasTkAgg(fig, self)
+        canvas.get_tk_widget().pack(expand=False)
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(expand=True)
+
+
+class cascadeCommonViewsCT(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
+    def __init__(self, master=None):
+        ttk.Frame.__init__(self, master)
+        self.place(x=1010, y=10)
+        self.createWidgetsCT()
+
+    def createWidgetsCT(self):
+        label = ttk.Label(self, text="Monitoring: Critical Production Parameters", font=LARGE_FONT)
+        label.pack(pady=10, padx=10)
+
+        # Define Axes ---------------------#
+        # fig = Figure(figsize=(25, 12), dpi=100)   # 13
+        fig = Figure(figsize=(13, 7), dpi=100)  # 13
+
+        # Attempt to auto screen size ---
+        fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+
+        # Declare Plots attributes --------------------------------[]
+        plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
+        # Calibrate limits for X-moving Axis -----------------------#
+        YScale_minCT, YScale_maxCT = hLSLa - 8.5, hUSLa + 8.5
+        window_Xmin, window_Xmax = 0, (int(sSize) + 3)              # windows view = visible data points
+        # ----------------------------------------------------------#
+
+        if pMinMax:
+            a1 = fig.add_subplot(1, 1, 1)
+
+            # Declare Plots attributes -----------------------------------------[]
+            a1.set_title('Cell Tension [Min/Max Curve]', fontsize=12, fontweight='bold')
+
+            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+            a1.legend(loc='upper left')
+            # Initialise runtime limits
+            a1.set_ylabel("Min/Max Value Plot - N/mm2")
+            a1.axhline(y=hMeanB, color="red", linestyle="-", linewidth=1)
+
+        elif pContrl:
+            a1 = fig.add_subplot(2, 2, (1, 2))  # Cell Tension X Bar Plot
+            a2 = fig.add_subplot(2, 2, (3, 4))  # Cell Tension s Plot
+
+            # Declare Plots attributes -----------------------------------------[]
+            a1.set_title('Cell Tension [XBar Plot]', fontsize=12, fontweight='bold')
+            a2.set_title('Cell Tension [SBar Plot]', fontsize=12, fontweight='bold')
+            # Apply grid lines -----
+            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+            a2.grid(color="0.5", linestyle='-', linewidth=0.5)
+
+            # Common properties -------------------------------------------------#
+            a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
+            a2.set_ylabel("Sample Deviation [" + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+            # ----------------------------
+            # a1.legend(loc='upper left')
+            # axp.legend(loc='upper left')
+
+            # Define limits for X Bar Plots -----------------------#
+            a1.axhline(y=hMeanB, color="green", linestyle="-", linewidth=1)
+            a1.axhspan(hLCLb, hUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
             # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-            a2.axhspan(hUCLb, hUSLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            a2.axhspan(hLSLb, hLCLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
+            a1.axhspan(hUCLb, hUSLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
+            a1.axhspan(hLSLb, hLCLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
             # clean up when Mean line changes ---
-            a2.axhspan(hUSLb, hUSLb + 0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-            a2.axhspan(hLSLb - 0.05, hLSLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+            a1.axhspan(hUSLb, hUSLb + 10, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+            a1.axhspan(hLSLb - 10, hLSLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+
+            # Define limits for S Bar Plot -----------------------#
+            a2.axhline(y=hDevB, color="green", linestyle="-", linewidth=1)
+            a2.axhspan(dLCLb, dUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
+
+            # clean up when Mean line changes ---
+            a2.axhspan(dUCLb, dUCLb + 0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+            a2.axhspan(dLCLb - 0.05, dLCLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
 
             # Model data --------------------------------------------------[]
             a1.plot([1857, 848, 1984, 529, 1740, 1136, 1012, 723, 1791, 600])
             a2.plot([-1.78, -1.0, -0.8, -1.3, -0.89, -0.92, -1.2, -1.5, -1.6, -0.85])
             # -------------------------------------------------------------[]
-            # Calibrate the rest of the Plots -----------------------------------#
+            # Calibrate the rest of the Plots -----------------------------#
 
-            # Define limits for Roller Force XBar Plots -----------------------[A]
-            a3.axhline(y=hMeanB, color="green", linestyle="-", linewidth=1)
-            a3.axhspan(hLCLb, hUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
-            # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-            a3.axhspan(hUCLb, hUSLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            a3.axhspan(hLSLb, hLCLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            # clean up when Mean line changes ---
-            a3.axhspan(hUSLb, hUSLb + 10, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-            a3.axhspan(hLSLb - 10, hLSLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-
-            # Define limits for Tape Temp XBar Plots ---------------------------[B]
-            a4.axhline(y=hMeand, color="green", linestyle="-", linewidth=1)
-            a4.axhspan(hLCLd, hUCLd, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
-            # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-            a4.axhspan(hUCLd, hUSLd, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            a4.axhspan(hLSLd, hLCLd, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            # clean up when Mean line changes ---
-            a4.axhspan(hUSLd, hUSLd + 10, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-            a4.axhspan(hLSLd - 10, hLSLd, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-
-            # Statistical Feed --------------------------------[]:
-            a5.cla()
-            a5.get_yaxis().set_visible(False)
-            a5.get_xaxis().set_visible(False)
-            a5.text(0.466, 0.945, 'Process Performance Feed', fontsize=16, fontweight='bold', ha='center', va='center',
-                    transform=a5.transAxes)
-            # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
-            rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
-            rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
-            a5.add_patch(rect1)
-            a5.add_patch(rect2)
-            # ------- Process Performance Pp (the spread)---------------------
-            a5.text(0.145, 0.804, plabel, fontsize=12, fontweight='bold', ha='center', transform=a5.transAxes)
-            a5.text(0.328, 0.658, '#Pp', fontsize=28, fontweight='bold', ha='center', transform=a5.transAxes)
-            a5.text(0.650, 0.820, 'Ring ' + plabel + ' Data', fontsize=14, ha='left', transform=a5.transAxes)
-            a5.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a5.transAxes)
-            a5.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a5.transAxes)
-            a5.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a5.transAxes)
-            a5.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a5.transAxes)
-            # ------- Process Performance Ppk (Performance)--------------------#
-            a5.text(0.145, 0.403, PPerf, fontsize=12, fontweight='bold', ha='center', transform=a5.transAxes)
-            a5.text(0.328, 0.282, '#Ppk', fontsize=28, fontweight='bold', ha='center', transform=a5.transAxes)
-            a5.text(0.640, 0.420, 'Ring ' + PPerf + ' Data', fontsize=14, ha='left', transform=a5.transAxes)
-            # -----------------------------------------------------------------#
-            a5.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a5.transAxes)
-            a5.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a5.transAxes)
-            a5.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a5.transAxes)
-            a5.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a5.transAxes)
-            # ----- Pipe Position and SMC Status -----
-            a5.text(0.080, 0.090, 'Pipe Position: ' + pPos + '    Processing Layer #' + layer, fontsize=12, ha='left',
-                    transform=a5.transAxes)
-            a5.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a5.transAxes)
-
-        # Update Canvas -----------------------------------------------------[]
+        # Update Canvas ---------------------------------------------------[]
         canvas = FigureCanvasTkAgg(fig, self)
         canvas.get_tk_widget().pack(expand=False)
         # Activate Matplot tools ------------------[Uncomment to activate]
@@ -3373,7 +3556,7 @@ class cascadeViews(ttk.Frame):          # Load common Cascade and all object in 
 
 
 def userMenu():     # listener, myplash
-    print('Welcome to Dr Labs Multivariate SPC....')
+    print('Welcome to RL Synchronous SPC....')
     global sqlRO, metRO, root, HeadA, HeadB, vTFM, comboL, comboR, qType
 
     # splash = myplash
@@ -3395,7 +3578,7 @@ def userMenu():     # listener, myplash
     window_height = 580     #1080
     window_width = 950      #1920
 
-    root.title('Magma Synchronous SPC - ' + strftime("%a, %d %b %Y", gmtime()))
+    root.title('Synchronous SPC - ' + strftime("%a, %d %b %Y", gmtime()))
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
 
@@ -5070,7 +5253,10 @@ def userMenu():     # listener, myplash
 
             if messagebox.askokcancel("Warning!!!", "Current Visualisation will be lost!"):
                 tabb_clearOut()                                           # Clear out existing Tabbed View
-                cascadeViews()                                            # --- start parallel thread
+                cascadeCommonViewsRF()                                    # start parallel thread
+                cascadeCommonViewsCT()
+
+                print('\nStarting new GPU thread...')
                 # call function for parallel pipeline --------------------#
                 import CascadeSwitcher as cs
                 p1, p2, p3, p4, p5 = cs.myMain(rType)
@@ -5088,7 +5274,10 @@ def userMenu():     # listener, myplash
             process.entryconfig(3, state='normal')                      # set close display to normal
 
             # --- start parallel thread ----------------------------------#
-            cascadeViews()                                                   # Critical Production Params
+            # cascadeViews()                                                   # Critical Production Params
+            cascadeCommonViewsRF()                                             #start parallel thread
+            cascadeCommonViewsCT()
+
             import CascadeSwitcher as cs
             p1, p2, p3, p4, p5 = cs.myMain(rType)                            # call function for parallel pipeline
             exit_bit.append(1)
@@ -5102,10 +5291,13 @@ def userMenu():     # listener, myplash
             process.entryconfig(3, state='normal')
 
             # --- start parallel thread ------------------------------#
-            cascadeViews()                                                  # Critical Production Params
+            # cascadeViews()                                                  # Critical Production Params
+            cascadeCommonViewsRF()                                            # start parallel thread
+            cascadeCommonViewsCT()
+
             import CascadeSwitcher as cs
 
-            p1, p2, p3, p4, p5 = cs.myMain(rType)                                # call function for parallel pipeline
+            p1, p2, p3, p4, p5 = cs.myMain(rType)                             # call function for parallel pipeline
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
