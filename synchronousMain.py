@@ -11,17 +11,16 @@ import numpy as np
 import pandas as pd
 import spcWatchDog as wd
 
-import selPlcColumnsTFM as vq
 # -------SQL Query ------------#
-import selSqlColsOEE as qo
-import selSqlColsCT as qc
-import selSqlColsRF as qf
+import selDataColsOEE as qo
+import selDataColsCT as qc
+import selDataColsRF as qf
 
-import selSqlColsTG as qg
-import selSqlColsWS as qw
-import selSqlColsST as qs
-import selSqlColsTT as qt
-import selSqlColsRP as qp
+import selDataColsTG as qg
+import selDataColsWS as qw
+import selDataColsST as qs
+import selDataColsTT as qt
+import selDataColsRP as qp
 
 # import rlMethodVoidData as rl
 # -----------------------------#
