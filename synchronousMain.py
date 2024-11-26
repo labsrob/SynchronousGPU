@@ -13,16 +13,17 @@ import spcWatchDog as wd
 
 import selPlcColumnsTFM as vq
 # -------SQL Query ------------#
-import selSqlColsOEE as qe
-import selSqlColsCT as qt
+import selSqlColsOEE as qo
+import selSqlColsCT as qc
 import selSqlColsRF as qf
+
 import selSqlColsTG as qg
 import selSqlColsWS as qw
 import selSqlColsST as qs
-import selSqlColsTT as qr
+import selSqlColsTT as qt
 import selSqlColsRP as qp
 
-import rlMethodVoidData as qrl
+# import rlMethodVoidData as rl
 # -----------------------------#
 import time
 import os
@@ -582,13 +583,12 @@ class common_OEE(ttk.Frame):
         def asynchronousOEE(db_freq):
 
             timei = time.time()                                 # start timing the entire loop
-            # declare asynchronous variables ------------------[]
             # Call data loader Method---------------------------#
             oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
 
             import oeVarSQL as qoe                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
-            g1 = qe.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
+            g1 = qo.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
             df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe
             OE = qoe.loadProcesValues(df3)                      # Join data values under dataframe
             print('\nDataFrame Content', df3.head(10))          # Preview Data frame head
@@ -984,7 +984,7 @@ class common_CT(ttk.Frame):     # PRODUCTION PARAM - CELL TENSION --------------
 
             import ctVarSQL as qct                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
-            g1 = qt.validCols('CT')                             # Construct Data Column selSqlColumnsTFM.py
+            g1 = qc.validCols('CT')                             # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(ctData, columns=g1)              # Import into python Dataframe
             CT = qct.loadProcesValues(df1)                      # Join data values under dataframe
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
@@ -1463,7 +1463,7 @@ class rollerPressure(ttk.Frame):            # -- Defines the tabbed region for Q
             else:
                 import rfVarSQL as qrf  # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
-                g1 = qq.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
+                g1 = qp.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(rpData, columns=g1)  # Import into python Dataframe
                 RP = qrf.loadProcesValues(df1)  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
@@ -1911,7 +1911,7 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
             else:
                 import rfVarSQL as qrf  # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
-                g1 = qq.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
+                g1 = qt.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(rpData, columns=g1)  # Import into python Dataframe
                 TT = qrf.loadProcesValues(df1)  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
@@ -2351,16 +2351,16 @@ class substTemp(ttk.Frame):     # -- Defines the tabbed region for QA param - Su
                 import rfVarPLC as qrf
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
-                columns = vq.validColsPLCData()  # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(rpData, columns=columns)  # Include table data into python Dataframe
-                ST = qrf.loadProcesValues(df1)  # Join data values under dataframe
+                columns = vq.validColsPLCData()                 # Load defined valid columns for PLC Data
+                df1 = pd.DataFrame(rpData, columns=columns)     # Include table data into python Dataframe
+                ST = qrf.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import rfVarSQL as qrf  # load SQL variables column names | rfVarSQL
+                import rfVarSQL as qrf                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
-                g1 = qq.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(rpData, columns=g1)  # Import into python Dataframe
-                ST = qrf.loadProcesValues(df1)  # Join data values under dataframe
+                g1 = qs.validCols('WS')                         # Construct Data Column selSqlColumnsTFM.py
+                df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
+                ST = qrf.loadProcesValues(df1)                  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
 
@@ -2746,7 +2746,7 @@ class windingSpeed(ttk.Frame):     # -- Defines the tabbed region for QA param -
             else:
                 import rfVarSQL as qrf  # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
-                g1 = qq.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
+                g1 = qw.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(wsData, columns=g1)  # Import into python Dataframe
                 WS = qrf.loadProcesValues(df1)  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
@@ -3122,7 +3122,7 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
             else:
                 import rfVarSQL as qrf                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
-                g1 = qq.validCols('TG')                         # Construct Data Column selSqlColumnsTFM.py
+                g1 = qg.validCols('TG')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(tgData, columns=g1)          # Import into python Dataframe
                 TG = qrf.loadProcesValues(df1)                  # Join data values under dataframe
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
@@ -5178,7 +5178,7 @@ def userMenu():     # listener, myplash
         inUse = len(root.winfo_children())
         print('TP2', inUse)
         if inUse == 9:
-            root.winfo_children()[9].destroy()
+            # root.winfo_children()[9].destroy()
             root.winfo_children()[8].destroy()
             root.winfo_children()[7].destroy()
             root.winfo_children()[6].destroy()

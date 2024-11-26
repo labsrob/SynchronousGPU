@@ -10,7 +10,8 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'OEE':
-        columns = ['TimeLine', 'CurrentLayer', 'TransitionCode', 'Description', 'Duration(Sec)', 'PipePosition', 'PipeDiameter', 'UserMessage']
+        columns = ['TimeLine', 'CurrentLayer', 'TransitionCode', 'Description', 'Duration(Sec)', 'PipePosition',
+                   'PipeDiameter', 'UserMessage']
     else:
         print('Invalid Columns or Query error...')
 
