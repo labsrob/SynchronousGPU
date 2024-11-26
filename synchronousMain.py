@@ -10,8 +10,20 @@
 import numpy as np
 import pandas as pd
 import spcWatchDog as wd
+
 import selPlcColumnsTFM as vq
-import selSqlColumnsTFM as qq
+# -------SQL Query ------------#
+import selSqlColsOEE as qe
+import selSqlColsCT as qt
+import selSqlColsRF as qf
+import selSqlColsTG as qg
+import selSqlColsWS as qw
+import selSqlColsST as qs
+import selSqlColsTT as qr
+import selSqlColsRP as qp
+
+import rlMethodVoidData as qrl
+# -----------------------------#
 import time
 import os
 import sys
@@ -38,8 +50,10 @@ import qParamsHL as mq
 import pWON_finder as sqld
 import qParameterLP as hla
 # ------------------------------------------------------------------------[]
+runStatus = 0
 
 cpTapeW, cpLayerNo, runType = [], [], []
+OTlayr, EPpos, pStatus = [], [], []
 HeadA, HeadB, vTFM = 0, 0, 0
 hostConn = 0
 optm = True
@@ -523,6 +537,8 @@ class common_OEE(ttk.Frame):
         a3.cla()
         a3.get_yaxis().set_visible(False)
         a3.get_xaxis().set_visible(False)
+        if not runStatus:
+            a3.pie([1, 7, 0, 5, 9, 6], shadow=True)
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
         def synchronousOEE(smp_Sz, smp_St, fetchT):
@@ -570,27 +586,27 @@ class common_OEE(ttk.Frame):
             # Call data loader Method---------------------------#
             oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
 
-            import rfVarSQL as qrf                              # load SQL variables column names | rfVarSQL
+            import oeVarSQL as qoe                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
-            g1 = qq.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
+            g1 = qe.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
             df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe
-            OE = qrf.loadProcesValues(df3)                      # Join data values under dataframe
+            OE = qoe.loadProcesValues(df3)                      # Join data values under dataframe
             print('\nDataFrame Content', df3.head(10))          # Preview Data frame head
             print("Memory Usage:", df3.info(verbose=False))     # Check memory utilization
 
             # --------------------------------
             # Allow the following code to run despite not on DNV condition ----------------#
             # TODO replace with process variable
-            cLayer = df3['CurrentLayer']  # .tail(1)
-            status = df3['Description'][1]  # .tail(1)
-            curLayer = list(set(cLayer))  # shuffle list to obtain unique layer number at a time
+            cLayer = OE[1]
+            status = OE[3]
+            curLayer = list(set(cLayer))            # shuffle list to obtain unique layer number at a time
             if len(curLayer) > 1:
                 lastE = len(curLayer)
-                curLayer = curLayer[lastE - 1]  # print the last index element
+                curLayer = curLayer[lastE - 1]      # print the last index element
             # ---------------------------------
             # if VarPerHeadA or VarPerHeadB or VariProcess:
-            OTlayr.append(curLayer[0])  # Post values into static array
-            EPpos.append('N/A')  # Insert pipe position is available
+            OTlayr.append(curLayer[0])              # Post values into static array
+            EPpos.append('N/A')                     # Insert pipe position is available
             pStatus.append(status)
             print('\nTP05[Layer/Status]:', curLayer[0], status)
             # ----------------------------------------------------------------------------#
@@ -603,20 +619,20 @@ class common_OEE(ttk.Frame):
             print('\nCurrent Time:', currentTime)
 
             # Compute essential variables ------------------------------- TODO verify filter *****
-            dayShiftTime = df3[(df3['TimeLine'] >= Start_Day) & (df3['TimeLine'] <= currentTime)]
+            dayShiftTime = df3[(df3['TimeLine'] >= sStart) & (df3['TimeLine'] <= currentTime)]
 
             totalRun = dayShiftTime.copy()
             totalRun = totalRun.drop_duplicates(subset='TimeLine', keep='first')
             # print('Total Run:', totalRun)
 
             # Convert Shift start time to string format -----------------
-            shiftStartTime = str(datetime.strptime(Start_Day, "%H:%M:%S").time())
-            shiftEndTime = str(datetime.strptime(FinishDay, "%H:%M:%S").time())
+            shiftStartTime = str(datetime.strptime(sStart, "%H:%M:%S").time())
+            shiftEndTime = str(datetime.strptime(sStops, "%H:%M:%S").time())
             print("Shift Starts:", shiftStartTime)
             print("Shift Ends @:", shiftEndTime)
 
             # Compute production lapse time -----------------------------
-            TShiftSec = datetime.strptime(FinishDay, '%H:%M:%S') - datetime.strptime(shiftStartTime, '%H:%M:%S')
+            TShiftSec = datetime.strptime(sStops, '%H:%M:%S') - datetime.strptime(shiftStartTime, '%H:%M:%S')
             ShiftinSec = TShiftSec.total_seconds()  # Convert values into seconds
             print('=' * 22)
             print('Shift Hours:', ShiftinSec, '(Sec)')
@@ -636,17 +652,14 @@ class common_OEE(ttk.Frame):
             print('-' * 28)
 
             endShiftHour = (ShiftinSec - prodTime)
-
             pieData = np.array([endShiftHour, prodTime, downtime])
             segexplode = [0, 0, 0.1]
 
             ind_metric = ['Current Shift', 'Production Time', 'OEE Time']
-
             # Pie Chart Plot ---------------------
             mycol = ['#4c72b0', 'green', 'orange']          # add colors
-            # a3.pie(pieData, labels=ind_metric, startangle=90, explode=segexplode, shadow=True, autopct='%1.1f%%',
-            #         colors=mycol, textprops={'fontsize': 10})
-            a3.pie([1, 7, 0, 5, 9, 6], shadow=True)
+            a3.pie(pieData, labels=ind_metric, startangle=90, explode=segexplode, shadow=True, autopct='%1.1f%%',
+                    colors=mycol, textprops={'fontsize': 10})
             if not HeadA:   # if HeadA (synchronous)
                 a3.set_title('Post Production Status', fontsize=12, fontweight='bold')
             else:
@@ -787,7 +800,7 @@ class common_RF(ttk.Frame):     # PRODUCTION PARAM - ROLLER FORCE --------------
 
             import rfVarSQL as qrf                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
-            g1 = qq.validCols('RF')                             # Construct Data Column selSqlColumnsTFM.py
+            g1 = qf.validCols('RF')                             # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(rfSQL, columns=g1)              # Import into python Dataframe
             RF = qrf.loadProcesValues(df1)                      # Join data values under dataframe
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
@@ -971,7 +984,7 @@ class common_CT(ttk.Frame):     # PRODUCTION PARAM - CELL TENSION --------------
 
             import ctVarSQL as qct                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
-            g1 = qq.validCols('CT')                             # Construct Data Column selSqlColumnsTFM.py
+            g1 = qt.validCols('CT')                             # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(ctData, columns=g1)              # Import into python Dataframe
             CT = qct.loadProcesValues(df1)                      # Join data values under dataframe
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
