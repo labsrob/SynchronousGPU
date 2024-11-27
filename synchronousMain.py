@@ -1452,23 +1452,23 @@ class rollerPressure(ttk.Frame):            # -- Defines the tabbed region for Q
             UsePLC_DBS = pType  # Query Type
 
             # Call data loader Method---------------------------#
-            rpData = synchronousRP(rpSize, rpgType, db_freq)  # data loading functions
+            rpData = synchronousRP(rpSize, rpgType, db_freq)    # data loading functions
             if UsePLC_DBS == 1:
-                import rfVarPLC as qrf
+                import rpVarPLC as qrp
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
-                columns = vq.validColsPLCData()  # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(rpData, columns=columns)  # Include table data into python Dataframe
-                RP = qrf.loadProcesValues(df1)  # Join data values under dataframe
+                columns = qp.validCols('WS')                    # Load defined valid columns for PLC Data
+                df1 = pd.DataFrame(rpData, columns=columns)     # Include table data into python Dataframe
+                RP = qrp.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import rfVarSQL as qrf  # load SQL variables column names | rfVarSQL
+                import rpVarSQL as qrp                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
-                g1 = qp.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(rpData, columns=g1)  # Import into python Dataframe
-                RP = qrf.loadProcesValues(df1)  # Join data values under dataframe
+                g1 = qp.validCols('WS')                         # Construct Data Column selSqlColumnsTFM.py
+                df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
+                RP = qrp.loadProcesValues(df1)                  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
-            print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
+            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
             # -------------------------------------------------------------------------------------[]
             # Plot X-Axis data points -------- X Plot
@@ -1900,23 +1900,23 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
             UsePLC_DBS = pType  # Query Type
 
             # Call data loader Method---------------------------#
-            rpData = synchronousTT(ttSize, ttgType, db_freq)  # data loading functions
+            ttData = synchronousTT(ttSize, ttgType, db_freq)    # data loading functions
             if UsePLC_DBS == 1:
-                import rfVarPLC as qrf
+                import ttVarPLC as qtt
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
-                columns = vq.validColsPLCData()  # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(rpData, columns=columns)  # Include table data into python Dataframe
-                TT = qrf.loadProcesValues(df1)  # Join data values under dataframe
+                columns = qt.validCols('WS')                    # Load defined valid columns for PLC Data
+                df1 = pd.DataFrame(ttData, columns=columns)     # Include table data into python Dataframe
+                TT = qtt.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import rfVarSQL as qrf  # load SQL variables column names | rfVarSQL
+                import ttVarSQL as qtt                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
-                g1 = qt.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(rpData, columns=g1)  # Import into python Dataframe
-                TT = qrf.loadProcesValues(df1)  # Join data values under dataframe
+                g1 = qt.validCols('WS')                         # Construct Data Column selSqlColumnsTFM.py
+                df1 = pd.DataFrame(ttData, columns=g1)          # Import into python Dataframe
+                TT = qtt.loadProcesValues(df1)                  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
-            print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
+            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
             # -------------------------------------------------------------------------------------[]
             # Plot X-Axis data points -------- X Plot
@@ -2349,19 +2349,19 @@ class substTemp(ttk.Frame):     # -- Defines the tabbed region for QA param - Su
             # Call data loader Method---------------------------#
             rpData = synchronousST(stSize, stgType, db_freq)  # data loading functions
             if UsePLC_DBS == 1:
-                import rfVarPLC as qrf
+                import rfVarPLC as qst
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
-                columns = vq.validColsPLCData()                 # Load defined valid columns for PLC Data
+                columns = qs.validCols('WS')                    # Load defined valid columns for PLC Data
                 df1 = pd.DataFrame(rpData, columns=columns)     # Include table data into python Dataframe
-                ST = qrf.loadProcesValues(df1)                  # Join data values under dataframe
+                ST = qst.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import rfVarSQL as qrf                          # load SQL variables column names | rfVarSQL
+                import rfVarSQL as qst                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qs.validCols('WS')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
-                ST = qrf.loadProcesValues(df1)                  # Join data values under dataframe
+                ST = qst.loadProcesValues(df1)                  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
 
@@ -2737,21 +2737,21 @@ class windingSpeed(ttk.Frame):     # -- Defines the tabbed region for QA param -
             # Call data loader Method---------------------------#
             wsData = synchronousWS(wsSize, wsgType, db_freq)  # data loading functions
             if UsePLC_DBS == 1:
-                import rfVarPLC as qrf
+                import rfVarPLC as qws
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
-                columns = vq.validColsPLCData()  # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(wsData, columns=columns)  # Include table data into python Dataframe
-                WS = qrf.loadProcesValues(df1)  # Join data values under dataframe
+                columns = qw.validCols('WS')                    # Load defined valid columns for PLC Data
+                df1 = pd.DataFrame(wsData, columns=columns)     # Include table data into python Dataframe
+                WS = qws.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import rfVarSQL as qrf  # load SQL variables column names | rfVarSQL
+                import rfVarSQL as qws                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
-                g1 = qw.validCols('WS')  # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(wsData, columns=g1)  # Import into python Dataframe
-                WS = qrf.loadProcesValues(df1)  # Join data values under dataframe
+                g1 = qw.validCols('WS')                         # Construct Data Column selSqlColumnsTFM.py
+                df1 = pd.DataFrame(wsData, columns=g1)          # Import into python Dataframe
+                WS = qws.loadProcesValues(df1)                  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
-            print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
+            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
             # -------------------------------------------------------------------------------------[]
             # Plot X-Axis data points -------- X Plot
@@ -2897,7 +2897,10 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
+        # define region ------
         self.create_widgets()
+        self.loadCum_Profile()
+        self.loadVoid_Profile()
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
@@ -2939,18 +2942,18 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
 
         # -------------------------------------------[End of Tape Gap]
 
-        label = ttk.Label(self, text='['  ' Mode]', font=LARGE_FONT)
-        label.pack(padx=10, pady=5)
+        label = ttk.Label(self, text='[' +rType+ ' Mode]', font=LARGE_FONT)
+        label.pack(padx=10, pady=8)     # 10 | 5
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)
-        f.subplots_adjust(left=0.029, bottom=0.05, right=0.99, top=0.955, wspace=0.117, hspace=0.157)
+        f = Figure(figsize=(10, 8), dpi=100)                    # 25,  = 12 | 8
+        f.subplots_adjust(left=0.057, bottom=0.033, right=0.979, top=0.955, wspace=0.18, hspace=0.167)
         # ---------------------------------[]
-        a1 = f.add_subplot(2, 5, (1, 2))                            # xbar plot
-        a2 = f.add_subplot(2, 5, (3, 4))                            # cumulative plot
-        a3 = f.add_subplot(2, 5, (6, 7))                            # s bar plot
-        a4 = f.add_subplot(2, 5, (8, 9))                            # cumulative contours
-        a5 = f.add_subplot(2, 5, (5, 10))                           # CPk/PPk Feed
+        a1 = f.add_subplot(2, 1, 1)                              # xbar plot
+        # a2 = f.add_subplot(2, 5, (3, 4))                       # cumulative profile
+        a3 = f.add_subplot(2, 1, 2)                              # s bar plot
+        # a4 = f.add_subplot(2, 5, (8, 9))                            # void mapping profile
+        # a5 = f.add_subplot(2, 5, (5, 10))                           # CPk/PPk Feed
 
         # ----------------------------------------------------------[H]
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
@@ -2965,6 +2968,12 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
         a3.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
         a1.set_title('Tape Gap [XBar Plot]', fontsize=12, fontweight='bold')
         a3.set_title('Tape Gap [S Plot]', fontsize=12, fontweight='bold')
+
+        # a2.set_title('Cumulative Profile - [TG]', fontsize=12, fontweight='bold')
+        # a4.set_title('Void Mapping Profile - [TG]', fontsize=12, fontweight='bold')
+        # a2.set_ylabel("Mean of Mean ")
+        # a4.set_ylabel("2D - Stacked Layer")
+
         a1.grid(color="0.5", linestyle='-', linewidth=0.5)
         a3.grid(color="0.5", linestyle='-', linewidth=0.5)
         a1.legend(loc='upper left', title='XBar Plot')
@@ -2977,9 +2986,9 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
         a3.set_xlim([window_Xmin, window_Xmax])
 
         # ----------------------------------------------------------[]
-        a5.cla()
-        a5.get_yaxis().set_visible(False)
-        a5.get_xaxis().set_visible(False)
+        # a5.cla()
+        # a5.get_yaxis().set_visible(False)
+        # a5.get_xaxis().set_visible(False)
         # ----------------------------------------------------------[]
         # Define Plot area and axes -
         # ----------------------------------------------------------#
@@ -2987,49 +2996,53 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
         im11, = a1.plot([], [], 'o-', label='Tape Gap(mm) - (B1)')
         im12, = a1.plot([], [], 'o-', label='Tape Gap(mm) - (A2)')
         im13, = a1.plot([], [], 'o-', label='Tape Gap(mm) - (B2)')
-        im14, = a1.plot([], [], 'o-', label='Tape Gap(°C) - (A3)')
-        im15, = a1.plot([], [], 'o-', label='Tape Gap(°C) - (B3)')
-        im16, = a1.plot([], [], 'o-', label='Tape Gap(°C) - (A4)')
-        im17, = a1.plot([], [], 'o-', label='Tape Gap(°C) - (B4)')
+        im14, = a1.plot([], [], 'o-', label='Tape Gap(mm) - (A3)')
+        im15, = a1.plot([], [], 'o-', label='Tape Gap(mm) - (B3)')
+        im16, = a1.plot([], [], 'o-', label='Tape Gap(mm) - (A4)')
+        im17, = a1.plot([], [], 'o-', label='Tape Gap(mm) - (B4)')
         # ------------ S Bar Plot ------------------------------
-        im18, = a2.plot([], [], 'o-', label='Tape Gap(mm)')
-        im19, = a2.plot([], [], 'o-', label='Tape Gap(mm)')
-        im20, = a2.plot([], [], 'o-', label='Tape Gap(mm)')
-        im21, = a2.plot([], [], 'o-', label='Tape Gap(mm)')
-        im22, = a2.plot([], [], 'o-', label='Tape Gap(mm)')
-        im23, = a2.plot([], [], 'o-', label='Tape Gap(mm)')
-        im24, = a2.plot([], [], 'o-', label='Tape Gap(mm)')
-        im25, = a2.plot([], [], 'o-', label='Tape Gap(mm)')
+        im18, = a3.plot([], [], 'o-', label='Tape Gap(mm)')
+        im19, = a3.plot([], [], 'o-', label='Tape Gap(mm)')
+        im20, = a3.plot([], [], 'o-', label='Tape Gap(mm)')
+        im21, = a3.plot([], [], 'o-', label='Tape Gap(mm)')
+        im22, = a3.plot([], [], 'o-', label='Tape Gap(mm)')
+        im23, = a3.plot([], [], 'o-', label='Tape Gap(mm)')
+        im24, = a3.plot([], [], 'o-', label='Tape Gap(mm)')
+        im25, = a3.plot([], [], 'o-', label='Tape Gap(mm)')
 
         # Statistical Feed ------------------------------------------[]
-        a5.text(0.466, 0.945, 'Performance Feed - TG', fontsize=16, fontweight='bold', ha='center', va='center',
-                transform=a5.transAxes)
-        # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
-        rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
-        rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
-        a5.add_patch(rect1)
-        a5.add_patch(rect2)
-        # ------- Process Performance Pp (the spread)----------------[]
-        a5.text(0.145, 0.804, tglabel, fontsize=12, fontweight='bold', ha='center', transform=a5.transAxes)
-        a5.text(0.328, 0.658, '#Pp Value', fontsize=22, fontweight='bold', ha='center', transform=a5.transAxes)
-        a5.text(0.650, 0.820, 'Ring ' + tglabel + ' Data', fontsize=14, ha='left', transform=a5.transAxes)
-        a5.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a5.transAxes)
-        a5.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a5.transAxes)
-        a5.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a5.transAxes)
-        a5.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a5.transAxes)
-        # ------- Process Performance Ppk (Performance)--------------[]
-        a5.text(0.145, 0.403, tgPerf, fontsize=12, fontweight='bold', ha='center', transform=a5.transAxes)
-        a5.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=a5.transAxes)
-        a5.text(0.640, 0.420, 'Ring ' + tgPerf + ' Data', fontsize=14, ha='left', transform=a5.transAxes)
-        # -----------------------------------------------------------[]
-        a5.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a5.transAxes)
-        a5.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a5.transAxes)
-        a5.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a5.transAxes)
-        a5.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a5.transAxes)
-        # ----- Pipe Position and SMC Status -----
-        a5.text(0.080, 0.090, 'Pipe Position: ' + pPos + '    Processing Layer #' + layer, fontsize=12, ha='left',
-                transform=a5.transAxes)
-        a5.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a5.transAxes)
+        # a5.text(0.466, 0.945, 'Performance Feed - TG', fontsize=16, fontweight='bold', ha='center', va='center',
+        #         transform=a5.transAxes)
+        # # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
+        # rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
+        # rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
+        # a5.add_patch(rect1)
+        # a5.add_patch(rect2)
+        # # ------- Process Performance Pp (the spread)----------------[]
+        # a5.text(0.145, 0.804, tglabel, fontsize=12, fontweight='bold', ha='center', transform=a5.transAxes)
+        # a5.text(0.328, 0.658, '#Pp Value', fontsize=22, fontweight='bold', ha='center', transform=a5.transAxes)
+        # a5.text(0.650, 0.820, 'Ring ' + tglabel + ' Data', fontsize=14, ha='left', transform=a5.transAxes)
+        # a5.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a5.transAxes)
+        # a5.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a5.transAxes)
+        # a5.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a5.transAxes)
+        # a5.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a5.transAxes)
+        # # ------- Process Performance Ppk (Performance)--------------[]
+        # a5.text(0.145, 0.403, tgPerf, fontsize=12, fontweight='bold', ha='center', transform=a5.transAxes)
+        # a5.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=a5.transAxes)
+        # a5.text(0.640, 0.420, 'Ring ' + tgPerf + ' Data', fontsize=14, ha='left', transform=a5.transAxes)
+        # # -----------------------------------------------------------[]
+        # a5.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a5.transAxes)
+        # a5.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a5.transAxes)
+        # a5.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a5.transAxes)
+        # a5.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a5.transAxes)
+        # # ----- Pipe Position and SMC Status -----
+        # a5.text(0.080, 0.090, 'Pipe Position: ' + pPos + '    Processing Layer #' + layer, fontsize=12, ha='left',
+        #         transform=a5.transAxes)
+        # a5.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a5.transAxes)
+
+        # TODO Call additional prolific functions ------------[try pooling data from SQL repo]
+        # loadSqlCumProfile(ttk.Frame)
+        # loadSqlVoidMapping()
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
         def synchronousTG(smp_Sz, smp_St, fetchT):
@@ -3114,27 +3127,21 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
             tgData = synchronousTG(smp_Sz, stp_Sz, db_freq)      # data loading functions
 
             if UsePLC_DBS == 1:
-                import rfVarPLC as qrf
+                import tgVarPLC as qtg
                 viz_cycle = 10
-                columns = vq.validColsPLCData()                 # Load defined valid columns for PLC Data
+                columns = qg.validCols('TG')                    # Load defined valid columns for PLC Data
                 df1 = pd.DataFrame(tgData, columns=columns)     # Include table data into python Dataframe
-                TG = qrf.loadProcesValues(df1)                  # Join data values under dataframe
+                TG = qtg.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import rfVarSQL as qrf                          # load SQL variables column names | rfVarSQL
+                import tgVarSQL as qtg                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qg.validCols('TG')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(tgData, columns=g1)          # Import into python Dataframe
-                TG = qrf.loadProcesValues(df1)                  # Join data values under dataframe
+                TG = qtg.loadProcesValues(df1)                  # Join data values under dataframe
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
-            # Declare Plots attributes ------------------------------------------------------------[]
-            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a1.legend(loc='upper left', title='XBar Plot')
-            a2.legend(loc='upper right', title='SDev Plot')
-            # -------------------------------------------------------------------------------------[]
             # Plot X-Axis data points -------- X Plot
             im10.set_xdata(np.arange(db_freq))
             im11.set_xdata(np.arange(db_freq))
@@ -3228,12 +3235,68 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)
         # Activate Matplot tools ------------------[Uncomment to activate]
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(expand=True)
+
+    # ------------------------------------------[B]
+    def loadCum_Profile(self):
+        label = ttk.Label(self, text="Cumulative Profile - [TG]", font=LARGE_FONT)
+        label.pack(padx=1800, pady=8)
+
+        # Define Axes ---------------------#
+        fig = Figure(figsize=(12, 4), dpi=100)  # 13
+        fig.subplots_adjust(left=0.048, bottom=0.093, right=0.993, top=0.952, hspace=0.14, wspace=0.195)
+        a1 = fig.add_subplot(1, 1, 1)
+
+        # Declare Plots attributes --------------------------------[]
+        plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
+        # Calibrate limits for X-moving Axis -----------------------#
+        YScale_minTG, YScale_maxTG = hLSLa - 8.5, hUSLa + 8.5
+        window_Xmin, window_Xmax = 0, (int(sSize) + 3)  # windows view = visible data points
+        # ----------------------------------------------------------#
+        a1.set_ylabel("Accumulated Average Gap Measurement & Average Gap Mean")
+        a1.set_xlabel("Progressive Layer ")
+        # -----Canvas update --------------------------------------------[]
+        canvas = FigureCanvasTkAgg(fig, self)
+        canvas.get_tk_widget().pack(expand=False)
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        # toolbar = NavigationToolbar2Tk(canvas, self)
+        # toolbar.update()
+        # canvas._tkcanvas.pack(expand=True)
+
+        # -------------------
+
+    def loadVoid_Profile(self):
+        label = ttk.Label(self, text="Void Mapping Profile - [TG]", font=LARGE_FONT)
+        label.pack(padx=1800, pady=10)
+
+        # Define Axes ---------------------#
+        fig = Figure(figsize=(12, 4), dpi=100)  # 13
+        fig.subplots_adjust(left=0.04, bottom=0.170, right=0.988, top=0.957, hspace=0.14, wspace=0.195)
+        a1 = fig.add_subplot(1, 1, 1)
+
+        # Declare Plots attributes --------------------------------[]
+        plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
+        # Calibrate limits for X-moving Axis -----------------------#
+        YScale_minTG, YScale_maxTG = hLSLa - 8.5, hUSLa + 8.5
+        window_Xmin, window_Xmax = 0, (int(sSize) + 3)  # windows view = visible data points
+        # ----------------------------------------------------------#
+        a1.set_ylabel("2D - Staked Layer Void Mapping")
+        a1.set_xlabel("Sample Distance (mt)")
+
+        # -----Canvas update --------------------------------------------[]
+        canvas = FigureCanvasTkAgg(fig, self)
+        canvas.get_tk_widget().pack(expand=False)
+        # Activate Matplot tools ------------------[Uncomment to activate]
         # toolbar = NavigationToolbar2Tk(canvas, self)
         # toolbar.update()
         # canvas._tkcanvas.pack(expand=True)
 
 
 # --------------------------------------------- CASCADE VIEW CLASSES -----------------------------------------------[]
+
+
 # FIXME -----------------------------------------------------------------------------------------------------[]
 
 class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
@@ -3243,15 +3306,15 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
         self.createWidgetsRF()
 
     def createWidgetsRF(self):
-        label = ttk.Label(self, text="Monitoring: Critical Production Parameters", font=LARGE_FONT)
+        label = ttk.Label(self, text="Production Parameter - RF", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
         # Define Axes ---------------------#
         # fig = Figure(figsize=(25, 12), dpi=100)   # 13
-        fig = Figure(figsize=(13, 7), dpi=100)      # 13
+        fig = Figure(figsize=(12, 7), dpi=100)      # 13
 
         # Attempt to auto screen size ---
-        fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+        fig.subplots_adjust(left=0.04, bottom=0.033, right=0.988, top=0.957, hspace=0.14, wspace=0.195)
 
         # Declare Plots attributes --------------------------------[]
         plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
@@ -3468,19 +3531,19 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
 class cascadeCommonViewsCT(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.place(x=1010, y=10)
+        self.place(x=1350, y=10)
         self.createWidgetsCT()
 
     def createWidgetsCT(self):
-        label = ttk.Label(self, text="Monitoring: Critical Production Parameters", font=LARGE_FONT)
+        label = ttk.Label(self, text="Production Parameter - CT", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
         # Define Axes ---------------------#
         # fig = Figure(figsize=(25, 12), dpi=100)   # 13
-        fig = Figure(figsize=(13, 7), dpi=100)  # 13
+        fig = Figure(figsize=(12, 7), dpi=100)  # 13
 
         # Attempt to auto screen size ---
-        fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+        fig.subplots_adjust(left=0.043, bottom=0.038, right=0.986, top=0.96, hspace=0.14, wspace=0.195)
 
         # Declare Plots attributes --------------------------------[]
         plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
@@ -3537,11 +3600,114 @@ class cascadeCommonViewsCT(ttk.Frame):          # Load common Cascade and all ob
             a2.axhspan(dUCLb, dUCLb + 0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
             a2.axhspan(dLCLb - 0.05, dLCLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
 
-            # Model data --------------------------------------------------[]
-            a1.plot([1857, 848, 1984, 529, 1740, 1136, 1012, 723, 1791, 600])
-            a2.plot([-1.78, -1.0, -0.8, -1.3, -0.89, -0.92, -1.2, -1.5, -1.6, -0.85])
-            # -------------------------------------------------------------[]
-            # Calibrate the rest of the Plots -----------------------------#
+        # Model data --------------------------------------------------[]
+        a1.plot([105, 120, 114, 109, 110, 86, 102, 103, 101, 100])
+        # -------------------------------------------------------------[]
+        # Calibrate the rest of the Plots -----------------------------#
+        # ----------------------------------------------------------[]
+        # Define Plot area and axes -
+        # ----------------------------------------------------------#
+        im10, = a1.plot([], [], 'o-', label='Cell Tension A (N/mm2)')
+        im11, = a1.plot([], [], 'o-', label='Cell tension B (N/mm2)')
+
+
+        # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
+        def synchronousCT(smp_Sz, smp_St, fetchT):
+            fetch_no = str(fetchT)  # entry value in string sql syntax
+            # Obtain SQL Data Host Server ---------------------------[]
+            qRP = conn.cursor()
+
+            # Evaluate conditions for SQL Data Fetch ---------------[A]
+            """
+            Load watchdog function with synchronous function every seconds
+            """
+            # Initialise RT variables ---[]
+            autoSpcRun = True
+            autoSpcPause = False
+            import keyboard  # for temporary use
+
+            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+            # Define PLC/SMC error state -------------------------------------------#
+
+            while True:
+                # print('Indefinite looping...')
+                import sqlArrayRLmethodCT as ct  # DrLabs optimization method
+                inProgress = True  # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+
+                # Get list of relevant SQL Tables using conn() --------------------[]
+                ctData = ct.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)  # perform DB connections
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    qRP.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
+
+            return ctData
+
+        # ================== End of synchronous Method ==========================
+
+        def asynchronousCT(db_freq):
+
+            timei = time.time()  # start timing the entire loop
+            # declare asynchronous variables ------------------[]
+            # Call data loader Method---------------------------#
+            ctSQL = synchronousCT(smp_Sz, stp_Sz, db_freq)      # data loading functions
+
+            import ctVarSQL as qct                              # load SQL variables column names | rfVarSQL
+            viz_cycle = 150
+            g1 = qc.validCols('CT')                             # Construct Data Column selSqlColumnsTFM.py
+            df1 = pd.DataFrame(ctSQL, columns=g1)               # Import into python Dataframe
+            RF = qct.loadProcesValues(df1)                      # Join data values under dataframe
+            print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
+            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+
+            # Declare Plots attributes ------------------------------------------------------------[]
+            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+            a1.legend(loc='upper left', title='XBar Plot')
+            # -------------------------------------------------------------------------------------[]
+            # Plot X-Axis data points -------- X Plot
+            im10.set_xdata(np.arange(db_freq))
+            im11.set_xdata(np.arange(db_freq))
+            # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
+            im10.set_ydata((RF[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+            im11.set_ydata((RF[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+            if not useHL and not pMinMax:  # switch to control plot on shewhart model
+                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(smp_Sz, mnA,
+                                                                                                      mnB,
+                                                                                                      0, 0, sdA,
+                                                                                                      sdB, 0, 0)
+            else:  # switch to historical limits
+                xline, sline = hMeanA, hDevA
+
+            # # Declare Plots attributes ------------------------------------------------------------[]
+            # XBar Mean Plot
+            a1.axhline(y=xline, color="red", linestyle="--", linewidth=0.8)
+            a1.axhspan(xlcT, xucT, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 3 Sigma span (Purple)
+            a1.axhspan(xucT, xusT, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
+            a1.axhspan(xlcT, xlsT, facecolor='#8d8794', edgecolor='#8d8794')
+            # ---------------------- sBar_minTG, sBar_maxTG -------[]
+            # Setting up the parameters for moving windows Axes ---[]
+            if db_freq > window_Xmax:
+                a1.set_xlim(db_freq - window_Xmax, db_freq)
+            else:
+                a1.set_xlim(0, window_Xmax)
+
+            # Set trip line for individual time-series plot -----[R1]
+            # No trigger module processing - Production parameter is for monitoring purposes only.
+            timef = time.time()
+            lapsedT = timef - timei
+            print(f"\nProcess Interval: {lapsedT} sec\n")
+
+            ani = FuncAnimation(f, asynchronousCT, frames=None, save_count=100, repeat_delay=None,
+                                interval=viz_cycle,
+                                blit=False)
+            plt.tight_layout()
+            plt.show()
 
         # Update Canvas ---------------------------------------------------[]
         canvas = FigureCanvasTkAgg(fig, self)
@@ -3550,6 +3716,169 @@ class cascadeCommonViewsCT(ttk.Frame):          # Load common Cascade and all ob
         toolbar = NavigationToolbar2Tk(canvas, self)
         toolbar.update()
         canvas._tkcanvas.pack(expand=True)
+
+
+
+class cascadeCommonViewsOEE(ttk.Frame):
+    def __init__(self, master=None):
+        ttk.Frame.__init__(self, master)
+        self.place(x=10, y=800)
+        self.createWidgets()
+
+    def createWidgets(self):
+        # -----------------------------------
+        f = Figure(figsize=(6, 5), dpi=100)
+        f.subplots_adjust(left=0.045, bottom=0, right=0.988, top=0.929, wspace=0.202)
+        a3 = f.add_subplot(1, 1, 1)
+
+        # Model data --------------------------------------------------[]
+        a3.cla()
+        a3.get_yaxis().set_visible(False)
+        a3.get_xaxis().set_visible(False)
+        if not runStatus:
+            a3.pie([1, 7, 0, 5, 9, 6], shadow=True)
+
+        # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
+        def synchronousOEE(smp_Sz, smp_St, fetchT):
+            fetch_no = str(fetchT)  # entry value in string sql syntax
+            # Obtain SQL Data Host Server ---------------------------[]
+            qRP = conn.cursor()
+
+            # Evaluate conditions for SQL Data Fetch ---------------[A]
+            """
+            Load watchdog function with synchronous function every seconds
+            """
+            # Initialise RT variables ---[]
+            autoSpcRun = True
+            autoSpcPause = False
+            import keyboard  # for temporary use
+
+            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+            # Define PLC/SMC error state -------------------------------------------#
+
+            while True:
+                # print('Indefinite looping...')
+                import sqlArrayRLmethodOE as oe                             # DrLabs optimization method
+                inProgress = True                                           # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+
+                # Get list of relevant SQL Tables using conn() ---------[TODO] Data fetch only at unique stoppages
+                oeData = oe.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)     # perform DB connections
+                if keyboard.is_pressed("Alt+Q"):                            # Terminate file-fetch
+                    qRP.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
+
+            return oeData
+
+        # ================== End of synchronous Method ==========================
+        def asynchronousOEE(db_freq):
+
+            timei = time.time()                                 # start timing the entire loop
+            # Call data loader Method---------------------------#
+            oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
+
+            import oeVarSQL as qoe                              # load SQL variables column names | rfVarSQL
+            viz_cycle = 150
+            g1 = qo.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
+            df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe
+            OE = qoe.loadProcesValues(df3)                      # Join data values under dataframe
+            print('\nDataFrame Content', df3.head(10))          # Preview Data frame head
+            print("Memory Usage:", df3.info(verbose=False))     # Check memory utilization
+
+            # --------------------------------
+            # Allow the following code to run despite not on DNV condition ----------------#
+            # TODO replace with process variable
+            cLayer = OE[1]
+            status = OE[3]
+            curLayer = list(set(cLayer))            # shuffle list to obtain unique layer number at a time
+            if len(curLayer) > 1:
+                lastE = len(curLayer)
+                curLayer = curLayer[lastE - 1]      # print the last index element
+            # ---------------------------------
+            # if VarPerHeadA or VarPerHeadB or VariProcess:
+            OTlayr.append(curLayer[0])              # Post values into static array
+            EPpos.append('N/A')                     # Insert pipe position is available
+            pStatus.append(status)
+            print('\nTP05[Layer/Status]:', curLayer[0], status)
+            # ----------------------------------------------------------------------------#
+            print('\nTesting loop...')
+            # Obtain current local time string ------------------------[]
+            cTime = strftime("%H:%M:%S")
+
+            # Convert current time string to datetime object ----------[]
+            currentTime = str(datetime.strptime(cTime, "%H:%M:%S").time())
+            print('\nCurrent Time:', currentTime)
+
+            # Compute essential variables ------------------------------- TODO verify filter *****
+            dayShiftTime = df3[(df3['TimeLine'] >= sStart) & (df3['TimeLine'] <= currentTime)]
+
+            totalRun = dayShiftTime.copy()
+            totalRun = totalRun.drop_duplicates(subset='TimeLine', keep='first')
+            # print('Total Run:', totalRun)
+
+            # Convert Shift start time to string format -----------------
+            shiftStartTime = str(datetime.strptime(sStart, "%H:%M:%S").time())
+            shiftEndTime = str(datetime.strptime(sStops, "%H:%M:%S").time())
+            print("Shift Starts:", shiftStartTime)
+            print("Shift Ends @:", shiftEndTime)
+
+            # Compute production lapse time -----------------------------
+            TShiftSec = datetime.strptime(sStops, '%H:%M:%S') - datetime.strptime(shiftStartTime, '%H:%M:%S')
+            ShiftinSec = TShiftSec.total_seconds()  # Convert values into seconds
+            print('=' * 22)
+            print('Shift Hours:', ShiftinSec, '(Sec)')
+
+            deltaT = datetime.strptime(str(currentTime), '%H:%M:%S') - datetime.strptime(shiftStartTime, '%H:%M:%S')
+            opTime = deltaT.total_seconds()  # Convert values into seconds
+            print('\n********* SUMMARY **********')
+            print('Operation Time:', opTime, '(Sec)')
+
+            # Compute downtime in seconds -------------------------------
+            downtime = totalRun['Duration(Sec)'].sum()
+            print('TCP1 Down Time:', float(downtime), '(Sec)')
+
+            # Computer work time relative to total shift hours ----------
+            prodTime = (opTime - downtime)
+            print('Net Production:', prodTime, '(Sec)')
+            print('-' * 28)
+
+            endShiftHour = (ShiftinSec - prodTime)
+            pieData = np.array([endShiftHour, prodTime, downtime])
+            segexplode = [0, 0, 0.1]
+
+            ind_metric = ['Current Shift', 'Production Time', 'OEE Time']
+            # Pie Chart Plot ---------------------
+            mycol = ['#4c72b0', 'green', 'orange']          # add colors
+            a3.pie(pieData, labels=ind_metric, startangle=90, explode=segexplode, shadow=True, autopct='%1.1f%%',
+                    colors=mycol, textprops={'fontsize': 10})
+            if not HeadA:   # if HeadA (synchronous)
+                a3.set_title('Post Production Status', fontsize=12, fontweight='bold')
+            else:
+                a3.set_title('Machine Live Status Analysis', fontsize=12, fontweight='bold')
+
+            # No trigger module processing - Production parameter is for monitoring purposes only.
+            timef = time.time()
+            lapsedT = timef - timei
+            print(f"\nProcess Interval: {lapsedT} sec\n")
+
+            ani = FuncAnimation(f, asynchronousOEE, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
+                                blit=False)
+            plt.tight_layout()
+            plt.show()
+        # -------------------------------------------------------------[]
+        canvas = FigureCanvasTkAgg(f, self)
+        canvas.get_tk_widget().pack(expand=False)
+
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        # toolbar = NavigationToolbar2Tk(canvas, self)
+        # toolbar.update()
+        # canvas._tkcanvas.pack(expand=True)
 
 # ====================================================== MAIN PIPELINE ===========================================[]
 # qType = 0   # default play mode
@@ -5255,6 +5584,7 @@ def userMenu():     # listener, myplash
                 tabb_clearOut()                                           # Clear out existing Tabbed View
                 cascadeCommonViewsRF()                                    # start parallel thread
                 cascadeCommonViewsCT()
+                cascadeCommonViewsOEE()
 
                 print('\nStarting new GPU thread...')
                 # call function for parallel pipeline --------------------#
@@ -5277,6 +5607,7 @@ def userMenu():     # listener, myplash
             # cascadeViews()                                                   # Critical Production Params
             cascadeCommonViewsRF()                                             #start parallel thread
             cascadeCommonViewsCT()
+            cascadeCommonViewsOEE()
 
             import CascadeSwitcher as cs
             p1, p2, p3, p4, p5 = cs.myMain(rType)                            # call function for parallel pipeline
@@ -5294,6 +5625,7 @@ def userMenu():     # listener, myplash
             # cascadeViews()                                                  # Critical Production Params
             cascadeCommonViewsRF()                                            # start parallel thread
             cascadeCommonViewsCT()
+            cascadeCommonViewsOEE()
 
             import CascadeSwitcher as cs
 
