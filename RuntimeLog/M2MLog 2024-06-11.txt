@@ -1,4 +1,0 @@
-2024-06-11 08:01.18 --- b' TCP : Unreachable peer'
-2024-06-11 08:01.21 --- b' TCP : Unreachable peer'
-2024-06-11 08:01.24 --- b' TCP : Unreachable peer'
-2024-06-11 11:30.44 --- writeSPCconfig() missing 30 required positional arguments: 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'a9', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', 'b9', 'c1', 'c2', and 'c3'

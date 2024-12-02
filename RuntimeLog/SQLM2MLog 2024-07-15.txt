@@ -1,4 +1,0 @@
-2024-07-15 08:14.43 --- local variable 'conn' referenced before assignment
-2024-07-15 08:16.17 --- local variable 'conn' referenced before assignment
-2024-07-15 13:13.35 --- local variable 'conn' referenced before assignment
-2024-07-15 14:13.48 --- local variable 'conn' referenced before assignment

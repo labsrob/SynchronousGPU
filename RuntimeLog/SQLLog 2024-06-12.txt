@@ -1,3 +1,0 @@
-2024-06-12 12:01.18 --- ('HYT00', '[HYT00] [Microsoft][ODBC SQL Server Driver]Login timeout expired (0) (SQLDriverConnect); [HYT00] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
-2024-06-12 12:02.15 --- ('HYT00', '[HYT00] [Microsoft][ODBC SQL Server Driver]Login timeout expired (0) (SQLDriverConnect); [HYT00] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
-2024-06-12 12:14.43 --- ('HYT00', '[HYT00] [Microsoft][ODBC SQL Server Driver]Login timeout expired (0) (SQLDriverConnect); [HYT00] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
