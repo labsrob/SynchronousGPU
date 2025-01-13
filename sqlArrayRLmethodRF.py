@@ -21,7 +21,7 @@ def sqlexec(nGZ, grp_step, daq, rT1, fetch_no):
     """
     NOTE:
     """
-    # idx = str(idx)                                  # convert Query Indexes to string concatenation
+    # idx = str(idx)                                # convert Query Indexes to string concatenation
 
     group_step = int(grp_step)                      # group size/ sample sze
     fetch_no = int(fetch_no)                        # dbfreq = TODO look into any potential conflict

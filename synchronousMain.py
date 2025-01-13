@@ -373,10 +373,10 @@ def tabbed_canvas():    # Tabbed Common Classes -------------------[]
             label = ttk.Label(root, text='Unassigned A '+plotType, font=LARGE_FONT)
             label.place(x=350, y=3)
             cP5 = common_PA(root)           # Uncomment to enable
-        elif method_selectedL == "Unassigned C":
-            label = ttk.Label(root, text='Unassigned C '+plotType, font=LARGE_FONT)
-            label.place(x=350, y=3)
-            cP6 = common_PC(root)           # Uncomment to enable
+        # elif method_selectedL == "Unassigned C":
+        #     label = ttk.Label(root, text='Unassigned C '+plotType, font=LARGE_FONT)
+        #     label.place(x=350, y=3)
+        #     cP6 = common_PC(root)           # Uncomment to enable
         else:
             cP4 = common_RF(root)
     comboL.bind("<<ComboboxSelected>>", option_Left)
@@ -394,10 +394,10 @@ def tabbed_canvas():    # Tabbed Common Classes -------------------[]
             label = ttk.Label(root, text='Unassigned B '+plotType, font=LARGE_FONT)
             label.place(x=1480, y=3)
             cP2 = common_PB(root)       # Uncomment to enable
-        elif method_selectedR == "Unassigned D":
-            label = ttk.Label(root, text='Unassigned D '+plotType, font=LARGE_FONT)
-            label.place(x=1480, y=3)
-            cP3 = common_PD(root)        # Uncomment to enable
+        # elif method_selectedR == "Unassigned D":
+        #     label = ttk.Label(root, text='Unassigned D '+plotType, font=LARGE_FONT)
+        #     label.place(x=1480, y=3)
+        #     cP3 = common_PD(root)        # Uncomment to enable
         else:
             cP1 = common_CT(root)        # Same thread as above
     comboR.bind("<<ComboboxSelected>>", option_Right)
@@ -1126,84 +1126,6 @@ class common_PB(ttk.Frame):     # PRODUCTION PARAM - SPARE PARAMETER B ---------
 
     # ------------------------------------------------- RIGHT HAND CONTROL PLOT -----------------------
 
-
-class common_PC(ttk.Frame):  # PRODUCTION PARAM - SPARE PARAMETER C
-    def __init__(self, master=None):
-        ttk.Frame.__init__(self, master)
-        self.place(x=1010, y=20)
-        self.createWidgets()
-
-    def createWidgets(self):
-        # --------------------------------------------------------------[]
-        f = Figure(figsize=(10, 4), dpi=100)
-        f.subplots_adjust(left=0.06, bottom=0.057, right=0.99, top=0.99, wspace=0.193)
-        a2 = f.add_subplot(1, 1, 1)
-
-        # --------------------------------------------------------------[]
-        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-        # a2.legend(loc='upper left')
-        a2.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-
-        # Define limits for Laser Angle Control Plots -----------------------#
-        a2.axhline(y=hMeanE, color="green", linestyle="-", linewidth=1)
-        a2.axhspan(hLCLe, hUCLe, facecolor='#A9EF91', edgecolor='#A9EF91')      # Light Green
-        # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-        a2.axhspan(hUCLe, hUSLe, facecolor='#8d8794', edgecolor='#8d8794')     # grey area
-        a2.axhspan(hLSLe, hLCLe, facecolor='#8d8794', edgecolor='#8d8794')    # grey area
-        # clean up when Mean line changes ---
-        a2.axhspan(hUSLe, hUSLe+0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-        a2.axhspan(hLSLe-0.05, hLSLe, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-
-        # Model data --------------------------------------------------[]
-        a2.plot([-1.78, -1.0, -0.8, -1.3, -0.89, -0.92, -1.2, -1.5, -1.6, -0.85])
-        # -------------------------------------------------------------[]
-
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.get_tk_widget().pack(expand=False)
-        # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True)
-    # --------------------------------------------------
-
-
-class common_PD(ttk.Frame):  # -- Defines tabbed production params common to QA parameters --[]
-    def __init__(self, master=None):
-        ttk.Frame.__init__(self, master)
-        self.place(x=1010, y=20)
-        self.createWidgets()
-
-    def createWidgets(self):
-        # -------------------
-        f = Figure(figsize=(10, 4), dpi=100)
-        f.subplots_adjust(left=0.06, bottom=0.057, right=0.99, top=0.99, wspace=0.193)
-        a2 = f.add_subplot(1, 1, 1)
-
-        # --------------------------------------------------------------[]
-        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-        # a2.legend(loc='upper left')
-        a2.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-
-        # Define limits for Laser Angle Control Plots -----------------------#
-        a2.axhline(y=hMeanF, color="green", linestyle="-", linewidth=1)
-        a2.axhspan(hLCLf, hUCLf, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
-        # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-        a2.axhspan(hUCLf, hUSLf, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-        a2.axhspan(hLSLf, hLCLf, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-        # clean up when Mean line changes ---
-        a2.axhspan(hUSLf, hUSLf + 0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-        a2.axhspan(hLSLf - 0.05, hLSLf, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-
-        # Model data --------------------------------------------------[]
-        a2.plot([-1.78, -1.0, -0.8, -1.3, -0.89, -0.92, -1.2, -1.5, -1.6, -0.85])
-        # -------------------------------------------------------------[]
-
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.get_tk_widget().pack(expand=False)
-        # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True
 # ------------------------------------------------------------------------------------------------------------------#
 
 
@@ -1797,7 +1719,7 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
         im39, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
         im40, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
         im41, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-        # --------------- Ramp Profile ---------------------------
+        # --------------- Ramp Profile ---------------------------[ Important ]
         im42, = a2.plot([], [], 'o-', label='Cumulated Ramp')
         im43, = a2.plot([], [], 'o-', label='Nominal Ramp')
 
@@ -3179,8 +3101,8 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
 
             return tgData
 
-        # -------------------------------------[A]
-        def synchronousProfileA(smp_Sz, smp_St, fetchT):
+        # -------------------------------------[Void Profile]
+        def synchronousVP1(smp_Sz, smp_St, fetchT):
             fetch_no = str(fetchT)                                                 # entry value in string sql syntax
 
             # Obtain Data from SQL Ropo ---------------------------[]
@@ -3237,7 +3159,7 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
             return profile_A
 
         # -------------------------------------[A]
-        def synchronousProfileB(smp_Sz, smp_St, fetchT):
+        def synchronousVP2(smp_Sz, smp_St, fetchT):
             fetch_no = str(fetchT)  # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
@@ -3308,9 +3230,9 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
             # declare asynchronous variables ------------------[]
 
             # Establish Multi-Stream data pooling pipeline -------------#
-            tgData = synchronousTG(smp_Sz, stp_Sz, db_freq)             # PLC synchronous Data loading method1
-            gapPdata = synchronousProfileA(smp_Sz, stp_Sz, db_freq)     # Accumulated Gap Mean Profile
-            voidData = synchronousProfileB(smp_Sz, stp_Sz, db_freq)     # Dr Labs Method for Void Mapping Profile
+            tgData = synchronousTG(smp_Sz, stp_Sz, db_freq)         # PLC synchronous Data loading method1
+            gapPdata = synchronousVP1(smp_Sz, stp_Sz, db_freq)      # Accumulated Gap Mean Profile
+            voidData = synchronousVP2(smp_Sz, stp_Sz, db_freq)      # Dr Labs Method for Void Mapping Profile
 
             # Initialise colum heads -----------------------------------#
             df3 = pd.DataFrame(gapPdata, columns=['CumulativeGapMean', 'NominalGapMean'])
@@ -3448,6 +3370,8 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
         toolbar = NavigationToolbar2Tk(canvas, self)
         toolbar.update()
         canvas._tkcanvas.pack(expand=True)
+
+
 # --------------------------------------------- CASCADE VIEW CLASSES -----------------------------------------------[]
 
 

@@ -1,10 +1,10 @@
-# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------#
 # Author: Dr RB Labs
 # Developed for Magma Global - TechnipFMC Industrialization
 # Email: robbielabs@uwl.ac.uk
 # Copyright (C) 2023-2025, Robbie Labs
 # Cascade (Multiple screen ) View
-# --------------------------------------------------------------------------
+# --------------------------------------------------------------------------#
 import time
 import os
 import sys
@@ -20,21 +20,22 @@ from multiprocessing import Process, freeze_support, set_start_method
 from matplotlib.figure import Figure
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+
 LARGE_FONT = ("Verdana", 12, 'bold')
 import matplotlib.patches as patches
 import loadSPCConfig as ty
 import qParamsHL as mq
 
-# -------PLC/SQL Query -------#
+# -------PLC/SQL Query --------#
 import selDataColsOEE as qo
 import selDataColsCT as qc
 import selDataColsRF as qf
 # ----- DNV Params ------
-import selDataColsTG as qg
-import selDataColsWS as qw
-import selDataColsST as qs
-import selDataColsTT as qt
 import selDataColsRP as qp
+import selDataColsTT as qt
+import selDataColsST as qs
+import selDataColsWS as qw
+import selDataColsTG as qg
 # -----------------------------#
 
 import subprocess
@@ -60,9 +61,8 @@ cpTapeW, cpLayerNo, runType = [], [], []
 UsePLC_DBS = True
 runStatus = 0
 hostConn = 0
-# ---------------------------------------------------------------------------------------------------------[]
 
-
+# -------------------------[ OEE Class module ] --------------------------[]
 # class common_OEE(ttk.Frame):
 #     def __init__(self, master=None):
 #         ttk.Frame.__init__(self, master)
@@ -470,7 +470,7 @@ def RollerPressure(vCounter, pType):
         # Call data loader Method---------------------------#
         rpData = synchronousRP(rpSize, rpgType, db_freq)  # data loading functions
         if UsePLC_DBS == 1:
-            import rfVarPLC as qrf
+            import VarPLCrf as qrf
             viz_cycle = 10
             # Call synchronous data function ---------------[]
             columns = qp.validCols('RP')                    # Load defined valid columns for PLC Data
@@ -633,31 +633,32 @@ def TapeTemperature(vCounter, pType):
     # Load Quality Historical Values -----------[]
     ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = mq.decryptpProcessLim(
         WON, 'TT')
+
     # Break down each element to useful list ---------------[Tape Temperature]
     if ttHL and ttParam1 and ttParam2 and ttParam3 and ttParam4 and ttParam5:  #
-        ttPerf = '$Pp_{k' + str(ttSize) + '}$'  # Using estimated or historical Mean
+        ttPerf = '$Pp_{k' + str(ttSize) + '}$'          # Using estimated or historical Mean
         ttlabel = 'Pp'
         # -------------------------------
-        One = ttParam1.split(',')  # split into list elements
+        One = ttParam1.split(',')                       # split into list elements
         Two = ttParam2.split(',')
         Thr = ttParam3.split(',')
         For = ttParam4.split(',')
         Fiv = ttParam5.split(',')
         # -------------------------------
-        dTape1 = One[1].strip("' ")  # defined Tape Width
-        dTape2 = Two[1].strip("' ")  # defined Tape Width
-        dTape3 = Thr[1].strip("' ")  # defined Tape Width
-        dTape4 = For[1].strip("' ")  # defined Tape Width
-        dTape5 = Fiv[1].strip("' ")  # defined Tape Width
+        dTape1 = One[1].strip("' ")                     # defined Tape Width
+        dTape2 = Two[1].strip("' ")                     # defined Tape Width
+        dTape3 = Thr[1].strip("' ")                     # defined Tape Width
+        dTape4 = For[1].strip("' ")                     # defined Tape Width
+        dTape5 = Fiv[1].strip("' ")                     # defined Tape Width
         # --------------------------------
-        dLayer1 = One[10].strip("' ")  # Defined Tape Layer
+        dLayer1 = One[10].strip("' ")                   # Defined Tape Layer
         dLayer2 = Two[10].strip("' ")
         dLayer3 = Thr[10].strip("' ")
         dLayer4 = For[10].strip("' ")
         dLayer5 = Fiv[10].strip("' ")
         # Load historical limits for the process------------#
-        if cpTapeW == dTape1 and cpLayerNo <= 1:  # '22mm'|'18mm',  1-40 | 41+
-            ttUCL = float(One[2].strip("' "))  # Strip out the element of the list
+        if cpTapeW == dTape1 and cpLayerNo <= 1:        # '22mm'|'18mm',  1-40 | 41+
+            ttUCL = float(One[2].strip("' "))           # Strip out the element of the list
             ttLCL = float(One[3].strip("' "))
             ttMean = float(One[4].strip("' "))
             ttDev = float(One[5].strip("' "))
@@ -669,7 +670,7 @@ def TapeTemperature(vCounter, pType):
             ttLSL = (ttMean - ttLCL) / 3 * 6
             # --------------------------------
         elif cpTapeW == dTape2 and cpLayerNo == 2:
-            ttUCL = float(Two[2].strip("' "))  # Strip out the element of the list
+            ttUCL = float(Two[2].strip("' "))           # Strip out the element of the list
             ttLCL = float(Two[3].strip("' "))
             ttMean = float(Two[4].strip("' "))
             ttDev = float(Two[5].strip("' "))
@@ -680,7 +681,7 @@ def TapeTemperature(vCounter, pType):
             ttUSL = (ttUCL - ttMean) / 3 * 6
             ttLSL = (ttMean - ttLCL) / 3 * 6
         elif cpTapeW == dTape3 and cpLayerNo == range(3, 40):
-            ttUCL = float(Thr[2].strip("' "))  # Strip out the element of the list
+            ttUCL = float(Thr[2].strip("' "))           # Strip out the element of the list
             ttLCL = float(Thr[3].strip("' "))
             ttMean = float(Thr[4].strip("' "))
             ttDev = float(Thr[5].strip("' "))
@@ -691,7 +692,7 @@ def TapeTemperature(vCounter, pType):
             ttUSL = (ttUCL - ttMean) / 3 * 6
             ttLSL = (ttMean - ttLCL) / 3 * 6
         elif cpTapeW == dTape4 and cpLayerNo == 41:
-            ttUCL = float(For[2].strip("' "))  # Strip out the element of the list
+            ttUCL = float(For[2].strip("' "))           # Strip out the element of the list
             ttLCL = float(For[3].strip("' "))
             ttMean = float(For[4].strip("' "))
             ttDev = float(For[5].strip("' "))
@@ -702,7 +703,7 @@ def TapeTemperature(vCounter, pType):
             ttUSL = (ttUCL - ttMean) / 3 * 6
             ttLSL = (ttMean - ttLCL) / 3 * 6
         else:
-            ttUCL = float(Fiv[2].strip("' "))  # Strip out the element of the list
+            ttUCL = float(Fiv[2].strip("' "))           # Strip out the element of the list
             ttLCL = float(Fiv[3].strip("' "))
             ttMean = float(Fiv[4].strip("' "))
             ttDev = float(Fiv[5].strip("' "))
@@ -722,7 +723,7 @@ def TapeTemperature(vCounter, pType):
         sLCLtt = 0
         ttUSL = 0
         ttLSL = 0
-        ttPerf = '$Cp_{k' + str(ttSize) + '}$'  # Using Automatic group Mean
+        ttPerf = '$Cp_{k' + str(ttSize) + '}$'          # Using Automatic group Mean
         ttlabel = 'Cp'
 
     # ------------------------------------[End of Tape Temperature Abstraction]
@@ -847,10 +848,10 @@ def TapeTemperature(vCounter, pType):
 
     # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
     def synchronousTT(ttSize, ttgType, fetchT):
-        fetch_no = str(fetchT)  # entry value in string sql syntax
+        fetch_no = str(fetchT)                                  # entry value in string sql syntax
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:  # Load CommsPlc class once
+        if not inUseAlready:                                    # Load CommsPlc class once
             import CommsSql as q
             q.DAQ_connect(1, 0)
         else:
@@ -862,7 +863,7 @@ def TapeTemperature(vCounter, pType):
         # Initialise RT variables ---[]
         autoSpcRun = True
         autoSpcPause = False
-        import keyboard                             # for temporary use
+        import keyboard                                         # for temporary use
 
         # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
         sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
@@ -906,7 +907,7 @@ def TapeTemperature(vCounter, pType):
 
                 # Play visualization ----------------------------------------------[]
                 print("Visualization in Play Mode...")
-                # play(nudge)     # audible alert
+                # play(nudge)                                   # audible alert
 
                 # -----------------------------------------------------------------[]
                 # Allow selective runtime parameter selection on production critical process
@@ -917,10 +918,10 @@ def TapeTemperature(vCounter, pType):
 
     # -------------------------------------[A]
     def synchronousRamp(smp_Sz, smp_St, fetchT):
-        fetch_no = str(fetchT)  # entry value in string sql syntax
+        fetch_no = str(fetchT)                                  # entry value in string sql syntax
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:  # Load CommsPlc class once
+        if not inUseAlready:                                    # Load CommsPlc class once
             import CommsSql as q
             q.DAQ_connect(1, 0)
         else:
@@ -933,7 +934,7 @@ def TapeTemperature(vCounter, pType):
         # Initialise RT variables ---[]
         autoSpcRun = True
         autoSpcPause = False
-        import keyboard  # for temporary use
+        import keyboard                                         # for temporary use
 
         # TODO ----------------------[]
         # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
@@ -942,18 +943,18 @@ def TapeTemperature(vCounter, pType):
 
         while True:
             # Latch on SQL Query only a
-            inProgress = False  # True for RetroPlay mode
+            inProgress = False                                  # True for RetroPlay mode
             print('\nAsynchronous controller activated...')
             if not sysRun:
-                sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                sysRun, msctcp, msc_rt = wd.autoPausePlay()     # Retrieve MSC from Watchdog
 
             # Get list of relevant SQL Tables using conn() --------------------[]
-            if keyboard.is_pressed("Ctrl"):  # Terminate file-fetch
+            if keyboard.is_pressed("Ctrl"):                     # Terminate file-fetch
                 print('\nProduction is pausing...')
                 if not autoSpcPause:
                     autoSpcRun = not autoSpcRun
                     autoSpcPause = True
-                    # play(error)                                               # Pause mode with audible Alert
+                    # play(error)                               # Pause mode with audible Alert
                     print("\nVisualization in Paused Mode...")
                 else:
                     autoSpcPause = False

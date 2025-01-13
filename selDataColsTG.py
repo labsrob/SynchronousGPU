@@ -11,9 +11,9 @@ Tape Gap Measured in millimeters (mm)
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'TG':
-        columns = ['TimeStamp', 'CurrentLayer', 'SampleCount', 'SampleCentre', 'PipePosition', 'GapGaugeA1(mm)',
-                   'GapGaugeA2(mm)', 'GapGaugeA3(mm)', 'GapGaugeA4(mm)', 'GapGaugeB1(mm)', 'GapGaugeB2(mm)',
-                   'GapGaugeB3(mm)', 'GapGaugeB4(mm)', 'PipeDirection']
+        columns = ['TimeStamp', 'cLayer', 'sCount', 'sCentre', 'PipePos', 'GaugeA1',
+                   'GaugeA2', 'GaugeA3', 'GaugeA4', 'GaugeB1', 'GaugeB2',
+                   'GaugeB3', 'GaugeB4', 'PipeDir']
     else:
         print('Invalid Columns or Query error...')
 
