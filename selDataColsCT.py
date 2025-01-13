@@ -10,7 +10,7 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH) 1 Mpa = 1 (N/mm2)
     if pParam == 'CT':
-        columns = ['CellTensionA (Mpa)', 'CellTensionB (Mpa)', 'PipeDirection']
+        columns = ['CellTensionA (N/m)', 'CellTensionB (N/m)', 'PipeDirection']
     else:
         print('Invalid Columns or Query error...')
 
