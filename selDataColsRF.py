@@ -4,16 +4,16 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
-Tape Gap Measured in millimeters (mm)
+Roller Force measured in Newton (N)
 """
 
 
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'TG':
-        columns = ['TimeStamp', 'CurrentLayer', 'SampleCount', 'SampleCentre', 'PipePosition', 'GapGaugeA1(mm)',
-                   'GapGaugeA2(mm)', 'GapGaugeA3(mm)', 'GapGaugeA4(mm)', 'GapGaugeB1(mm)', 'GapGaugeB2(mm)',
-                   'GapGaugeB3(mm)', 'GapGaugeB4(mm)', 'PipeDirection']
+    if pParam == 'RF':
+        columns = ['TimeLine', 'R1H1RF(N)', 'R1H2RP(N)', 'R1H3RP(N)', 'R1H4RP(N)', 'R2H1RP(N)', 'R2H2RP(N)',
+                   'R2H3RP(N)', 'R2H4RP(N)', 'R3H1RP(N)', 'R3H2RP(N)', 'R3H3RP(N)', 'R3H4RP(N)', 'R4H1RP(N)',
+                   'R4H2RP(N)', ' R4H3RP(N)', 'R4H4RP(N)']
     else:
         print('Invalid Columns or Query error...')
 

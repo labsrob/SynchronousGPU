@@ -4,6 +4,7 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
+Cell Tension measured in Newton per metre (N/m)
 """
 
 

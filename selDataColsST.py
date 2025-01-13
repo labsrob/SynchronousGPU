@@ -4,6 +4,7 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
+Substrate Temperature measured in Degree Celsius (°C)
 """
 
 

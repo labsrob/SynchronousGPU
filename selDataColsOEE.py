@@ -4,6 +4,7 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
+Overall Equipment Efficiency measured by composite/derived factors
 """
 
 
