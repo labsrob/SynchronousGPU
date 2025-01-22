@@ -27,7 +27,7 @@ def errorLog(err):
     event = datetime.now().strftime("%Y-%m-%d %H:%M.%S")
     errorlogFile = str(fileName)
     f = open('.\\RuntimeLog\\'+errorlogFile+".txt", "a")
-    f.write(event+' --- '+err+'\n')
+    f.write(event+' --- '+str(err)+'\n')
     f.close()
 
 
@@ -50,16 +50,23 @@ def autoConn():
     print("\nMS-SQL Server: Connection successful, SCADA notified...")
 
 
+# --------------------------------------------------------
+
 # Connection to MS-SQL Server (MARS enabled connection) ------------[+ In-Memory OLTP]
 def DAQ_connect(state, agent):
     """
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
     """
+
     # -------- Actual SQL Connection request -----------------#
     conn = None
     connect = state
-    if connect == 0:
+    print('\nValues -', 'State:', state, 'Agent:', agent)
+    # ---------------------------------------------------------#
+
+    if conn == None:
+        print('Connecting to SQL server...')
         try:
             conn = pyodbc.connect('Driver={SQL Server};'
                                   'Server=' + server_IP + ';'
@@ -69,26 +76,31 @@ def DAQ_connect(state, agent):
                                   'uid=' + isAtho + ';'
                                   'pwd=' + yekref + ';'
                                   'MultipleActiveResultSets=True')
+            # conn = 'true'
+            print('SQL Server connection active!\n')
+
         except Exception as err:
             errorLog(str(err))                      # Log the error in txt file
             errorConnect()
             print('[ODBC ver18] Connector failure: SQL Server is inaccessible...')
             conn = 'failed'
-        else:
-            if agent == 1:
-                autoConn()                          # feedback to SCADA data [SQLConnACK]
-            else:
-                successNote()                       # popup message
+        # else:
+        #     # SQL sends acknowledgement to SCADA ---#
+        #     if agent == 1:
+        #         autoConn()                          # feedback to SCADA data [SQLConnACK]
+        #     else:
+        #         successNote()                       # popup message
     else:                                           # when connection = 1 and requires disconnect
         try:
             connect.close()
             errorNote()
             print('\nActive connection will be closed...')
+
         except Exception as err:
             print(f"Connection Error: {err}")       # catch whatever error raised
             conn = 'failed'
             errorLog(err)
-    print('\nConnection Summary:', conn)
+        print('\nConnection Summary:', conn)
 
     return conn
 

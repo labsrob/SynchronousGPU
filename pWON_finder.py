@@ -37,19 +37,20 @@ def errorSearchWON():
     return
 
 
-def searchSqlRecs(conn, DATEentry, WONentry):                   # Post Production data search
+def searchSqlRecs(conn_t, DATEentry, WONentry):                   # Post Production data search
+    # print('\nConn:', conn_t)
     StaSearchD = DATEentry                                      # Date Lower Boundary or WON #
     EndSearchD = int(DATEentry) + 1                             # Date Upper Boundary or 0
     EndSearchD = str(EndSearchD)
 
     # Test connection readiness and clear any flags ups.....
-    if conn !='failed':
-        mPTablesID = conn.cursor()
-        mProcessID = conn.cursor()
+    if conn_t != 'failed':
+        mPTablesID = conn_t.cursor()
+        mProcessID = conn_t.cursor()
 
         # ----------------------------------- If Search was by Date String ----------------------[]
-        if StaSearchD != '0' and WONentry == '0':     # If Date search
-            print('\nWON: Date Search... True')
+        if StaSearchD != '0' and WONentry == '0':               # If Date search
+            print('\nWON: Date Search.')
 
             # Find out how many tables meet this condition -----[A]
             pTables = mPTablesID.execute('SELECT COUNT(create_date) AS ValidTotal from sys.tables where '
@@ -100,7 +101,7 @@ def searchSqlRecs(conn, DATEentry, WONentry):                   # Post Productio
                     nTables)
                 checkOEE_date = mTables[1][2]
                 newWON = WONentry
-                OEEdataID = searchOEERecs(conn, checkOEE_date)         # get OEE file name
+                OEEdataID = searchOEERecs(conn_t, checkOEE_date)         # get OEE file name
 
             else:
                 print('Invalid Work Order Number..')
@@ -113,7 +114,7 @@ def searchSqlRecs(conn, DATEentry, WONentry):                   # Post Productio
             OEEdataID = mP.seek_OEE_data()                             # Default to current date's OEE
             newWON = 0
     else:
-        print('Sorry, connection attempt to SQL server failed.')
+        # print('SQL Query failed. Please, check Server connection.')
         conn = 0
         OEEdataID = 0
         newWON = 0

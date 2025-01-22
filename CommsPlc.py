@@ -7,6 +7,7 @@ import snap7
 from datetime import datetime
 from time import sleep
 import time
+from tkinter import messagebox, ttk
 
 # ---------------------------------------------------------------------------
 Ring1ON, Ring2ON, Ring3ON, Ring4ON = 0, 0, 0, 0,
@@ -59,6 +60,10 @@ in Vista/Windows 7/Windows 8.
 """
 
 
+def errorNoconnect():
+	messagebox.showerror("Disconnect Alert", "Invalid request, no active connection(s) found.")
+
+
 def errorLog(err):
 	fileName = datetime.now().strftime('M2MLog '+"%Y-%m-%d")
 	event = datetime.now().strftime("%Y-%m-%d %H:%M.%S")
@@ -78,9 +83,29 @@ def successNote():
 	return
 
 
+def check_PLC_connect():
+	if connectPLC:
+		active_conn = 'true'
+	else:
+		active_conn = 'false'
+
+	return active_conn
+
+
+def disconnct_PLC():
+	state = check_PLC_connect()
+	if state == 'true':
+		plc.disconnect(TCP01_IP, RACK, SLOT)
+	else:
+		errorNoconnect()
+		state = 'false'
+	return state
+
+
 def connectM2M():
 	global connectPLC, plc, err
 	retry = 0
+
 	while not connectPLC and retry < 5:
 		sleep(2)		# Pause for connection to be through
 		# continuously try to connect to PLC or set trial times using while loop

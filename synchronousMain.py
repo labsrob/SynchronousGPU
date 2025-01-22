@@ -138,7 +138,7 @@ else:
     plabel = 'Cp'
 # --------------------------------------------------------------------[]
 # Break down each element to useful list
-if useHL and pContrl and pParam2:           # Cell Tension Parameter
+if useHL and pContrl and pParam2:            # Cell Tension Parameter
     pTwo = pParam2.split(',')                # split into list elements
     hUCLb = float(pTwo[2].strip("' "))       # Strip out the element of the list
     hLCLb = float(pTwo[3].strip("' "))
@@ -339,17 +339,20 @@ def menuExit():
                     print(f'Process {p} failed to terminate!')
         root.quit()
         os._exit(0)
+
 # -------------------------------------------------------------------------------------------[ MAIN PROGRAM ]
+#
+# ---------------------------------------------------------------------------------------------------------#
 
 
-def tabbed_canvas():    # Tabbed Common Classes -------------------[]
+def tabbed_canvas():    # Tabbed Common Classes -------------------[TABBED ]
     # Create an instance of ttk style
     s = ttk.Style()
     s.theme_use('default')                                          # Options: ('clam', 'alt', 'default', 'classic')
     s.configure('TNotebook.Tab', background="green3")
 
     # Allow user to change critical process during runtime ----------[ Production Critical Parameters ]
-    comboL = ttk.Combobox(root, values=[" Change RT Plot", "Roller Force", "Unassigned Param A", "Unassigned Param C"])
+    comboL = ttk.Combobox(root, values=[" Change RT Plot", "Roller Force", "Laser Angle", "Unassigned Param C"])
     comboL.place(x=872, y=2)
     comboL.current(0)
 
@@ -369,8 +372,8 @@ def tabbed_canvas():    # Tabbed Common Classes -------------------[]
             label = ttk.Label(root, text='Roller Force '+plotType, font=LARGE_FONT)
             label.place(x=350, y=3)
             cP4 = common_RF(root)
-        elif method_selectedL == "Unassigned A":
-            label = ttk.Label(root, text='Unassigned A '+plotType, font=LARGE_FONT)
+        elif method_selectedL == "Laser Angle":
+            label = ttk.Label(root, text='Laser Angle '+plotType, font=LARGE_FONT)
             label.place(x=350, y=3)
             cP5 = common_PA(root)           # Uncomment to enable
         # elif method_selectedL == "Unassigned C":
@@ -413,13 +416,15 @@ def tabbed_canvas():    # Tabbed Common Classes -------------------[]
     tab4 = ttk.Frame(notebook)
     tab5 = ttk.Frame(notebook)
     tab6 = ttk.Frame(notebook)
+    tab7 = ttk.Frame(notebook)
     # --------------------------DNV Parameters -----[]
     notebook.add(tab1, text="Roller Pressure")
     notebook.add(tab2, text="Tape Temperature")
     notebook.add(tab3, text="Substrate Temperature")
     notebook.add(tab4, text="Winding Tape Speed")
     notebook.add(tab5, text="Gap Measurements")
-    notebook.add(tab6, text="EoL Reporting System")
+    notebook.add(tab6, text="EoL Report System")
+    notebook.add(tab7, text="EoP Report System")
     notebook.grid()
 
     # Create DNV tab frames properties -------------[]
@@ -438,9 +443,11 @@ def tabbed_canvas():    # Tabbed Common Classes -------------------[]
     app5 = tapeGap(master=tab5)
     app5.grid(column=0, row=0, padx=10, pady=10)
 
-    app6 = collectiveRPT(master=tab6)
+    app6 = collectiveEoL(master=tab6)
     app6.grid(column=0, row=0, padx=10, pady=10)
 
+    app7 = collectiveEoP(master=tab7)
+    app7.grid(column=0, row=0, padx=10, pady=10)
     # ------------------------------------------[]
     root.mainloop()
 
@@ -464,7 +471,7 @@ def readRPTrf(text_widget, rptID):
 # --------------- Defines the collective one screen structure -------------------------------------[]
 
 
-class collectiveRPT(ttk.Frame):                                # End of Layer Progressive Report Tabb
+class collectiveEoL(ttk.Frame):                                # End of Layer Progressive Report Tabb
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         # self.grid(column=0, row=0, padx=10, pady=10)
@@ -472,11 +479,11 @@ class collectiveRPT(ttk.Frame):                                # End of Layer Pr
         self.createWidgets()
 
     def createWidgets(self):
-        label = ttk.Label(self, text="End of Layer - Progressive Summary:                                          ", font=LARGE_FONT)
+        label = ttk.Label(self, text="End of Layer Transition Report:                                          ", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
         # label.place(x=100, y=50)
         # Define Axes ---------------------#
-        combo = ttk.Combobox(self, values=["= Select Progressive Report =", "Roller Pressure",
+        combo = ttk.Combobox(self, values=["= Select Process Parameter =", "Roller Pressure",
                                            "Tape Temperature", "Subs Temperature",
                                            "Winding Speed", "Gap Measurement"], width=25)
         combo.place(x=520, y=10)
@@ -519,6 +526,61 @@ class collectiveRPT(ttk.Frame):                                # End of Layer Pr
         # toolbar.update()
         # canvas._tkcanvas.pack(expand=True)
 
+
+class collectiveEoP(ttk.Frame):                                # End of Layer Progressive Report Tabb
+    def __init__(self, master=None):
+        ttk.Frame.__init__(self, master)
+        # self.grid(column=0, row=0, padx=10, pady=10)
+        self.place(x=10, y=10)
+        self.createWidgets()
+
+    def createWidgets(self):
+        label = ttk.Label(self, text="End of Pipe Report:                                          ", font=LARGE_FONT)
+        label.pack(pady=10, padx=10)
+        # label.place(x=100, y=50)
+        # Define Axes ---------------------#
+        combo = ttk.Combobox(self, values=["= Select Process Parameter =", "Roller Pressure",
+                                           "Tape Temperature", "Subs Temperature",
+                                           "Winding Speed", "Gap Measurement"], width=25)
+        combo.place(x=520, y=10)
+        combo.current(0)
+
+        # Create empty Text Space -----------------------------------
+        text_widget = tk.Text(self, wrap='word', width=110, height=80)
+        text_widget.pack(padx=10, pady=10)
+
+        def option_selected(event):
+            selected_option = combo.get()
+            if selected_option == "Roller Pressure":
+                rpt = "RPT_RP_" + str(processWON[0])
+                readRPTrf(text_widget, rpt)                                 # Open txt file from FMEA folder
+            elif selected_option == "Tape Temperature":
+                rpt = "RPT_TT_" + str(processWON[0])
+                readRPTrf(text_widget, rpt)                                 # Open txt file from FMEA folder
+            elif selected_option == "Subs Temperature":
+                rpt = "RPT_ST_" + str(processWON[0])
+                readRPTrf(text_widget, rpt)                                 # Open txt file from FMEA folder
+            elif selected_option == "Winding Speed":
+                rpt = "RPT_WS_" + str(processWON[0])
+                readRPTrf(text_widget, rpt)                                 # Open txt file from FMEA folder
+            elif selected_option == "Gap Measurement":
+                rpt = "RPT_TG_" + str(processWON[0])
+                readRPTrf(text_widget, rpt)                                 # Open txt file from FMEA folder
+            else:
+                rpt = "VOID_REPORT"
+                readRPTrf(text_widget, rpt)
+
+            print("You selected:", selected_option)
+        combo.bind("<<ComboboxSelected>>", option_selected)
+
+        # Update Canvas -----------------------------------------------------[NO FIGURE YET]
+        # canvas = FigureCanvasTkAgg(fig, self)
+        # canvas.get_tk_widget().pack(expand=False)
+
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        # toolbar = NavigationToolbar2Tk(canvas, self)
+        # toolbar.update()
+        # canvas._tkcanvas.pack(expand=True)
 # --------------------------------------------- COMMON VIEW CLASSES -----------------------------------------------[A]
 
 
@@ -586,7 +648,7 @@ class common_OEE(ttk.Frame):
             # Call data loader Method---------------------------#
             oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
 
-            import oeVarSQL as qoe                              # load SQL variables column names | rfVarSQL
+            import VarSQLoe as qoe                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qo.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
             df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe
@@ -798,7 +860,7 @@ class common_RF(ttk.Frame):     # PRODUCTION PARAM - ROLLER FORCE --------------
             # Call data loader Method---------------------------#
             rfSQL = synchronousRF(smp_Sz, stp_Sz, db_freq)      # data loading functions
 
-            import rfVarSQL as qrf                              # load SQL variables column names | rfVarSQL
+            import VarSQLrf as qrf                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qf.validCols('RF')                             # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(rfSQL, columns=g1)              # Import into python Dataframe
@@ -982,7 +1044,7 @@ class common_CT(ttk.Frame):     # PRODUCTION PARAM - CELL TENSION --------------
             # Call data loader Method---------------------------#
             ctData = synchronousCT(smp_Sz, stp_Sz, db_freq)  # data loading functions
 
-            import ctVarSQL as qct                              # load SQL variables column names | rfVarSQL
+            import VarSQLct as qct                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qc.validCols('CT')                             # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(ctData, columns=g1)              # Import into python Dataframe
@@ -1376,7 +1438,7 @@ class rollerPressure(ttk.Frame):            # -- Defines the tabbed region for Q
             # Call data loader Method---------------------------#
             rpData = synchronousRP(rpSize, rpgType, db_freq)    # data loading functions
             if UsePLC_DBS == 1:
-                import rpVarPLC as qrp
+                import VarPLCrp as qrp
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qp.validCols('RP')                    # Load defined valid columns for PLC Data
@@ -1900,7 +1962,7 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
             # --------------------------------------------------#
 
             if UsePLC_DBS == 1:
-                import ttVarPLC as qtt
+                import VarPLCtt as qtt
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qt.validCols('TT')                    # Load defined valid columns for PLC Data
@@ -1908,7 +1970,7 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
                 TT = qtt.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import ttVarSQL as qtt                          # load SQL variables column names | rfVarSQL
+                import VarSQLtt as qtt                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qt.validCols('TT')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(ttData, columns=g1)          # Import into python Dataframe
@@ -2354,7 +2416,7 @@ class substTemp(ttk.Frame):     # -- Defines the tabbed region for QA param - Su
             # Call data loader Method---------------------------#
             rpData = synchronousST(stSize, stgType, db_freq)  # data loading functions
             if UsePLC_DBS == 1:
-                import rfVarPLC as qst
+                import VarPLCrf as qst
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qs.validCols('ST')                    # Load defined valid columns for PLC Data
@@ -2362,7 +2424,7 @@ class substTemp(ttk.Frame):     # -- Defines the tabbed region for QA param - Su
                 ST = qst.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import rfVarSQL as qst                          # load SQL variables column names | rfVarSQL
+                import VarSQLrf as qst                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qs.validCols('ST')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
@@ -2742,7 +2804,7 @@ class windingSpeed(ttk.Frame):     # -- Defines the tabbed region for QA param -
             # Call data loader Method---------------------------#
             wsData = synchronousWS(wsSize, wsgType, db_freq)  # data loading functions
             if UsePLC_DBS == 1:
-                import rfVarPLC as qws
+                import VarPLCrf as qws
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qw.validCols('WS')                    # Load defined valid columns for PLC Data
@@ -2750,7 +2812,7 @@ class windingSpeed(ttk.Frame):     # -- Defines the tabbed region for QA param -
                 WS = qws.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import rfVarSQL as qws                          # load SQL variables column names | rfVarSQL
+                import VarSQLrf as qws                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qw.validCols('WS')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(wsData, columns=g1)          # Import into python Dataframe
@@ -3243,14 +3305,14 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
             # ----------------------------------------------------------#
 
             if UsePLC_DBS == 1:
-                import tgVarPLC as qtg
+                import VarPLCtg as qtg
                 viz_cycle = 10
                 columns = qg.validCols('TG')                    # Load defined valid columns for PLC Data
                 df1 = pd.DataFrame(tgData, columns=columns)     # Include table data into python Dataframe
                 TG = qtg.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import tgVarSQL as qtg                          # load SQL variables column names | rfVarSQL
+                import VarSQLtg as qtg                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qg.validCols('TG')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(tgData, columns=g1)          # Import into python Dataframe
@@ -3520,7 +3582,7 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
             # Call data loader Method---------------------------#
             rfSQL = synchronousRF(smp_Sz, stp_Sz, db_freq)  # data loading functions
 
-            import rfVarSQL as qrf                          # load SQL variables column names | rfVarSQL
+            import VarSQLrf as qrf                          # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qf.validCols('RF')                         # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(rfSQL, columns=g1)           # Import into python Dataframe
@@ -3931,7 +3993,7 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
             # Call data loader Method---------------------------#
             ctSQL = synchronousEoL(smp_Sz, stp_Sz, db_freq)      # data loading functions
 
-            import ctVarSQL as qct                              # load SQL variables column names | rfVarSQL
+            import VarSQLct as qct                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qc.validCols('CT')                             # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(ctSQL, columns=g1)               # Import into python Dataframe
@@ -4114,7 +4176,7 @@ class cascadeCommonViewsOEE(ttk.Frame):
             # Call data loader Method---------------------------#
             oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
 
-            import oeVarSQL as qoe                              # load SQL variables column names | rfVarSQL
+            import VarSQLoe as qoe                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qo.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
             df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe
@@ -5636,6 +5698,7 @@ def userMenu():     # listener, myplash
             netTX = sq.testNetworkConn([server_IP], 1)  # if ICMP ping response is allowed on the server
             if netTX:
                 hostConnect()  # acknowledgement
+                conn = 'true'
             else:
                 pingError()  # Ping error failed -------
                 conn = 'none'
@@ -5657,6 +5720,7 @@ def userMenu():     # listener, myplash
             netTX = sq.testNetworkConn([server_IP], 1)  # if ICMP ping response is allowed on the server
             if netTX:
                 hostConnect()                                              # acknowledgement
+                conn = 'true'
             else:
                 pingError()                                            # Ping error failed -------
                 conn = 'none'
@@ -5670,27 +5734,33 @@ def userMenu():     # listener, myplash
 
     def sCloseConnSQL():
         global conn
-
+        # ------------------------------------------------------------------ Start
         import CommsSql as mCon
-        agent = 0
-        if agent == 0:
-            conn = mCon.DAQ_connect(1, agent)  # 1 = connection is active to be .closed()
+        conn = mCon.DAQ_connect(1, 0)  # 1 = connection is active to be .closed()
+        if conn == 'true':
+            conn.close()
+            print('SQL Data is disconnected')
         else:
             conn = 'none'
+            print('No active connections!')
             errorNoconnect()
         return conn
+
+    # ---------------------------------------------------------------------------[]
 
     def sCloseConnPLC():
         global conn
-
+        # plc_stop() - beware not to halt PLC
+        # ------------------------------------------------------------------ Start
         import CommsPlc as mCon
-        agent = 0
-        if agent == 0:
-            conn = mCon.connectM2M()                    # TODO: Check PLC server link
+        conn_active = mCon.disconnct_PLC()                    # TODO: Check PLC server link
+        if conn_active == 'true':
+            print('Host PLC is disconnected')
         else:
-            conn = 'none'
-            errorNoconnect()
-        return conn
+            print('No active connections!')
+            conn_active = 'false'
+
+        return conn_active
 
     # ---------------------------------------------------------------------------[]
     def discALL():
@@ -5719,79 +5789,97 @@ def userMenu():     # listener, myplash
     # One of the challenging object to configure both checkbox and state --------[]
 
     def retroPlay():
-        # Declare global variable available to all proceesses
+        # Declare global variable available to all processes
         global stpd, WON, processID, OEEdataID, hostConn
-        import CommsSql as hs
 
-        # import signal
-        # os.kill(sid, signal.SIGTERM)
-        if (analysis.entrycget(0, 'state') == 'normal'
-                and analysis.entrycget(1, 'state') == 'normal'
-                and analysis.entrycget(3, 'state') == 'normal'):
-            analysis.entryconfig(0, state='disabled')
+        if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
+            import CommsSql as hs
 
-            # ----- Calling essential functions ---------#
-            DATEentry, WONentry = retroUserSearchReq()                                  # Search for Production data
-            hostConn = hs.DAQ_connect(0, 1)                                 # Connect to SQL Host
+            # import signal
+            # os.kill(sid, signal.SIGTERM)
+            if (analysis.entrycget(0, 'state') == 'normal'
+                    and analysis.entrycget(1, 'state') == 'normal'
+                    and analysis.entrycget(3, 'state') == 'normal'):
+                analysis.entryconfig(0, state='disabled')                             # turn command off
 
-            OEEdataID, processID = sqld.searchSqlRecs(hostConn, DATEentry, WONentry)    # Query SQL record
-            # processID = processID +'RF'
-            qType = 2
-            runType.append(qType)
-            print('Connecting to SQL Query...')
+                # ----- Calling essential functions -----------[1]
+                DATEentry, WONentry = retroUserSearchReq()                                  # Popup dialogue
 
-        elif (analysis.entrycget(3, 'state') == 'disabled'
-              and analysis.entrycget(0, 'state') == 'normal'):
-            analysis.entryconfig(3, state='normal')
-            analysis.entryconfig(0, state='disabled')
+                # ---------------------------------------------[2]
+                print('Attempting connection with SQL Server...')
+                hostConn = hs.DAQ_connect(0, 1)                                 # Connect to SQL Host
 
-            # ----- Calling essential functions ----------#
-            DATEentry, WONentry = retroUserSearchReq()                                  # Search for Production data
-            hostConn = hs.DAQ_connect(0, 1)                                 # Connect to SQL Host
-            # connect SQL Server and obtain Process ID ----#
-            OEEdataID, processID = sqld.searchSqlRecs(hostConn, DATEentry, WONentry)    # Query SQL record
-            # ---------------------------------------------[]
-            qType = 2
-            runType.append(qType)
-            print('Connecting to SQL Query...')
+                if hostConn:
+                    # -----------------------------------------[3]
+                    OEEdataID, processID = sqld.searchSqlRecs(hostConn, DATEentry, WONentry)    # Query SQL record
+                    # processID = processID +'RF'
+                    qType = 2
+                    runType.append(qType)
+                else:
+                    print('Connection to SQL Server failed. Please, check Server connection.')
+
+            elif (analysis.entrycget(3, 'state') == 'disabled'
+                  and analysis.entrycget(0, 'state') == 'normal'):
+                analysis.entryconfig(3, state='normal')
+                analysis.entryconfig(0, state='disabled')
+
+                # ----- Calling essential functions ----------#
+                DATEentry, WONentry = retroUserSearchReq()                                 # Search for Production data
+                hostConn = hs.DAQ_connect(0, 1)                                # Connect to SQL Host
+                print('Connecting to SQL Server...')
+
+                if hostConn:
+                    # connect SQL Server and obtain Process ID ----#
+                    OEEdataID, processID = sqld.searchSqlRecs(hostConn, DATEentry, WONentry)    # Query SQL record
+                    # ---------------------------------------------[]
+                    qType = 2
+                    runType.append(qType)
+                else:
+                    print('Connection to SQL Server failed. Please, check Server connection.')
+
+            else:
+                runtimeChange()
+                qType = 0
+                runType.append(qType)
+                print('Invalid SQL Query connection...')
 
         else:
-            runtimeChange()
-            qType = 0
-            runType.append(qType)
-            print('Invalid SQL Query connection...')
+            print('Invalid selection. Please, enable a visualisation mode')
 
         # return # stpd, WON, processID, OEEdataID, qType, hostConn
 
     def realTimePlay():
         import CommsPlc as hp
 
-        global hostConn
+        if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
+            global hostConn
 
-        # import dataRepository as sqld
-        if (analysis.entrycget(0, 'state') == 'normal'
-                and analysis.entrycget(1, 'state') == 'normal'
-                and analysis.entrycget(3, 'state') == 'normal'):
-            analysis.entryconfig(1, state='disabled')
-            # ----- Calling essential functions -----------[]
-            qType = 1
-            runType.append(qType)
-            # ---------------------------------------------[]
-            hostConn = hp.connectM2M()
+            # import dataRepository as sqld
+            if (analysis.entrycget(0, 'state') == 'normal'
+                    and analysis.entrycget(1, 'state') == 'normal'
+                    and analysis.entrycget(3, 'state') == 'normal'):
+                analysis.entryconfig(1, state='disabled')
+                # ----- Calling essential functions -----------[]
+                qType = 1
+                runType.append(qType)
+                # ---------------------------------------------[]
+                hostConn = hp.connectM2M()
 
-        elif (analysis.entrycget(3, 'state') == 'disabled'
-              and analysis.entrycget(1, 'state') == 'normal'):
-            analysis.entryconfig(3, state='normal')
-            analysis.entryconfig(1, state='disabled')
-            # ----- Calling essential functions -----------
-            qType = 1
-            runType.append(qType)
-            hostConn = hp.connectM2M()
+            elif (analysis.entrycget(3, 'state') == 'disabled'
+                  and analysis.entrycget(1, 'state') == 'normal'):
+                analysis.entryconfig(3, state='normal')
+                analysis.entryconfig(1, state='disabled')
+                # ----- Calling essential functions -----------
+                qType = 1
+                runType.append(qType)
+                hostConn = hp.connectM2M()
 
+            else:
+                runtimeChange()
+                qType = 0
+                runType.append(qType)
         else:
-            runtimeChange()
-            qType = 0
-            runType.append(qType)
+            print('Invalid selection. Please, enable a visualisation mode')
 
         return
 
@@ -6081,7 +6169,10 @@ def userMenu():     # listener, myplash
             print(f'Process {p3} failed to terminate!')
             print(f'Process {p2} failed to terminate!')
             print(f'Process {p1} failed to terminate!')
-        # for widget in root.winfo_children():
+            print(f'Process {p1} failed to terminate!')
+        # clear out all children process ---
+        root.winfo_children()[3].destroy()
+        root.winfo_children()[2].destroy()
         root.winfo_children()[1].destroy()
 
     def closeViews():
@@ -6134,15 +6225,6 @@ def userMenu():     # listener, myplash
     filemenu.add_command(label="Exit", command=menuExit)
     menubar.add_cascade(label="System Setup", menu=filemenu)
 
-    # Analysis Menu -----------------------------------------[]
-    analysis = Menu(menubar, tearoff=0)
-    analysis.add_command(label="Post Production", command=retroPlay)
-    analysis.add_command(label="Synchronous SPC", command=realTimePlay)
-
-    analysis.add_separator()
-    analysis.add_command(label="Stop SPC Process", command=stopSPCrun)
-    menubar.add_cascade(label="Runtime Mode", menu=analysis)
-
     # Process Menu ----------------------------------------[]
     process = Menu(menubar, tearoff=0)
     process.add_command(label="Cascade Views", command=viewTypeA)
@@ -6150,6 +6232,14 @@ def userMenu():     # listener, myplash
     process.add_separator()
     process.add_command(label="Close Display", command=closeViews)
     menubar.add_cascade(label="Visualisation", menu=process)
+
+    # Analysis Menu -----------------------------------------[]
+    analysis = Menu(menubar, tearoff=0)
+    analysis.add_command(label="Post Production", command=retroPlay)
+    analysis.add_command(label="Synchronous SPC", command=realTimePlay)
+    analysis.add_separator()
+    analysis.add_command(label="Stop SPC Process", command=stopSPCrun)
+    menubar.add_cascade(label="Runtime Mode", menu=analysis)
 
     # Help Menu ------------------------------------------------[]
     helpmenu = Menu(menubar, tearoff=0)
