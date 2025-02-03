@@ -82,3 +82,31 @@ logout = session.post(posturl_logout, cookies=s7cookies, headers=headers, data=p
 print(logout.status_code)
 print(logout.headers)
 #print logout.content
+
+
+"""
+if @10Hz
+@6m/min = (10cm/sec),   [100cm/10sec]  - @ 10.0sec * 10 = 100 * 4 heads = 400 data points / mt
+@8m/min = (13.3cm/sec), [100cm/7.5sec] - @ 07.5sec * 10 = 075 * 4 heads = 300 data points / mt
+12m/min = (20cm/sec),   [100cm/5sec]   - @ 05.0sec * 10 = 050 * 4 heads = 200 data points / mt
+"""
+
+# -----------------------------------------------------------------------------------------------
+
+import numpy as np
+import matplotlib.pyplot as plt
+x = np.arange(0, 10, 0.1)
+y1 = 0.05 * x**2
+y2 = -1 *y1
+
+fig, ax1 = plt.subplots()
+
+ax2 = ax1.twinx()
+ax1.plot(x, y1, 'g-')
+ax2.plot(x, y2, 'b-')
+
+ax1.set_xlabel('X data')
+ax1.set_ylabel('Y1 data', color='g')
+ax2.set_ylabel('Y2 data', color='b')
+
+plt.show()
