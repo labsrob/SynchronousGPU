@@ -100,6 +100,7 @@ rtValues = []
 # ---------------------------------------------- Common to all Process Procedures -------------------------------[]
 # Call function for configuration file ----[]
 sSize, gType, sStart, sStops, OT, CT, RF, LA, TS, PE, ST, LP = mp.decryptMetricspP(WON)
+print('\nDecrypted Prod Parameters:', OT, CT, RF, LA, TS, PE, ST, LP)
 
 # -----------------------------------------------------------------------------------------------------------------[]
 smp_Sz = int(sSize)                                   # Allow SCADA User to specify window sample size
@@ -268,9 +269,7 @@ def menuExit():
 
 # -------------------------------------------------------------------------------------------[ MAIN PROGRAM ]
 #
-DNVproduction = True
 # ---------------------------------------------------------------------------------------------------------#
-
 
 def tabbed_canvas():    # Tabbed Common Classes -------------------[TABBED ]
     # Create an instance of ttk style
@@ -306,39 +305,42 @@ def tabbed_canvas():    # Tabbed Common Classes -------------------[TABBED ]
     tab6 = ttk.Frame(notebook)
     tab7 = ttk.Frame(notebook)
     tab8 = ttk.Frame(notebook)
-    tab9 = ttk.Frame(notebook)
-    tab10 = ttk.Frame(notebook)
-    tab11 = ttk.Frame(notebook)
+    # tab9 = ttk.Frame(notebook)
+    # tab10 = ttk.Frame(notebook)
+    # tab11 = ttk.Frame(notebook)
 
     # --------------------------DNV Parameters -----[]
-    if DNVproduction:
-        notebook.add(tab1, text="Roller Pressure")          # Stats
-        notebook.add(tab2, text="Tape Temperature")         # Stats
-        notebook.add(tab3, text="Substrate Temperature")    # Stats
-        notebook.add(tab4, text="Winding Tape Speed")       # Stats
-        notebook.add(tab5, text="Gap Measurements")         # Stats
-        # ----------------------------------------------#
-        notebook.add(tab6, text="[Laser Angle]")            # Min/Max x16
-        notebook.add(tab7, text="[Roller Force]")           # Min/Max x16
-        notebook.add(tab8, text="[Cell Tension]")           # Min/Max x2
-        notebook.add(tab8, text="[Oven Temperature]")       # Min/Max x2
-        # ----------------------------------------------#
-        notebook.add(tab9, text="EoL Report System")        # Report
-        notebook.add(tab10, text="EoP Report System")       # Report
-    else:
-        notebook.add(tab1, text="Laser Power")              # Stats
-        notebook.add(tab2, text="Roller Force")             # Stats
-        notebook.add(tab3, text="Tape Temperature")         # Stats
-        notebook.add(tab4, text="Substrate Temperature")    # Stats
-        notebook.add(tab5, text="Winding Tape Speed")       # Stats
-        notebook.add(tab6, text="Gap Measurements")         # Stats
-        # ----------------------------------------------#
-        notebook.add(tab7, text="[Roller Pressure]")        # Min/Max?
-        notebook.add(tab8, text="[Laser Angle]")            # Min/Max - Trend analysis
-        notebook.add(tab9, text="[Cell Tension]")           # Min/Max?
-        # ----------------------------------------------#
-        notebook.add(tab10, text="EoL Report System")
-        notebook.add(tab11, text="EoP Report System")
+    # if DNVproduction:
+    notebook.add(tab1, text="Roller Pressure")          # Stats
+    notebook.add(tab2, text="Tape Temperature")         # Stats
+    notebook.add(tab3, text="Substrate Temperature")    # Stats
+    notebook.add(tab4, text="Winding Tape Speed")       # Stats
+    notebook.add(tab5, text="Gap Measurements")         # Stats
+    # ----------------------------------------------#
+    notebook.add(tab6, text="[Runtime Monitoring]")     # Default DNV Prod Param - Min/Max x16
+    # notebook.add(tab6, text="[Laser Angle]")          # Min/Max x16
+    # notebook.add(tab7, text="[Roller Force]")         # Min/Max x16
+    # notebook.add(tab8, text="[Cell Tension]")         # Min/Max x2
+    # notebook.add(tab9, text="[Oven Temperature]")     # Min/Max x2
+    # if OT == 1 and CT == 1 and RF == 1 and LA == 1:   # DNV, MGM, Bespoke
+
+    # ----------------------------------------------#
+    notebook.add(tab7, text="EoL Report System")        # Report
+    notebook.add(tab8, text="EoP Report System")       # Report
+    # else:
+    #     notebook.add(tab1, text="Laser Power")              # Stats
+    #     notebook.add(tab2, text="Roller Force")             # Stats
+    #     notebook.add(tab3, text="Tape Temperature")         # Stats
+    #     notebook.add(tab4, text="Substrate Temperature")    # Stats
+    #     notebook.add(tab5, text="Winding Tape Speed")       # Stats
+    #     notebook.add(tab6, text="Gap Measurements")         # Stats
+    #     # ----------------------------------------------#
+    #     notebook.add(tab7, text="[Roller Pressure]")        # Min/Max?
+    #     notebook.add(tab8, text="[Laser Angle]")            # Min/Max - Trend analysis
+    #     notebook.add(tab9, text="[Cell Tension]")           # Min/Max?
+    #     # ----------------------------------------------#
+    #     notebook.add(tab10, text="EoL Report System")
+    #     notebook.add(tab11, text="EoP Report System")
     notebook.grid()
 
     # Create DNV tab frames properties -------------[]
@@ -357,20 +359,15 @@ def tabbed_canvas():    # Tabbed Common Classes -------------------[TABBED ]
     app5 = tapeGap(master=tab5)
     app5.grid(column=0, row=0, padx=10, pady=10)
 
-    app6 = paramRollerForce(master=tab6)
+    # app6 = paramMonitors(master=tab6)
+    app6 = MonitorTabb(master=tab6)
     app6.grid(column=0, row=0, padx=10, pady=10)
 
-    app7 = paramCellTension(master=tab7)
+    app7 = collectiveEoL(master=tab7)
     app7.grid(column=0, row=0, padx=10, pady=10)
 
-    app8 = paramLaserAngle(master=tab8)
+    app8 = collectiveEoP(master=tab8)
     app8.grid(column=0, row=0, padx=10, pady=10)
-
-    app9 = collectiveEoP(master=tab9)
-    app9.grid(column=0, row=0, padx=10, pady=10)
-
-    app10 = collectiveEoL(master=tab10)
-    app10.grid(column=0, row=0, padx=10, pady=10)
     # ------------------------------------------[]
     root.mainloop()
 
@@ -476,7 +473,7 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
         combo.bind("<<ComboboxSelected>>", option_selected)
 
         # Update Canvas -----------------------------------------------------[NO FIGURE YET]
-        # canvas = FigureCanvasTkAgg(fig, self)
+        # canvas = FigureCanvasTkAgg(figure, self)
         # canvas.get_tk_widget().pack(expand=False)
 
         # Activate Matplot tools ------------------[Uncomment to activate]
@@ -1100,46 +1097,75 @@ class common_gapProfile(ttk.Frame):
 # ------------------------------------ Additional Tabb for Monitoring Parameters -----------------------------------[B]
 # PRODUCTION PARAM - ROLLER FORCE ------------------[1]
 
-class monitor_RF(ttk.Frame):
+
+class MonitorTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=20)
         self.createWidgets()
 
     def createWidgets(self):
+        # Load Quality Historical Values -----------[]
+        label = ttk.Label(self, text='[' + rType + ' Mode]', font=LARGE_FONT)
+        label.pack(padx=10, pady=5)
         # --------------------------------------------------------------[TODO if pMinMax:]
-        f = Figure(figsize=(10, 4), dpi=100)
-        f.subplots_adjust(left=0.071, bottom=0.057, right=0.99, top=0.998, wspace=0.193)
-        a1 = f.add_subplot(1, 1, 1)
+        f = Figure(figsize=(25, 8), dpi=100)
+        f.subplots_adjust(left=0.024, bottom=0.057, right=0.99, top=0.998, wspace=0.179, hspace=0.164)
+        # a1 = f.add_subplot(1, 1, 1)
+        if int(OT) and int(CT) and int(RF) and int(LA) and not int(TS) and not int(PE):
+            print('\n 4 params condition met....', OT, CT, RF, LA)
+            a1 = f.add_subplot(2, 4, (1, 2))        # Roller Force
+            a2 = f.add_subplot(2, 4, (3, 4))        # Laser Angle
+            a3 = f.add_subplot(2, 4, (5, 6))        # Cell Tension
+            a4 = f.add_subplot(2, 4, (7, 8))        # Oven Temperature
+        else:
+            print('\n6 Param condition met....', OT, CT, RF, LA)
+            # if not ST == 1 and not LP == 1:       # ----- Commercial Production ----
+            a1 = f.add_subplot(2, 6, (1, 2))        # Roller Force      #3
+            a2 = f.add_subplot(2, 6, (3, 4))        # Laser Angle       #4
+            a3 = f.add_subplot(2, 6, (5, 6))        # Cell Tension      #2
+            a4 = f.add_subplot(2, 6, (7, 8))        # Oven Temperature  #1
+            a5 = f.add_subplot(2, 6, (9, 10))       # Placement Error   #6
+            a6 = f.add_subplot(2, 6, (11, 12))      # Tape Speed        #5
 
         # Declare Plots attributes --------------------------------[]
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
+
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minRF, YScale_maxRF = hLSLa - 8.5, hUSLa + 8.5
+        YScale_minRF, YScale_maxRF = 10 - 8.5, 10 + 8.5
         window_Xmin, window_Xmax = 0, (int(sSize) + 3)              # windows view = visible data points
         # ----------------------------------------------------------#
 
         # ---------------------------------------------------------[]
-        a1.legend(loc='upper left')
-        a1.grid(color="0.5", linestyle='-', linewidth=0.5)
 
-        if not pMinMax:   # Do Control plot without S-Plot
-            a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
+        # Initialise runtime limits --------------------#
 
-            # Define limits for Laser Power Control Plots -----------------------#
-            a1.axhline(y=hMeanA, color="green", linestyle="-", linewidth=1)
-            a1.axhspan(hLCLa, hUCLa, facecolor='#A9EF91', edgecolor='#A9EF91')      # Light Green
-            # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-            a1.axhspan(hUCLa, hUSLa, facecolor='#8d8794', edgecolor='#8d8794')      # grey area
-            a1.axhspan(hLSLa, hLCLa, facecolor='#8d8794', edgecolor='#8d8794')      # grey area
-            # clean up when Mean line changes ---
-            a1.axhspan(hUSLa, hUSLa+10, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-            a1.axhspan(hLSLa-10, hLSLa, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-
+        if int(OT) and int(CT) and int(RF) and int(LA) and not int(TS) and not int(PE):
+            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+            a1.legend(loc='upper right', title='Roller Force - N.m')
+            a2.legend(loc='upper right', title='Laser Angle - Deg')
+            a3.legend(loc='upper right', title='Cell Tension - N.m')
+            a4.legend(loc='upper right', title='Oven Temperature - °C')
+            # Initialise runtime limits --------------------#
+            a1.set_ylabel("Compression Force - N.m")  # Force measured in Newton
+            a2.set_ylabel("Laser Head Inclination - Deg")  # Angle measured in Degrees
+            a3.set_ylabel("Cell Tension Force - N.m")  # Tension measured in Newton
+            a4.set_ylabel("Oven Temperature - °C")  # Oven Temperature in Degrees Celsius
         else:
-            # Initialise runtime limits
-            a1.set_ylabel("Min/Max Value Plot - N.m")
-            a1.axhline(y=hMeanA, color="red", linestyle="-", linewidth=1)
+            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+            a1.legend(loc='upper right', title='Roller Force - N.m')
+            a2.legend(loc='upper right', title='Laser Angle - Deg')
+            a3.legend(loc='upper right', title='Oven Temperature - °C')
+            a4.legend(loc='upper right', title='Cell Tension - N.m')
+            a5.legend(loc='upper right', title='Placement Error - Unit')
+            a6.legend(loc='upper right', title='Tape Laying Speed - m/s')
+            # Initialise runtime limits --------------------#
+            a1.set_ylabel("Compression Force - N.m")        # Force measured in Newton
+            a2.set_ylabel("Laser Head Inclination - Deg")   # Angle measured in Degrees
+            a3.set_ylabel("Oven Temperature - °C")          # Oven Temperature in Degree Celsius
+            a4.set_ylabel("Cell Tension - N.m")             # Oven Temperature in Degrees Celsius
+            a5.set_ylabel("Tape Placement Error - %")       # Force measured in Newton
+            a6.set_ylabel("Tape Rotary Speed - m/s")        # Angle measured in Degrees
 
         # Initialise runtime limits --------------------------------#
         a1.set_ylim([YScale_minRF, YScale_maxRF], auto=True)
@@ -1216,7 +1242,7 @@ class monitor_RF(ttk.Frame):
             import VarSQLrf as qrf                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qf.validCols('RF')                             # Construct Data Column selSqlColumnsTFM.py
-            df1 = pd.DataFrame(rfSQL, columns=g1)              # Import into python Dataframe
+            df1 = pd.DataFrame(rfSQL, columns=g1)               # Import into python Dataframe
             RF = qrf.loadProcesValues(df1)                      # Join data values under dataframe
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
@@ -1256,21 +1282,12 @@ class monitor_RF(ttk.Frame):
             im24.set_ydata((RF[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
             im25.set_ydata((RF[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
             # No computation for PPk / Cpk
-
-            if not useHL and not pMinMax:       # switch to control plot on shewhart model
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(smp_Sz, mnA,
-                                                                                                      mnB,
-                                                                                                      0, 0, sdA,
-                                                                                                      sdB, 0, 0)
-            else:                               # switch to historical limits
-                xline, sline = hMeanA, hDevA
+                               # switch to historical limits
+            xline, sline = 10, 2.2
 
             # # Declare Plots attributes ------------------------------------------------------------[]
             # XBar Mean Plot
             a1.axhline(y=xline, color="red", linestyle="--", linewidth=0.8)
-            a1.axhspan(xlcT, xucT, facecolor='#F9C0FD', edgecolor='#F9C0FD')            # 3 Sigma span (Purple)
-            a1.axhspan(xucT, xusT, facecolor='#8d8794', edgecolor='#8d8794')            # grey area
-            a1.axhspan(xlcT, xlsT, facecolor='#8d8794', edgecolor='#8d8794')
             # ---------------------- sBar_minTG, sBar_maxTG -------[]
 
             # Setting up the parameters for moving windows Axes ---[]
@@ -1295,18 +1312,21 @@ class monitor_RF(ttk.Frame):
         canvas.get_tk_widget().pack(expand=False)
 
         # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True)
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(expand=True)
 
+        # ----------------------------------------------------------------------------------------#
 
-class monnitor_CT(ttk.Frame):     # PRODUCTION PARAM - CELL TENSION --------------------[2]
+class monitor_CT(ttk.Frame):     # PRODUCTION PARAM - CELL TENSION --------------------[2]
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.place(x=1010, y=20)
+        # self.place(x=1010, y=20)
+        self.place(x=10, y=10)
         self.createWidgets()
 
-    def createWidgets(self):
+    def createWidget_CT(self):
+        # self.place(x=1010, y=10)
         # --------------------------------------------------------------[]
         f = Figure(figsize=(10, 4), dpi=100)
         f.subplots_adjust(left=0.071, bottom=0.057, right=0.99, top=0.998, wspace=0.193)
@@ -1315,28 +1335,16 @@ class monnitor_CT(ttk.Frame):     # PRODUCTION PARAM - CELL TENSION ------------
         # Declare Plots attributes --------------------------------[]
         plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minCT, YScale_maxCT = hLSLb - 8.5, hUSLb + 8.5
+        YScale_minCT, YScale_maxCT = 12 - 8.5, 10 + 8.5
         window_Xmin, window_Xmax = 0, (int(sSize) + 3)  # windows view = visible data points
 
         # ---------------------------------------------------------[]
         a1.legend(loc='upper left')
         a1.grid(color="0.5", linestyle='-', linewidth=0.5)
 
-        if not pMinMax:  # Do Control plot without S-Plot
-            a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-            # Define limits for Laser Power Control Plots ---------------#
-            a1.axhline(y=hMeanB, color="green", linestyle="-", linewidth=1)
-            a1.axhspan(hLCLb, hUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')      # Light Green
-            # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-            a1.axhspan(hUCLb, hUSLb, facecolor='#8d8794', edgecolor='#8d8794')      # grey area
-            a1.axhspan(hLSLb, hLCLb, facecolor='#8d8794', edgecolor='#8d8794')      # grey area
-            # clean up when Mean line changes ---
-            a1.axhspan(hUSLb, hUSLb+10, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-            a1.axhspan(hLSLb-10, hLSLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-        else:
-            # Initialise runtime limits
-            a1.set_ylabel("Min/Max Value Plot - N.m")
-            a1.axhline(y=hMeanB, color="red", linestyle="-", linewidth=1)
+        # Initialise runtime limits
+        a1.set_ylabel("Min/Max Value Plot - N.m")
+        a1.axhline(y=14, color="red", linestyle="-", linewidth=1)
 
         # Initialise runtime limits ------------------------------------#
         a1.set_ylim([YScale_minCT, YScale_maxCT], auto=True)
@@ -1863,10 +1871,12 @@ class rollerPressure(ttk.Frame):            # -- Defines the tabbed region for Q
         # -----Canvas update --------------------------------------[TODO MOVE TO LAST LINE]
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)
+
         # Activate Matplot tools ------------------[Uncomment to activate]
         # toolbar = NavigationToolbar2Tk(canvas, self)
         # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True)  # ---------------------------------------------[]
+        # canvas._tkcanvas.pack(expand=True)
+        # ---------------------------------------------[]
 
 
 class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Tape Temperature --[]
@@ -5151,14 +5161,17 @@ def userMenu():     # listener, myplash
         s_butt.config(state="disabled")                         # disable Save button
 
         print('\nStacked Values:', rtValues)
-        print('Switch Values', rtValues[-1])
         print('Array Length', len(rtValues))
+        # print('Switch Values', rtValues[-1])
         if len(rtValues) > 1:                                   # Compute the length for dynamic arrays
             x = len(rtValues) - 1                               # Use the last index
-        # Encrypt configuration for production parameters ------#
-        mp.saveMetricspP(WON, sel_SS, sel_gT, sSta, sEnd, rtValues[x][0], rtValues[x][1], rtValues[x][2], rtValues[x][3], rtValues[x][4], rtValues[x][5], rtValues[x][6], rtValues[x][7])
-
+            # Encrypt configuration on production parames ------#
+            mp.saveMetricspP(WON, sel_SS, sel_gT, sSta, sEnd, rtValues[x][0], rtValues[x][1], rtValues[x][2],
+                             rtValues[x][3], rtValues[x][4], rtValues[x][5], rtValues[x][6], rtValues[x][7])
+        else:
+            mp.saveMetricspP(WON, sel_SS, sel_gT, sSta, sEnd, OT, CT, RF, LA, TS, PE, ST, LP)
         return
+
 
     def clearMetrics():
         # clear the content of chart parameter using change settings button ---
@@ -5238,7 +5251,7 @@ def userMenu():     # listener, myplash
 
 
     def dMinMaxPlot():
-        global pStat, dMax, mMax, oMax, OT, CT, RF, LA, TS, PE, ST, LP
+        global pStat, dMax, mMax, oMax, OT, CT, RF, LA, TS, PE, ST, LP, m1, m2, m3, m4, m5, m6, m7, m8
         if dnvMinMax.get():
             print('\nMin/Max Monitoring for DNV Production Parameters..')
             dMax = 1
@@ -5301,7 +5314,7 @@ def userMenu():     # listener, myplash
         return OT, CT, RF, LA, TS, PE, ST, LP
 
     def mMinMaxPlot():
-        global pStat, dMax, mMax, oMax, OT, CT, RF, LA, TS, PE, ST, LP
+        global pStat, dMax, mMax, oMax, OT, CT, RF, LA, TS, PE, ST, LP, m1, m2, m3, m4, m5, m6, m7, m8
         if mgmMinMax.get():
             print('\nMin/Max Monitoring for MGM Production Parameters..')
             dMax = 0
@@ -5362,7 +5375,7 @@ def userMenu():     # listener, myplash
             mTS.set(0)
             mPE.set(0)
             OT, CT, RF, LA, TS, PE, ST, LP = 0, 0, 0, 0, 0, 0, 0, 0
-        print('Min/Max Monitoring:', mMax, 'Plot Stats:', pStat)
+        print('Monitoring Params:', OT, CT, RF, LA, TS, PE, ST, LP, 'Plot Stats:', pStat)
         return OT, CT, RF, LA, TS, PE, ST, LP
 
     def oMinMaxPlot():
@@ -5445,7 +5458,7 @@ def userMenu():     # listener, myplash
                     LP = 0
                 print('Laser Power:', LP)
                 print('\nMonitoring Stored Values:', OT, CT, RF, LA, TS, PE, ST, LP)
-
+                # --------- Use dynamic array to store user selection --------
                 storedV = [OT, CT, RF, LA, TS, PE, ST, LP]
                 rtValues.append(storedV)
 
@@ -5586,12 +5599,11 @@ def userMenu():     # listener, myplash
         else:
             pTG.set(0)
 
-    def mgmConfigs():
+    def mgmConfigs():       # TODO ------- Use the completed URS table to finalise function
         pass
 
 
-
-    def dnvConfigs():  # FIXME ------ Configuration page []
+    def dnvConfigs():
         global modal, pRP, pTT, pST, pWS, pTG
 
         # prevent parent window closure until 'Save settings' ---[]
@@ -5640,9 +5652,6 @@ def userMenu():     # listener, myplash
         Label(modal, text='x̄USL').place(x=440, y=50)
         Label(modal, text='x̄LSL').place(x=500, y=50)
         Label(modal, text='Layer(s)').place(x=550, y=50)
-
-        # Label(pop, text='X\u033FLine :').place(x=278, y=110)
-        # Label(pop, text='S\u0305Line :').place(x=400, y=110)
 
         # # Add Button for making selection -----------------------------------------------------[]
         # rf = Button(modal, text="Save " + pTy + " Metrics", command=saveMetricRP, bg="green", fg="white")
@@ -5725,8 +5734,8 @@ def userMenu():     # listener, myplash
     def newMetricsConfig():  # This is a DNV Metric Configuration Lookup Table ------[]
 
         global pLmtA, sSta, sEnd, eStat, gSize1, gSize2, xUCLLP, xLCLLP, xUCLLA, xLCLLA, xUCLHT, xLCLHT, xUCLDL, \
-            xLCLDL, xUCLDD, xLCLDD, xUCLOT, xLCLOT, hLmtA, pLmtB, dnvMinMax, mgmMinMax, othMinMax, s_butt, sSta, \
-            sEnd, e5, e6, dnv_butt, mgm_butt, button2, pop, mOT, mCT, mRF, mLA, mST, mPE, mTS, mLP
+            xLCLDL, xUCLDD, xLCLDD, xUCLOT, xLCLOT, hLmtA, shewhart, pLmtB, dnvMinMax, mgmMinMax, othMinMax, \
+            s_butt, sSta, sEnd, e5, e6, dnv_butt, mgm_butt, button2, pop, mOT, mCT, mRF, mLA, mST, mPE, mTS, mLP
 
         pop = Toplevel(root)
         pop.wm_attributes('-topmost', True)
@@ -5745,8 +5754,6 @@ def userMenu():     # listener, myplash
 
         sSta, sEnd, gSize1, gSize2 = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
         lPwr, lAng, eStat, optm1, optm2 = IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop)
-
-        XBarMLP, SBarMLP, XBarMLA, SBarMLA = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
 
         pLmtA, pLmtB, pLmtC, pLmtD, pLmtE, pLmtF, mTS, mLP = (IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop),
                                                               IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop))
@@ -5814,7 +5821,7 @@ def userMenu():     # listener, myplash
 
         m8 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="disabled")
         m8.place(x=400, y=y_start + y_incmt * 1)
-        # ---------------------------------------------------------------------
+        # ---------------------------------------------------------------------#
         # load variables directly from ini files --[TODO]
         sbutton = 'disabled'  # disable Save button on entry state
         cState = 'disabled'
@@ -5822,16 +5829,14 @@ def userMenu():     # listener, myplash
         separatorU = ttk.Separator(pop, orient='horizontal')
         separatorU.place(relx=0.01, rely=0.53, relwidth=0.75, relheight=0.01)  # y=7.3
 
-        # separator = ttk.Separator(pop, orient='horizontal')
-        # separator.place(relx=0.12, rely=0.62, relwidth=0.98, relheight=0.02)  # y=0.17
-        # ---------------------------------------------------------------------
+        # ---------------------------------------------------------------------#
         Label(pop, text='[Configure Quality Parameters]', font=("bold", 10)).place(x=10,
                                                                              y=(y_start + 5) + (y_incmt * 3))  # 320 | 7
 
         dnv_butt = Button(pop, text="DNV Key Parameters", wraplength=90, justify=CENTER, width=12,
                           height=3, font=("bold", 12), command=dnvConfigs, state=cState)
         dnv_butt.place(x=240, y=3 + y_start + y_incmt * 4)  # 350 | 8
-        # ----------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------------#
         mgm_butt = Button(pop, text="MGM Key Parameters", wraplength=90, justify=CENTER, width=12,
                               height=3, font=("bold", 12), command=mgmConfigs, state=cState)
         mgm_butt.place(x=380, y=3 + y_start + y_incmt * 4)  # 350 | 8
@@ -6097,43 +6102,6 @@ def userMenu():     # listener, myplash
         else:
             dDispl.set(0)
         return
-
-
-    def cseRF():
-        pass
-
-    def csdRF():
-        pass
-
-    def cseTT():
-        pass
-
-    def csdTT():
-        pass
-
-    def cseST():
-        pass
-
-    def csdST():
-        pass
-
-    def cseTG():
-        pass
-
-    def csdTG():
-        pass
-
-    def cseLP():
-        pass
-
-    def csdLP():
-        pass
-
-    def cseLA():
-        pass
-
-    def csdLA():
-        pass
 
     # ----------------------------------------------------------------
     def enableStats():
