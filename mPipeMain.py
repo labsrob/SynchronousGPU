@@ -116,7 +116,7 @@ def differential_idx(layer, idx1, idx2, idx3, idx4, idx5, idx6, idx7, idx8, pPos
     else:                                                       # if it's an existing report
         f = open('.\\RT_Index_Log\\' + PidxLog + ".txt", "a")   # Just open the file for a write operations
     # initialise a tab delimited data and insert corresponding values in string format ------------------------[]
-    f.write(event+'\t'+str(layer)+'\t'+str(idx1)+'\t'+str(idx2)+'\t'+str(idx3)+'\t'+str(idx4)+ '\t'+str(idx5)+'\t'+str(idx6)+'\t'+str(idx7)+'\t'+str(idx8)+ '\t'+str(pPos)+'\n')
+    f.write(event+'\t'+str(layer)+'\t'+str(idx1)+'\t'+str(idx2)+'\t'+str(idx3)+'\t'+str(idx4)+ '\t'+str(idx5)+'\t'+str(idx6)+'\t'+str(pPos)+'\n')
     f.close()
 
 
