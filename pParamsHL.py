@@ -64,7 +64,7 @@ def checkhistDev(xUCL, MeanP, sampSiz):
     return UCL, LCL, stdDev
 
 
-def saveMetricspP(WorkOrderID, sSize, sGroup, shiftS, shiftE, OT, CT, RF, LA, TS, PE, ST, LP):
+def saveMetricspP(WorkOrderID, sSize, sGroup, shiftS, shiftE, OT, CT, RP, LA, WS, TG, ST, LP):
     shfS = shiftS.get()
     shfE = shiftE.get()
     print('Details of metrics to save:', WorkOrderID, sSize, sGroup, shfS, shfE)
@@ -72,7 +72,7 @@ def saveMetricspP(WorkOrderID, sSize, sGroup, shiftS, shiftE, OT, CT, RF, LA, TS
     # ----------------------------------------------------------------[]
     try:
         print("Attempting to encrypt config values...")
-        encryptMetricspP(WorkOrderID, sSize, sGroup, shfS, shfE, OT, CT, RF, LA, TS, PE, ST, LP)
+        encryptMetricspP(WorkOrderID, sSize, sGroup, shfS, shfE, OT, CT, RP, LA, WS, TG, ST, LP)
 
     except ValueError:
         errorNote()     # response to save button when entry field is empty
@@ -82,7 +82,7 @@ def saveMetricspP(WorkOrderID, sSize, sGroup, shiftS, shiftE, OT, CT, RF, LA, TS
 # --------------------------------------------------------------------[]
 
 
-def encryptMetricspP(WON, sSize, sGroup, shiftS, shiftE, OT, CT, RF, LA, TS, PE, ST, LP):
+def encryptMetricspP(WON, sSize, sGroup, shiftS, shiftE, OT, CT, RP, LA, WS, TG, ST, LP):
     WONID = WON
     # objective of cryptography is to provide basic security concepts in data exchange & integrity
     print('\nWriting encryption into archive...')
@@ -97,10 +97,10 @@ def encryptMetricspP(WON, sSize, sGroup, shiftS, shiftE, OT, CT, RF, LA, TS, PE,
     # ------
     cf5 = onetimepad.encrypt(str(OT), 'random')
     cf6 = onetimepad.encrypt(str(CT), 'random')
-    cf7 = onetimepad.encrypt(str(RF), 'random')
+    cf7 = onetimepad.encrypt(str(RP), 'random')
     cf8 = onetimepad.encrypt(str(LA), 'random')
-    cf9 = onetimepad.encrypt(str(TS), 'random')
-    cfA = onetimepad.encrypt(str(PE), 'random')
+    cf9 = onetimepad.encrypt(str(WS), 'random')
+    cfA = onetimepad.encrypt(str(TG), 'random')
     cfB = onetimepad.encrypt(str(ST), 'random')
     cfC = onetimepad.encrypt(str(LP), 'random')
 
@@ -124,11 +124,11 @@ def encryptMetricspP(WON, sSize, sGroup, shiftS, shiftE, OT, CT, RF, LA, TS, PE,
             # Plot type Min/Max or Control Charts -------
             config.set("ProdParameters_" + WONID, "Oven_Temp", str(cf5))
             config.set("ProdParameters_" + WONID, "Cell_Tens", str(cf6))
-            # ------ ------------------------------------
-            config.set("ProdParameters_"+WONID, "Roller_Force", str(cf7))
+            config.set("ProdParameters_"+WONID, "Roller_Pre", str(cf7))
             config.set("ProdParameters_"+WONID, "Laser_Angle", str(cf8))
-            config.set("ProdParameters_" + WONID, "Tape_Speed", str(cf9))
-            config.set("ProdParameters_" + WONID, "Place_Error", str(cfA))
+            # ------ ------------------------------------
+            config.set("ProdParameters_" + WONID, "Winding_Spd", str(cf9))
+            config.set("ProdParameters_" + WONID, "TapeGap_Pol", str(cfA))
             config.set("ProdParameters_" + WONID, "Spooling_T", str(cfB))
             config.set("ProdParameters_" + WONID, "Laser_Power", str(cfC))
             config.set("ProdParameters_" + WONID, "[" + dt_string + "]", str("-" * 172) + "EndOfConfig.")
@@ -160,10 +160,10 @@ def decryptMetricspP(WONID):
             # ------------------------------------------------------------------#
             OT = onetimepad.decrypt(limpParams["Oven_Temp"], 'random')
             CT = onetimepad.decrypt(limpParams["Cell_Tens"], 'random')
-            RF = onetimepad.decrypt(limpParams["Roller_Force"], 'random')
+            RP = onetimepad.decrypt(limpParams["Roller_Pre"], 'random')
             LA = onetimepad.decrypt(limpParams["Laser_Angle"], 'random')
-            TS = onetimepad.decrypt(limpParams["Tape_Speed"], 'random')
-            PE = onetimepad.decrypt(limpParams["Place_Error"], 'random')
+            WS = onetimepad.decrypt(limpParams["Winding_Spd"], 'random')
+            TG = onetimepad.decrypt(limpParams["TapeGap_Pol"], 'random')
             ST = onetimepad.decrypt(limpParams["Spooling_T"], 'random')
             LP = onetimepad.decrypt(limpParams["Laser_Power"], 'random')
 
@@ -175,10 +175,10 @@ def decryptMetricspP(WONID):
             sStops = 0
             OT = 0
             CT = 0
-            RF = 0
+            RP = 0
             LA = 0
-            TS = 0
-            PE = 0
+            WS = 0
+            TG = 0
             ST = 0
             LP = 0
 
@@ -192,13 +192,13 @@ def decryptMetricspP(WONID):
         sStops = 0
         OT = 0
         CT = 0
-        RF = 0
+        RP = 0
         LA = 0
-        TS = 0
-        PE = 0
+        WS = 0
+        TG = 0
         ST = 0
         LP = 0
 
     # print('Fetch Data:','\n', sSize, '\n', gType, '\n', sStart, '\n', sStops, '\n', pParam1, '\n', pParam2)
 
-    return sSize, gType, sStart, sStops, OT, CT, RF, LA, TS, PE, ST, LP
+    return sSize, gType, sStart, sStops, OT, CT, RP, LA, WS, TG, ST, LP

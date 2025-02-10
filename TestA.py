@@ -3,24 +3,22 @@ from tkinter import ttk
 from tkinter import simpledialog
 
 
-
-
-def make_draggable(widget):
-    widget.bind("<Button-1>", on_drag_start)
-    widget.bind("<B1-Motion>", on_drag_motion)
-
-
-def on_drag_start(event):
-    widget = event.widget
-    widget._drag_start_x = event.x
-    widget._drag_start_y = event.y
-
-
-def on_drag_motion(event):
-    widget = event.widget
-    x = widget.winfo_x() - widget._drag_start_x + event.x
-    y = widget.winfo_y() - widget._drag_start_y + event.y
-    widget.place(x=x, y=y)
+# def make_draggable(widget):
+#     widget.bind("<Button-1>", on_drag_start)
+#     widget.bind("<B1-Motion>", on_drag_motion)
+#
+#
+# def on_drag_start(event):
+#     widget = event.widget
+#     widget._drag_start_x = event.x
+#     widget._drag_start_y = event.y
+#
+#
+# def on_drag_motion(event):
+#     widget = event.widget
+#     x = widget.winfo_x() - widget._drag_start_x + event.x
+#     y = widget.winfo_y() - widget._drag_start_y + event.y
+#     widget.place(x=x, y=y)
 
 #
 # root = tk.Tk()
@@ -81,11 +79,11 @@ import rsa
 #
 # print("decrypted string: ", decMessage)
 
-from cryptography.fernet import Fernet
-
-# Generate a key and instantiate a Fernet instance
-key = Fernet.generate_key()
-cipher_suite = Fernet(key)
+# from cryptography.fernet import Fernet
+#
+# # Generate a key and instantiate a Fernet instance
+# key = Fernet.generate_key()
+# cipher_suite = Fernet(key)
 
 # Encrypt a message
 # text = "Hello, World!"
@@ -111,7 +109,7 @@ cipher_suite = Fernet(key)
 # print("Encoded in Base64:", base64_encoded)
 
 # -----------------------------------------------
-from cryptography.fernet import Fernet
+# from cryptography.fernet import Fernet
 
 # # key generation
 # key = Fernet.generate_key()
@@ -147,7 +145,7 @@ from cryptography.fernet import Fernet
 from cryptography.fernet import Fernet
 
 # we will be encrypting the below string.
-message = "hello geeks"
+# message = "hello geeks"
 
 # generate a key for encryption and decryption
 # You can use fernet to generate
@@ -190,14 +188,14 @@ message = "hello geeks"
 # list1 = [*tuples2,]
 # print('TP01', tuples2)
 # print('TP02', list1)
-from configparser import ConfigParser
-# ----------------------------------------------------------
-config_parser = ConfigParser()
-keyword = "SampleProp_275045"
-
-with open("histProdParams.INI", 'r') as configfile:
-    for section in config_parser.sections():
-        print(section)
+# from configparser import ConfigParser
+# # ----------------------------------------------------------
+# config_parser = ConfigParser()
+# keyword = "SampleProp_275045"
+#
+# with open("histProdParams.INI", 'r') as configfile:
+#     for section in config_parser.sections():
+#         print(section)
 
     #     for key in dict(config_parser.items(section)):
     #         print(section)
@@ -208,3 +206,24 @@ with open("histProdParams.INI", 'r') as configfile:
     # print('\nTP01', section)
 
 
+
+
+def bufferEOF(fname, N):
+    # open index tracker file, and load the     # values in the end of file
+    with open(fname) as file:
+        for line in (file.readlines()[-N:]):    # N = number of lines to read
+            oem = line
+        print('\nEND OF FILE:', oem)
+        print(line, end='')
+    return oem
+
+
+fname = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\RT_Index_Log\\IDXLog_20240507Z.txt'
+eoF = bufferEOF(fname, 1)
+print('\nParsed1:', eoF[10:])
+
+testY = list(eoF[10:])
+print('Parsed2', testY)
+
+lines = eoF[10:].splitlines()
+print('Parsed3', lines)
