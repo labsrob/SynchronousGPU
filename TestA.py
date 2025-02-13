@@ -208,22 +208,44 @@ from cryptography.fernet import Fernet
 
 
 
-def bufferEOF(fname, N):
-    # open index tracker file, and load the     # values in the end of file
-    with open(fname) as file:
-        for line in (file.readlines()[-N:]):    # N = number of lines to read
-            oem = line
-        print('\nEND OF FILE:', oem)
-        print(line, end='')
-    return oem
+# def bufferEOF(fname, N):
+#     # open index tracker file, and load the     # values in the end of file
+#     with open(fname) as file:
+#         for line in (file.readlines()[-N:]):    # N = number of lines to read
+#             oem = line
+#         print('\nEND OF FILE:', oem)
+#         print(line, end='')
+#     return oem
+#
+#
+# fname = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\RT_Index_Log\\IDXLog_20240507Z.txt'
+# eoF = bufferEOF(fname, 1)
+# print('\nParsed1:', eoF[10:])
+#
+# testY = list(eoF[10:])
+# print('Parsed2', testY)
+#
+# lines = eoF[10:].splitlines()
+# print('Parsed3', lines)
 
 
-fname = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\RT_Index_Log\\IDXLog_20240507Z.txt'
-eoF = bufferEOF(fname, 1)
-print('\nParsed1:', eoF[10:])
+# from Tkinter import *
 
-testY = list(eoF[10:])
-print('Parsed2', testY)
+root = tk.Tk()
 
-lines = eoF[10:].splitlines()
-print('Parsed3', lines)
+# variable is stored in the root object
+root.counter = 0
+
+
+def clicked():
+    root.counter += 1
+    L['text'] = 'Button clicked: ' + str(root.counter)
+
+
+b = tk.Button(root, text="Click Me", command=clicked)
+b.pack()
+
+L = tk.Label(root, text="No clicks yet.")
+L.pack()
+
+root.mainloop()

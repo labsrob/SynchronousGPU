@@ -49,7 +49,7 @@ from matplotlib.animation import FuncAnimation
 import pParamsHL as mp
 import qParamsHL as mq
 import pWON_finder as sqld
-import qParameterLP as hla
+import qParameterDNV as hla
 # ------------------------------------------------------------------------[]
 
 cpTapeW, cpLayerNo, runType = [], [], []

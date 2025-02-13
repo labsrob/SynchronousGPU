@@ -19,7 +19,7 @@ from threading import *
 from tkinter import messagebox, ttk
 LARGE_FONT = ("Verdana", 10, 'bold')
 # ---------------------------------
-import qParameterLP as hla
+import qParameterDNV as hla
 import pParamsHL as mp
 
 import pWON_finder as sqld

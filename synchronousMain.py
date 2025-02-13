@@ -50,7 +50,8 @@ from matplotlib.animation import FuncAnimation
 import pParamsHL as mp
 import qParamsHL as mq
 import pWON_finder as sqld
-import qParameterLP as hla
+import qParametersDNV as hla
+import qParametersMGM as hlb
 # ------------------------------------------------------------------------[]
 # tabConfig = []
 cpTapeW, cpLayerNo, runType = [], [], []
@@ -275,9 +276,7 @@ def menuExit():
         root.quit()
         os._exit(0)
 
-# -----------------------------------------------------------[ MAIN PROGRAM ]
-#
-# --------------------------------------------------------------------------#
+# ------------------------------------------------------------------------------------[ MAIN PROGRAM ]
 
 def tabbed_canvas():   # Tabbed Common Classes -------------------[TABBED ]
     """
@@ -337,7 +336,7 @@ def tabbed_canvas():   # Tabbed Common Classes -------------------[TABBED ]
         notebook.add(tab4, text="Tape Temperature")         # Stats x16
         notebook.add(tab5, text="Subs Temperature")         # Stats x16
         notebook.add(tab6, text="Tape Placement Error")     # Stats x8 (2 per Ring)
-        notebook.add(tab7, text="Tape Gap Polarisation")    # Stats x4 per Ring
+        notebook.add(tab7, text="Tape Gap Polarisation")    # Stats x4 (1 per Ring)
         # --------------------------------------------------#
         notebook.add(tab8, text="[Runtime Monitoring]")     # Commercial - LP, LA, RP, WS, TG, RP
         # --------------------------------------------------#
@@ -572,7 +571,7 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         label.pack(pady=10, padx=10)
         # label.place(x=100, y=50)
         # Define Axes ---------------------#
-        combo = ttk.Combobox(self, values=["= Select Process Parameter =", "Roller Pressure",
+        combo = ttk.Combobox(self, values=["= Specify Sample Space =", "Roller Pressure",
                                            "Tape Temperature", "Subs Temperature",
                                            "Winding Speed", "Gap Measurement"], width=25)
         combo.place(x=520, y=10)
@@ -639,6 +638,7 @@ class common_rampProfile(ttk.Frame):
         YScale_minRP, YScale_maxRP = 10 - 8.5, 10 + 8.5             # Roller Force
         window_Xmin, window_Xmax = 0, (12 + 3)                      # windows view = visible data points
 
+        a1.grid(color="0.5", linestyle='-', linewidth=0.5)
         a1.legend(loc='upper right', title='Cumulative Ramp Profile')
         a1.set_ylabel("Cumulated & Average Process Ramp")
         a1.set_xlabel("Sample Distance (mt)")
@@ -651,10 +651,10 @@ class common_rampProfile(ttk.Frame):
         # ---------------- EXECUTE SYNCHRONOUS METHOD --------------#
 
         def synchronousRamp(smp_Sz, smp_St, fetchT):
-            fetch_no = str(fetchT)  # entry value in string sql syntax
+            fetch_no = str(fetchT)              # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
-            if not inUseAlready:  # Load CommsPlc class once
+            if not inUseAlready:                # Load CommsPlc class once
                 import CommsSql as q
                 q.DAQ_connect(1, 0)
             else:
@@ -667,7 +667,7 @@ class common_rampProfile(ttk.Frame):
             # Initialise RT variables ---[]
             autoSpcRun = True
             autoSpcPause = False
-            import keyboard  # for temporary use
+            import keyboard                     # for temporary use
 
             # TODO ----------------------[]
             # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
@@ -843,6 +843,7 @@ class common_climateProfile(ttk.Frame):
         window_Xmin, window_Xmax = 0, (12 + 3)                      # windows view = visible data points
 
         a2.legend(loc='upper right', title='Location-Based Climatic Profile')
+        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
         a2.set_ylabel("Temperature [°C]", color='r')
         a3.set_ylabel("Relative Humidity", color='g')
         a2.set_xlabel("Time Series ")
@@ -1019,6 +1020,7 @@ class common_gapProfile(ttk.Frame):
         YScale_minGP, YScale_maxGP = 10 - 8.5, 10 + 8.5  # Roller Force
         window_Xmin, window_Xmax = 0, (12 + 3)  # windows view = visible data points
 
+        a3.grid(color="0.5", linestyle='-', linewidth=0.5)
         a3.legend(loc='upper right', title='Cumulative Gap Profile')
         a3.set_ylabel("Cumulated & Average Tape Gap Measurement")
         a3.set_xlabel("Sample Distance (mt)")
@@ -2728,7 +2730,7 @@ class laserPower(ttk.Frame):      # -- Defines the tabbed region for QA param - 
         im43, = a2.plot([], [], 'o-', label='Nominal Ramp')
 
         # Statistical Feed -----------------------------------------[]
-        a3.text(0.466, 0.945, 'Performance Feed - TT', fontsize=16, fontweight='bold', ha='center', va='center',
+        a3.text(0.466, 0.945, 'Performance Feed - LP', fontsize=16, fontweight='bold', ha='center', va='center',
                 transform=a3.transAxes)
         # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
         rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
@@ -4044,14 +4046,9 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
         f = Figure(figsize=(25, 8), dpi=100)
         f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
-        a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
-        a2 = f.add_subplot(2, 4, (5, 7))   # S Bar Plo
-        a3 = f.add_subplot(2, 4, (4, 8))   # Performance Feeed
-        # --------------- Former format -------------
-        # a1 = f.add_subplot(2, 5, (1, 4))    # X Bar Plot
-        # a2 = f.add_subplot(2, 5, (8, 9))    # Ramp Profile
-        # a3 = f.add_subplot(2, 5, (6, 7))    # S Bar Plot
-        # a4 = f.add_subplot(2, 5, (5, 10))   # Performance Feeed
+        a1 = f.add_subplot(2, 6, (1, 3))                            # xbar plot
+        a2 = f.add_subplot(2, 6, (7, 9))                            # s bar plot
+        a3 = f.add_subplot(2, 6, (4, 12))                           # void mapping profile
 
         # Declare Plots attributes --------------------------------[H]
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
@@ -4063,12 +4060,21 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
         # Initialise runtime limits
         a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
         a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+
         a1.set_title('Tape Temperature [XBar Plot]', fontsize=12, fontweight='bold')
         a2.set_title('Tape Temperature [S Plot]', fontsize=12, fontweight='bold')
+        a3.set_title('Ramp Mapping Profile - [RMP]', fontsize=12, fontweight='bold')
+
+        a3.set_ylabel("2D - Staked Layer Ramp Mapping")
+        a3.set_xlabel("Sample Distance (mt)")
+
         a1.grid(color="0.5", linestyle='-', linewidth=0.5)
         a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a1.legend(loc='upper right', title='Tape Temperature Control Plot')
+        a3.grid(color="0.5", linestyle='-', linewidth=0.5)
+
+        a1.legend(loc='upper right', title='Tape Temperature')
         a2.legend(loc='upper right', title='Sigma curve')
+        a3.legend(loc='upper right', title='Ramp Profile')
 
         # ----------------------------------------------------------#
         a1.set_ylim([YScale_minTT, YScale_maxTT], auto=True)
@@ -4076,11 +4082,9 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
         # ----------------------------------------------------------#
         a2.set_ylim([sBar_minTT, sBar_maxTT], auto=True)
         a2.set_xlim([window_Xmin, window_Xmax])
-
         # ---------------------------------------------------------[]
-        a3.cla()
-        a3.get_yaxis().set_visible(False)
-        a3.get_xaxis().set_visible(False)
+        a3.set_ylim([sBar_minTT, sBar_maxTT], auto=True)
+        a3.set_xlim([window_Xmin, window_Xmax])
 
         # ---------------------------------------------------------[]
         # Define Plot area and axes -
@@ -4124,35 +4128,6 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
         im42, = a2.plot([], [], 'o-', label='Cumulated Ramp')
         im43, = a2.plot([], [], 'o-', label='Nominal Ramp')
 
-        # Statistical Feed -----------------------------------------[]
-        a3.text(0.466, 0.945, 'Performance Feed - TT', fontsize=16, fontweight='bold', ha='center', va='center',
-                transform=a3.transAxes)
-        # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
-        rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
-        rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
-        a3.add_patch(rect1)
-        a3.add_patch(rect2)
-        # ------- Process Performance Pp (the spread)---------------------
-        a3.text(0.145, 0.804, ttlabel, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.658, '#Pp Value', fontsize=24, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.650, 0.820, 'Ring ' + ttlabel + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
-        a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
-        # ------- Process Performance Ppk (Performance)---------------------
-        a3.text(0.145, 0.403, ttPerf, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.640, 0.420, 'Ring ' + ttPerf + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
-        # -------------------------------------
-        a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
-        # ----- Pipe Position and SMC Status -----
-        a3.text(0.080, 0.090, 'Pipe Position: ' + pPos + '    Processing Layer #' + layer, fontsize=12, ha='left',
-                transform=a3.transAxes)
-        a3.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a3.transAxes)
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
         def synchronousTT(ttSize, ttgType, fetchT):
@@ -4224,7 +4199,62 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
 
             return ttData
 
-        # -------------------------------------[A]
+        # -------------------------------------[Void Profile]
+        def synchronousRMP(smp_Sz, smp_St, fetchT):
+            fetch_no = str(fetchT)  # entry value in string sql syntax
+
+            # Obtain Data from SQL Ropo ---------------------------[]
+            qRP = conn.cursor()
+
+            """
+            Load watchdog function with synchronous function every seconds
+            """
+            # Initialise variables ---[]
+            autoSpcRun = True
+            autoSpcPause = False
+            import keyboard  # for temporary use
+
+            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+            # Define PLC/SMC error state -------------------------------------------#
+
+            while True:
+                # Latch on SQL Query only a
+                import ArrayRP_sqlRLmethod as lq  # DrLabs optimization method
+                inProgress = False  # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+
+                # Get list of relevant SQL Tables using conn() --------------------[]
+                if keyboard.is_pressed("Ctrl"):  # Terminate file-fetch
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        # play(error)                                               # Pause mode with audible Alert
+                        print("\nVisualization in Paused Mode...")
+                    else:
+                        autoSpcPause = False
+                        qRP.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+
+                else:
+                    profile_A = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)  # perform DB connections
+                    print('\nUpdating....')
+
+                # Play visualization ----------------------------------------------[]
+                print("Visualization in Play Mode...")
+                # play(nudge)     # audible alert
+
+                # -----------------------------------------------------------------[]
+                # Allow selective runtime parameter selection on production critical process
+                procID = 'ProA'
+                profile_A = q.paramDataRequest(procID, smp_Sz, smp_St, fetch_no)
+
+            return profile_A
 
         # ================== End of synchronous Method ==========================
         def asynchronousTT(db_freq):
@@ -4234,6 +4264,7 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
 
             # Bistream Data Pooling Method ---------------------#
             ttData = synchronousTT(ttSize, ttgType, db_freq)    # data loading functions
+            rmData = synchronousRMP(smp_Sz, stp_Sz, db_freq)    # Accumulated Gap Mean Profile
             # --------------------------------------------------#
 
             if UsePLC_DBS == 1:
@@ -5303,9 +5334,9 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
         # Initialise runtime limits --------------------------------#
         a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
         a3.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+
         a1.set_title('Tape Gap Polarisation [XBar Plot]', fontsize=12, fontweight='bold')
         a3.set_title('Tape Gap Polarisation [S Plot]', fontsize=12, fontweight='bold')
-
         a4.set_title('Gap Mapping Profile - [TG]', fontsize=12, fontweight='bold')
 
         a4.set_ylabel("2D - Staked Layer Void Mapping")
@@ -5313,11 +5344,12 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
 
         a1.grid(color="0.5", linestyle='-', linewidth=0.5)
         a3.grid(color="0.5", linestyle='-', linewidth=0.5)
+        a4.grid(color="0.5", linestyle='-', linewidth=0.5)
+
         a1.legend(loc='upper right', title='Gap Polarisation')
         a3.legend(loc='upper right', title='Sigma curve')
-
-        # a2.legend(loc='upper right', title='Cumulative Mean Profile')
         a4.legend(loc='upper right', title='Void Map Profile')
+
         # Initialise runtime limits -------------------------------#
         a1.set_ylim([YScale_minTG, YScale_maxTG], auto=True)
         a1.set_xlim([window_Xmin, window_Xmax])
@@ -5327,7 +5359,7 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
 
         # ----------------------------------------------------------[]
         # Define Plot area and axes -
-        # ----------------------------------------------------------#
+        # ----------------------------------------------------------[8 into 4]
         im10, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (A1)')
         im11, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (B1)')
         im12, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (A2)')
@@ -5346,10 +5378,11 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
         im24, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
         im25, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
 
-        # Statistical Profile ------------------------------------------[]
-        # ----------- #
-        im28, = a4.plot([], [], 'o-', label='Keyance Gap Data')             # Profile B
-        im29, = a4.plot([], [], 'o-', label='Keyance Gap Volume')           # Profile B
+        # Statistical Profile ------------------------------------------[4 into 1]
+        im26, = a4.plot([], [], 'o-', label='Ring 1 Gap Data')          # Profile B
+        im27, = a4.plot([], [], 'o-', label='Ring 2 Gap Data')          # Profile B
+        im28, = a4.plot([], [], 'o-', label='Ring 3 Gap Data')          # Profile B
+        im29, = a4.plot([], [], 'o-', label='Ring 4 Gap Data')          # Profile B
 
         # TODO Call additional prolific functions ------------[try pooling data from SQL repo]
         # loadSqlCumProfile(ttk.Frame)
@@ -5428,7 +5461,7 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
             return tgData
 
         # -------------------------------------[Void Profile]
-        def synchronousVP1(smp_Sz, smp_St, fetchT):
+        def synchronousPTG(smp_Sz, smp_St, fetchT):
             fetch_no = str(fetchT)                                                 # entry value in string sql syntax
 
             # Obtain Data from SQL Ropo ---------------------------[]
@@ -5470,7 +5503,7 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
                     continue
 
                 else:
-                    profile_A = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)      # perform DB connections
+                    pro_A = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)      # perform DB connections
                     print('\nUpdating....')
 
                 # Play visualization ----------------------------------------------[]
@@ -5480,71 +5513,10 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
                 # -----------------------------------------------------------------[]
                 # Allow selective runtime parameter selection on production critical process
                 procID = 'ProA'
-                profile_A = q.paramDataRequest(procID, smp_Sz, smp_St, fetch_no)
+                pro_A = q.paramDataRequest(procID, smp_Sz, smp_St, fetch_no)
 
-            return profile_A
+            return pro_A
 
-        # -------------------------------------[A]
-        def synchronousVP2(smp_Sz, smp_St, fetchT):
-            fetch_no = str(fetchT)  # entry value in string sql syntax
-
-            # Obtain Volatile Data from PLC Host Server ---------------------------[]
-            if not inUseAlready:  # Load CommsPlc class once
-                import CommsSql as q
-                q.DAQ_connect(1, 0)
-            else:
-                qRP = conn.cursor()
-
-            # Evaluate conditions for SQL Data Fetch ------------------------------[A]
-            """
-            Load watchdog function with synchronous function every seconds
-            """
-            # Initialise RT variables ---[]
-            autoSpcRun = True
-            autoSpcPause = False
-            import keyboard  # for temporary use
-
-            # TODO ----------------------[]
-            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-            # Define PLC/SMC error state -------------------------------------------#
-
-            while True:
-                # Latch on SQL Query only a
-                inProgress = False  # True for RetroPlay mode
-                print('\nAsynchronous controller activated...')
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
-
-                # Get list of relevant SQL Tables using conn() --------------------[]
-                if keyboard.is_pressed("Ctrl"):  # Terminate file-fetch
-                    print('\nProduction is pausing...')
-                    if not autoSpcPause:
-                        autoSpcRun = not autoSpcRun
-                        autoSpcPause = True
-                        # play(error)                                               # Pause mode with audible Alert
-                        print("\nVisualization in Paused Mode...")
-                    else:
-                        autoSpcPause = False
-                        qRP.close()
-                    print('SQL End of File, connection closes after 30 mins...')
-                    time.sleep(60)
-                    continue
-
-                else:
-                    profile_B = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)  # perform DB connections
-                    print('\nUpdating....')
-
-                # Play visualization ----------------------------------------------[]
-                print("Visualization in Play Mode...")
-                # play(nudge)     # audible alert
-
-                # -----------------------------------------------------------------[]
-                # Allow selective runtime parameter selection on production critical process
-                procID = 'ProB'
-                profile_B = q.paramDataRequest(procID, smp_Sz, smp_St, fetch_no)
-
-            return profile_B
 
         # ================== End of synchronous Method ==========================
 
@@ -5557,15 +5529,14 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
 
             # Establish Multi-Stream data pooling pipeline -------------#
             tgData = synchronousTG(smp_Sz, stp_Sz, db_freq)         # PLC synchronous Data loading method1
-            gapPdata = synchronousVP1(smp_Sz, stp_Sz, db_freq)      # Accumulated Gap Mean Profile
-            voidData = synchronousVP2(smp_Sz, stp_Sz, db_freq)      # Dr Labs Method for Void Mapping Profile
+            voidData = synchronousPTG(smp_Sz, stp_Sz, db_freq)      # Dr Labs Method for Void Mapping Profile
 
             # Initialise colum heads -----------------------------------#
-            df3 = pd.DataFrame(gapPdata, columns=['CumulativeGapMean', 'NominalGapMean'])
-            ProA = [df3['CumulativeGapMean'], df3['NominalGapMean']]
-
+            # gapPdata = synchronousVP1(smp_Sz, stp_Sz, db_freq)    # Accumulated Gap Mean Profile
+            # df3 = pd.DataFrame(gapPdata, columns=['CumulativeGapMean', 'NominalGapMean'])
+            # ProA = [df3['CumulativeGapMean'], df3['NominalGapMean']]
             df4 = pd.DataFrame(voidData, columns=['AverageVoid', 'SampleDistance'])
-            ProB = [df4['AverageVoid'], df4['SampleDistance']]
+            Pro_A = [df4['AverageVoid'], df4['SampleDistance']]
             # ----------------------------------------------------------#
 
             if UsePLC_DBS == 1:
@@ -5606,9 +5577,8 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
             # ----- Sample Nominal Layer -----
             im26.set_xdata(np.arange(db_freq))
             im27.set_xdata(np.arange(db_freq))
-            # ---- Sample Distance in meters --
-            im28.set_xdata(np.arange(db_freq * 10 /db_freq))      # Assuming TCP01 running at 10cm/sec))
-            im29.set_xdata(np.arange(db_freq * 10 /db_freq))      # Assuming TCP01 running at 10cm/sec))
+            im28.set_xdata(np.arange(db_freq))
+            im29.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
             im10.set_ydata((TG[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
@@ -5635,6 +5605,11 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
             im23.set_ydata((TG[5]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
             im24.set_ydata((TG[6]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
             im25.set_ydata((TG[7]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+            # ---- Sample Distance in meters ---------
+            im26.set_xdata(np.arange(db_freq * 10 / db_freq))  # Assuming TCP01 running at 10cm/sec))
+            im27.set_xdata(np.arange(db_freq * 10 / db_freq))  # Assuming TCP01 running at 10cm/sec))
+            im28.set_xdata(np.arange(db_freq * 10 / db_freq))  # Assuming TCP01 running at 10cm/sec))
+            im29.set_xdata(np.arange(db_freq * 10 / db_freq))  # Assuming TCP01 running at 10cm/sec))
 
             if not tgHL:
                 mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(smp_Sz, mnA,
@@ -5647,10 +5622,10 @@ class tapeGapPol(ttk.Frame):       # -- Defines the tabbed region for QA param -
                                                                                           0, 0, tgUSL, tgLSL, tgUCL,
                                                                                           tgLCL)
             # ---- Profile rolling Data Plot -------
-            im26.set_ydata((ProA[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Profile A
-            im27.set_ydata((ProA[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Profile A
-            im28.set_ydata((ProB[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq* 10 /db_freq])  # Profile B
-            im29.set_ydata((ProB[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq* 10 /db_freq])  # Profile B
+            im26.set_ydata((Pro_A[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Profile A
+            im27.set_ydata((Pro_A[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Profile A
+            im28.set_ydata((Pro_A[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq* 10 /db_freq])  # Profile B
+            im29.set_ydata((Pro_A[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq* 10 /db_freq])  # Profile B
 
             # # Declare Plots attributes ------------------------------------------------------------[]
             # XBar Mean Plot
@@ -7381,16 +7356,17 @@ def userMenu():     # listener, myplash
             mgmMinMax.set(mMax)
             othMinMax.set(oMax)
             # Set Production Parameter Variables
-            mLP.set(1)
             mLA.set(1)
-            mTG.set(1)
+            mLP.set(1)
+            mCT.set(1)
+            mOT.set(1)
+            mRP.set(1)
             mWS.set(1)
             # ---------
+            mTG.set(0)
             mST.set(0)
-            mRP.set(0)
-            mOT.set(0)
-            mCT.set(0)
-            # ----------------------------------------------------
+            # ----------------------------------------------------[]
+
             if metRO:
                 # repopulate with default values -----------#
                 m1 = Checkbutton(pop, text="Oven Temperature", font=("bold", 10), variable=mOT, state="disabled")
@@ -7427,15 +7403,15 @@ def userMenu():     # listener, myplash
             dnvMinMax.set(dMax)
             mgmMinMax.set(mMax)
             othMinMax.set(oMax)
-            mLP.set(0)
             mLA.set(0)
+            mLP.set(0)
+            mCT.set(0)
+            mOT.set(0)
+            mRP.set(0)
+            mWS.set(0)
+            # ---------
             mTG.set(0)
             mST.set(0)
-            # -------
-            mWS.set(0)
-            mRP.set(0)
-            mOT.set(0)
-            mCT.set(0)
 
             OT, CT, RP, LA, WS, TG, ST, LP = 0, 0, 0, 0, 0, 0, 0, 0
         print('Monitoring Params:', OT, CT, RP, LA, WS, TG, ST, LP, 'Plot Stats:', pStat)
@@ -7619,16 +7595,103 @@ def userMenu():     # listener, myplash
 
         return usepHL
 
-    def runChecksA():
-        if pRP.get():
+    def mgmChecksA():
+        if pLP.get():
             pRP.set(1)
+            pLA.set(0)
+            pTP.set(0)
+            pRF.set(0)
             pTT.set(0)
             pST.set(0)
-            pWS.set(0)
             pTG.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pRP, pTT, pST, pWS, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
+            pLP.set(0)
+
+    # ------------------------
+    def mgmChecksB():
+        if pLA.get():
             pRP.set(0)
+            pLA.set(1)
+            pTP.set(0)
+            pRF.set(0)
+            pTT.set(0)
+            pST.set(0)
+            pTG.set(0)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+        else:
+            pLA.set(0)
+
+    # ------------------------
+    def mgmChecksC():
+        if pTP.get():
+            pRP.set(0)
+            pLA.set(0)
+            pTP.set(1)
+            pRF.set(0)
+            pTT.set(0)
+            pST.set(0)
+            pTG.set(0)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+        else:
+            pTP.set(0)
+
+    # ------------------------
+    def mgmChecksD():
+        if pRF.get():
+            pRP.set(0)
+            pLA.set(0)
+            pTP.set(0)
+            pRF.set(1)
+            pTT.set(0)
+            pST.set(0)
+            pTG.set(0)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+        else:
+            pRF.set(0)
+
+    # ------------------------
+    def mgmChecksE():
+        if pLA.get():
+            pRP.set(0)
+            pLA.set(0)
+            pTP.set(0)
+            pRF.set(0)
+            pTT.set(1)
+            pST.set(0)
+            pTG.set(0)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+        else:
+            pTT.set(0)
+
+    # ------------------------
+    def mgmChecksF():
+        if pST.get():
+            pRP.set(0)
+            pLA.set(0)
+            pTP.set(0)
+            pRF.set(0)
+            pTT.set(0)
+            pST.set(1)
+            pTG.set(0)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+        else:
+            pST.set(0)
+
+    # ------------------------
+    def mgmChecksG():
+        if pTG.get():
+            pRP.set(0)
+            pLA.set(0)
+            pTP.set(0)
+            pRF.set(0)
+            pTT.set(0)
+            pST.set(0)
+            pTG.set(1)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+        else:
+            pLA.set(0)
+
 
     def runChecksB():
         if pTT.get():
@@ -7674,9 +7737,6 @@ def userMenu():     # listener, myplash
         else:
             pTG.set(0)
 
-    def mgmConfigs():       # TODO ------- Use the completed URS table to finalise function
-        pass
-
 
     def dnvConfigs():
         global modal, pRP, pTT, pST, pWS, pTG
@@ -7716,6 +7776,72 @@ def userMenu():     # listener, myplash
 
         a5 = Checkbutton(modal, text="TapeGaps", font=("bold", 10), variable=pTG, command=runChecksE)
         a5.place(x=500, y=10)
+
+        separator = ttk.Separator(modal, orient='horizontal')
+        separator.place(relx=0.01, rely=0.17, relwidth=0.98, relheight=0.02)
+
+        # ----------------------------------------[Laser Power]
+        Label(modal, text='Tape Size').place(x=10, y=50)
+        Label(modal, text='x̄UCL').place(x=80, y=50)
+        Label(modal, text='x̄LCL').place(x=140, y=50)
+        Label(modal, text='ŝUCL').place(x=200, y=50)
+        Label(modal, text='ŝLCL').place(x=260, y=50)
+        Label(modal, text='x̄Mean').place(x=320, y=50)
+        Label(modal, text='ŝMean').place(x=380, y=50)
+        Label(modal, text='x̄USL').place(x=440, y=50)
+        Label(modal, text='x̄LSL').place(x=500, y=50)
+        Label(modal, text='Layer(s)').place(x=550, y=50)
+
+        # # Add Button for making selection -----------------------------------------------------[]
+        # rf = Button(modal, text="Save " + pTy + " Metrics", command=saveMetricRP, bg="green", fg="white")
+        # rf.place(x=254, y=200)
+        return
+
+# ------------------------------------------------------------------------------------------------[]
+    def mgmConfigs():
+        global modal, pLP, pLA, pTP, pRF, pTT, pST, pTG
+
+        # prevent parent window closure until 'Save settings' ---[]
+        root.protocol("WM_DELETE_WINDOW", preventClose)  # prevent closure even when using (ALT + F4)
+        # -------------------------------------------------------[]
+
+        modal = Toplevel(root)
+        modal.wm_attributes('-topmost', True)
+
+        pLP, pLA, pTP, pRF, pTT, pST, pTG = IntVar(), IntVar(), IntVar(), IntVar(), IntVar(), IntVar(), IntVar()
+
+        # --------------------------------------------------------------------------------------------------------[]
+        modal.resizable(False, False)
+
+        w, h = 650, 250
+        modal.title('Lookup Table: Define Historical Limits')
+        screen_w = modal.winfo_screenwidth()
+        screen_h = modal.winfo_screenheight()
+        x_c = int((screen_w / 2) - (w / 2))
+        y_c = int((screen_h / 2) - (h / 2))
+        modal.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
+
+        # --------------------------------------------------------[]
+        a1 = Checkbutton(modal, text="Laser Power", font=("bold", 10), variable=pLP, command=mgmChecksA)
+        a1.place(x=20, y=10)
+
+        a2 = Checkbutton(modal, text="Laser Angle", font=("bold", 10), variable=pLA, command=mgmChecksB)
+        a2.place(x=120, y=10)
+
+        a3 = Checkbutton(modal, text="Keyance Error", font=("bold", 10), variable=pTP, command=mgmChecksC)
+        a3.place(x=220, y=10)
+
+        a4 = Checkbutton(modal, text="Roller Force", font=("bold", 10), variable=pRF, command=mgmChecksD)
+        a4.place(x=320, y=10)
+
+        a5 = Checkbutton(modal, text="Tape Temperature", font=("bold", 10), variable=pTT, command=mgmChecksE)
+        a5.place(x=420, y=10)
+
+        a6 = Checkbutton(modal, text="Subst Temperature", font=("bold", 10), variable=pST, command=mgmChecksF)
+        a6.place(x=520, y=10)
+
+        a7 = Checkbutton(modal, text="TapeGaps", font=("bold", 10), variable=pTG, command=mgmChecksG)
+        a7.place(x=620, y=10)
 
         separator = ttk.Separator(modal, orient='horizontal')
         separator.place(relx=0.01, rely=0.17, relwidth=0.98, relheight=0.02)
