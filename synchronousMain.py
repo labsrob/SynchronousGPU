@@ -48,7 +48,7 @@ from pydub import AudioSegment
 from matplotlib.animation import FuncAnimation
 # ---------------------------------
 import pParamsHL as mp
-import qParamsHL as mq
+import qParamsHL_DNV as mq
 import pWON_finder as sqld
 import qParametersDNV as hla
 import qParametersMGM as hlb
@@ -7597,7 +7597,7 @@ def userMenu():     # listener, myplash
 
     def mgmChecksA():
         if pLP.get():
-            pRP.set(1)
+            pLP.set(1)
             pLA.set(0)
             pTP.set(0)
             pRF.set(0)
@@ -7611,7 +7611,7 @@ def userMenu():     # listener, myplash
     # ------------------------
     def mgmChecksB():
         if pLA.get():
-            pRP.set(0)
+            pLP.set(0)
             pLA.set(1)
             pTP.set(0)
             pRF.set(0)
@@ -7625,7 +7625,7 @@ def userMenu():     # listener, myplash
     # ------------------------
     def mgmChecksC():
         if pTP.get():
-            pRP.set(0)
+            pLP.set(0)
             pLA.set(0)
             pTP.set(1)
             pRF.set(0)
@@ -7639,7 +7639,7 @@ def userMenu():     # listener, myplash
     # ------------------------
     def mgmChecksD():
         if pRF.get():
-            pRP.set(0)
+            pLP.set(0)
             pLA.set(0)
             pTP.set(0)
             pRF.set(1)
@@ -7652,8 +7652,8 @@ def userMenu():     # listener, myplash
 
     # ------------------------
     def mgmChecksE():
-        if pLA.get():
-            pRP.set(0)
+        if pTT.get():
+            pLP.set(0)
             pLA.set(0)
             pTP.set(0)
             pRF.set(0)
@@ -7667,7 +7667,7 @@ def userMenu():     # listener, myplash
     # ------------------------
     def mgmChecksF():
         if pST.get():
-            pRP.set(0)
+            pLP.set(0)
             pLA.set(0)
             pTP.set(0)
             pRF.set(0)
@@ -7681,7 +7681,7 @@ def userMenu():     # listener, myplash
     # ------------------------
     def mgmChecksG():
         if pTG.get():
-            pRP.set(0)
+            pLP.set(0)
             pLA.set(0)
             pTP.set(0)
             pRF.set(0)
@@ -7786,10 +7786,12 @@ def userMenu():     # listener, myplash
         Label(modal, text='x̄LCL').place(x=140, y=50)
         Label(modal, text='ŝUCL').place(x=200, y=50)
         Label(modal, text='ŝLCL').place(x=260, y=50)
+
         Label(modal, text='x̄Mean').place(x=320, y=50)
         Label(modal, text='ŝMean').place(x=380, y=50)
         Label(modal, text='x̄USL').place(x=440, y=50)
         Label(modal, text='x̄LSL').place(x=500, y=50)
+
         Label(modal, text='Layer(s)').place(x=550, y=50)
 
         # # Add Button for making selection -----------------------------------------------------[]
@@ -7813,7 +7815,7 @@ def userMenu():     # listener, myplash
         # --------------------------------------------------------------------------------------------------------[]
         modal.resizable(False, False)
 
-        w, h = 650, 250
+        w, h = 750, 250
         modal.title('Lookup Table: Define Historical Limits')
         screen_w = modal.winfo_screenwidth()
         screen_h = modal.winfo_screenheight()
@@ -7828,109 +7830,111 @@ def userMenu():     # listener, myplash
         a2 = Checkbutton(modal, text="Laser Angle", font=("bold", 10), variable=pLA, command=mgmChecksB)
         a2.place(x=120, y=10)
 
-        a3 = Checkbutton(modal, text="Keyance Error", font=("bold", 10), variable=pTP, command=mgmChecksC)
+        a3 = Checkbutton(modal, text="Tape Error", font=("bold", 10), variable=pTP, command=mgmChecksC)
         a3.place(x=220, y=10)
 
         a4 = Checkbutton(modal, text="Roller Force", font=("bold", 10), variable=pRF, command=mgmChecksD)
         a4.place(x=320, y=10)
 
-        a5 = Checkbutton(modal, text="Tape Temperature", font=("bold", 10), variable=pTT, command=mgmChecksE)
+        a5 = Checkbutton(modal, text="Tape Temp", font=("bold", 10), variable=pTT, command=mgmChecksE)
         a5.place(x=420, y=10)
 
-        a6 = Checkbutton(modal, text="Subst Temperature", font=("bold", 10), variable=pST, command=mgmChecksF)
+        a6 = Checkbutton(modal, text="Substrate Temp", font=("bold", 10), variable=pST, command=mgmChecksF)
         a6.place(x=520, y=10)
 
-        a7 = Checkbutton(modal, text="TapeGaps", font=("bold", 10), variable=pTG, command=mgmChecksG)
-        a7.place(x=620, y=10)
+        a7 = Checkbutton(modal, text="Tape Gaps", font=("bold", 10), variable=pTG, command=mgmChecksG)
+        a7.place(x=650, y=10)
 
         separator = ttk.Separator(modal, orient='horizontal')
         separator.place(relx=0.01, rely=0.17, relwidth=0.98, relheight=0.02)
 
-        # ----------------------------------------[Laser Power]
+        # --------------------------------------------[LP]
         Label(modal, text='Tape Size').place(x=10, y=50)
         Label(modal, text='x̄UCL').place(x=80, y=50)
         Label(modal, text='x̄LCL').place(x=140, y=50)
         Label(modal, text='ŝUCL').place(x=200, y=50)
         Label(modal, text='ŝLCL').place(x=260, y=50)
-        Label(modal, text='x̄Mean').place(x=320, y=50)
-        Label(modal, text='ŝMean').place(x=380, y=50)
-        Label(modal, text='x̄USL').place(x=440, y=50)
-        Label(modal, text='x̄LSL').place(x=500, y=50)
-        Label(modal, text='Layer(s)').place(x=550, y=50)
 
+        Label(modal, text='x̄Mean').place(x=380, y=50)
+        Label(modal, text='ŝMean').place(x=440, y=50)
+        Label(modal, text='x̄USL').place(x=500, y=50)
+        Label(modal, text='x̄LSL').place(x=560, y=50)
+
+        Label(modal, text='Tape Layer(s)').place(x=660, y=50)
+        # 550, 670
         # # Add Button for making selection -----------------------------------------------------[]
         # rf = Button(modal, text="Save " + pTy + " Metrics", command=saveMetricRP, bg="green", fg="white")
         # rf.place(x=254, y=200)
         return
 
-    def enQHL():
-        global qHl, qAl, aut
+    def enDNV():
+        global dnv, mgm, aut
         if pLmtA.get():
-            qAl = 1
-            qHl = 0
+            dnv = 1
+            mgm = 0
             aut = 0
             dnv_butt.config(state="normal")
             mgm_butt.config(state="disabled")
-            pLmtA.set(qAl)
+            pLmtA.set(dnv)
             shewhart.set(aut)
-            pLmtB.set(qHl)
+            pLmtB.set(mgm)
         else:
-            qAl = 0
-            qHl = 0
-            aut = 1
-            dnv_butt.config(state="disabled")
-            mgm_butt.config(state="disabled")
-            pLmtA.set(qAl)
-            shewhart.set(aut)
-            pLmtB.set(qHl)
-
-        return qHl, qAl, aut
-    #
-    def enQAL():
-        global qAl, qHl, aut
-        if shewhart.get():
-            qAl = 0
-            aut = 1
-            qHl = 0
-            dnv_butt.config(state="disabled")
-            mgm_butt.config(state="disabled")
-            pLmtA.set(qAl)
-            shewhart.set(aut)
-            pLmtB.set(qHl)
-        else:
-            qAl = 0
-            aut = 1
-            qHl = 0
-            dnv_butt.config(state="disabled")
-            mgm_butt.config(state="disabled")
-            pLmtA.set(qAl)
-            shewhart.set(aut)
-            pLmtB.set(qHl)
-
-        return qAl, qHl, aut
-
-    def enAFO():
-        global qAl, qHl, aut
-        if pLmtB.get():
-            qAl = 0
+            dnv = 1
+            mgm = 0
             aut = 0
-            qHl = 1
+            dnv_butt.config(state="disabled")
+            mgm_butt.config(state="disabled")
+            pLmtA.set(dnv)
+            shewhart.set(aut)
+            pLmtB.set(mgm)
+
+        return dnv, mgm, aut
+
+    def enAUTO():
+        global dnv, mgm, aut
+        if shewhart.get():
+            dnv = 0
+            mgm = 0
+            aut = 1
+            dnv_butt.config(state="disabled")
+            mgm_butt.config(state="disabled")
+            pLmtA.set(dnv)
+            shewhart.set(aut)
+            pLmtB.set(mgm)
+        else:
+            dnv = 0
+            mgm = 0
+            aut = 1
+            dnv_butt.config(state="disabled")
+            mgm_butt.config(state="disabled")
+            pLmtA.set(dnv)
+            shewhart.set(aut)
+            pLmtB.set(mgm)
+
+        return dnv, mgm, aut
+
+    def enMGM():
+        global dnv, mgm, aut
+        if pLmtB.get():
+            dnv = 0
+            mgm = 1
+            aut = 0
             mgm_butt.config(state="normal")
             dnv_butt.config(state="disabled")
-            pLmtA.set(qAl)
+            pLmtA.set(dnv)
             shewhart.set(aut)
-            pLmtB.set(qHl)
+            pLmtB.set(mgm)
         else:
-            qAl = 0
-            aut = 1
-            qHl = 0
+            dnv = 0
+            mgm = 1
+            aut = 0
             mgm_butt.config(state="disabled")
             dnv_butt.config(state="disabled")
-            pLmtA.set(qAl)
+            pLmtA.set(dnv)
             shewhart.set(aut)
-            pLmtB.set(qHl)
+            pLmtB.set(mgm)
 
-        return qAl, qHl, aut
+        return dnv, mgm, aut
 
     def preventClose():
         print('Variable State:', pLmtA.get())
@@ -8047,14 +8051,14 @@ def userMenu():     # listener, myplash
         mgm_butt.place(x=380, y=3 + y_start + y_incmt * 4)  # 350 | 8
         # --------------------------------------------------------------------------------------------#
 
-        p1 = Checkbutton(pop, text="DNV Quality Limits", font=("bold", 10), variable=pLmtA, command=enQHL)
+        p1 = Checkbutton(pop, text="DNV Quality Limits", font=("bold", 10), variable=pLmtA, command=enDNV)
         p1.place(x=10, y=3 + y_start + y_incmt * 4)         # 353
 
-        p2 = Checkbutton(pop, text="Shewhart's Limits", font=("bold", 10), variable=shewhart, command=enQAL)
+        p2 = Checkbutton(pop, text="Shewhart's Limits", font=("bold", 10), variable=shewhart, command=enAUTO)
         p2.place(x=10, y=y_start + y_incmt * 5)             # 373 | 9
         shewhart.set(1)
 
-        p3 = Checkbutton(pop, text="Commercial Limits", font=("bold", 10), variable=pLmtB, command=enAFO)
+        p3 = Checkbutton(pop, text="Commercial Limits", font=("bold", 10), variable=pLmtB, command=enMGM)
         p3.place(x=10, y=y_start + y_incmt * 6)             # 393 |10
 
         def display_selection(event):
