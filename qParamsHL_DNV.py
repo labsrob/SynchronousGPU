@@ -1371,7 +1371,7 @@ def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
     return
 
 
-def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA, lineB, lineC, lineD, lineE):
+def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, lineA, lineB, lineC, lineD, lineE):
     WONID = WON
     # objective of cryptography is to provide basic security concepts in data exchange & integrity
     # initialise object instance ---
@@ -1384,48 +1384,74 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         tgA = onetimepad.encrypt(str(sSize), 'random')
         tgB = onetimepad.encrypt(str(gType), 'random')
         tgK = onetimepad.encrypt(str(sCyc), 'random')
-        tgC = onetimepad.encrypt(str(enHL), 'random')
-        tgD = onetimepad.encrypt(str(enAL), 'random')
-        tgE = onetimepad.encrypt(str(enFO), 'random')
+        tgC = onetimepad.encrypt(str(enDNV), 'random')
+        tgD = onetimepad.encrypt(str(enMGM), 'random')
+        tgE = onetimepad.encrypt(str(enAUT), 'random')
         tgF = onetimepad.encrypt(str(lineA), 'random')
-        tgG = 0                                            # Do nothing -- Can be used for future scalability
+        tgG = 0  # Do nothing -- Can be used for future scalability
         tgH = 0
         tgI = 0
         tgJ = 0
 
-    elif processID == 'WS':
-        wsA = onetimepad.encrypt(str(sSize), 'random')
-        wsB = onetimepad.encrypt(str(gType), 'random')
-        wsK = onetimepad.encrypt(str(sCyc), 'random')
-        wsC = onetimepad.encrypt(str(enHL), 'random')
-        wsD = onetimepad.encrypt(str(enAL), 'random')
-        wsE = onetimepad.encrypt(str(enFO), 'random')
-        wsF = onetimepad.encrypt(str(lineA), 'random')
-        wsG = 0                                            # Do nothing -- Can be used for future scalability
-        wsH = 0
-        wsI = 0
-        wsJ = 0
+    elif processID == 'TP':
+        tpA = onetimepad.encrypt(str(sSize), 'random')
+        tpB = onetimepad.encrypt(str(gType), 'random')
+        tpK = onetimepad.encrypt(str(sCyc), 'random')
+        tpC = onetimepad.encrypt(str(enDNV), 'random')
+        tpD = onetimepad.encrypt(str(enMGM), 'random')
+        tpE = onetimepad.encrypt(str(enAUT), 'random')
+        tpF = onetimepad.encrypt(str(lineA), 'random')
+        tpG = 0  # Do nothing -- Can be used for future scalability
+        tpH = 0
+        tpI = 0
+        tpJ = 0
 
-    elif processID == 'RP':
-        rpA = onetimepad.encrypt(str(sSize), 'random')
-        rpB = onetimepad.encrypt(str(gType), 'random')
-        rpK = onetimepad.encrypt(str(sCyc), 'random')
-        rpC = onetimepad.encrypt(str(enHL), 'random')
-        rpD = onetimepad.encrypt(str(enAL), 'random')
-        rpE = onetimepad.encrypt(str(enFO), 'random')
-        rpF = onetimepad.encrypt(str(lineA), 'random')
-        rpG = onetimepad.encrypt(str(lineB), 'random')
-        rpH = 0                                            # Do nothing -- Can be used for future scalability
-        rpI = 0
-        rpJ = 0
+    elif processID == 'LA':
+        laA = onetimepad.encrypt(str(sSize), 'random')
+        laB = onetimepad.encrypt(str(gType), 'random')
+        laK = onetimepad.encrypt(str(sCyc), 'random')
+        laC = onetimepad.encrypt(str(enDNV), 'random')
+        laD = onetimepad.encrypt(str(enMGM), 'random')
+        laE = onetimepad.encrypt(str(enAUT), 'random')
+        laF = onetimepad.encrypt(str(lineA), 'random')
+        laG = 0                                            # Do nothing -- Can be used for future scalability
+        laH = 0
+        laI = 0
+        laJ = 0
+
+    elif processID == 'RF':
+        rfA = onetimepad.encrypt(str(sSize), 'random')
+        rfB = onetimepad.encrypt(str(gType), 'random')
+        rfK = onetimepad.encrypt(str(sCyc), 'random')
+        rfC = onetimepad.encrypt(str(enDNV), 'random')
+        rfD = onetimepad.encrypt(str(enMGM), 'random')
+        rfE = onetimepad.encrypt(str(enAUT), 'random')
+        rfF = onetimepad.encrypt(str(lineA), 'random')
+        rfG = onetimepad.encrypt(str(lineB), 'random')
+        rfH = 0                                            # Do nothing -- Can be used for future scalability
+        rfI = 0
+        rfJ = 0
+
+    elif processID == 'LP':
+        lpA = onetimepad.encrypt(str(sSize), 'random')
+        lpB = onetimepad.encrypt(str(gType), 'random')
+        lpK = onetimepad.encrypt(str(sCyc), 'random')
+        lpC = onetimepad.encrypt(str(enDNV), 'random')
+        lpD = onetimepad.encrypt(str(enMGM), 'random')
+        lpE = onetimepad.encrypt(str(enAUT), 'random')
+        lpF = onetimepad.encrypt(str(lineA), 'random')
+        lpG = onetimepad.encrypt(str(lineB), 'random')
+        lpH = 0                                            # Do nothing -- Can be used for future scalability
+        lpI = 0
+        lpJ = 0
 
     elif processID == 'TT':
         ttA = onetimepad.encrypt(str(sSize), 'random')
         ttB = onetimepad.encrypt(str(gType), 'random')
         ttK = onetimepad.encrypt(str(sCyc), 'random')
-        ttC = onetimepad.encrypt(str(enHL), 'random')
-        ttD = onetimepad.encrypt(str(enAL), 'random')
-        ttE = onetimepad.encrypt(str(enFO), 'random')
+        ttC = onetimepad.encrypt(str(enDNV), 'random')
+        ttD = onetimepad.encrypt(str(enMGM), 'random')
+        ttE = onetimepad.encrypt(str(enAUT), 'random')
         ttF = onetimepad.encrypt(str(lineA), 'random')
         ttG = onetimepad.encrypt(str(lineB), 'random')
         ttH = onetimepad.encrypt(str(lineC), 'random')
@@ -1436,9 +1462,9 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         stA = onetimepad.encrypt(str(sSize), 'random')
         stB = onetimepad.encrypt(str(gType), 'random')
         stK = onetimepad.encrypt(str(sCyc), 'random')
-        stC = onetimepad.encrypt(str(enHL), 'random')
-        stD = onetimepad.encrypt(str(enAL), 'random')
-        stE = onetimepad.encrypt(str(enFO), 'random')
+        stC = onetimepad.encrypt(str(enDNV), 'random')
+        stD = onetimepad.encrypt(str(enMGM), 'random')
+        stE = onetimepad.encrypt(str(enAUT), 'random')
         stF = onetimepad.encrypt(str(lineA), 'random')
         stG = onetimepad.encrypt(str(lineB), 'random')
         stH = onetimepad.encrypt(str(lineC), 'random')
@@ -1450,69 +1476,69 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
     # Open text file and save historical details -----------#
     iniName = "hisLim"+processID+".INI"
     with open(iniName, 'a') as configfile:                                 # append to config file
-        if processID == 'WS':
+        if processID == 'TP':
             if not config.has_section(processID +"HL_" + WONID):
                 config.add_section(processID +"HL_" + WONID)
-                config.set(processID +"HL_" + WONID, "SmpleSize", str(wsA))
-                config.set(processID +"HL_" + WONID, "GroupType", str(wsB))
-                config.set(processID + "HL_" + WONID, "SampleSpace", str(wsK))
-                config.set(processID +"HL_" + WONID, "EnableHL", str(wsC))
-                config.set(processID +"HL_" + WONID, "EnableAL", str(wsD))
-                config.set(processID +"HL_" + WONID, "EnableFO", str(wsE))
-                config.set(processID +"HL_" + WONID, "Size" + processID + "d1", str(wsF))
-                config.set(processID +"HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
+                config.set(processID + "HL_" + WONID, "SmpleSize", str(tpA))
+                config.set(processID + "HL_" + WONID, "GroupType", str(tpB))
+                config.set(processID + "HL_" + WONID, "SmplSpace", str(tpK))
+                config.set(processID + "HL_" + WONID, "EnableDNV", str(tpC))
+                config.set(processID + "HL_" + WONID, "EnableAUT", str(tpD))
+                config.set(processID + "HL_" + WONID, "EnableMGM", str(tpE))
+                config.set(processID + "HL_" + WONID, "Size" + processID + "d1", str(tpF))
+                config.set(processID + "HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
             config.write(configfile)
-            usedVar = ("WSHL_" + WONID)
+            usedVar = ("TPHL_" + WONID)
             config.remove_section(usedVar)      # Required to correct Parser class bug - Dr labs discovered the bug
 
         elif processID == 'TG':
             if not config.has_section(processID +"HL_" + WONID):
                 config.add_section(processID +"HL_" + WONID)
-                config.set(processID +"HL_" + WONID, "SmpleSize", str(tgA))
-                config.set(processID +"HL_" + WONID, "GroupType", str(tgB))
-                config.set(processID + "HL_" + WONID, "SampleSpace", str(tgK))
-                config.set(processID +"HL_" + WONID, "EnableHL", str(tgC))
-                config.set(processID +"HL_" + WONID, "EnableAL", str(tgD))
-                config.set(processID +"HL_" + WONID, "EnableFO", str(tgE))
-                config.set(processID +"HL_" + WONID, "Size" + processID + "d1", str(tgF))
-                config.set(processID +"HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
+                config.set(processID + "HL_" + WONID, "SmpleSize", str(tgA))
+                config.set(processID + "HL_" + WONID, "GroupType", str(tgB))
+                config.set(processID + "HL_" + WONID, "SmplSpace", str(tgK))
+                config.set(processID + "HL_" + WONID, "EnableDNV", str(tgC))
+                config.set(processID + "HL_" + WONID, "EnableAUT", str(tgD))
+                config.set(processID + "HL_" + WONID, "EnableMGM", str(tgE))
+                config.set(processID + "HL_" + WONID, "Size" + processID + "d1", str(tgF))
+                config.set(processID + "HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
             config.write(configfile)
             usedVar = ("TGHL_" + WONID)
             config.remove_section(usedVar)
             # print('Deleting unused variables...')
 
-        elif processID == 'RP':
+        elif processID == 'RF':
             if not config.has_section(processID +"HL_" + WONID):
                 config.add_section(processID +"HL_" + WONID)
-                config.set(processID +"HL_" + WONID, "SmpleSize", str(rpA))
-                config.set(processID +"HL_" + WONID, "GroupType", str(rpB))
-                config.set(processID + "HL_" + WONID, "SampleSpace", str(rpK))
-                config.set(processID +"HL_" + WONID, "EnableHL", str(rpC))
-                config.set(processID +"HL_" + WONID, "EnableAL", str(rpD))
-                config.set(processID +"HL_" + WONID, "EnableFO", str(rpE))
-                config.set(processID +"HL_" + WONID, "Size20" + processID + "d1", str(rpF))
-                config.set(processID +"HL_" + WONID, "Size18" + processID + "d2", str(rpG))
-                config.set(processID +"HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
+                config.set(processID + "HL_" + WONID, "SmpleSize", str(rfA))
+                config.set(processID + "HL_" + WONID, "GroupType", str(rfB))
+                config.set(processID + "HL_" + WONID, "SmplSpace", str(rfK))
+                config.set(processID + "HL_" + WONID, "EnableDNV", str(rfC))
+                config.set(processID + "HL_" + WONID, "EnableAUT", str(rfD))
+                config.set(processID + "HL_" + WONID, "EnableMGM", str(rfE))
+                config.set(processID + "HL_" + WONID, "Size20" + processID + "d1", str(rfF))
+                config.set(processID + "HL_" + WONID, "Size18" + processID + "d2", str(rfG))
+                config.set(processID + "HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
             config.write(configfile)
-            usedVar = ("RPHL_" + WONID)
+            usedVar = ("RFHL_" + WONID)
             config.remove_section(usedVar)
             # print('Deleting unused variables...')
 
         elif processID == 'TT':
             if not config.has_section(processID +"HL_" + WONID):
                 config.add_section(processID +"HL_" + WONID)
-                config.set(processID +"HL_" + WONID, "SmpleSize", str(ttA))
-                config.set(processID +"HL_" + WONID, "GroupType", str(ttB))
-                config.set(processID + "HL_" + WONID, "SampleSpace", str(ttK))
-                config.set(processID +"HL_" + WONID, "EnableHL", str(ttC))
-                config.set(processID +"HL_" + WONID, "EnableAL", str(ttD))
-                config.set(processID +"HL_" + WONID, "EnableFO", str(ttE))
-                config.set(processID +"HL_"+WONID, "Size20" + processID + "d1", str(ttF))
-                config.set(processID +"HL_"+WONID, "Size20" + processID + "d2", str(ttG))
-                config.set(processID +"HL_"+WONID, "Size20" + processID + "d3", str(ttH))
-                config.set(processID +"HL_"+WONID, "Size18" + processID + "d4", str(ttI))
-                config.set(processID +"HL_"+WONID, "Size18" + processID + "d5", str(ttJ))
-                config.set(processID +"HL_"+WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
+                config.set(processID + "HL_" + WONID, "SmpleSize", str(ttA))
+                config.set(processID + "HL_" + WONID, "GroupType", str(ttB))
+                config.set(processID + "HL_" + WONID, "SmplSpace", str(ttK))
+                config.set(processID + "HL_" + WONID, "EnableDNV", str(ttC))
+                config.set(processID + "HL_" + WONID, "EnableAUT", str(ttD))
+                config.set(processID + "HL_" + WONID, "EnableMGM", str(ttE))
+                config.set(processID + "HL_" + WONID, "Size20" + processID + "d1", str(ttF))
+                config.set(processID + "HL_" + WONID, "Size20" + processID + "d2", str(ttG))
+                config.set(processID + "HL_" + WONID, "Size20" + processID + "d3", str(ttH))
+                config.set(processID + "HL_" + WONID, "Size18" + processID + "d4", str(ttI))
+                config.set(processID + "HL_" + WONID, "Size18" + processID + "d5", str(ttJ))
+                config.set(processID + "HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
             config.write(configfile)
             usedVar = ("TTHL_" + WONID)
             config.remove_section(usedVar)
@@ -1521,18 +1547,18 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         elif processID == 'ST':
             if not config.has_section(processID +"HL_"+WONID):
                 config.add_section(processID +"HL_"+WONID)
-                config.set(processID +"HL_" + WONID, "SmpleSize", str(stA))
-                config.set(processID +"HL_" + WONID, "GroupType", str(stB))
-                config.set(processID + "HL_" + WONID, "SampleSpace", str(stK))
-                config.set(processID +"HL_" + WONID, "EnableHL", str(stC))
-                config.set(processID +"HL_" + WONID, "EnableAL", str(stD))
-                config.set(processID +"HL_" + WONID, "EnableFO", str(stE))
-                config.set(processID +"HL_"+WONID, "Size20" + processID + "d1", str(stF))
-                config.set(processID +"HL_"+WONID, "Size20" + processID + "d2", str(stG))
-                config.set(processID +"HL_"+WONID, "Size20" + processID + "d3", str(stH))
-                config.set(processID +"HL_"+WONID, "Size18" + processID + "d4", str(stI))
-                config.set(processID +"HL_"+WONID, "Size18" + processID + "d5", str(stJ))
-                config.set(processID +"HL_"+WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
+                config.set(processID + "HL_" + WONID, "SmpleSize", str(stA))
+                config.set(processID + "HL_" + WONID, "GroupType", str(stB))
+                config.set(processID + "HL_" + WONID, "SmplSpace", str(stK))
+                config.set(processID + "HL_" + WONID, "EnableDNV", str(stC))
+                config.set(processID + "HL_" + WONID, "EnableAUT", str(stD))
+                config.set(processID + "HL_" + WONID, "EnableMGM", str(stE))
+                config.set(processID + "HL_" + WONID, "Size20" + processID + "d1", str(stF))
+                config.set(processID + "HL_" + WONID, "Size20" + processID + "d2", str(stG))
+                config.set(processID + "HL_" + WONID, "Size20" + processID + "d3", str(stH))
+                config.set(processID + "HL_" + WONID, "Size18" + processID + "d4", str(stI))
+                config.set(processID + "HL_" + WONID, "Size18" + processID + "d5", str(stJ))
+                config.set(processID + "HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
             config.write(configfile)
             usedVar = ("STHL_" + WONID)
             config.remove_section(usedVar)
@@ -1560,13 +1586,13 @@ def decryptpProcessLim(WONID, processID):
     try:
         limX = config_object[processID +"HL_" + WONID]
 
-        if processID == 'RP':
+        if processID == 'RF':       # Roller Force (Not applicable on DNV Reqs)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SampleSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableHL'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAL'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableFO'], 'random')
+            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
             # ----------------------------------------------------------
             tapeA = onetimepad.decrypt(limX['size20'+processID+'d1'], 'random')
             tapeB = onetimepad.decrypt(limX['size18'+processID+'d2'], 'random')
@@ -1574,13 +1600,27 @@ def decryptpProcessLim(WONID, processID):
             tapeD = 0
             tapeE = 0
 
-        elif processID == 'WS':
+        elif processID == 'LP':     # Laser Power (Not applicable on DNV Reqs)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SampleSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableHL'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAL'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableFO'], 'random')
+            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
+            # ----------------------------------------------------------
+            tapeA = onetimepad.decrypt(limX['size20' + processID + 'd1'], 'random')
+            tapeB = onetimepad.decrypt(limX['size18' + processID + 'd2'], 'random')
+            tapeC = 0
+            tapeD = 0
+            tapeE = 0
+
+        elif processID == 'TG':  # Tape Gag (Polarisation)
+            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
+            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
+            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
             # ----------------------------------------------------------
             tapeA = onetimepad.decrypt(limX['Size'+processID+'d1'], 'random')
             tapeB = 0
@@ -1588,13 +1628,27 @@ def decryptpProcessLim(WONID, processID):
             tapeD = 0
             tapeE = 0
 
-        elif processID == 'TG':
+        elif processID == 'TP':  # Tape Placement Error (Keyance) (Not applicable on DNV Reqs)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SampleSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableHL'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAL'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableFO'], 'random')
+            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
+            # ----------------------------------------------------------
+            tapeA = onetimepad.decrypt(limX['Size' + processID + 'd1'], 'random')
+            tapeB = 0
+            tapeC = 0
+            tapeD = 0
+            tapeE = 0
+
+        elif processID == 'LA': # Laser Angle (Not applicable on DNV Reqs)
+            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
+            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
+            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
             # ----------------------------------------------------------
             tapeA = onetimepad.decrypt(limX['Size'+processID+'d1'], 'random')
             tapeB = 0
@@ -1602,13 +1656,13 @@ def decryptpProcessLim(WONID, processID):
             tapeD = 0
             tapeE = 0
 
-        elif processID == 'TT':
+        elif processID == 'TT':     # Tape Temperature
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SampleSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableHL'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAL'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableFO'], 'random')
+            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
             # ----------------------------------------------------------
             tapeA = onetimepad.decrypt(limX['size20'+processID+'d1'], 'random')
             tapeB = onetimepad.decrypt(limX['size20'+processID+'d2'], 'random')
@@ -1616,13 +1670,13 @@ def decryptpProcessLim(WONID, processID):
             tapeD = onetimepad.decrypt(limX['size18'+processID+'d4'], 'random')
             tapeE = onetimepad.decrypt(limX['size18'+processID+'d5'], 'random')
 
-        elif processID == 'ST':
+        elif processID == 'ST':     # Substrate Temperature
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SampleSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableHL'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAL'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableFO'], 'random')
+            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
             # ----------------------------------------------------------
             tapeA = onetimepad.decrypt(limX['size20'+processID+'d1'], 'random')
             tapeB = onetimepad.decrypt(limX['size20'+processID+'d2'], 'random')

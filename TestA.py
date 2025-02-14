@@ -230,22 +230,60 @@ from cryptography.fernet import Fernet
 
 
 # from Tkinter import *
+# ----------------------------------------------
+# import tkinter as tk
+# from tkinter import ttk
+#
+# root = tk.Tk()
+# root.title("Progress Bar in Tk")
+# progressbar = ttk.Progressbar(mode="indeterminate")
+# progressbar.place(x=30, y=60, width=200)
+# # Start moving the indeterminate progress bar.
+# progressbar.start()
+# root.geometry("300x200")
+# root.mainloop()
 
+# ---------------------------------------------[]
+
+import tkinter as tk
+from tkinter import ttk
+from threading import Thread
+from urllib.request import urlretrieve, urlcleanup
+
+
+def connectSQLquery():
+    url = "10.0.3.72"
+    urlretrieve(url, "[dbo].[OEE_20230614]", eolProgressBar)
+    urlcleanup()
+
+
+def processEOL_button():
+    # Download the file in a new thread.
+    Thread(target=connectSQLquery).start()
+
+
+def eolProgressBar(count, data_size, total_data):
+    """
+    This function is called by urlretrieve() every time
+    a chunk of data is downloaded.
+    """
+    if count == 0:
+        # Set the maximum value for the progress bar.
+        progressbar.configure(maximum=total_data)
+    else:
+        # Increase the progress.
+        progressbar.step(data_size)
+
+# ----------------------------------------[]
 root = tk.Tk()
 
-# variable is stored in the root object
-root.counter = 0
+root.title("Process EoL Summary")
+progressbar = ttk.Progressbar()
 
+progressbar.place(x=30, y=60, width=200)
+download_button = ttk.Button(text="Start EoL", command=processEOL_button)
+download_button.place(x=30, y=20)
 
-def clicked():
-    root.counter += 1
-    L['text'] = 'Button clicked: ' + str(root.counter)
-
-
-b = tk.Button(root, text="Click Me", command=clicked)
-b.pack()
-
-L = tk.Label(root, text="No clicks yet.")
-L.pack()
+root.geometry("300x200")
 
 root.mainloop()

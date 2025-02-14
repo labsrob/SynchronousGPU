@@ -78,8 +78,8 @@ WeldQualityProcess = True
 paused = False
 
 url = 'http://www.magmaglobal.com'
-localArray = []                     # raising the bit for GUI canvas
-exit_bit = []                       # enable the close out of all cascade windows
+localArray = []                                         # raising the bit for GUI canvas
+exit_bit = []                                           # enable the close out of all cascade windows
 
 # XBar Constants ------------------------------[]
 A3 = [0.975, 0.789, 0.680, 0.6327, 0.606, 0.5525]       # 10, 15, 20, 23, 25, 30  sample sizes respectively
@@ -501,14 +501,19 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
         label.pack(pady=10, padx=100)
 
         # Define Axes ---------------------#
-        combo = ttk.Combobox(self, values=["= Select Process Parameter =", "Roller Pressure",
-                                           "Tape Temperature", "Subs Temperature",
-                                           "Winding Speed", "Gap Measurement", "All DNV Parameters"], width=25, height=2)
+        combo = ttk.Combobox(self, values=["= Select End of Layer Report =", "Roller Force",
+                                           "Tape Temperature", "Subs Temperature", "Laser Power",
+                                           "Laser Angle", "Tape Placement Error",
+                                           "Tape Gap Polarisation"], width=25, height=4)
         # combo.place(x=720, y=10, height=20)  # 520
         # combo.current(0)
 
         combo.place(x=220, y=10, height=20)  # 520
         combo.current(0)
+
+        # Create empty Text Space -----------------------------------#
+        text_widget = tk.Text(self, wrap='word', width=110, height=80)
+        text_widget.pack(padx=1580, pady=10)
 
         # Create empty Text Space -----------------------------------#
         text_widget3 = tk.Text(self, wrap='word', width=110, height=80)
@@ -518,14 +523,10 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
         text_widget2 = tk.Text(self, wrap='word', width=110, height=80)
         text_widget2.pack(padx=210, pady=10)
 
-        # Create empty Text Space -----------------------------------#
-        text_widget = tk.Text(self, wrap='word', width=110, height=80)
-        text_widget.pack(padx=1580, pady=10)
-
         def option_selected(event):
             selected_option = combo.get()
-            if selected_option == "Roller Pressure":
-                rpt = "RPT_RP_" + str(processWON[0])
+            if selected_option == "Roller Force":
+                rpt = "RPT_RF_" + str(processWON[0])
                 readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
             elif selected_option == "Tape Temperature":
                 rpt = "RPT_TT_" + str(processWON[0])
@@ -533,14 +534,17 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
             elif selected_option == "Subs Temperature":
                 rpt = "RPT_ST_" + str(processWON[0])
                 readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
-            elif selected_option == "Winding Speed":
-                rpt = "RPT_WS_" + str(processWON[0])
+            elif selected_option == "Laser Power":
+                rpt = "RPT_LP_" + str(processWON[0])
                 readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
-            elif selected_option == "Gap Measurement":
+            elif selected_option == "Laser Angle":
+                rpt = "RPT_LA_" + str(processWON[0])
+                readEoP(text_widget, rpt)
+            elif selected_option == "Tape Placement Error":
+                rpt = "RPT_TP_" + str(processWON[0])
+                readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
+            elif selected_option == "Tape Gap Polarisation":
                 rpt = "RPT_TG_" + str(processWON[0])
-                readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
-            elif selected_option == "All DNV Parameters":
-                rpt = "RPT_AL_" + str(processWON[0])
                 readEoP(text_widget, rpt)
             else:
                 rpt = "VOID_REPORT"
@@ -571,9 +575,10 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         label.pack(pady=10, padx=10)
         # label.place(x=100, y=50)
         # Define Axes ---------------------#
-        combo = ttk.Combobox(self, values=["= Specify Sample Space =", "Roller Pressure",
-                                           "Tape Temperature", "Subs Temperature",
-                                           "Winding Speed", "Gap Measurement"], width=25)
+        combo = ttk.Combobox(self, values=["= Select Process Parameter =", "Roller Force",
+                                           "Tape Temperature", "Subs Temperature", "Laser Power",
+                                           "Laser Angle", "Tape Placement Error",
+                                           "Tape Gap Polarisation"], width=25)
         combo.place(x=520, y=10)
         combo.current(0)
 
@@ -7604,7 +7609,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pLP.set(0)
 
@@ -7618,7 +7623,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pLA.set(0)
 
@@ -7632,7 +7637,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pTP.set(0)
 
@@ -7646,7 +7651,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pRF.set(0)
 
@@ -7660,7 +7665,7 @@ def userMenu():     # listener, myplash
             pTT.set(1)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pTT.set(0)
 
@@ -7674,7 +7679,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pST.set(1)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pST.set(0)
 
@@ -7688,7 +7693,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(1)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pLA.set(0)
 
@@ -7700,7 +7705,7 @@ def userMenu():     # listener, myplash
             pST.set(0)
             pWS.set(0)
             pTG.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pRP, pTT, pST, pWS, pTG)
+            hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
         else:
             pTT.set(0)
 
@@ -7711,7 +7716,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pWS.set(0)
             pTG.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pRP, pTT, pST, pWS, pTG)
+            hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
         else:
             pST.set(0)
 
@@ -7722,7 +7727,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pRP, pTT, pST, pWS, pTG)
+            hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
         else:
             pWS.set(0)
 
@@ -7733,7 +7738,7 @@ def userMenu():     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pWS.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, qHl, qAl, aut, pRP, pTT, pST, pWS, pTG)
+            hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
         else:
             pTG.set(0)
 
@@ -8811,7 +8816,7 @@ def userMenu():     # listener, myplash
             e2.place(x=86, y=100)
             e3 = Entry(pop, textvariable=uname, state='readonly')
             e3.place(x=330, y=60)
-            e4 = Entry(pop, textvariable=autho, state='readonly') #, show="*")
+            e4 = Entry(pop, textvariable=autho, state='readonly')   #, show="*")
             e4.place(x=330, y=100)
         else:
             e1 = Entry(pop, textvariable=seripPlc, state='normal')
@@ -8900,7 +8905,7 @@ def userMenu():     # listener, myplash
             # Test server connection over TCP/IP ---------------------[]
             netTX = sq.testNetworkConn([server_IP], 1)  # if ICMP ping response is allowed on the server
             if netTX:
-                hostConnect()                                              # acknowledgement
+                hostConnect()                                          # acknowledgement
                 conn = 'true'
             else:
                 pingError()                                            # Ping error failed -------
@@ -8908,7 +8913,7 @@ def userMenu():     # listener, myplash
 
         except Exception as err:
             errorLog(f"{err}")
-            errorNoServer()                                             # errorNoServer()
+            errorNoServer()                                            # errorNoServer()
             conn = 'none'
 
         return conn

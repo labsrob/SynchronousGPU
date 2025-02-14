@@ -1692,7 +1692,7 @@ def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
     return
 
 
-def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA, lineB, lineC, lineD, lineE):
+def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, lineA, lineB, lineC, lineD, lineE):
     WONID = WON
     # objective of cryptography is to provide basic security concepts in data exchange & integrity
     # initialise object instance ---
@@ -1705,9 +1705,9 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         tgA = onetimepad.encrypt(str(sSize), 'random')
         tgB = onetimepad.encrypt(str(gType), 'random')
         tgK = onetimepad.encrypt(str(sCyc), 'random')
-        tgC = onetimepad.encrypt(str(enHL), 'random')
-        tgD = onetimepad.encrypt(str(enAL), 'random')
-        tgE = onetimepad.encrypt(str(enFO), 'random')
+        tgC = onetimepad.encrypt(str(enDNV), 'random')
+        tgD = onetimepad.encrypt(str(enMGM), 'random')
+        tgE = onetimepad.encrypt(str(enAUT), 'random')
         tgF = onetimepad.encrypt(str(lineA), 'random')
         tgG = 0                                            # Do nothing -- Can be used for future scalability
         tgH = 0
@@ -1718,9 +1718,9 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         tpA = onetimepad.encrypt(str(sSize), 'random')
         tpB = onetimepad.encrypt(str(gType), 'random')
         tpK = onetimepad.encrypt(str(sCyc), 'random')
-        tpC = onetimepad.encrypt(str(enHL), 'random')
-        tpD = onetimepad.encrypt(str(enAL), 'random')
-        tpE = onetimepad.encrypt(str(enFO), 'random')
+        tpC = onetimepad.encrypt(str(enDNV), 'random')
+        tpD = onetimepad.encrypt(str(enMGM), 'random')
+        tpE = onetimepad.encrypt(str(enAUT), 'random')
         tpF = onetimepad.encrypt(str(lineA), 'random')
         tpG = 0                                            # Do nothing -- Can be used for future scalability
         tpH = 0
@@ -1731,9 +1731,9 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         laA = onetimepad.encrypt(str(sSize), 'random')
         laB = onetimepad.encrypt(str(gType), 'random')
         laK = onetimepad.encrypt(str(sCyc), 'random')
-        laC = onetimepad.encrypt(str(enHL), 'random')
-        laD = onetimepad.encrypt(str(enAL), 'random')
-        laE = onetimepad.encrypt(str(enFO), 'random')
+        laC = onetimepad.encrypt(str(enDNV), 'random')
+        laD = onetimepad.encrypt(str(enMGM), 'random')
+        laE = onetimepad.encrypt(str(enAUT), 'random')
         laF = onetimepad.encrypt(str(lineA), 'random')
         laG = 0                                            # Do nothing -- Can be used for future scalability
         laH = 0
@@ -1744,9 +1744,9 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         rfA = onetimepad.encrypt(str(sSize), 'random')
         rfB = onetimepad.encrypt(str(gType), 'random')
         rfK = onetimepad.encrypt(str(sCyc), 'random')
-        rfC = onetimepad.encrypt(str(enHL), 'random')
-        rfD = onetimepad.encrypt(str(enAL), 'random')
-        rfE = onetimepad.encrypt(str(enFO), 'random')
+        rfC = onetimepad.encrypt(str(enDNV), 'random')
+        rfD = onetimepad.encrypt(str(enMGM), 'random')
+        rfE = onetimepad.encrypt(str(enAUT), 'random')
         rfF = onetimepad.encrypt(str(lineA), 'random')
         rfG = onetimepad.encrypt(str(lineB), 'random')
         rfH = 0                                            # Do nothing -- Can be used for future scalability
@@ -1757,9 +1757,9 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         lpA = onetimepad.encrypt(str(sSize), 'random')
         lpB = onetimepad.encrypt(str(gType), 'random')
         lpK = onetimepad.encrypt(str(sCyc), 'random')
-        lpC = onetimepad.encrypt(str(enHL), 'random')
-        lpD = onetimepad.encrypt(str(enAL), 'random')
-        lpE = onetimepad.encrypt(str(enFO), 'random')
+        lpC = onetimepad.encrypt(str(enDNV), 'random')
+        lpD = onetimepad.encrypt(str(enMGM), 'random')
+        lpE = onetimepad.encrypt(str(enAUT), 'random')
         lpF = onetimepad.encrypt(str(lineA), 'random')
         lpG = onetimepad.encrypt(str(lineB), 'random')
         lpH = 0                                            # Do nothing -- Can be used for future scalability
@@ -1770,9 +1770,9 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         ttA = onetimepad.encrypt(str(sSize), 'random')
         ttB = onetimepad.encrypt(str(gType), 'random')
         ttK = onetimepad.encrypt(str(sCyc), 'random')
-        ttC = onetimepad.encrypt(str(enHL), 'random')
-        ttD = onetimepad.encrypt(str(enAL), 'random')
-        ttE = onetimepad.encrypt(str(enFO), 'random')
+        ttC = onetimepad.encrypt(str(enDNV), 'random')
+        ttD = onetimepad.encrypt(str(enMGM), 'random')
+        ttE = onetimepad.encrypt(str(enAUT), 'random')
         ttF = onetimepad.encrypt(str(lineA), 'random')
         ttG = onetimepad.encrypt(str(lineB), 'random')
         ttH = onetimepad.encrypt(str(lineC), 'random')
@@ -1783,9 +1783,9 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
         stA = onetimepad.encrypt(str(sSize), 'random')
         stB = onetimepad.encrypt(str(gType), 'random')
         stK = onetimepad.encrypt(str(sCyc), 'random')
-        stC = onetimepad.encrypt(str(enHL), 'random')
-        stD = onetimepad.encrypt(str(enAL), 'random')
-        stE = onetimepad.encrypt(str(enFO), 'random')
+        stC = onetimepad.encrypt(str(enDNV), 'random')
+        stD = onetimepad.encrypt(str(enMGM), 'random')
+        stE = onetimepad.encrypt(str(enAUT), 'random')
         stF = onetimepad.encrypt(str(lineA), 'random')
         stG = onetimepad.encrypt(str(lineB), 'random')
         stH = onetimepad.encrypt(str(lineC), 'random')
@@ -1844,7 +1844,6 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enHL, enAL, enFO, lineA
             usedVar = ("LAHL_" + WONID)
             config.remove_section(usedVar)
             # print('Deleting unused variables...')
-
 
         elif processID == 'RF':
             if not config.has_section(processID +"HL_" + WONID):
@@ -1984,7 +1983,7 @@ def decryptpProcessLim(WONID, processID):
             tapeD = 0
             tapeE = 0
 
-        elif processID == 'TP':
+        elif processID == 'TP':     # Tape Placementr Error(Keyance)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
             gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
