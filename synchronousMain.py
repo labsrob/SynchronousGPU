@@ -1660,17 +1660,15 @@ class MonitorTabb(ttk.Frame):
             print('\n DNV 4 params condition met....', OT, CT, RP, WS)
             T1 = WON + '_RP'    # Roller Pressure
             T2 = WON + '_WS'    # Tape Winding Speed
-            T3 = WON + '_CT'    # Cell Tension
-            T4 = WON + '_OT'    # Oven Temperature
+            T3 = WON + '_CT'    # Cell Tension & Oven Temp
 
         elif int(LP) and int(LA) and int(CT) and int(OT) and int(RP) and int(WS):
             print('\n MGM 4 params condition met....', LP, LA, CT, OT, RP, WS)
-            T1 = WON + '_LP'    # Laser Power
-            T2 = WON + '_LA'    # Laser Angle
-            T3 = WON + '_RP'    # Roller Pressure
-            T4 = WON + '_WS'    # Tape Winding Speed
-            T5 = WON + '_CT'    # Cell Tension
-            T6 = WON + '_OT'    # Oven Temperature
+            T4 = WON + '_LP'    # Laser Power
+            T5 = WON + '_LA'    # Laser Angle
+            T6 = WON + '_RP'    # Roller Pressure
+            T7 = WON + '_WS'    # Tape Winding Speed
+            T8 = WON + '_CT'    # Cell Tension & Oven Temp
 
         else:       # Bespoke user selection criteria
             print('\n Bespoke 2 params condition met....', OT, CT, RP, WS)
@@ -1792,7 +1790,7 @@ class MonitorTabb(ttk.Frame):
             im23, = a1.plot([], [], 'o-', label='Roller Pressure - (R4H2)')
             im24, = a1.plot([], [], 'o-', label='Roller Pressure - (R4H3)')
             im25, = a1.plot([], [], 'o-', label='Roller Pressure - (R4H4)')
-            # ------------------------------------------------------[Laser Angle]
+            # ------------------------------------------------------[Winding Speed]
             im26, = a2.plot([], [], 'o-', label='Winding Speed - (R1H1)')
             im27, = a2.plot([], [], 'o-', label='Winding Speed - (R1H2)')
             im28, = a2.plot([], [], 'o-', label='Winding Speed - (R1H3)')
@@ -1809,10 +1807,9 @@ class MonitorTabb(ttk.Frame):
             im39, = a2.plot([], [], 'o-', label='Winding Speed - (R4H2)')
             im40, = a2.plot([], [], 'o-', label='Winding Speed - (R4H3)')
             im41, = a2.plot([], [], 'o-', label='Winding Speed - (R4H4)')
-            # -----------------------------------------------------[Cell Tension]
+            # -------------------------------------------[Cell Tension & Oven Temp]
             im42, = a3.plot([], [], 'o-', label='Cell Tension (Southward)')
             im43, = a3.plot([], [], 'o-', label='Cell Tension (Northward)')
-            # -------------------------------------------------[Oven Temperature]
             im44, = a4.plot([], [], 'o-', label='Oven Temperature (Southward)')
             im45, = a4.plot([], [], 'o-', label='Oven Temperature (Northward)')
 
@@ -1834,7 +1831,7 @@ class MonitorTabb(ttk.Frame):
             im23, = a1.plot([], [], 'o-', label='Laser Power - (R4H2)')
             im24, = a1.plot([], [], 'o-', label='Laser Power - (R4H3)')
             im25, = a1.plot([], [], 'o-', label='Laser Power - (R4H4)')
-            # -----------------------------------------------------[Cell Tension]
+            # ---------------------------------------- [Cell Tension  & Oven Temp]
             im26, = a2.plot([], [], 'o-', label='Cell Tension (Southward)')
             im27, = a2.plot([], [], 'o-', label='Cell Tension (Northward)')
             # --------------------------------------------------[Roller Pressure]
@@ -1871,7 +1868,7 @@ class MonitorTabb(ttk.Frame):
             im57, = a4.plot([], [], 'o-', label='Laser Angle - (R4H2)')
             im58, = a4.plot([], [], 'o-', label='Laser Angle - (R4H3)')
             im59, = a4.plot([], [], 'o-', label='Laser Angle - (R4H4)')
-            # -------------------------------------------------[Oven Temperature]
+            # -----------------------------------------------[ Oven Temperature]
             im60, = a5.plot([], [], 'o-', label='Oven Temperature (Southward)')
             im61, = a5.plot([], [], 'o-', label='Oven Temperature (Northward)')
             # ----------------------------------------------[Winding Speed x16]
@@ -1989,10 +1986,10 @@ class MonitorTabb(ttk.Frame):
 
             # Obtain SQL Data Host Server ---------------------------[]
             if monitorP == 'DNV':
-                conA, conB, conC, conD  = conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor()
+                conA, conB, conC  = conn.cursor(), conn.cursor(), conn.cursor()
             elif monitorP == 'MGM':
-                conA, conB, conC, conD, conE, conF = (conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor(),
-                                              conn.cursor(),conn.cursor())
+                conA, conB, conC, conD, conE = (conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor(),
+                                              conn.cursor())
             else:
                 pass  # reserved for bespoke configuration
 
@@ -2022,45 +2019,91 @@ class MonitorTabb(ttk.Frame):
                     sysRun, msctcp, msc_rt = wd.autoPausePlay()             # Retrieve M.State from Watchdog
                 print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
-                # Get list of relevant SQL Tables using conn() and execute real-time query --------------------[]
-                if monitorP == 'DNV':
-                    idxRF, idxLA, idxCT, idxOT, dtRF, dtLA, dtCT, dtOT = pm.dnv_sqlexec(smp_Sz, smp_St, conA, conB,
-                                                                                        conC, conD, T1, T2, T3, T4,
-                                                                                        idxRF, idxLA, idxCT, idxOT,
-                                                                                        fetchT)
-                elif monitorP == 'MGM':
-                    idxRF, idxLA, idxCT, idxOT, idxPE, idxTS, dtRF, dtLA, dtCT, dtOT, dtPE, dtTS = pm.dnv_sqlexec(
-                        smp_Sz, smp_St, conA, conB, conC, conD, conE, conF, T1, T2, T3, T4, T5, T6, idxRF, idxLA, idxCT,
-                        idxOT, idxPE, idxTS, fetchT)
+                if keyboard.is_pressed("Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:                            # Terminate file-fetch
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        print("\nVisualization in Paused Mode...")
                 else:
-                    pmData = 0                                              # Not assigned to Bespoke User Selection.
+                    autoSpcPause = False
+                    print("Visualization in Real-time Mode...")
 
-                if keyboard.is_pressed("Alt+Q"):                            # Terminate file-fetch
-                    qRP.close()
-                    print('SQL End of File, connection closes after 30 mins...')
-                    time.sleep(60)
-                    continue
-                else:
-                    print('\nUpdating....')
+                    # Get list of relevant SQL Tables using conn() and execute real-time query --------------------[]
+                    if monitorP == 'DNV':
+                        dtRP, dtWS, dtCD = pm.dnv_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, T1, T2, T3, fetch_no)
+                    elif monitorP == 'MGM':
+                        dtLP, dtLA, dtCD, dtRP, dtWS = pm.dnv_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, conE,
+                                                                      T4, T5, T6, T7, T8, fetch_no)
+                    else:
+                        pmData = 0  # Assigned to Bespoke User Selection.
 
-            return pmData
+                    # ------ Inhibit iteration ----------------------------------------------------------[]
+                    """
+                    # Set condition for halting real-time plots in watchdog class ---------------------
+                    """
+                    # TODO --- values for inhibiting the SQL processing
+                    if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                        conA.close()
+                        conB.close()
+                        conC.close()
+                        if monitorP == 'MGM':
+                            conD.close()
+                            conE.close()
+                        print('SQL End of File, connection closes after 30 mins...')
+                        time.sleep(60)
+                        continue
+                    else:
+                        print('\nUpdating....')
+
+            if monitorP == 'DNV':
+                return dtRP, dtWS, dtCD
+            else:
+                return dtLP, dtLA, dtCD, dtRP, dtWS
+
         # ================== End of synchronous Method ==========================[]
 
         def asynchronousP(db_freq):
             timei = time.time()                                 # start timing the entire loop
 
             # declare asynchronous variables ------------------[]
-            rfSQL = synchronousP(smp_Sz, stp_Sz, db_freq)       # data loading functions
-            import VarSQLpm as qpm                              # load SQL variables column names | rfVarSQL
+            if monitorP == 'DNV':
+                dtRP, dtWS, dtCD = synchronousP(smp_Sz, stp_Sz, db_freq)                # data loading functions
+            else:
+                dtLP, dtLA, dtCD, dtRP, dtWS = synchronousP(smp_Sz, stp_Sz, db_freq)    # data loading functions
+
+            import VarSQLpm as qpm                                                      # load SQL named columns
             viz_cycle = 150
 
+            # Load column names for monitoring params [Ref: SQL Data Column]
             if monitorP == 'DNV':
-                g1 = qm.validCols('DNV')                        # Load 4 monitoring params [SQL Data Column]
+                g1 = qm.validCols(T1)                   # Roller Pressure
+                d1 = pd.DataFrame(dtRP, columns=g1)
+                g2 = qm.validCols(T2)                   # Tape Winding Speed
+                d2 = pd.DataFrame(dtWS, columns=g2)
+                g3 = qm.validCols(T3)                   # Cell Tension and Oven Temp
+                d3 = pd.DataFrame(dtCD, columns=g3)
+                # Concatenate all columns -----------[]
+                df1 = pd.concat([d1, d2, d3], axis=1)
+            elif monitorP == 'MGM':
+                g1 = qm.validCols(T4)                   # Laser Power
+                d1 = pd.DataFrame(dtLP, columns=g1)
+                g2 = qm.validCols(T5)                   # Laser Angle
+                d2 = pd.DataFrame(dtLA, columns=g2)
+                g3 = qm.validCols(T6)                   # Cell Tension & Oven Temp
+                d3 = pd.DataFrame(dtCD, columns=g3)
+                g4 = qm.validCols(T7)                   # Roller Pressure
+                d4 = pd.DataFrame(dtRP, columns=g4)
+                g5 = qm.validCols(T8)                   # Tape Winding Speed
+                d5 = pd.DataFrame(dtWS, columns=g5)
+                # Concatenate all columns -----------[]
+                df1 = pd.concat([d1, d2, d3, d4, d5], axis=1)
             else:
-                g1 = qm.validCols('MGM')                        # Load 6 monitoring params [SQL Data Column]
+                df1 = 0
+                pass                # Reserve for process scaling -- RBL.
 
-            df1 = pd.DataFrame(rfSQL, columns=g1)               # Import into python Dataframe
-            PM = qpm.loadProcesValues(df1, pool)                # Join data values under dataframe
+            # ----- Access data element within the concatenated columns -------------------------[A]
+            PM = qpm.loadProcesValues(df1, monitorP)            # Join data values under dataframe
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -2140,11 +2183,10 @@ class MonitorTabb(ttk.Frame):
 
             if monitorP == 'DNV':
                 # X Plot Y-Axis data points for XBar ----------[Roller Pressure x16, A1]
-                im10.set_ydata((PM[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im10.set_ydata((PM[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H1
                 im11.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
                 im12.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
                 im13.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                # No computation for PPk / Cpk
                 im14.set_ydata((PM[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
                 im15.set_ydata((PM[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
                 im16.set_ydata((PM[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3

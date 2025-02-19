@@ -4,56 +4,69 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
-Substrate Temperature measured in Degree Celsius (°C)
+Check SQL data columns ...
 """
 
 
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'DNV':
-        columns = ['R1H1RF', 'R1H2RF', 'R1H3RF', 'R1H4RF',
-                   'R2H1RF', 'R2H2RF', 'R2H3RF', 'R2H4RF',
-                   'R3H1RF', 'R3H2RF', 'R3H3RF', 'R3H4RF',
-                   'R4H1RF', 'R4H2RF', 'R4H3RF', 'R4H4RF',
-                   # Laser Angle -----------[]
+    if pParam == 'T1':
+        columns = [ # Roller Pressure --------------[]
+                    'R1H1RP', 'R1H2RP', 'R1H3RP', 'R1H4RP',
+                   'R2H1RP', 'R2H2RP', 'R2H3RP', 'R2H4RP',
+                   'R3H1RP', 'R3H2RP', 'R3H3RP', 'R3H4RP',
+                   'R4H1RP', 'R4H2RP', 'R4H3RP', 'R4H4RP',]
+
+    if pParam == 'T2':
+        columns = [
+                   # Winding Speed ---------------[]
+                   'R1H1WS', 'R1H2WS', 'R1H3WS', 'R1H4LA',
+                   'R2H1WS', 'R2H2WS', 'R2H3WS', 'R2H4WS',
+                   'R3H1WS', 'R3H2WS', 'R3H3WS', 'R3H4WS',
+                   'R4H1WS', 'R4H2WS', 'R4H3WS', 'R4H4WS']
+
+    if pParam == 'T3':
+        columns = [
+                   # Cell Tension & Oven Temp ----[]
+                   'tStamp', 'oTempA', 'oTempB', 'cTensA',
+                   'cTensB', 'PipeDi', 'cRTemp', 'cHumid',
+                   'fDTemp', 'fHumid', 'locTemp', 'locHumid',
+                   'UVIndex']
+
+    if pParam == 'T4':
+        columns = [ # Laser Power ------------------[]
+                    'R1H1LP', 'R1H2LP', 'R1H3LP', 'R1H4LP',
+                   'R2H1LP', 'R2H2LP', 'R2H3LP', 'R2H4LP',
+                   'R3H1LP', 'R3H2LP', 'R3H3LP', 'R3H4LP',
+                   'R4H1LP', 'R4H2LP', 'R4H3LP', 'R4H4LP',]
+
+    if pParam == 'T5':
+        columns = [ # Laser Angle ---------------------[]
                    'R1H1LA', 'R1H2LA', 'R1H3LA', 'R1H4LA',
                    'R2H1LA', 'R2H2LA', 'R2H3LA', 'R2H4LA',
                    'R3H1LA', 'R3H2LA', 'R3H3LA', 'R3H4LA',
-                   'R4H1LA', 'R4H2LA', 'R4H3LA', 'R4H4LA',
-                   # Cell Tension -----------[]
-                   'tStamp', 'cTensA','cTensB', 'PipeDi',
-                   'cRTemp', 'cHumid', 'fDTemp', 'fHumid',
-                   'locTemp', 'locHumid', 'UVIndex',
-                   # Oven Temperature -----------[]
-                   'tStamp', 'oTempA', 'oTempB']
+                   'R4H1LA', 'R4H2LA', 'R4H3LA', 'R4H4LA',]
 
-    elif pParam == 'MGM':
-        columns = ['R1H1RF', 'R1H2RF', 'R1H3RF', 'R1H4RF',
-                   'R2H1RF', 'R2H2RF', 'R2H3RF', 'R2H4RF',
-                   'R3H1RF', 'R3H2RF', 'R3H3RF', 'R3H4RF',
-                   'R4H1RF', 'R4H2RF', 'R4H3RF', 'R4H4RF',
-                   # Laser Angle -----------[]
-                   'R1H1LA', 'R1H2LA', 'R1H3LA', 'R1H4LA',
-                   'R2H1LA', 'R2H2LA', 'R2H3LA', 'R2H4LA',
-                   'R3H1LA', 'R3H2LA', 'R3H3LA', 'R3H4LA',
-                   'R4H1LA', 'R4H2LA', 'R4H3LA', 'R4H4LA',
-                   # Oven Temperature -----------[]
-                   'tStamp', 'oTempA', 'oTempB',
-                   # Cell Tension -----------[]
-                   'tStamp', 'cTensA', 'cTensB', 'PipeDi',
-                   'cRTemp', 'cHumid', 'fDTemp', 'fHumid',
-                   'locTemp', 'locHumid', 'UVIndex',
-                   # Placement Error -----------[]
-                   'R1H1PE', 'R1H2PE', 'R1H3PE', 'R1H4PE',
-                   'R2H1PE', 'R2H2PE', 'R2H3PE', 'R2H4PE',
-                   'R3H1PE', 'R3H2PE', 'R3H3PE', 'R3H4PE',
-                   'R4H1PE', 'R4H2PE', 'R4H3PE', 'R4H4PE',
-                   # Tape Speed -----------[62]
-                   'R1H1TS', 'R1H2TS', 'R1H3TS', 'R1H4TS',
-                   'R2H1TS', 'R2H2TS', 'R2H3TS', 'R2H4TS',
-                   'R3H1TS', 'R3H2TS', 'R3H3TS', 'R3H4TS',
-                   'R4H1TS', 'R4H2TS', 'R4H3TS', 'R4H4TS'] #77
+    if pParam == 'T6':
+        columns = [ # Cell Tension & Oven Temp ---------[]
+                   'tStamp', 'oTempA', 'oTempB', 'cTensA',
+                   'cTensB', 'PipeDi', 'cRTemp', 'cHumid',
+                   'fDTemp', 'fHumid', 'locTemp', 'locHumid',
+                   'UVIndex',]
 
+    if pParam == 'T7':
+        columns = [ # Roller Pressure ------------------[]
+                   'R1H1RP', 'R1H2RP', 'R1H3RP', 'R1H4RP',
+                   'R2H1RP', 'R2H2RP', 'R2H3RP', 'R2H4RP',
+                   'R3H1RP', 'R3H2RP', 'R3H3RP', 'R3H4RP',
+                   'R4H1RP', 'R4H2RP', 'R4H3RP', 'R4H4RP']
+
+    if pParam == 'T8':
+        columns = [ # Tape Winding Speed ---------------[]
+                   'R1H1WS', 'R1H2WS', 'R1H3WS', 'R1H4WS',
+                   'R2H1WS', 'R2H2WS', 'R2H3WS', 'R2H4WS',
+                   'R3H1WS', 'R3H2WS', 'R3H3WS', 'R3H4WS',
+                   'R4H1WS', 'R4H2WS', 'R4H3WS', 'R4H4WS']
 
     else:
         print('Invalid Columns or Query error...')

@@ -2093,7 +2093,6 @@ def mainRun(conn, ret, stad, stpd, Sqlfmt, HeadA, HeadB, viewTFM, oEE, rp, ts, t
                     autoSpcPause = True
                     # play(error)             # Indicate pause mode with audible Alert
                     print("\nVisualization in Paused Mode...")
-
             else:
                 autoSpcPause = False
                 # Play visualization ----------------------------------------------[]

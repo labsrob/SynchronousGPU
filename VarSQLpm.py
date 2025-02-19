@@ -7,47 +7,46 @@ All production procedure relies on Word Order Number - Assuming a Unique identit
 
 Author: Dr Robert Labs
 """
-# Variables required here: The aggregated plots for monitoring process variables
+# MONITORING VARIABLES: The aggregated plots for monitoring process variables
 
 
-def loadProcesValues(df1, prod):
+def loadProcesValues(df1, prod):        # Load useful columns out of many
     if prod == 'DNV':
         # -------- Roller Force Monitoring --#
-        sqlPM = [df1['R1H1RF'], df1['R1H2RF'],
-                 df1['R1H3RF'], df1['R1H4RF'],
-                 df1['R2H1RF'], df1['R2H2RF'],
-                 df1['R2H3RF'], df1['R2H4RF'],
-                 df1['R3H1RF'], df1['R3H2RF'],
-                 df1['R3H3RF'], df1['R3H4RF'],
-                 df1['R4H1RF'], df1['R4H2RF'],
-                 df1['R4H3RF'], df1['R4H4RF'],
-                 # -------- Laser Angle ----#
-                 df1['R1H1LA'], df1['R1H2LA'],
-                 df1['R1H3LA'], df1['R1H4LA'],
-                 df1['R2H1LA'], df1['R2H2LA'],
-                 df1['R2H3LA'], df1['R2H4LA'],
-                 df1['R3H1LA'], df1['R3H2LA'],
-                 df1['R3H3LA'], df1['R3H4LA'],
-                 df1['R4H1LA'], df1['R4H2LA'],
-                 df1['R4H3LA'], df1['R4H4LA'],
-                 # ------- Cell Tension ----#
+        sqlPM = [df1['R1H1RP'], df1['R1H2RP'],
+                 df1['R1H3RP'], df1['R1H4RP'],
+                 df1['R2H1RP'], df1['R2H2RP'],
+                 df1['R2H3RP'], df1['R2H4RP'],
+                 df1['R3H1RP'], df1['R3H2RP'],
+                 df1['R3H3RP'], df1['R3H4RP'],
+                 df1['R4H1RP'], df1['R4H2RP'],
+                 df1['R4H3RP'], df1['R4H4RP'],
+                 # ------ Winding Speed ----#
+                 df1['R1H1WS'], df1['R1H2WS'],
+                 df1['R1H3WS'], df1['R1H4WS'],
+                 df1['R2H1WS'], df1['R2H2WS'],
+                 df1['R2H3WS'], df1['R2H4WS'],
+                 df1['R3H1WS'], df1['R3H2WS'],
+                 df1['R3H3WS'], df1['R3H4WS'],
+                 df1['R4H1WS'], df1['R4H2WS'],
+                 df1['R4H3WS'], df1['R4H4WS'],
+                 # -Cell Tension & Oven Temp -#
+                 df1['oTempA'], df1['oTempB'],
                  df1['cTensA'], df1['cTensB'],
                  df1['PipeDi'], df1['cRTemp'],
                  df1['cHumid'], df1['fDTemp'],
                  df1['fHumid'], df1['locTemp'],
-                 df1['locHumid'], df1['UVIndex'],
-                 # ------ Oven Temperature ---#
-                 df1['oTempA'], df1['oTempB']]
+                 df1['locHumid'], df1['UVIndex']]
     elif prod == 'MGM':
-        # -------- Roller Force Monitoring --#
-        sqlPM = [df1['R1H1RF'], df1['R1H2RF'],
-                 df1['R1H3RF'], df1['R1H4RF'],
-                 df1['R2H1RF'], df1['R2H2RF'],
-                 df1['R2H3RF'], df1['R2H4RF'],
-                 df1['R3H1RF'], df1['R3H2RF'],
-                 df1['R3H3RF'], df1['R3H4RF'],
-                 df1['R4H1RF'], df1['R4H2RF'],
-                 df1['R4H3RF'], df1['R4H4RF'],
+        # -------- Laser Power Monitoring --#
+        sqlPM = [df1['R1H1LP'], df1['R1H2LP'],
+                 df1['R1H3LP'], df1['R1H4LP'],
+                 df1['R2H1LP'], df1['R2H2LP'],
+                 df1['R2H3LP'], df1['R2H4LP'],
+                 df1['R3H1LP'], df1['R3H2LP'],
+                 df1['R3H3LP'], df1['R3H4LP'],
+                 df1['R4H1LP'], df1['R4H2LP'],
+                 df1['R4H3LP'], df1['R4H4LP'],
                  # -------- Laser Angle ----#
                  df1['R1H1LA'], df1['R1H2LA'],
                  df1['R1H3LA'], df1['R1H4LA'],
@@ -65,24 +64,24 @@ def loadProcesValues(df1, prod):
                  df1['cHumid'], df1['fDTemp'],
                  df1['fHumid'], df1['locTemp'],
                  df1['locHumid'], df1['UVIndex'],
-                 # Placement Error -----------[]
-                 df1['R1H1PE'], df1['R1H2PE'],
-                 df1['R1H3PE'], df1['R1H4PE'],
-                 df1['R2H1PE'], df1['R2H2PE'],
-                 df1['R2H3PE'], df1['R2H4PE'],
-                 df1['R3H1PE'], df1['R3H2PE'],
-                 df1['R3H3PE'], df1['R3H4PE'],
-                 df1['R4H1PE'], df1['R4H2PE'],
-                 df1['R4H3PE'], df1['R4H4PE'],
+                 # Roller Pressure -----------[]
+                 df1['R1H1RP'], df1['R1H2RP'],
+                 df1['R1H3RP'], df1['R1H4RP'],
+                 df1['R2H1RP'], df1['R2H2RP'],
+                 df1['R2H3RP'], df1['R2H4RP'],
+                 df1['R3H1RP'], df1['R3H2RP'],
+                 df1['R3H3RP'], df1['R3H4RP'],
+                 df1['R4H1RP'], df1['R4H2RP'],
+                 df1['R4H3RP'], df1['R4H4RP'],
                  # Tape Speed -----------[]
-                 df1['R1H1TS'], df1['R1H2TS'],
-                 df1['R1H3TS'], df1['R1H4TS'],
-                 df1['R2H1TS'], df1['R2H2TS'],
-                 df1['R2H3TS'], df1['R2H4TS'],
-                 df1['R3H1TS'], df1['R3H2TS'],
-                 df1['R3H3TS'], df1['R3H4TS'],
-                 df1['R4H1TS'], df1['R4H2TS'],
-                 df1['R4H3TS'], df1['R4H4TS']]
+                 df1['R1H1WS'], df1['R1H2WS'],
+                 df1['R1H3WS'], df1['R1H4WS'],
+                 df1['R2H1WS'], df1['R2H2WS'],
+                 df1['R2H3WS'], df1['R2H4WS'],
+                 df1['R3H1WS'], df1['R3H2WS'],
+                 df1['R3H3WS'], df1['R3H4WS'],
+                 df1['R4H1WS'], df1['R4H2WS'],
+                 df1['R4H3WS'], df1['R4H4WS']]
     else:
         print('SQL Query: Invalid request error...')
 
