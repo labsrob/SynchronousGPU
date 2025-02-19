@@ -243,47 +243,222 @@ from cryptography.fernet import Fernet
 # root.geometry("300x200")
 # root.mainloop()
 
-# ---------------------------------------------[]
+# ---------------------------------------------[RUNTIME PROCESS BAR]
+
+# import tkinter as tk
+# from tkinter import ttk
+# from threading import Thread
+# from urllib.request import urlretrieve, urlcleanup
+#
+#
+# def connectSQLquery():
+#     url = "10.0.3.72"
+#     urlretrieve(url, "[dbo].[OEE_20230614]", eolProgressBar)
+#     urlcleanup()
+#
+#
+# def processEOL_button():
+#     # Download the file in a new thread.
+#     Thread(target=connectSQLquery).start()
+#
+#
+# def eolProgressBar(count, data_size, total_data):
+#     """
+#     This function is called by urlretrieve() every time
+#     a chunk of data is downloaded.
+#     """
+#     if count == 0:
+#         # Set the maximum value for the progress bar.
+#         progressbar.configure(maximum=total_data)
+#     else:
+#         # Increase the progress.
+#         progressbar.step(data_size)
+#
+# # ----------------------------------------[]
+# root = tk.Tk()
+#
+# root.title("Process EoL Summary")
+# progressbar = ttk.Progressbar()
+#
+# progressbar.place(x=30, y=60, width=200)
+# download_button = ttk.Button(text="Start EoL", command=processEOL_button)
+# download_button.place(x=30, y=20)
+#
+# root.geometry("300x200")
+#
+# root.mainloop()
+
+# --------------------------------------------------------------------------------[PDF Converter]
+# Import Module
+# from tkinter import *
+# from tkinter.filedialog import askopenfilenames
+# import img2pdf
+#
+# # Create Object
+# root = Tk()
+# # set Geometry
+# root.geometry('400x200')
+#
+# def select_file():
+# 	global file_names
+# 	file_names = askopenfilenames(initialdir = "/",
+# 								title = "Select File")
+#
+# # IMAGE TO PDF
+# def image_to_pdf():
+# 	for index, file_name in enumerate(file_names):
+# 		with open(f"file {index}.pdf", "wb") as f:
+# 			f.write(img2pdf.convert(file_name))
+#
+# # IMAGES TO PDF
+# def images_to_pdf():
+# 	with open(f"file.pdf", "wb") as f:
+# 		f.write(img2pdf.convert(file_names))
+#
+# # Add Labels and Buttons
+# Label(root, text = "IMAGE CONVERSION",
+# 	font = "italic 15 bold").pack(pady = 10)
+#
+# Button(root, text = "Select Images",
+# 	command = select_file, font = 14).pack(pady = 10)
+#
+# frame = Frame()
+# frame.pack(pady = 20)
+#
+# Button(frame, text = "Image to PDF",
+# 	command = image_to_pdf,
+# 	relief = "solid",
+# 	bg = "white", font = 15).pack(side = LEFT, padx = 10)
+#
+# Button(frame, text = "Images to PDF",
+# 	command = images_to_pdf, relief = "solid",
+# 	bg = "white", font = 15).pack()
+#
+# # Execute Tkinter
+# root.mainloop()
+
+
+# -------------------------------------------------------------------------------[Tables]
+# Python program to create a table
+#
+# from tkinter import *
+#
+# widths = [10, 10] + [10]*(10 - 2)
+#
+# class Table:
+#
+#     def __init__(self, root):
+#
+#         # code for creating table ---
+#         for i in range(total_rows):
+#             for j in range(total_columns):
+#                 self.e = Entry(root, width=widths[j], justify="center", fg='blue', font=('Arial', 12, 'bold'))    #16
+#
+#                 if lst[0] == 'Tape Temperature in Degrees Celsius':
+#                     self.e.grid(row=0, column=0, columnspan=2)
+#                 else:
+#                     self.e.grid(row=i, column=j)
+#                 self.e.insert(END, lst[i][j])
+#
+#
+# # take the data
+# lst = [('Tape Temperature in Degrees Celsius', '', '', '', '', ''),
+#        ('TCP01', 'Actual', 'Nominal', 'StdDev', 'Tolerance ±', 'Status'),
+#        ('Ring 1', 4.6, 4.5, 0.25, 0.5, 'OK'),
+#        ('Ring 2', 4.5, 4.5, 0.16, 0.5, 'OK'),
+#        ('Ring 3', 4.7, 4.5, 0.27, 0.5, 'OK'),
+#        ('Ring 4', 4.5, 4.5, 0.32, 0.5, 'OK')]
+#
+# # find total number of rows and
+# # ('Tape Temperature in Degrees Celsius', '', '', '', '', '')
+# # columns in list
+# total_rows = len(lst)
+# total_columns = len(lst[0])
+#
+# # create root window
+# root = Tk()
+# t = Table(root)
+#
+#
+# root.title("Grid Column Spanning")
+# root.geometry("600x360")  # Set the window size
+# # -----------------------------------------------
+# # # Create some placeholder labels (widgets)
+# # text1 = tk.Label(root, text="Label 1")
+# # text2 = tk.Label(root, text="Label 2")
+# # text3 = tk.Label(root, text="Label 3")
+# # text4 = tk.Label(root, text="Label 4")
+# #
+# # # Place widgets in the grid using tkinter's grid manager
+# # text1.grid(row=0, column=0)
+# # text2.grid(row=1, column=0, columnspan=2)
+# # text3.grid(row=0, column=1)
+#
+# root.mainloop()
+
+
+# -------------------------------------------------------------------
 
 import tkinter as tk
 from tkinter import ttk
-from threading import Thread
-from urllib.request import urlretrieve, urlcleanup
+from fpdf import FPDF
+
+# Function to generate PDF
+def generate_pdf(data):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("helvetica", size=12)
+
+    # Create table header -------------------------------------[]
+    for header in ["TCP01", "Actual", "Nominal", "Std Dev", "Tolerance +/-", "Status"]:
+        pdf.cell(30, 10, header, 1)
+    pdf.ln()
+
+    # Create table label --------------------------------------[]
+    for label in ['Ring1', 'Ring2', 'Ring3', 'Ring4']:
+        pdf.cell(30, 10, label, 1)
+    pdf.ln()
+
+    # Create table rows ---------------------------------------[]
+    for row in data:
+        for item in row:
+            pdf.cell(30, 10, str(item), 1)
+        pdf.ln()
+
+    pdf.output("QualityEOL.pdf")
 
 
-def connectSQLquery():
-    url = "10.0.3.72"
-    urlretrieve(url, "[dbo].[OEE_20230614]", eolProgressBar)
-    urlcleanup()
+def get_data():
+    data = []
+    for i in range(4):
+        row = [entry.get() for entry in entries[i]]
+        # row1 = r1_actual.get(), r1_nominal.get(), r1_stdDev.get(), r1_tolerance.get(), r1_status.get()
+        # row2 = r2_actual.get(), r2_nominal.get(), r2_stdDev.get(), r2_tolerance.get(), r2_status.get()
+        # row3 = r3_actual.get(), r3_nominal.get(), r3_stdDev.get(), r3_tolerance.get(), r3_status.get()
+        # row4 = r4_actual.get(), r4_nominal.get(), r4_stdDev.get(), r4_tolerance.get(), r4_status.get()
 
+        data.append(row)
+    generate_pdf(data)
 
-def processEOL_button():
-    # Download the file in a new thread.
-    Thread(target=connectSQLquery).start()
-
-
-def eolProgressBar(count, data_size, total_data):
-    """
-    This function is called by urlretrieve() every time
-    a chunk of data is downloaded.
-    """
-    if count == 0:
-        # Set the maximum value for the progress bar.
-        progressbar.configure(maximum=total_data)
-    else:
-        # Increase the progress.
-        progressbar.step(data_size)
-
-# ----------------------------------------[]
+# Create main window -----------------------[]
 root = tk.Tk()
+root.title("6 Column Table")
 
-root.title("Process EoL Summary")
-progressbar = ttk.Progressbar()
+# Create table -----------------------------[]
+entries = []
+for i in range(5):  # Example: 5 rows
+    row_entries = []
+    for j in range(6):  # 6 columns
+        entry = tk.Entry(root)
+        entry.grid(row=i, column=j)
+        row_entries.append(entry)
+    entries.append(row_entries)
 
-progressbar.place(x=30, y=60, width=200)
-download_button = ttk.Button(text="Start EoL", command=processEOL_button)
-download_button.place(x=30, y=20)
+# Create button to generate PDF
+generate_button = tk.Button(root, text="Generate PDF Report", command=get_data)
+# generate_button.grid(row=6, columnspan=6)
+generate_button.place(x=170, y=110)
 
-root.geometry("300x200")
-
+# Run the application
 root.mainloop()
+# ------------------------------------------[]
