@@ -7,6 +7,7 @@ import time
 import timeit
 import os
 
+# --------------------------------- TODO - confirm the logic meet PLC standards ---------[]
 UseRowIndex = True
 idx = count()
 now = datetime.now()

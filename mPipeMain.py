@@ -2031,6 +2031,7 @@ def mainRun(conn, ret, stad, stpd, Sqlfmt, HeadA, HeadB, viewTFM, oEE, rp, ts, t
     def synchronous(db_freq):
 
         fetch_no = str(db_freq)     # convert entry value to string for sql syntax
+
         # Initialise sql connection based on number of sql tables in use ------------------[D1]
         if UsePLC_DBS:
             # Establish connection with SQL server and PLC-Snap 7 server link

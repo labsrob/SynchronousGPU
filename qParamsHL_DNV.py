@@ -1575,7 +1575,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
 def decryptpProcessLim(WONID, processID):
 
     # initialise object instance -----------[]
-    processFile = 'hisLim'+processID+'.INI'
+    processFile = 'hisLim' + processID + '.INI'
     # print('Config FileName:', processFile)
 
     if processFile:
@@ -1584,7 +1584,7 @@ def decryptpProcessLim(WONID, processID):
         print('Configuration file does not exist...')
 
     try:
-        limX = config_object[processID +"HL_" + WONID]
+        limX = config_object[processID + "HL_" + WONID]
 
         if processID == 'RF':       # Roller Force (Not applicable on DNV Reqs)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')

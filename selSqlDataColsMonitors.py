@@ -17,7 +17,7 @@ def validCols(pParam):
                    'R3H1RP', 'R3H2RP', 'R3H3RP', 'R3H4RP',
                    'R4H1RP', 'R4H2RP', 'R4H3RP', 'R4H4RP',]
 
-    if pParam == 'T2':
+    elif pParam == 'T2':
         columns = [
                    # Winding Speed ---------------[]
                    'R1H1WS', 'R1H2WS', 'R1H3WS', 'R1H4LA',
@@ -25,7 +25,7 @@ def validCols(pParam):
                    'R3H1WS', 'R3H2WS', 'R3H3WS', 'R3H4WS',
                    'R4H1WS', 'R4H2WS', 'R4H3WS', 'R4H4WS']
 
-    if pParam == 'T3':
+    elif pParam == 'T3':
         columns = [
                    # Cell Tension & Oven Temp ----[]
                    'tStamp', 'oTempA', 'oTempB', 'cTensA',
@@ -33,14 +33,14 @@ def validCols(pParam):
                    'fDTemp', 'fHumid', 'locTemp', 'locHumid',
                    'UVIndex']
 
-    if pParam == 'T4':
+    elif pParam == 'T4':
         columns = [ # Laser Power ------------------[]
                     'R1H1LP', 'R1H2LP', 'R1H3LP', 'R1H4LP',
                    'R2H1LP', 'R2H2LP', 'R2H3LP', 'R2H4LP',
                    'R3H1LP', 'R3H2LP', 'R3H3LP', 'R3H4LP',
                    'R4H1LP', 'R4H2LP', 'R4H3LP', 'R4H4LP',]
 
-    if pParam == 'T5':
+    elif pParam == 'T5':
         columns = [ # Laser Angle ---------------------[]
                    'R1H1LA', 'R1H2LA', 'R1H3LA', 'R1H4LA',
                    'R2H1LA', 'R2H2LA', 'R2H3LA', 'R2H4LA',
@@ -54,14 +54,14 @@ def validCols(pParam):
                    'fDTemp', 'fHumid', 'locTemp', 'locHumid',
                    'UVIndex',]
 
-    if pParam == 'T7':
+    elif pParam == 'T7':
         columns = [ # Roller Pressure ------------------[]
                    'R1H1RP', 'R1H2RP', 'R1H3RP', 'R1H4RP',
                    'R2H1RP', 'R2H2RP', 'R2H3RP', 'R2H4RP',
                    'R3H1RP', 'R3H2RP', 'R3H3RP', 'R3H4RP',
                    'R4H1RP', 'R4H2RP', 'R4H3RP', 'R4H4RP']
 
-    if pParam == 'T8':
+    elif pParam == 'T8':
         columns = [ # Tape Winding Speed ---------------[]
                    'R1H1WS', 'R1H2WS', 'R1H3WS', 'R1H4WS',
                    'R2H1WS', 'R2H2WS', 'R2H3WS', 'R2H4WS',
