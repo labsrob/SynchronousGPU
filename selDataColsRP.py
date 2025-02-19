@@ -11,9 +11,10 @@ Roller Pressure measured in Pascal (Pa)
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'RP':
-        columns = ['TimeLine', 'R1H1RP(kPa)', 'R1H2RP(kPa)', 'R1H3RP(kPa)', 'R1H4RP(kPa)', 'R2H1RP(°C)', 'R2H2RP(°C)',
-                   'R2H3RP(kPa)', 'R2H4RP(kPa)', 'R3H1RP(kPa)', 'R3H2RP(kPa)', 'R3H3RP(kPa)', 'R3H4RP(kPa)', 'R4H1RP(kPa)',
-                   'R4H2RP(kPa)',' R4H3RP(kPa)', 'R4H4RP(kPa)']
+        columns = ['R1H1RP', 'R1H2RP', 'R1H3RP', 'R1H4RP',
+                   'R2H1RP', 'R2H2RP', 'R2H3RP', 'R2H4RP',
+                   'R3H1RP', 'R3H2RP', 'R3H3RP', 'R3H4RP',
+                   'R4H1RP', 'R4H2RP',' R4H3RP', 'R4H4RP']
     else:
         print('Invalid Columns or Query error...')
 

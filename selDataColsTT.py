@@ -11,9 +11,10 @@ Tape Temperature measured in Degree Celsius (°C)
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'TT':
-        columns = ['TimeLine', 'R1H1TT(°C)', 'R1H2TT(°C)', 'R1H3TT(°C)', 'R1H4TT(°C)', 'R2H1TT(°C)', 'R2H2TT(°C)',
-                   'R2H3TT(°C)', 'R2H4TT(°C)', 'R3H1TT(°C)', 'R3H2TT(°C)', 'R3H3TT(°C)', 'R3H4TT(°C)', 'R4H1TT(°C)',
-                   'R4H2TT(°C)', ' R4H3TT(°C)', 'R4H4TT(°C)']
+        columns = ['R1H1TT', 'R1H2TT', 'R1H3TT', 'R1H4TT',
+                   'R2H1TT', 'R2H2TT', 'R2H3TT', 'R2H4TT',
+                   'R3H1TT', 'R3H2TT', 'R3H3TT', 'R3H4TT',
+                   'R4H1TT', 'R4H2TT', ' R4H3TT', 'R4H4TT']
     else:
         print('Invalid Columns or Query error...')
 

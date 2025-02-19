@@ -11,9 +11,10 @@ Substrate Temperature measured in Degree Celsius (°C)
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'ST':
-        columns = ['TimeLine', 'R1H1ST(°C)', 'R1H2ST(°C)', 'R1H3ST(°C)', 'R1H4ST(°C)', 'R2H1ST(°C)', 'R2H2ST(°C)',
-                   'R2H3ST(°C)', 'R2H4ST(°C)', 'R3H1ST(°C)', 'R3H2ST(°C)', 'R3H3ST(°C)', 'R3H4ST(°C)', 'R4H1ST(°C)',
-                    'R4H2ST(°C)', 'R4H3ST(°C)', 'R4H4ST(°C)']
+        columns = ['R1H1ST', 'R1H2ST', 'R1H3ST', 'R1H4ST',
+                   'R2H1ST', 'R2H2ST', 'R2H3ST', 'R2H4ST',
+                   'R3H1ST', 'R3H2ST', 'R3H3ST', 'R3H4ST',
+                   'R4H1ST', 'R4H2ST', 'R4H3ST', 'R4H4ST']
     else:
         print('Invalid Columns or Query error...')
 

@@ -11,9 +11,10 @@ Roller Force measured in Newton (N)
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'RF':
-        columns = ['TimeLine', 'R1H1RF(N)', 'R1H2RP(N)', 'R1H3RP(N)', 'R1H4RP(N)', 'R2H1RP(N)', 'R2H2RP(N)',
-                   'R2H3RP(N)', 'R2H4RP(N)', 'R3H1RP(N)', 'R3H2RP(N)', 'R3H3RP(N)', 'R3H4RP(N)', 'R4H1RP(N)',
-                   'R4H2RP(N)', ' R4H3RP(N)', 'R4H4RP(N)']
+        columns = ['R1H1RF', 'R1H2RF', 'R1H3RF', 'R1H4RF',
+                   'R2H1RF', 'R2H2RF', 'R2H3RF', 'R2H4RF',
+                   'R3H1RF', 'R3H2RF', 'R3H3RF', 'R3H4RF',
+                   'R4H1RF', 'R4H2RF', ' R4H3RF','R4H4RF']
     else:
         print('Invalid Columns or Query error...')
 

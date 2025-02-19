@@ -11,7 +11,7 @@ Tape Winding Speed measured in metre per sec (m/s)
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'WS':
-        columns = ['TimeLine', 'SpeedR1', 'SpeedR2', 'SpedR3', 'SpeedR4', 'PipePosition']
+        columns = ['R1WS', 'R2WS', 'R3WS', 'R4WS', 'PipePos']
     else:
         print('Invalid Columns or Query error...')
 
