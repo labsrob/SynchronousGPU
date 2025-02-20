@@ -4403,6 +4403,7 @@ class rollerForce(ttk.Frame):      # -- Defines the tabbed region for QA param -
         toolbar.update()
         canvas._tkcanvas.pack(expand=True)
 
+
 # -------------------------------------------------------------------------------------------[Tap Temperature]
 class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Tape Temperature --[]
     """ Application to convert feet to meters or vice versa. """
@@ -4526,10 +4527,13 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
 
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minTT, YScale_maxTT = ttLSL - 8.5, ttUSL + 8.5       # Roller Force
+        YScale_minTT, YScale_maxTT = ttLSL - 8.5, ttUSL + 8.5       # Tape Temperature
         sBar_minTT, sBar_maxTT = sLCLtt - 80, sUCLtt + 80           # Calibrate Y-axis for S-Plot
         window_Xmin, window_Xmax = 0, (int(ttSize) + 3)             # windows view = visible data points
         # ----------------------------------------------------------#
+        YScale_minRM, YScale_maxRM = 0, 80                          # Valid layer number
+        window_XminRM, window_XmaxRM = 0, 6000                      # Get details from SCADA PIpe Recipe TODO[1]
+
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
         if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
             print('\n DNV 4 params condition met....', OT, CT, RP, WS)
@@ -4542,8 +4546,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
         a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
 
-        a1.set_title('Tape Temperature [XBar Plot]', fontsize=12, fontweight='bold')
-        a2.set_title('Tape Temperature [S Plot]', fontsize=12, fontweight='bold')
+        a1.set_title('Tape Temperature [XBar]', fontsize=12, fontweight='bold')
+        a2.set_title('Tape Temperature [SDev]', fontsize=12, fontweight='bold')
         a3.set_title('Ramp Mapping Profile - [RMP]', fontsize=12, fontweight='bold')
 
         a3.set_ylabel("2D - Staked Layer Ramp Mapping")
@@ -4554,8 +4558,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         a3.grid(color="0.5", linestyle='-', linewidth=0.5)
 
         a1.legend(loc='upper right', title='Tape Temperature')
-        a2.legend(loc='upper right', title='Sigma curve')
-        a3.legend(loc='upper right', title='Ramp Profile')
+        a2.legend(loc='upper right', title='Sigma Plot')
+        a3.legend(loc='upper right', title='Temp Ramp Profile')
         # ----------------------------------------------------------#
         a1.set_ylim([YScale_minTT, YScale_maxTT], auto=True)
         a1.set_xlim([window_Xmin, window_Xmax])
@@ -4563,8 +4567,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         a2.set_ylim([sBar_minTT, sBar_maxTT], auto=True)
         a2.set_xlim([window_Xmin, window_Xmax])
         # --------------------------------------------------------[]
-        a3.set_ylim([sBar_minTT, sBar_maxTT], auto=True)
-        a3.set_xlim([window_Xmin, window_Xmax])
+        a3.set_ylim([YScale_minRM, YScale_maxRM], auto=True)
+        a3.set_xlim([window_XminRM, window_XmaxRM])
 
         # --------------------------------------------------------[]
         # Define Plot area and axes -
@@ -4605,8 +4609,10 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         im40, = a2.plot([], [], 'o-', label='Tape Temp')
         im41, = a2.plot([], [], 'o-', label='Tape Temp')
         # --------------- Ramp Profile ---------------------------[ Important ]
-        im42, = a2.plot([], [], 'o-', label='Cumulated Ramp')
-        im43, = a2.plot([], [], 'o-', label='Nominal Ramp')
+        im42, = a3.plot([], [], marker='|', ms=20, mec='r', label='Ring 1 Ramp')
+        im43, = a3.plot([], [], marker='|', ms=20, mec='b', label='Ring 2 Ramp')
+        im44, = a3.plot([], [], marker='|', ms=20, mec='g', label='Ring 3 Ramp')
+        im45, = a3.plot([], [], marker='|', ms=20, mec='y', label='Ring 4 Ramp')
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 
@@ -4635,29 +4641,33 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             while True:
                 # print('Indefinite looping...')
                 # Using PLC Data ----------------#
-                import plcArrayRLmethodTT as p_dA
+                if UsePLC_DBS:
+                    import plcArrayRLmethodTT as p_dA
 
-                inProgress = True                               # True for RetroPlay mode
-                print('\nAsynchronous controller activated...')
-                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+                    inProgress = True                               # True for RetroPlay mode
+                    print('\nAsynchronous controller activated...')
+                    print('DrLabs' + "' Runtime Optimisation is Enabled!")
 
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+                    if not sysRun:
+                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
+                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
-                if keyboard.is_pressed(
-                        "Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:  # Terminate file-fetch
-                    print('\nProduction is pausing...')
-                    if not autoSpcPause:
-                        autoSpcRun = not autoSpcRun
-                        autoSpcPause = True
-                        print("\nVisualization in Paused Mode...")
+                    if keyboard.is_pressed(
+                            "Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:  # Terminate file-fetch
+                        print('\nProduction is pausing...')
+                        if not autoSpcPause:
+                            autoSpcRun = not autoSpcRun
+                            autoSpcPause = True
+                            print("\nVisualization in Paused Mode...")
+                    else:
+                        autoSpcPause = False
+                        print("Visualization in Real-time Mode...")
+
+                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        ttData = p_dA.sqlexec(smp_Sz, 0, 0, 0, fetchT)   # get details from PLC array ---- TODO --------[]
                 else:
-                    autoSpcPause = False
-                    print("Visualization in Real-time Mode...")
-
-                # Get list of relevant SQL Tables using conn() --------------------[]
-                ttData = p_dA.sqlexec(smp_Sz, 0, 0, 0, fetchT)   # get details from PLC array ---- TODO --------[]
+                    print('Procedure for real-time Processing only...')
+                    pass
 
                 # ------ Inhibit iteration ----------------------------------------[]
                 """
@@ -4729,29 +4739,38 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
             return rm_profile
 
-        # ================== End of synchronous Method ==========================
+        # ================== End of synchronous Method ==========================--------------------[]
         def asynchronousTT(db_freq):
 
             timei = time.time()         # start timing the entire loop
             UsePLC_DBS = rType          # Query Type
 
-            # Bistream Data Pooling Method ---------------------#
+            # Bi-stream Data Pooling Method ---------------------#
             ttData = synchronousTT(ttSize, ttgType, db_freq)    # data loading functions
             rmData = synchronousRMP(smp_Sz, stp_Sz, db_freq)    # Accumulated Gap Mean Profile
             # --------------------------------------------------#
-            import VarPLCtt as qtt
-            viz_cycle = 10
-            # Call synchronous data PLC function ----------[]
-            columns = qt.validCols('TT')                    # Load defined valid columns for PLC Data
-            df1 = pd.DataFrame(ttData, columns=columns)     # Include table data into python Dataframe
-            TT = qtt.loadProcesValues(df1)                  # Join data values under dataframe
+            if UsePLC_DBS == 1:
+                import VarPLCtt as qtt
+                viz_cycle = 10
 
-            # function call ----------- SQL loader ---------#
-            import VarSQLrm as qrm                          # load SQL variables column names | rfVarSQL
+                # Call synchronous data PLC function ----------[A]
+                columns = qt.validCols('TT')                    # Load defined valid columns for PLC Data
+                df1 = pd.DataFrame(ttData, columns=columns)     # Include table data into python Dataframe
+                TT = qtt.loadProcesValues(df1)                  # Join data values under dataframe
+            else:
+                import VarSQLst as qtt
+
+                viz_cycle = 150
+                columns = qt.validCols('TT')                    # Load defined valid columns for PLC Data
+                df1 = pd.DataFrame(ttData, columns=columns)     # Include table data into python Dataframe
+                TT = qtt.loadProcesValues(df1)                  # Join data values under dataframe
+
+            # Compulsory Ramp function call -- SQL loader -[B]
+            import VarSQLrm as qrm                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
-            g1 = qr.validCols('RM')                         # Construct Data Column selSqlColumnsTFM.py
-            df1 = pd.DataFrame(rmData, columns=g1)          # Import into python Dataframe
-            RM = qrm.loadProcesValues(df1)                  # Join data values under dataframe
+            g1 = qr.validCols('RM')                             # Construct Data Column selSqlColumnsTFM.py
+            df1 = pd.DataFrame(rmData, columns=g1)              # Import into python Dataframe
+            RM = qrm.loadProcesValues(df1)                      # Join data values under dataframe
 
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
@@ -4793,9 +4812,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             im41.set_xdata(np.arange(db_freq))
             im42.set_xdata(np.arange(db_freq))
             im43.set_xdata(np.arange(db_freq))
-            # --------- Ramp Profile ---------
-            # im42.set_xdata(np.arange(db_freq * 10 /db_freq))      # TODO - Define db_freq as x-axis sample distance
-            # im43.set_xdata(np.arange(db_freq * 10 /db_freq))      # Assuming TCP01 running at 10cm/sec
+            im44.set_xdata(np.arange(db_freq))
+            im45.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
             im10.set_ydata((TT[0]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 1
@@ -4860,9 +4878,11 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             # ---------------------------------------------------------------------------------------[RAMP]
             # TODO ----
                 # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im42.set_ydata((RM[0]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im43.set_ydata((RM[1]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 2
-
+            # im42.set_ydata((RM[1]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # tStamp
+            im42.set_ydata((RM[1])[0:db_freq])              # Ring 1
+            im43.set_ydata((RM[2])[0:db_freq])              # Ring 2
+            im44.set_ydata((RM[3])[0:db_freq])              # Ring 3
+            im45.set_ydata((RM[4])[0:db_freq])              # Ring 4
 
             # # Declare Plots attributes --------------------------------------------------------[]
             # XBar Mean Plot
@@ -4877,7 +4897,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             a2.axhspan(sUCLtt, sBar_maxTT, facecolor='#CCCCFF', edgecolor='#CCCCFF')  # 1 Sigma above the Mean
             a2.axhspan(sBar_minTT, sLCLtt, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
-            # Setting up the parameters for moving windows Axes ---------------------------------[]
+            # Setting up the parameters for windows moving Axes on Tape Temp only ---------------[]
             if db_freq > window_Xmax:
                 a1.set_xlim(db_freq - window_Xmax, db_freq)
                 a2.set_xlim(db_freq - window_Xmax, db_freq)
@@ -4902,9 +4922,9 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)
         # Activate Matplot tools ------------------[Uncomment to activate]
-        toolbar = NavigationToolbar2Tk(canvas, self)
-        toolbar.update()
-        canvas._tkcanvas.pack(expand=True)
+        # toolbar = NavigationToolbar2Tk(canvas, self)
+        # toolbar.update()
+        # canvas._tkcanvas.pack(expand=True)
 
 
 class substTempTabb(ttk.Frame):     # -- Defines the tabbed region for QA param - Substrate Temperature --[]
@@ -5122,14 +5142,13 @@ class substTempTabb(ttk.Frame):     # -- Defines the tabbed region for QA param 
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
         def synchronousST(stSize, stgType, fetchT):
-            fetch_no = str(fetchT)  # entry value in string sql syntax
+            fetch_no = str(fetchT)                          # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
-            if not inUseAlready:  # Load CommsPlc class once
+            if not inUseAlready:                            # Load Coms Plc class once
                 import CommsSql as q
-                q.DAQ_connect(1, 0)
-            else:
-                qRP = conn.cursor()
+                con_st = q.DAQ_connect(1, 0)
+
             # Evaluate conditions for SQL Data Fetch ------------------------------[A]
             """
             Load watchdog function with synchronous function every seconds
@@ -5145,48 +5164,38 @@ class substTempTabb(ttk.Frame):     # -- Defines the tabbed region for QA param 
 
             while True:
                 # print('Indefinite looping...')
-                if not UsePLC_DBS:  # Not Using PLC Data
-                    import ArrayRP_sqlRLmethod as lq  # DrLabs optimization method
-                    inProgress = True  # True for RetroPlay mode
+                if UsePLC_DBS:                                      # Using PLC Data
+                    import ArrayRP_sqlRLmethod as lq                    # DrLabs optimization method
+                    inProgress = True                                   # True for RetroPlay mode
                     print('\nAsynchronous controller activated...')
                     print('DrLabs' + "' Runtime Optimisation is Enabled!")
 
-                    # Get list of relevant SQL Tables using conn() --------------------[]
-                    stData = lq.sqlexec(stSize, stgType, qRP, tblID, fetchT)
-                    if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        qRP.close()
-                        print('SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        continue
-                    else:
-                        print('\nUpdating....')
-
-                else:
-                    inProgress = False  # False for Real-time mode
-                    print('\nSynchronous controller activated...')
                     if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                        sysRun, msctcp, msc_rt = wd.autoPausePlay()     # Retrieve M.State from Watchdog
                     print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                     # Either of the 2 combo variables are assigned to trigger routine pause
-                    if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
+                    if keyboard.is_pressed(
+                            "Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:  # Terminate file-fetch
                         print('\nProduction is pausing...')
                         if not autoSpcPause:
                             autoSpcRun = not autoSpcRun
                             autoSpcPause = True
-                            # play(error)                            # Pause mode with audible Alert
                             print("\nVisualization in Paused Mode...")
                     else:
                         autoSpcPause = False
+                        print("Visualization in Real-time Mode...")
+                        # -----------------------------------------------------------------[]
+                        stData = q.paramDataRequest(procID, stSize, stgType, fetch_no)
+                else:
+                    print('Procedure for real-time Processing only...')
+                    pass
 
-                    # Play visualization ----------------------------------------------[]
-                    print("Visualization in Play Mode...")
-                    # play(nudge)     # audible alert
-
-                    # -----------------------------------------------------------------[]
-                    # Allow selective runtime parameter selection on production critical process
-                    procID = 'ST'
-                    stData = q.paramDataRequest(procID, stSize, stgType, fetch_no)
+                # ------ Inhibit iteration ----------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class ---------------------
+                """
+                print('\nUpdating....')
 
             return stData
 
@@ -5197,21 +5206,24 @@ class substTempTabb(ttk.Frame):     # -- Defines the tabbed region for QA param 
             UsePLC_DBS = rType  # Query Type
 
             # Call data loader Method---------------------------#
-            rpData = synchronousST(stSize, stgType, db_freq)  # data loading functions
+            stData = synchronousST(stSize, stgType, db_freq)  # data loading functions
+            # --------------------------------------------------#
             if UsePLC_DBS == 1:
-                import VarPLCrf as qst
+                import VarPLCst as qst
+
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qs.validCols('ST')                    # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(rpData, columns=columns)     # Include table data into python Dataframe
+                df1 = pd.DataFrame(stData, columns=columns)     # Include table data into python Dataframe
                 ST = qst.loadProcesValues(df1)                  # Join data values under dataframe
-
             else:
-                import VarSQLrf as qst                          # load SQL variables column names | rfVarSQL
+                import VarSQLst as qst                          # load SQL variables column names | rfVarSQL
+
                 viz_cycle = 150
                 g1 = qs.validCols('ST')                         # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
+                df1 = pd.DataFrame(stData, columns=g1)          # Import into python Dataframe
                 ST = qst.loadProcesValues(df1)                  # Join data values under dataframe
+
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -5810,14 +5822,24 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         sBar_minTG, sBar_maxTG = sLCLtg - 80, sUCLtg + 80           # Calibrate Y-axis for S-Plot
         window_Xmin, window_Xmax = 0, (smp_Sz + 3)                  # windows view = visible data points
         # ----------------------------------------------------------#
+        YScale_minVM, YScale_maxVM = 0, 80                          # Valid Void Mapping
+        window_XminVM, window_XmaxVM = 0, 6000                      # Get details from SCADA PIpe Recipe TODO[1]
+
+        # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
+        if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
+            print('\n DNV 4 params condition met....', OT, CT, RP, WS)
+            T1 = WON + '_TG'  # Tape Gap Polarisation
+            T2 = WON + '_VM'  # Void Mapping Profile
+        else:
+            pass
 
         # Initialise runtime limits --------------------------------#
         a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
         a3.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
 
-        a1.set_title('Tape Gap Polarisation [XBar Plot]', fontsize=12, fontweight='bold')
-        a3.set_title('Tape Gap Polarisation [S Plot]', fontsize=12, fontweight='bold')
-        a4.set_title('Gap Mapping Profile - [TG]', fontsize=12, fontweight='bold')
+        a1.set_title('Tape Gap Polarisation [XBar]', fontsize=12, fontweight='bold')
+        a3.set_title('Tape Gap Polarisation [SDev]', fontsize=12, fontweight='bold')
+        a4.set_title('Tape Gap Mapping Profile', fontsize=12, fontweight='bold')
 
         a4.set_ylabel("2D - Staked Layer Void Mapping")
         a4.set_xlabel("Sample Distance (mt)")
@@ -5826,8 +5848,8 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         a3.grid(color="0.5", linestyle='-', linewidth=0.5)
         a4.grid(color="0.5", linestyle='-', linewidth=0.5)
 
-        a1.legend(loc='upper right', title='Gap Polarisation')
-        a3.legend(loc='upper right', title='Sigma curve')
+        a1.legend(loc='upper right', title='Tape Gap Polarisation')
+        a3.legend(loc='upper right', title='Sigma Plots')
         a4.legend(loc='upper right', title='Void Map Profile')
 
         # Initialise runtime limits -------------------------------#
@@ -5836,33 +5858,45 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         # ----------------------------------------------------------#
         a3.set_ylim([sBar_minTG, sBar_maxTG], auto=True)
         a3.set_xlim([window_Xmin, window_Xmax])
+        # --------------------------------------------------------[]
+        a4.set_ylim([YScale_minVM, YScale_maxVM], auto=True)
+        a4.set_xlim([window_XminVM, window_XmaxVM])
 
         # ----------------------------------------------------------[]
         # Define Plot area and axes -
         # ----------------------------------------------------------[8 into 4]
-        im10, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (A1)')
-        im11, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (B1)')
-        im12, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (A2)')
-        im13, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (B2)')
-        im14, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (A3)')
-        im15, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (B3)')
-        im16, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (A4)')
-        im17, = a1.plot([], [], 'o-', label='Tape Gap Polarisation - (B4)')
+        im10, = a1.plot([], [], 'o-', label='Tape Gap Pol - (A1)')
+        im11, = a1.plot([], [], 'o-', label='Tape Gap Pol - (B1)')
+        im12, = a1.plot([], [], 'o-', label='Tape Gap Pol - (A2)')
+        im13, = a1.plot([], [], 'o-', label='Tape Gap Pol - (B2)')
+        im14, = a1.plot([], [], 'o-', label='Tape Gap Pol - (A3)')
+        im15, = a1.plot([], [], 'o-', label='Tape Gap Pol - (B3)')
+        im16, = a1.plot([], [], 'o-', label='Tape Gap Pol - (A4)')
+        im17, = a1.plot([], [], 'o-', label='Tape Gap Pol - (B4)')
         # ------------ S Bar Plot ------------------------------
-        im18, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
-        im19, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
-        im20, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
-        im21, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
-        im22, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
-        im23, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
-        im24, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
-        im25, = a3.plot([], [], 'o-', label='Tape Gap Polarisation')
+        im18, = a3.plot([], [], 'o-', label='Tape Gap Pol')
+        im19, = a3.plot([], [], 'o-', label='Tape Gap Pol')
+        im20, = a3.plot([], [], 'o-', label='Tape Gap Pol')
+        im21, = a3.plot([], [], 'o-', label='Tape Gap Pol')
+        im22, = a3.plot([], [], 'o-', label='Tape Gap Pol')
+        im23, = a3.plot([], [], 'o-', label='Tape Gap Pol')
+        im24, = a3.plot([], [], 'o-', label='Tape Gap Pol')
+        im25, = a3.plot([], [], 'o-', label='Tape Gap Pol')
 
         # Statistical Profile ------------------------------------------[4 into 1]
-        im26, = a4.plot([], [], 'o-', label='Ring 1 Gap Data')          # Profile B
-        im27, = a4.plot([], [], 'o-', label='Ring 2 Gap Data')          # Profile B
-        im28, = a4.plot([], [], 'o-', label='Ring 3 Gap Data')          # Profile B
-        im29, = a4.plot([], [], 'o-', label='Ring 4 Gap Data')          # Profile B
+        # Color code MFC (marker markeredgecolor | markerfacecolor)
+        fcoded = 0
+        if fcoded == 0:
+            fcoded = 'b'
+        elif fcoded > 2 and fcoded <4:
+            fcoded = 'g'
+        elif fcoded > 4 and fcoded < 6:
+            fcoded = 'y'
+        elif fcoded > 6 and fcoded < 8:
+            fcoded = 'r'
+        else:
+            fcoded = 'b'
+        im26, = a4.plot([], [], marker='s', ms=20, mec=fcoded, label='Gap Volume Data') # Square bl
 
         # TODO Call additional prolific functions ------------[try pooling data from SQL repo]
         # loadSqlCumProfile(ttk.Frame)
@@ -5997,7 +6031,6 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
 
             return pro_A
 
-
         # ================== End of synchronous Method ==========================
 
 
@@ -6016,7 +6049,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             # df3 = pd.DataFrame(gapPdata, columns=['CumulativeGapMean', 'NominalGapMean'])
             # ProA = [df3['CumulativeGapMean'], df3['NominalGapMean']]
             df4 = pd.DataFrame(voidData, columns=['AverageVoid', 'SampleDistance'])
-            Pro_A = [df4['AverageVoid'], df4['SampleDistance']]
+            pro_A = [df4['AverageVoid'], df4['SampleDistance']]
             # ----------------------------------------------------------#
 
             if UsePLC_DBS == 1:
@@ -6054,12 +6087,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             im24.set_xdata(np.arange(db_freq))
             im25.set_xdata(np.arange(db_freq))
             # -------------------------------- Profile Axes
-            # ----- Sample Nominal Layer -----
             im26.set_xdata(np.arange(db_freq))
-            im27.set_xdata(np.arange(db_freq))
-            im28.set_xdata(np.arange(db_freq))
-            im29.set_xdata(np.arange(db_freq))
-
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
             im10.set_ydata((TG[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
             im11.set_ydata((TG[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
@@ -6085,11 +6113,6 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             im23.set_ydata((TG[5]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
             im24.set_ydata((TG[6]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
             im25.set_ydata((TG[7]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            # ---- Sample Distance in meters ---------
-            im26.set_xdata(np.arange(db_freq * 10 / db_freq))  # Assuming TCP01 running at 10cm/sec))
-            im27.set_xdata(np.arange(db_freq * 10 / db_freq))  # Assuming TCP01 running at 10cm/sec))
-            im28.set_xdata(np.arange(db_freq * 10 / db_freq))  # Assuming TCP01 running at 10cm/sec))
-            im29.set_xdata(np.arange(db_freq * 10 / db_freq))  # Assuming TCP01 running at 10cm/sec))
 
             if not tgHL:
                 mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(smp_Sz, mnA,
@@ -6101,11 +6124,13 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
                 mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT = tq.tManualPerf(mnA, mnB, 0, 0, sdA, sdB,
                                                                                           0, 0, tgUSL, tgLSL, tgUCL,
                                                                                           tgLCL)
-            # ---- Profile rolling Data Plot -------
-            im26.set_ydata((Pro_A[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Profile A
-            im27.set_ydata((Pro_A[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Profile A
-            im28.set_ydata((Pro_A[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq* 10 /db_freq])  # Profile B
-            im29.set_ydata((Pro_A[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq* 10 /db_freq])  # Profile B
+            # ---- Profile rolling Data Plot -------------
+            pVoidMax = max(pro_A[1], pro_A[2], pro_A[3], pro_A[4])
+            pVoidAvg = (pro_A[1], pro_A[2], pro_A[3], pro_A[4]).mean()
+            pSampleDist = (db_freq * 10 / db_freq)
+
+            gap_vol = (pVoidAvg / pSampleDist) * 10
+            im26.set_ydata((gap_vol)[0:db_freq])  # Profile A
 
             # # Declare Plots attributes ------------------------------------------------------------[]
             # XBar Mean Plot

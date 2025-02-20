@@ -8,7 +8,6 @@ All production procedure relies on Word Order Number - Assuming a Unique identit
 Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
-# 1. Laser Power, 2. Laser Angle, 3. Tape Speed
 
 
 def loadProcesValues(df1):
