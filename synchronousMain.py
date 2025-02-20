@@ -21,7 +21,9 @@ import selDataColsWS as qw
 import selDataColsST as qs
 import selDataColsTT as qt
 import selDataColsRP as qp
+import selDataColsRM as qr
 # import selDataColsRP as qm
+
 import selSqlDataColsMonitors as qm
 # import rlMethodVoidData as rl
 # -----------------------------#
@@ -4745,11 +4747,11 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             TT = qtt.loadProcesValues(df1)                  # Join data values under dataframe
 
             # function call ----------- SQL loader ---------#
-            import VarSQLtt as qrm                          # load SQL variables column names | rfVarSQL
+            import VarSQLrm as qrm                          # load SQL variables column names | rfVarSQL
             viz_cycle = 150
-            g1 = qt.validCols('TT')                         # Construct Data Column selSqlColumnsTFM.py
-            df1 = pd.DataFrame(ttData, columns=g1)          # Import into python Dataframe
-            RM = qtt.loadProcesValues(df1)                  # Join data values under dataframe
+            g1 = qr.validCols('RM')                         # Construct Data Column selSqlColumnsTFM.py
+            df1 = pd.DataFrame(rmData, columns=g1)          # Import into python Dataframe
+            RM = qrm.loadProcesValues(df1)                  # Join data values under dataframe
 
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization

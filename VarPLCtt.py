@@ -12,13 +12,13 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    plcTT = [df1['R1H1TT(°C)'], df1['R1H2TT(°C)'],
-            df1['R1H3TT(°C)'], df1['R1H4TT(°C)'],
-            df1['R2H1TT(°C)'], df1['R2H2TT(°C)'],
-            df1['R2H3TT(°C)'], df1['R2H4TT(°C)'],
-            df1['R3H1TT(°C)'], df1['R3H2TT(°C)'],
-            df1['R3H3TT(°C)'], df1['R3H4TT(°C)'],
-            df1['R4H1TT(°C)'], df1['R4H2TT(°C)'],
-            df1['R4H3TT(°C)'], df1['R4H4TT(°C)']]
+    plcTT = [df1['R1H1TT'], df1['R1H2TT'],
+             df1['R1H3TT'], df1['R1H4TT'],
+             df1['R2H1TT'], df1['R2H2TT'],
+             df1['R2H3TT'], df1['R2H4TT'],
+             df1['R3H1TT'], df1['R3H2TT'],
+             df1['R3H3TT'], df1['R3H4TT'],
+             df1['R4H1TT'], df1['R4H2TT'],
+             df1['R4H3TT'], df1['R4H4TT']]
 
     return plcTT
