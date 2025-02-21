@@ -22,6 +22,7 @@ import selDataColsST as qs
 import selDataColsTT as qt
 import selDataColsRP as qp
 import selDataColsRM as qr
+import selDataColsVM as qv
 # import selDataColsRP as qm
 
 import selSqlDataColsMonitors as qm
@@ -61,6 +62,9 @@ OTlayr, EPpos, pStatus = [], [], []
 HeadA, HeadB, vTFM = 0, 0, 0
 hostConn = 0
 runStatus = 0
+
+gap_vol = 0
+
 optm = True
 
 import subprocess
@@ -4623,6 +4627,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             if not inUseAlready:                         # Load Comm Plc class once
                 import CommsSql as q
                 con_tt = q.DAQ_connect(1, 0) # Connect PLC for real-time data
+            else:
+                con_tt = conn.cursor()
 
             # Evaluate conditions for SQL Data Fetch ------------------------------[A]
             """
@@ -4663,21 +4669,43 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                         autoSpcPause = False
                         print("Visualization in Real-time Mode...")
 
-                        # Get list of relevant SQL Tables using conn() --------------------[]
-                        ttData = p_dA.sqlexec(smp_Sz, 0, 0, 0, fetchT)   # get details from PLC array ---- TODO --------[]
-                else:
-                    print('Procedure for real-time Processing only...')
-                    pass
+                        # Get list of relevant PLC Tables using conn() --------------------[]
+                        ttData = p_dA.paramDataRequest(procID, smp_Sz, smp_St, fetch_no)
 
-                # ------ Inhibit iteration ----------------------------------------[]
-                """
-                # Set condition for halting real-time plots in watchdog class ---------------------
-                """
+                else:
+                    import sqlArrayRLmethodTT as p_dA
+
+                    inProgress = False  # False for Real-time mode
+                    print('\nSynchronous controller activated...')
+                    if not sysRun:
+                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                    # Either of the 2 combo variables are assigned to trigger routine pause
+                    if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
+                        print('\nProduction is pausing...')
+                        if not autoSpcPause:
+                            autoSpcRun = not autoSpcRun
+                            autoSpcPause = True
+                            # play(error)                                               # Pause mode with audible Alert
+                            print("\nVisualization in Paused Mode...")
+                    else:
+                        autoSpcPause = False
+
+                    # Play visualization ----------------------------------------------[]
+                    print("Visualization in Play Mode...")
+                    # play(nudge)     # audible alert
+
+                    # -----------------------------------------------------------------[]
+                    # Allow selective runtime parameter selection on production critical process
+                    procID = 'TG'
+                    ttData = p_dA.sqlexec(smp_Sz, 0, 0, 0, fetchT)
+
                 print('\nUpdating....')
 
             return ttData
 
-        # -------------------------------------[Void Profile]
+        # -------------------------------------[Strictly from SQL Repo Void Profile]
         def synchronousRMP(smp_Sz, smp_St, fetchT):
             fetch_no = str(fetchT)  # entry value in string sql syntax
 
@@ -5755,7 +5783,9 @@ class tapePlacement(ttk.Frame):     # -- Defines the tabbed region for QA param 
 
 
 class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA param - Tape Gap Measurement --[]
+
     """ Application to convert feet to meters or vice versa. """
+
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
@@ -5885,19 +5915,19 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
 
         # Statistical Profile ------------------------------------------[4 into 1]
         # Color code MFC (marker markeredgecolor | markerfacecolor)
-        fcoded = 0
-        if fcoded == 0:
+        if gap_vol <= 1:
             fcoded = 'b'
-        elif fcoded > 2 and fcoded <4:
+        elif 1 <= gap_vol <= 3:
             fcoded = 'g'
-        elif fcoded > 4 and fcoded < 6:
+        elif 3 <= gap_vol <= 5:
             fcoded = 'y'
-        elif fcoded > 6 and fcoded < 8:
+        elif 5 <= gap_vol <= 7:
             fcoded = 'r'
         else:
             fcoded = 'b'
-        im26, = a4.plot([], [], marker='s', ms=20, mec=fcoded, label='Gap Volume Data') # Square bl
+        im26, = a4.plot([], [], marker='s', ms=20, mec=fcoded, label='Gap Volume Data')  # Square block
 
+        # -------------------------------------------------------------------------------------#
         # TODO Call additional prolific functions ------------[try pooling data from SQL repo]
         # loadSqlCumProfile(ttk.Frame)
         # loadSqlVoidMapping()
@@ -5909,9 +5939,9 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
             if not inUseAlready:                                                   # Load CommsPlc class once
                 import CommsSql as q
-                q.DAQ_connect(1, 0)
+                con_tg = q.DAQ_connect(1, 0)
             else:
-                qRP = conn.cursor()
+                con_tg = conn.cursor()
 
             # Evaluate conditions for SQL Data Fetch ------------------------------[A]
             """
@@ -5929,23 +5959,33 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
 
             while True:
                 # print('Indefinite looping...')
-                if not UsePLC_DBS:                                                      # Not Using PLC Data
-                    import ArrayRP_sqlRLmethod as lq                                    # DrLabs optimization method
-                    inProgress = True                                                   # True for RetroPlay mode
+                if UsePLC_DBS:                                                      # Not Using PLC Data
+                    import plcArrayRLmethodTG as p_dB                               # DrLabs optimization method
+
+                    inProgress = True                                               # True for RetroPlay mode
                     print('\nAsynchronous controller activated...')
                     print('DrLabs' + "' Runtime Optimisation is Enabled!")
 
-                    # Get list of relevant SQL Tables using conn() --------------------[]
-                    tgData = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)             # perform DB connections
-                    if keyboard.is_pressed("Alt+Q"):                                    # Terminate file-fetch
-                        qRP.close()
-                        print('SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        continue
+                    if not sysRun:
+                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
+                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                    if keyboard.is_pressed(
+                            "Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:  # Terminate file-fetch
+                        print('\nProduction is pausing...')
+                        if not autoSpcPause:
+                            autoSpcRun = not autoSpcRun
+                            autoSpcPause = True
+                            print("\nVisualization in Paused Mode...")
                     else:
-                        print('\nUpdating....')
+                        autoSpcPause = False
+                        print("Visualization in Real-time Mode...")
+                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        tgData = p_dB.sqlexec(smp_Sz, 0, 0, 0, fetchT)  # get details from PLC array
 
                 else:
+                    import sqlArrayRLmethodTG as p_dB
+
                     inProgress = False                                                  # False for Real-time mode
                     print('\nSynchronous controller activated...')
                     if not sysRun:
@@ -5972,14 +6012,16 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
                     procID = 'TG'
                     tgData = q.paramDataRequest(procID, smp_Sz, smp_St, fetch_no)
 
+                print('\nUpdating....')
+
             return tgData
 
-        # -------------------------------------[Void Profile]
-        def synchronousPTG(smp_Sz, smp_St, fetchT):
+        # -------------------------------------[Strictly from SQL Repo Void Profile]
+        def synchronousMAP(smp_Sz, smp_St, fetchT):
             fetch_no = str(fetchT)                                                 # entry value in string sql syntax
 
-            # Obtain Data from SQL Ropo ---------------------------[]
-            qRP = conn.cursor()
+            # Obtain Data from SQL Repo ---------------------------[]
+            con_vm = conn.cursor()      # Void mapping
 
             """
             Load watchdog function with synchronous function every seconds
@@ -6017,54 +6059,60 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
                     continue
 
                 else:
-                    pro_A = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)      # perform DB connections
+                    pro_B = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)      # perform DB connections
                     print('\nUpdating....')
 
-                # Play visualization ----------------------------------------------[]
-                print("Visualization in Play Mode...")
-                # play(nudge)     # audible alert
+                # ------ Inhibit iteration ----------------------------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class ---------------------
+                """
+                # TODO --- values for inhibiting the SQL processing
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    con_vm.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
 
-                # -----------------------------------------------------------------[]
-                # Allow selective runtime parameter selection on production critical process
-                procID = 'ProA'
-                pro_A = q.paramDataRequest(procID, smp_Sz, smp_St, fetch_no)
-
-            return pro_A
+            return pro_B
 
         # ================== End of synchronous Method ==========================
 
-
         def asynchronousTG(db_freq):
+            global gap_vol
 
             timei = time.time()                                 # start timing the entire loop
             UsePLC_DBS = qType                                  # Query Type
             # declare asynchronous variables ------------------[]
 
-            # Establish Multi-Stream data pooling pipeline -------------#
-            tgData = synchronousTG(smp_Sz, stp_Sz, db_freq)         # PLC synchronous Data loading method1
-            voidData = synchronousPTG(smp_Sz, stp_Sz, db_freq)      # Dr Labs Method for Void Mapping Profile
-
-            # Initialise colum heads -----------------------------------#
-            # gapPdata = synchronousVP1(smp_Sz, stp_Sz, db_freq)    # Accumulated Gap Mean Profile
-            # df3 = pd.DataFrame(gapPdata, columns=['CumulativeGapMean', 'NominalGapMean'])
-            # ProA = [df3['CumulativeGapMean'], df3['NominalGapMean']]
-            df4 = pd.DataFrame(voidData, columns=['AverageVoid', 'SampleDistance'])
-            pro_A = [df4['AverageVoid'], df4['SampleDistance']]
+            # Bi-stream Data Pooling Method ----------------------#
+            tgData = synchronousTG(smp_Sz, stp_Sz, db_freq)       # PLC synchronous Data loading method1
+            vmData = synchronousMAP(smp_Sz, stp_Sz, db_freq)      # Dr Labs Method for Void Mapping Profile
             # ----------------------------------------------------------#
 
             if UsePLC_DBS == 1:
                 import VarPLCtg as qtg
+
                 viz_cycle = 10
                 columns = qg.validCols('TG')                    # Load defined valid columns for PLC Data
                 df1 = pd.DataFrame(tgData, columns=columns)     # Include table data into python Dataframe
                 TG = qtg.loadProcesValues(df1)                  # Join data values under dataframe
-
             else:
                 import VarSQLtg as qtg                          # load SQL variables column names | rfVarSQL
+
                 viz_cycle = 150
                 g1 = qg.validCols('TG')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(tgData, columns=g1)          # Import into python Dataframe
                 TG = qtg.loadProcesValues(df1)                  # Join data values under dataframe
+
+            # Compulsory VoidMap function call -- SQL loader -[B]
+            import VarSQLvm as qvm                              # load SQL variables column names | rfVarSQL
+            viz_cycle = 150
+            g1 = qv.validCols('VM')                             # Construct Data Column selSqlColumnsTFM.py
+            df1 = pd.DataFrame(vmData, columns=g1)              # Import into python Dataframe
+            VM = qvm.loadProcesValues(df1)                      # Join data values under dataframe
+
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -6085,7 +6133,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             im22.set_xdata(np.arange(db_freq))
             im23.set_xdata(np.arange(db_freq))
             im24.set_xdata(np.arange(db_freq))
-            im25.set_xdata(np.arange(db_freq))
+            im25.set_xdata(np.arange(db_freq * 30))     # @10hz resolution = 30cm
             # -------------------------------- Profile Axes
             im26.set_xdata(np.arange(db_freq))
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
@@ -6125,12 +6173,16 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
                                                                                           0, 0, tgUSL, tgLSL, tgUCL,
                                                                                           tgLCL)
             # ---- Profile rolling Data Plot -------------
-            pVoidMax = max(pro_A[1], pro_A[2], pro_A[3], pro_A[4])
-            pVoidAvg = (pro_A[1], pro_A[2], pro_A[3], pro_A[4]).mean()
-            pSampleDist = (db_freq * 10 / db_freq)
+            pScount = VM[0]
+            pCenter = VM[1]
+            pAvgGap = VM[2]
+            pMaxGap = VM[3]
+            vLayerN = VM[4]
+            sLength = VM[5]
 
-            gap_vol = (pVoidAvg / pSampleDist) * 10
-            im26.set_ydata((gap_vol)[0:db_freq])  # Profile A
+            gap_vol = (pAvgGap / sLength) * 100  # Percentage Void
+            im26.set_ydata((gap_vol)[0:db_freq])  # --------------------------------------- Profile A
+            im27.set_ydata((gap_vol)[0:db_freq])
 
             # # Declare Plots attributes ------------------------------------------------------------[]
             # XBar Mean Plot
