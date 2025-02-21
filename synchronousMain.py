@@ -1181,13 +1181,21 @@ class common_rampProfile(ttk.Frame):
 
             # --------------------------------------------------#
             import VarSQLcRamp as qcr                       # load SQL variables column names | rfVarSQL
-            viz_cycle = 150
 
-            g1 = qp.validCols('RP')                         # Construct Data Column selSqlColumnsTFM.py
+            viz_cycle = 150
+            g1 = qp.validCols('CRP')                        # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
-            RP = qrp.loadProcesValues(df1)                  # Join data values under dataframe
+            cRP = qcr .loadProcesValues(df1)                # Join data values under dataframe
+
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+
+            # Plot X-Axis data points -------- X Plot
+            im10.set_xdata(np.arange(db_freq))
+            im11.set_xdata(np.arange(db_freq))
+            # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
+            im10.set_ydata((cRP[0]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 1
+            im11.set_ydata((cRP[1]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 2
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if db_freq > window_Xmax:
@@ -1207,12 +1215,7 @@ class common_rampProfile(ttk.Frame):
             plt.tight_layout()
             plt.show()
 
-        # rampData = synchronousRamp(ttSize, ttgType, db_freq)
-        # Initialise colum heads ---------------------------#
-        # df3 = pd.DataFrame(rampData, columns=['CumulativeRamp', 'SampleDistance'])
-        # RAMP = [df3['CumulativeRamp'], df3['SampleDistance']]
-
-        # -------------------------------------------------------------[]
+        # -----Canvas update --------------------------------------------[]
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)
 
@@ -4776,6 +4779,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
             # Compulsory Ramp function call -- SQL loader -[B]
             import VarSQLrm as qrm                              # load SQL variables column names | rfVarSQL
+
             viz_cycle = 150
             g1 = qr.validCols('RM')                             # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(rmData, columns=g1)              # Import into python Dataframe
