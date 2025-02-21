@@ -63,10 +63,14 @@ HeadA, HeadB, vTFM = 0, 0, 0
 hostConn = 0
 runStatus = 0
 
+# -------------
 gap_vol = 0
+ramp_vol = 0
+pLength = 100000
+pExLayer = 100
+# --------------
 
 optm = True
-
 import subprocess
 try:
     subprocess.check_output('nvidia-smi')
@@ -78,6 +82,15 @@ except Exception:
 impath ='C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\Media\\'
 nudge = AudioSegment.from_wav(impath+'tada.wav')
 error = AudioSegment.from_wav(impath+'error.wav')
+
+# -------------------------------------------------------------------------------------------#
+path = ('C:\\Users\\DevEnv\\OneDrive - Magma Global LTD\\Documents\\Development DOCUMENTS\\'
+                'Technical Reqs Docs\\Tape Gap Measurements\\testFile.csv')
+csv_file = (path)
+df = pd.read_csv(csv_file)
+
+#print('Test Print', df.head())
+# im26 = a4.scatter(data=df, x='sDistanceX', y='Pipe LayersY', s='Pipe LayersY', marker='|', c=colors, cmap='GnBu')
 
 # Define statistical operations ----------------------------------------------------------[]
 WeldQualityProcess = True
@@ -1046,8 +1059,11 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         # toolbar = NavigationToolbar2Tk(canvas, self)
         # toolbar.update()
         # canvas._tkcanvas.pack(expand=True)
-# --------------------------------------------- COMMON VIEW CLASS OBJECTS -------------------------------------[A]
+# --------------------------------------------- COMMON VIEW CLASS OBJECTS -----------------[A]
+
+
 class common_rampProfile(ttk.Frame):
+    # compute ram Count against cumulative layers ramp count --------[A]
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=20)
@@ -1056,7 +1072,7 @@ class common_rampProfile(ttk.Frame):
     def createWidgets(self):
         # -----------------------------------
         f = Figure(figsize=(9, 4), dpi=100)
-        f.subplots_adjust(left=0.052, bottom=0.11, right=0.988, top=0.99, wspace=0.202)
+        f.subplots_adjust(left=0.07, bottom=0.11, right=0.971, top=0.99, wspace=0.202)
         a1 = f.add_subplot(1, 1, 1)
 
         # Model data -----------------------------------------------[]
@@ -1068,30 +1084,30 @@ class common_rampProfile(ttk.Frame):
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
 
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minRP, YScale_maxRP = 10 - 8.5, 10 + 8.5             # Roller Force
-        window_Xmin, window_Xmax = 0, (12 + 3)                      # windows view = visible data points
+        YScale_minRP, YScale_maxRP = 0, pExLayer                    # Ramp Count Profile (Per segment)
+        window_Xmin, window_Xmax = 0, pLength                       # windows view = visible data points
 
+        # Load SQL Query Table -------------------------------------#
+        cData1 = WON + '_RM'                                        # Identify Table
+        # ----------------------------------------------------------#
         a1.grid(color="0.5", linestyle='-', linewidth=0.5)
         a1.legend(loc='upper right', title='Cumulative Ramp Profile')
         a1.set_ylabel("Cumulated & Average Process Ramp")
         a1.set_xlabel("Sample Distance (mt)")
-
         # ----------------------------------------------------------#
         a1.set_ylim([YScale_minRP, YScale_maxRP], auto=True)
         a1.set_xlim([window_Xmin, window_Xmax])
-
         # ----------------------------------------------------------#
+        # ------- plot ramp count ------------[]
+        im10, = a1.plot([], [], 'o-', label='Current Layer Ramp Count')
+        im11, = a1.plot([], [], 'o-', label='Cumulated Ramp Count per Segment')
         # ---------------- EXECUTE SYNCHRONOUS METHOD --------------#
 
-        def synchronousRamp(smp_Sz, smp_St, fetchT):
+        def synchronous_cRamp(smp_Sz, smp_St, fetchT):
             fetch_no = str(fetchT)              # entry value in string sql syntax
 
-            # Obtain Volatile Data from PLC Host Server ---------------------------[]
-            if not inUseAlready:                # Load CommsPlc class once
-                import CommsSql as q
-                q.DAQ_connect(1, 0)
-            else:
-                qRP = conn.cursor()
+            # Obtain Volatile Data from sql Host Server ---------------------------[]
+            con_ramp = conn.cursor()
 
             # Evaluate conditions for SQL Data Fetch ------------------------------[A]
             """
@@ -1109,102 +1125,69 @@ class common_rampProfile(ttk.Frame):
 
             while True:
                 # Latch on SQL Query only a
+                import sqlArrayRLmethodRMP as qrm  # DrLabs optimization method
+
                 inProgress = False  # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
+                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+
                 if not sysRun:
                     sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 # Get list of relevant SQL Tables using conn() --------------------[]
-                if keyboard.is_pressed("Ctrl"):  # Terminate file-fetch
+                if keyboard.is_pressed(
+                        "Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:  # Terminate file-fetch
                     print('\nProduction is pausing...')
                     if not autoSpcPause:
                         autoSpcRun = not autoSpcRun
                         autoSpcPause = True
-                        # play(error)                                               # Pause mode with audible Alert
                         print("\nVisualization in Paused Mode...")
                     else:
                         autoSpcPause = False
-                        qRP.close()
+                        con_ramp.close()
                     print('SQL End of File, connection closes after 30 mins...')
                     time.sleep(60)
                     continue
 
                 else:
-                    RAMP = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)  # perform DB connections
+                    cRamp = lq.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)  # perform DB connections
                     print('\nUpdating....')
 
-                # Play visualization ----------------------------------------------[]
-                print("Visualization in Play Mode...")
-                # play(nudge)     # audible alert
+                # ------ Inhibit iteration ----------------------------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class ---------------------
+                """
+                # TODO --- values for inhibiting the SQL processing
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    con_ramp.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
 
-                # -----------------------------------------------------------------[]
-                # Allow selective runtime parameter selection on production critical process
-                procID = 'Ramp'
-                rampP = q.paramDataRequest(procID, smp_Sz, smp_St, fetch_no)
-
-            return rampP
+            return cRamp
 
         # ================== End of synchronous Method ==========================obal
 
-        def asynchronousRamp(db_freq):
+        def asynchronous_cRamp(db_freq):
 
             timei = time.time()  # start timing the entire loop
             UsePLC_DBS = rType  # Query Type
 
             # Call data loader Method---------------------------#
-            rpData = synchronousRamp(rpSize, rpgType, db_freq)    # data loading functions
-            if UsePLC_DBS == 1:
-                import VarPLCrp as qrp
-                viz_cycle = 10
-                # Call synchronous data function ---------------[]
-                columns = qp.validCols('RP')                    # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(rpData, columns=columns)     # Include table data into python Dataframe
-                RP = qrp.loadProcesValues(df1)                  # Join data values under dataframe
+            rpData = synchronous_cRamp(ttSize, ttgType, db_freq)    # data loading functions
 
-            else:
-                import rpVarSQL as qrp                          # load SQL variables column names | rfVarSQL
-                viz_cycle = 150
-                g1 = qp.validCols('RP')                         # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
-                RP = qrp.loadProcesValues(df1)                  # Join data values under dataframe
+            # --------------------------------------------------#
+            import VarSQLcRamp as qcr                       # load SQL variables column names | rfVarSQL
+            viz_cycle = 150
+
+            g1 = qp.validCols('RP')                         # Construct Data Column selSqlColumnsTFM.py
+            df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
+            RP = qrp.loadProcesValues(df1)                  # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
-
-            # -------------------------------------------------------------------------------------[]
-            # Plot X-Axis data points -------- X Plot
-            # im10.set_xdata(np.arange(db_freq))
-            # im11.set_xdata(np.arange(db_freq))
-            # # ------------------------------- S Plot
-            # im26.set_xdata(np.arange(db_freq))
-            # im27.set_xdata(np.arange(db_freq))
-            #
-            # # -------------- Ramp Data --------------------------------#
-            # im42.set_ydata((RAMP[0]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq * 10 / db_freq])  # Cumulative
-            # im43.set_ydata((RAMP[1]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq * 10 / db_freq])  # Nominal
-            #
-            #
-            # # Compute entire Process Capability ----------------------------------------#
-            # if not rpHL:
-            #     mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLa, dLCLa, ppT, pkT, xline, sline = tq.tAutoPerf(rpSize, mnA, mnB,
-            #                                                                                           mnC, mnD, sdA,
-            #                                                                                           sdB, sdC, sdD)
-            # else:
-            #     xline, sline = rpMean, rpDev
-            #     mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLa, dLCLa, ppT, pkT = tq.tManualPerf(mnA, mnB, mnC, mnD, sdA, sdB,
-            #                                                                               sdC, sdD, rpUSL, rpLSL, rpUCL,
-            #                                                                               rpLCL)
-            # # Declare Plots attributes --------------------------------------------------------[]
-            # XBar Mean Plot
-            a1.axhline(y=xline, color="red", linestyle="--", linewidth=0.8)
-            a1.axhspan(xlcT, xucT, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 3 Sigma span (Purple)
-            a1.axhspan(xucT, xusT, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            a1.axhspan(xlcT, xlsT, facecolor='#8d8794', edgecolor='#8d8794')
-            # ---------------------- sBar_minTT, sBar_maxTT -------[]
-            # Define Legend's Attributes  ----
-            a2.axhline(y=sline, color="blue", linestyle="--", linewidth=0.8)
-            a2.axhspan(sLCLrp, sUCLrp, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 1 Sigma Span
-            a2.axhspan(sUCLrp, sBar_maxRP, facecolor='#CCCCFF', edgecolor='#CCCCFF')  # 1 Sigma above the Mean
-            a2.axhspan(sBar_minRP, sLCLrp, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if db_freq > window_Xmax:
@@ -1214,15 +1197,11 @@ class common_rampProfile(ttk.Frame):
                 a1.set_xlim(0, window_Xmax)
                 a2.set_xlim(0, window_Xmax)
 
-            # Set trip line for individual time-series plot -----------------------------------[R1]
-            import triggerModule as sigma
-            sigma.trigViolations(a1, UsePLC_DBS, 'RP', YScale_minRP, YScale_maxRP, xucT, xlcT, xusT, xlsT, mnT, sdT)
-
             timef = time.time()
             lapsedT = timef - timei
             print(f"\nProcess Interval: {lapsedT} sec\n")
 
-            ani = FuncAnimation(f, asynchronousRamp, frames=None, save_count=100, repeat_delay=None,
+            ani = FuncAnimation(f, asynchronous_cRamp, frames=None, save_count=100, repeat_delay=None,
                                 interval=viz_cycle,
                                 blit=False)
             plt.tight_layout()
@@ -1238,9 +1217,9 @@ class common_rampProfile(ttk.Frame):
         canvas.get_tk_widget().pack(expand=False)
 
         # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True)
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(expand=True)
 
 
 class common_climateProfile(ttk.Frame):
@@ -1257,10 +1236,10 @@ class common_climateProfile(ttk.Frame):
         a3 = a2.twinx()
 
         # --------------------------------------- Dump Data ----------[]
-        x = np.arange(0, 10, 0.1)
-        y1 = 0.05 * x ** 2
+        x = np.arange(0, 100, 0.1)
+        y1 = - 0.01 * x ** 2
         y2 = -1 * y1
-
+        # configure plot curves -----
         a2.plot(x, y1, 'r-')
         a3.plot(x, y2, 'b-')
 
@@ -1272,14 +1251,14 @@ class common_climateProfile(ttk.Frame):
         plt.rcParams.update({'font.size': 9})                       # Reduce font size to 7pt for all legends
 
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minCP, YScale_maxCP = 10 - 8.5, 10 + 8.5             # Roller Force
-        window_Xmin, window_Xmax = 0, (12 + 3)                      # windows view = visible data points
+        YScale_minCP, YScale_maxCP = -10, 80                        # Climate Data
+        window_Xmin, window_Xmax = 0, 30                            # windows view = visible data points
 
         a2.legend(loc='upper right', title='Location-Based Climatic Profile')
         a2.grid(color="0.5", linestyle='-', linewidth=0.5)
         a2.set_ylabel("Temperature [°C]", color='r')
-        a3.set_ylabel("Relative Humidity", color='g')
-        a2.set_xlabel("Time Series ")
+        a3.set_ylabel("Relative Humidity", color='b')
+        a2.set_xlabel("Time Series")
 
         # ----------------------------------------------------------#
         a2.set_ylim([YScale_minCP, YScale_maxCP], auto=True)
@@ -1422,7 +1401,6 @@ class common_climateProfile(ttk.Frame):
         # -------------------------------------------------------------[]
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)
-
         # Activate Matplot tools ------------------[Uncomment to activate]
         # toolbar = NavigationToolbar2Tk(canvas, self)
         # toolbar.update()
@@ -1439,7 +1417,7 @@ class common_gapProfile(ttk.Frame):
     def createWidgets(self):
         # -----------------------------------
         f = Figure(figsize=(9, 4), dpi=100)   #w.h
-        f.subplots_adjust(left=0.057, bottom=0.1, right=0.993, top=0.99, wspace=0.202)
+        f.subplots_adjust(left=0.076, bottom=0.1, right=0.971, top=0.99, wspace=0.202)
         a3 = f.add_subplot(1, 1, 1)
 
         # Model data --------------------------------------------------[]
@@ -1450,8 +1428,8 @@ class common_gapProfile(ttk.Frame):
         plt.rcParams.update({'font.size': 9})  # Reduce font size to 7pt for all legends
 
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minGP, YScale_maxGP = 10 - 8.5, 10 + 8.5  # Roller Force
-        window_Xmin, window_Xmax = 0, (12 + 3)  # windows view = visible data points
+        YScale_minGP, YScale_maxGP = 0, pExLayer
+        window_Xmin, window_Xmax = 0, pLength                       # windows view = visible data points
 
         a3.grid(color="0.5", linestyle='-', linewidth=0.5)
         a3.legend(loc='upper right', title='Cumulative Gap Profile')
@@ -1600,11 +1578,10 @@ class common_gapProfile(ttk.Frame):
         # -------------------------------------------------------------[]
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)
-
         # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True)
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(expand=True)
 
 # ------------------------------------ Additional Tabb for Monitoring Parameters -----------------------------------[B]
 # PRODUCTION PARAM - ROLLER FORCE ------------------[1]
@@ -4521,7 +4498,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         # Define Axes ---------------------#
         f = Figure(figsize=(25, 8), dpi=100)
-        f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
+        f.subplots_adjust(left=0.022, bottom=0.05, right=0.983, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 6, (1, 3))                            # xbar plot
         a2 = f.add_subplot(2, 6, (7, 9))                            # s bar plot
@@ -4535,8 +4512,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         sBar_minTT, sBar_maxTT = sLCLtt - 80, sUCLtt + 80           # Calibrate Y-axis for S-Plot
         window_Xmin, window_Xmax = 0, (int(ttSize) + 3)             # windows view = visible data points
         # ----------------------------------------------------------#
-        YScale_minRM, YScale_maxRM = 0, 80                          # Valid layer number
-        window_XminRM, window_XmaxRM = 0, 6000                      # Get details from SCADA PIpe Recipe TODO[1]
+        YScale_minRM, YScale_maxRM = 0, pExLayer                    # Valid layer number
+        window_XminRM, window_XmaxRM = 0, pLength                   # Get details from SCADA PIpe Recipe TODO[1]
 
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
         if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
@@ -4613,10 +4590,10 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         im40, = a2.plot([], [], 'o-', label='Tape Temp')
         im41, = a2.plot([], [], 'o-', label='Tape Temp')
         # --------------- Ramp Profile ---------------------------[ Important ]
-        im42, = a3.plot([], [], marker='|', ms=20, mec='r', label='Ring 1 Ramp')
-        im43, = a3.plot([], [], marker='|', ms=20, mec='b', label='Ring 2 Ramp')
-        im44, = a3.plot([], [], marker='|', ms=20, mec='g', label='Ring 3 Ramp')
-        im45, = a3.plot([], [], marker='|', ms=20, mec='y', label='Ring 4 Ramp')
+        im42, = a3.scatter([], [], c='b', marker='|', label='Ring 1 Ramp')
+        im43, = a3.scatter([], [], c='g', marker='|', label='Ring 2 Ramp')
+        im44, = a3.scatter([], [], c='y', marker='|', label='Ring 3 Ramp')
+        im45, = a3.scatter([], [], c='r', marker='|', label='Ring 4 Ramp')
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 
@@ -4745,10 +4722,14 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                         autoSpcRun = not autoSpcRun
                         autoSpcPause = True
                         print("\nVisualization in Paused Mode...")
-                else:
-                    autoSpcPause = False
+                    else:
+                        autoSpcPause = False
+                        con_rm.close()
                     print("Visualization in Near Real-time Mode...")
+                    time.sleep(60)
+                    continue
 
+                else:
                     rm_profile = qrm.sqlexec(smp_Sz, smp_St, con_rm, T2, fetch_no)  # perform DB connections
                     print('\nUpdating....')
 
@@ -4950,9 +4931,9 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)
         # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True)
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(expand=True)
 
 
 class substTempTabb(ttk.Frame):     # -- Defines the tabbed region for QA param - Substrate Temperature --[]
@@ -5793,7 +5774,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         self.display_rtStats()
 
     def display_rtStats(self):
-        global a2, a4       # allow axial inheritance on new class method
+        global a2, a4, gap_vol       # allow axial inheritance on new class method
 
         """Create the widgets for the GUI"""
         # Load metrics from config -----------------------------------[Tape Gap]
@@ -5829,7 +5810,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             sLCLtg = 0
             tgUSL = 0
             tgLSL = 0
-            tgPerf = '$Cp_{k' + str(sSize) + '}$'   # Using Automatic group Mean
+            tgPerf = '$Cp_{k' + str(sSize) + '}$'                   # Using Automatic group Mean
             tglabel = 'Cp'
 
         # -------------------------------------------[End of Tape Gap]
@@ -5838,12 +5819,12 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         label.pack(padx=10, pady=5)     # 10 | 5
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)                    # 25,  = 12 | 8
-        f.subplots_adjust(left=0.026, bottom=0.045, right=0.993, top=0.967, wspace=0.217, hspace=0.162)
+        f = Figure(figsize=(25, 8), dpi=100)                        # 25,  = 12 | 8
+        f.subplots_adjust(left=0.026, bottom=0.045, right=0.986, top=0.967, wspace=0.217, hspace=0.162)
         # ---------------------------------[]
-        a1 = f.add_subplot(2, 6, (1, 3))                      # xbar plot
-        a3 = f.add_subplot(2, 6, (7, 9))                      # s bar plot
-        a4 = f.add_subplot(2, 6, (4, 12))                     # void mapping profile
+        a1 = f.add_subplot(2, 6, (1, 3))                            # xbar plot
+        a3 = f.add_subplot(2, 6, (7, 9))                            # s bar plot
+        a4 = f.add_subplot(2, 6, (4, 12))                           # void mapping profile
 
         # ----------------------------------------------------------[H]
         plt.rcParams.update({'font.size': 9})                       # Reduce font size to 7pt for all legends
@@ -5853,7 +5834,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         window_Xmin, window_Xmax = 0, (smp_Sz + 3)                  # windows view = visible data points
         # ----------------------------------------------------------#
         YScale_minVM, YScale_maxVM = 0, 80                          # Valid Void Mapping
-        window_XminVM, window_XmaxVM = 0, 6000                      # Get details from SCADA PIpe Recipe TODO[1]
+        window_XminVM, window_XmaxVM = 0, 100000                    # Get details from SCADA PIpe Recipe TODO[1]
 
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
         if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
@@ -5881,6 +5862,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         a1.legend(loc='upper right', title='Tape Gap Polarisation')
         a3.legend(loc='upper right', title='Sigma Plots')
         a4.legend(loc='upper right', title='Void Map Profile')
+        # a4.colorbar()
 
         # Initialise runtime limits -------------------------------#
         a1.set_ylim([YScale_minTG, YScale_maxTG], auto=True)
@@ -5914,28 +5896,23 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         im25, = a3.plot([], [], 'o-', label='Tape Gap Pol')
 
         # Statistical Profile ------------------------------------------[4 into 1]
-        # Color code MFC (marker markeredgecolor | markerfacecolor)
-        if gap_vol <= 1:
-            fcoded = 'b'
-        elif 1 <= gap_vol <= 3:
-            fcoded = 'g'
-        elif 3 <= gap_vol <= 5:
-            fcoded = 'y'
-        elif 5 <= gap_vol <= 7:
-            fcoded = 'r'
-        else:
-            fcoded = 'b'
-        im26, = a4.plot([], [], marker='s', ms=20, mec=fcoded, label='Gap Volume Data')  # Square block
+        '''
+        Ref: https://matplotlib.org/stable/users/explain/colors/colormaps.html
+        # 'viridis', 'plasma' 'inferno', 'magma', 'cividis', 'Greens', 'Blues', 'winter', 'hsv', 'jet', 
+            'cool', 'hot', 'OrRd', 'viridis_r', 'rainbow'
+        '''
+        # ScatterPlot because we don't need to join points -------------------------#
+        colors = np.random.randint(50, 101, size=(0))           # tgSize customise the colorbar
+        im26 = a4.scatter([], [], s=gap_vol, marker='|', c=colors, cmap='GnBu', label='Gap Volume %')
 
-        # -------------------------------------------------------------------------------------#
-        # TODO Call additional prolific functions ------------[try pooling data from SQL repo]
+        # -------------------------------------------------------------------------#
+        # TODO Call additional prolific functions ---[try pooling data from SQL repo]
         # loadSqlCumProfile(ttk.Frame)
         # loadSqlVoidMapping()
-
         # ---------------- EXECUTE SYNCHRONOUS TG METHOD --------------------------#
+
         def synchronousTG(smp_Sz, smp_St, fetchT):
             fetch_no = str(fetchT)                                                 # entry value in string sql syntax
-
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
             if not inUseAlready:                                                   # Load CommsPlc class once
                 import CommsSql as q
@@ -6136,6 +6113,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             im25.set_xdata(np.arange(db_freq * 30))     # @10hz resolution = 30cm
             # -------------------------------- Profile Axes
             im26.set_xdata(np.arange(db_freq))
+
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
             im10.set_ydata((TG[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
             im11.set_ydata((TG[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
@@ -6181,8 +6159,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             sLength = VM[5]
 
             gap_vol = (pAvgGap / sLength) * 100  # Percentage Void
-            im26.set_ydata((gap_vol)[0:db_freq])  # --------------------------------------- Profile A
-            im27.set_ydata((gap_vol)[0:db_freq])
+            im26.set_ydata((vLayerN),(gap_vol) [0:db_freq])  # ------------------------------ Profile A
 
             # # Declare Plots attributes ------------------------------------------------------------[]
             # XBar Mean Plot
