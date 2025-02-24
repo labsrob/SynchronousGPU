@@ -7,12 +7,14 @@ import time
 import timeit
 import os
 
+# ================================ RAMP COUNT DATA =======================================#
+
 UseRowIndex = True
 idx = count()
 now = datetime.now()
 
 dataList0 = []
-Idx, dW = [], []
+Idx, dL = [], []
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
@@ -27,12 +29,12 @@ def sqlexec(nGZ, grp_step, daq, rT1, fetch_no):
     print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
 
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
-    if len(dW) < (nGZ - 1):
+    if len(dL) < (nGZ - 1):
         n2fetch = nGZ                                       # fetch initial specified number
         print('\nRows to Fetch:', n2fetch)
         print('Processing SQL Row #:', int(idx) + fetch_no + 1, 'to', (int(idx) + fetch_no + 1) + n2fetch)
 
-    elif group_step == 1 and len(dW) >= nGZ:
+    elif group_step == 1 and len(dL) >= nGZ:
         print('\nSINGLE STEP SLIDE')
         print('=================')
         n2fetch = (nGZ + fetch_no)                          # fetch just one line to on top of previous fetch
@@ -53,24 +55,24 @@ def sqlexec(nGZ, grp_step, daq, rT1, fetch_no):
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dW.append(result)
+            dL.append(result)
 
             # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
             # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dW) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dW[0:(len(dW) - nGZ)]
+            if group_step > 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
+                del dL[0:(len(dL) - nGZ)]
 
             # Step processing rate >1 ---[moving window]
             elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dW[0:(len(dW) - fetch_no)]
+                del dL[0:(len(dL) - fetch_no)]
 
             # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dW) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dW[0:(len(dW) - nGZ)]  # delete overflow data
+            elif group_step == 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:
+                del dL[0:(len(dL) - nGZ)]  # delete overflow data
 
             # Step processing rate =1 ---[moving window]
             elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dW[0:(len(dW) - fetch_no)]
+                del dL[0:(len(dL) - fetch_no)]
 
             else:  # len(dL1) < nGZ:
                 pass
@@ -81,5 +83,5 @@ def sqlexec(nGZ, grp_step, daq, rT1, fetch_no):
         time.sleep(5)
     daq.close()
 
-    return dW
+    return dL
 # -----------------------------------------------------------------------------------[Dr Labs]

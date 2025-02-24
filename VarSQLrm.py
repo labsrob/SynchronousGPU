@@ -12,6 +12,6 @@ Author: Dr Robert Labs
 
 def loadProcesValues(df1):
     sqlRM = [df1['tStamp'], df1['R1Pos'], df1['R2Pos'], df1['R3Pos'],
-             df1['R4Pos'], df1['PipeDir'], df1['rCount'], df1['cLayer']]
+             df1['R4Pos'], df1['PipeDir'], df1['cLayer']]
 
     return sqlRM

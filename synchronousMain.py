@@ -4593,10 +4593,10 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         im40, = a2.plot([], [], 'o-', label='Tape Temp')
         im41, = a2.plot([], [], 'o-', label='Tape Temp')
         # --------------- Ramp Profile ---------------------------[ Important ]
-        im42, = a3.scatter([], [], c='b', marker='|', label='Ring 1 Ramp')
-        im43, = a3.scatter([], [], c='g', marker='|', label='Ring 2 Ramp')
-        im44, = a3.scatter([], [], c='y', marker='|', label='Ring 3 Ramp')
-        im45, = a3.scatter([], [], c='r', marker='|', label='Ring 4 Ramp')
+        im42 = a3.scatter([], [], c='b', marker='|', label='Ring 1 Ramp')
+        im43 = a3.scatter([], [], c='g', marker='|', label='Ring 2 Ramp')
+        im44 = a3.scatter([], [], c='y', marker='|', label='Ring 3 Ramp')
+        im45 = a3.scatter([], [], c='r', marker='|', label='Ring 4 Ramp')
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 

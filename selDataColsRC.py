@@ -4,15 +4,14 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
-2-D Void Mapping Data SQL Tabel
+Ramp count data
 """
 
 
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'VM':
-        columns = ['sCount', 'sCenter', 'AvgGap',
-                   'MaxGap', 'cLayer', 'sDistance']
+    if pParam == 'RM':
+        columns = ['sCentre', 'R1Count', 'R2Count', 'R3Count', 'R4Count', 'PipeDir', 'cLayer']
     else:
         print('Invalid Columns or Query error...')
 
