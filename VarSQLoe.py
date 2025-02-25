@@ -9,11 +9,10 @@ Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
 
-
 def loadProcesValues(df1):
-    sqlOEE = [df1['tStamp'], df1['cLayer'], df1['tCode'],
+    sqlOE = [df1['tStamp'], df1['cLayer'], df1['tCode'],
              df1['Desc'], df1['Lapsed'], df1['PipePos'],
              df1['nDiam'], df1['Ovality'], df1['tChange']]
 
-    return sqlOEE
+    return sqlOE
 

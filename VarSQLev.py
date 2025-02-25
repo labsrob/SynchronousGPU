@@ -7,11 +7,13 @@ All production procedure relies on Word Order Number - Assuming a Unique identit
 
 Author: Dr Robert Labs
 """
-# Variables required here: The aggregated plots for monitoring process variables
 
+
+# Variables required here: Environmental variables
 # pull data from simotion and Met Office for location specific data
+
 def loadProcesValues(df1):
-    sqlCT = [df1['tStamp'], df1['cTensionA'], df1['cTensionB'], df1['PipeDi']]
+    sqlEV = [df1['tStamp'], df1['cTensionA'], df1['cTensionB'], df1['cRTemp'],
+             df1['cHumid'], df1['locTemp'], df1['locHumid'], df1['UVIndex']]
 
-    return sqlCT
-
+    return sqlEV

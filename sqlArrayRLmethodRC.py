@@ -22,7 +22,7 @@ def sqlexec(nGZ, grp_step, daq, rT1, fetch_no):
     """
     NOTE:
     """
-    # idx = str(idx)                                  # convert Query Indexes to string concatenation
+    # idx = str(idx)                                # convert Query Indexes to string concatenation
 
     group_step = int(grp_step)                      # group size/ sample sze
     fetch_no = int(fetch_no)                        # dbfreq = TODO look into any potential conflict
@@ -30,7 +30,7 @@ def sqlexec(nGZ, grp_step, daq, rT1, fetch_no):
 
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     if len(dL) < (nGZ - 1):
-        n2fetch = nGZ                                       # fetch initial specified number
+        n2fetch = nGZ                               # fetch initial specified number
         print('\nRows to Fetch:', n2fetch)
         print('Processing SQL Row #:', int(idx) + fetch_no + 1, 'to', (int(idx) + fetch_no + 1) + n2fetch)
 
@@ -46,7 +46,7 @@ def sqlexec(nGZ, grp_step, daq, rT1, fetch_no):
 
     # ------------------------------------------------------------------------------------[]
     # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data1 = daq.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
+    data1 = daq.execute('SELECT * FROM ' + rT1 + 'WHERE cLayer=').fetchmany(n2fetch)
     if len(data1) != 0:
         for result in data1:
             result = list(result)

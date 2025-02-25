@@ -4,14 +4,14 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
-Cell Tension measured in Newton per metre (N/m)
+Overall Equipment Efficiency measured by composite/derived factors
 """
 
 
 def validCols(pParam):
-    # print('Detected RingHead Combo:', configH) 1 Mpa = 1 (N/mm2)
-    if pParam == 'CT':
-        columns = ['tStamp', 'cTensA', 'cTensB', 'PipeDi']
+    # print('Detected RingHead Combo:', configH)
+    if pParam == 'OE':
+        columns = ['tStamp', 'cLayer', 'tCode', 'Desc', 'Lapsed', 'PipePos', 'nDiam', 'Ovality', 'tChange', 'uMessag']
     else:
         print('Invalid Columns or Query error...')
 

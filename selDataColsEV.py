@@ -4,14 +4,15 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
-Overall Equipment Efficiency measured by composite/derived factors
+YTape Void count data
 """
 
 
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'OEE':
-        columns = ['tStamp', 'cLayer', 'tCode', 'Desc', 'Lapsed', 'PipePos', 'nDiam', 'Ovality', 'tChange', 'uMessag']
+    if pParam == 'EV':
+        columns = ['tStamp', 'oTempA', 'oTempB', 'cRTemp', 'cHumid',
+                   'fDTemp', 'fHumid', 'locTemp', 'locHumid', 'UVIndex']
     else:
         print('Invalid Columns or Query error...')
 
