@@ -30,9 +30,9 @@ import selDataColsVC as qvc     # void (gap) count
 import selDataColsVM as qvm     # Void mapping
 import selDataColsWA as qwa
 import selDataColsWS as qws
+import selDataColsEoL as eol
 # ----- DNV/MGM Params ------
-
-import selSqlDataColsMonitors as qm
+import selDataColsPM as qpm
 # import rlMethodVoidData as rl
 # -----------------------------#
 import time
@@ -592,19 +592,21 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
         # ------------------------------------------------------#
         # Load SQL Query Table ---------------------------------#
         if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
-            EoL1 = WON + '_TT'  # Identify Table
-            EoL2 = WON + '_ST'  # Identify Table
-            EoL3 = WON + '_TG'  # Identify Table
-            EoL4 = WON + '_RM'  # Identify Table
+            EoLRep = 'DNV'
+            T1 = WON + '_TT'  # Identify Table
+            T2 = WON + '_ST'  # Identify Table
+            T3 = WON + '_TG'  # Identify Table
+            T4 = WON + '_RM'  # Identify Table
         elif int(LP) and int(LA) and int(CT) and int(OT) and int(RP) and int(WS):
-            EoL5 = WON + '_LP'  # Identify Table
-            EoL6 = WON + '_LA'  # Identify Table
-            EoL7 = WON + '_TP'  # Identify Table
-            EoL8 = WON + '_RF'  # Identify Table
-            EoL1 = WON + '_TT'  # Identify Table
-            EoL2 = WON + '_ST'  # Identify Table
-            EoL3 = WON + '_TG'  # Identify Table
-            EoL4 = WON + '_RM'  # Identify Table
+            EoLRep = 'MGM'
+            T5 = WON + '_LP'  # Identify Table
+            T6 = WON + '_LA'  # Identify Table
+            T7 = WON + '_TP'  # Identify Table
+            T8 = WON + '_RF'  # Identify Table
+            T1 = WON + '_TT'  # Identify Table
+            T2 = WON + '_ST'  # Identify Table
+            T3 = WON + '_TG'  # Identify Table
+            T4 = WON + '_RM'  # Identify Table
         else:
             pass
         # ----------------------------------------------------------#
@@ -647,7 +649,7 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
         # ---------------------------------------------------------[]
         # Define Plot area and axes -
         # ---------------------------------------------------------[1-5]
-        if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
+        if EoLRep == 'DNV':
             im10, = a1.plot([], [], 'o-', label='Tape Temp - (R1H1)')
             im11, = a1.plot([], [], 'o-', label='Tape Temp - (R1H2)')
             im12, = a1.plot([], [], 'o-', label='Tape Temp - (R1H3)')
@@ -724,6 +726,7 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
             im79, = a3.plot([], [], 'o-', label='Tape Gap - (B2)')
             im80, = a3.plot([], [], 'o-', label='Tape Gap - (B3)')
             im81, = a3.plot([], [], 'o-', label='Tape Gap - (B4)')
+            # -----------------------------------------------------
             im82, = a7.plot([], [], 'o-', label='Tape Gap')
             im83, = a7.plot([], [], 'o-', label='Tape Gap')
             im84, = a7.plot([], [], 'o-', label='Tape Gap')
@@ -732,16 +735,258 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
             im87, = a7.plot([], [], 'o-', label='Tape Gap')
             im88, = a7.plot([], [], 'o-', label='Tape Gap')
             im89, = a7.plot([], [], 'o-', label='Tape Gap')
+            # -------------------------------------------------------[Ramp Data]
+            im90, = a3.plot([], [], 'o-', label='Ramp Mappings - (R1)')     # Ring 1 value count per layer
+            im91, = a3.plot([], [], 'o-', label='Ramp Mappings - (R2)')     # Ring 2 value count per layer
+            im92, = a3.plot([], [], 'o-', label='Ramp Mappings - (R3)')     # Ring 3 value count per layer
+            im93, = a3.plot([], [], 'o-', label='Ramp Mappings - (R4)')     # Ring 4 value count per layer
+            # im94, = a7.plot([], [], 'o-', label='Tape Gap')
+            # im95, = a7.plot([], [], 'o-', label='Tape Gap')
+            # im96, = a7.plot([], [], 'o-', label='Tape Gap')
+            # im97, = a7.plot([], [], 'o-', label='Tape Gap')
         else:
-            pass
+            EoLRep = 'MGM'
+            im10, = a1.plot([], [], 'o-', label='Tape Temp - (R1H1)')
+            im11, = a1.plot([], [], 'o-', label='Tape Temp - (R1H2)')
+            im12, = a1.plot([], [], 'o-', label='Tape Temp - (R1H3)')
+            im13, = a1.plot([], [], 'o-', label='Tape Temp - (R1H4)')
+            im14, = a1.plot([], [], 'o-', label='Tape Temp - (R2H1)')
+            im15, = a1.plot([], [], 'o-', label='Tape Temp - (R2H2)')
+            im16, = a1.plot([], [], 'o-', label='Tape Temp - (R2H3)')
+            im17, = a1.plot([], [], 'o-', label='Tape Temp - (R2H4)')
+            im18, = a1.plot([], [], 'o-', label='Tape Temp - (R3H1)')
+            im19, = a1.plot([], [], 'o-', label='Tape Temp - (R3H2)')
+            im20, = a1.plot([], [], 'o-', label='Tape Temp - (R3H3)')
+            im21, = a1.plot([], [], 'o-', label='Tape Temp - (R3H4)')
+            im22, = a1.plot([], [], 'o-', label='Tape Temp - (R4H1)')
+            im23, = a1.plot([], [], 'o-', label='Tape Temp - (R4H2)')
+            im24, = a1.plot([], [], 'o-', label='Tape Temp - (R4H3)')
+            im25, = a1.plot([], [], 'o-', label='Tape Temp - (R4H4)')
+            # -------------------------------------------------------
+            im26, = a5.plot([], [], 'o-', label='Tape Temp')
+            im27, = a5.plot([], [], 'o-', label='Tape Temp')
+            im28, = a5.plot([], [], 'o-', label='Tape Temp')
+            im29, = a5.plot([], [], 'o-', label='Tape Temp')
+            im30, = a5.plot([], [], 'o-', label='Tape Temp')
+            im31, = a5.plot([], [], 'o-', label='Tape Temp')
+            im32, = a5.plot([], [], 'o-', label='Tape Temp')
+            im33, = a5.plot([], [], 'o-', label='Tape Temp')
+            im34, = a5.plot([], [], 'o-', label='Tape Temp')
+            im35, = a5.plot([], [], 'o-', label='Tape Temp')
+            im36, = a5.plot([], [], 'o-', label='Tape Temp')
+            im37, = a5.plot([], [], 'o-', label='Tape Temp')
+            im38, = a5.plot([], [], 'o-', label='Tape Temp')
+            im39, = a5.plot([], [], 'o-', label='Tape Temp')
+            im40, = a5.plot([], [], 'o-', label='Tape Temp')
+            im41, = a5.plot([], [], 'o-', label='Tape Temp')
+            # ---------------------------------------------------------[2-6]
+            im42, = a2.plot([], [], 'o-', label='Substrate Temp - (R1H1)')
+            im43, = a2.plot([], [], 'o-', label='Substrate Temp - (R1H2)')
+            im44, = a2.plot([], [], 'o-', label='Substrate Temp - (R1H3)')
+            im45, = a2.plot([], [], 'o-', label='Substrate Temp - (R1H4)')
+            im46, = a2.plot([], [], 'o-', label='Substrate Temp - (R2H1)')
+            im47, = a2.plot([], [], 'o-', label='Substrate Temp - (R2H2)')
+            im48, = a2.plot([], [], 'o-', label='Substrate Temp - (R2H3)')
+            im49, = a2.plot([], [], 'o-', label='Substrate Temp - (R2H4)')
+            im50, = a2.plot([], [], 'o-', label='Substrate Temp - (R3H1)')
+            im51, = a2.plot([], [], 'o-', label='Substrate Temp - (R3H2)')
+            im52, = a2.plot([], [], 'o-', label='Substrate Temp - (R3H3)')
+            im53, = a2.plot([], [], 'o-', label='Substrate Temp - (R3H4)')
+            im54, = a2.plot([], [], 'o-', label='Substrate Temp - (R4H1)')
+            im55, = a2.plot([], [], 'o-', label='Substrate Temp - (R4H2)')
+            im56, = a2.plot([], [], 'o-', label='Substrate Temp - (R4H3)')
+            im57, = a2.plot([], [], 'o-', label='Substrate Temp - (R4H4)')
+            # -----------------------------------------------------------------
+            im58, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im59, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im60, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im61, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im62, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im63, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im64, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im65, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im66, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im67, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im68, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im69, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im70, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im71, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im72, = a6.plot([], [], 'o-', label='Substrate Temp')
+            im73, = a6.plot([], [], 'o-', label='Substrate Temp')
+            # -----------------------------------------------------[3-7]
+            im74, = a3.plot([], [], 'o-', label='Tape Gap - (A1)')
+            im75, = a3.plot([], [], 'o-', label='Tape Gap - (A2)')
+            im76, = a3.plot([], [], 'o-', label='Tape Gap - (A3)')
+            im77, = a3.plot([], [], 'o-', label='Tape Gap - (A4)')
+            im78, = a3.plot([], [], 'o-', label='Tape Gap - (B1)')
+            im79, = a3.plot([], [], 'o-', label='Tape Gap - (B2)')
+            im80, = a3.plot([], [], 'o-', label='Tape Gap - (B3)')
+            im81, = a3.plot([], [], 'o-', label='Tape Gap - (B4)')
+            # -----------------------------------------------------[]
+            im82, = a7.plot([], [], 'o-', label='Tape Gap')
+            im83, = a7.plot([], [], 'o-', label='Tape Gap')
+            im84, = a7.plot([], [], 'o-', label='Tape Gap')
+            im85, = a7.plot([], [], 'o-', label='Tape Gap')
+            im86, = a7.plot([], [], 'o-', label='Tape Gap')
+            im87, = a7.plot([], [], 'o-', label='Tape Gap')
+            im88, = a7.plot([], [], 'o-', label='Tape Gap')
+            im89, = a7.plot([], [], 'o-', label='Tape Gap')
+            # -------------------------------------------------------[Ramp Data]
+            im90, = a3.plot([], [], 'o-', label='Ramp Mappings - (R1)')  # Ring 1 value count per layer
+            im91, = a3.plot([], [], 'o-', label='Ramp Mappings - (R2)')  # Ring 2 value count per layer
+            im92, = a3.plot([], [], 'o-', label='Ramp Mappings - (R3)')  # Ring 3 value count per layer
+            im93, = a3.plot([], [], 'o-', label='Ramp Mappings - (R4)')  # Ring 4 value count per layer
 
-        # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
+            # ---------------------------------------------------[Laser Power]
+            im91, = a2.plot([], [], 'o-', label='Laser Power - (R1H1)')
+            im92, = a2.plot([], [], 'o-', label='Laser Power - (R1H2)')
+            im93, = a2.plot([], [], 'o-', label='Laser Power - (R1H3)')
+            im94, = a2.plot([], [], 'o-', label='Laser Power - (R1H4)')
+            im95, = a2.plot([], [], 'o-', label='Laser Power - (R2H1)')
+            im96, = a2.plot([], [], 'o-', label='Laser Power - (R2H2)')
+            im97, = a2.plot([], [], 'o-', label='Laser Power - (R2H3)')
+            im98, = a2.plot([], [], 'o-', label='Laser Power - (R2H4)')
+            im99, = a2.plot([], [], 'o-', label='Laser Power - (R3H1)')
+            im100, = a2.plot([], [], 'o-', label='Laser Power - (R3H2)')
+            im101, = a2.plot([], [], 'o-', label='Laser Power - (R3H3)')
+            im102, = a2.plot([], [], 'o-', label='Laser Power - (R3H4)')
+            im103, = a2.plot([], [], 'o-', label='Laser Power - (R4H1)')
+            im104, = a2.plot([], [], 'o-', label='Laser Power - (R4H2)')
+            im105, = a2.plot([], [], 'o-', label='Laser Power - (R4H3)')
+            im106, = a2.plot([], [], 'o-', label='Laser Power - (R4H4)')
+            # -----------------------------------------------------------------
+            im107, = a6.plot([], [], 'o-', label='Laser Power')
+            im108, = a6.plot([], [], 'o-', label='Laser Power')
+            im109, = a6.plot([], [], 'o-', label='Laser Power')
+            im110, = a6.plot([], [], 'o-', label='Laser Power')
+            im111, = a6.plot([], [], 'o-', label='Laser Power')
+            im112, = a6.plot([], [], 'o-', label='Laser Power')
+            im113, = a6.plot([], [], 'o-', label='Laser Power')
+            im114, = a6.plot([], [], 'o-', label='Laser Power')
+            im115, = a6.plot([], [], 'o-', label='Laser Power')
+            im116, = a6.plot([], [], 'o-', label='Laser Power')
+            im117, = a6.plot([], [], 'o-', label='Laser Power')
+            im118, = a6.plot([], [], 'o-', label='Laser Power')
+            im119, = a6.plot([], [], 'o-', label='Laser Power')
+            im120, = a6.plot([], [], 'o-', label='Laser Power')
+            im121, = a6.plot([], [], 'o-', label='Laser Power')
+            im122, = a6.plot([], [], 'o-', label='Laser Power')
+            # ---------------------------------------------------[Laser Angle]
+            im123, = a2.plot([], [], 'o-', label='Laser Angle - (R1H1)')
+            im124, = a2.plot([], [], 'o-', label='Laser Angle - (R1H2)')
+            im125, = a2.plot([], [], 'o-', label='Laser Angle - (R1H3)')
+            im126, = a2.plot([], [], 'o-', label='Laser Angle - (R1H4)')
+            im127, = a2.plot([], [], 'o-', label='Laser Angle - (R2H1)')
+            im128, = a2.plot([], [], 'o-', label='Laser Angle - (R2H2)')
+            im129, = a2.plot([], [], 'o-', label='Laser Angle - (R2H3)')
+            im130, = a2.plot([], [], 'o-', label='Laser Angle - (R2H4)')
+            im131, = a2.plot([], [], 'o-', label='Laser Angle - (R3H1)')
+            im132, = a2.plot([], [], 'o-', label='Laser Angle - (R3H2)')
+            im133, = a2.plot([], [], 'o-', label='Laser Angle - (R3H3)')
+            im134, = a2.plot([], [], 'o-', label='Laser Angle - (R3H4)')
+            im135, = a2.plot([], [], 'o-', label='Laser Angle - (R4H1)')
+            im136, = a2.plot([], [], 'o-', label='Laser Angle - (R4H2)')
+            im137, = a2.plot([], [], 'o-', label='Laser Angle - (R4H3)')
+            im138, = a2.plot([], [], 'o-', label='Laser Angle - (R4H4)')
+            # -----------------------------------------------------------------
+            im139, = a6.plot([], [], 'o-', label='Laser Angle')
+            im140, = a6.plot([], [], 'o-', label='Laser Angle')
+            im141, = a6.plot([], [], 'o-', label='Laser Angle')
+            im142, = a6.plot([], [], 'o-', label='Laser Angle')
+            im143, = a6.plot([], [], 'o-', label='Laser Angle')
+            im144, = a6.plot([], [], 'o-', label='Laser Angle')
+            im145, = a6.plot([], [], 'o-', label='Laser Angle')
+            im146, = a6.plot([], [], 'o-', label='Laser Angle')
+            im147, = a6.plot([], [], 'o-', label='Laser Angle')
+            im148, = a6.plot([], [], 'o-', label='Laser Angle')
+            im149, = a6.plot([], [], 'o-', label='Laser Angle')
+            im150, = a6.plot([], [], 'o-', label='Laser Angle')
+            im151, = a6.plot([], [], 'o-', label='Laser Angle')
+            im152, = a6.plot([], [], 'o-', label='Laser Angle')
+            im153, = a6.plot([], [], 'o-', label='Laser Angle')
+            im154, = a6.plot([], [], 'o-', label='Laser Angle')
+            # -----------------------------------------[Tape Placement]
+            im155, = a2.plot([], [], 'o-', label='Tape Placement - (R1H1)')
+            im156, = a2.plot([], [], 'o-', label='Tape Placement - (R1H2)')
+            im157, = a2.plot([], [], 'o-', label='Tape Placement - (R1H3)')
+            im158, = a2.plot([], [], 'o-', label='Tape Placement - (R1H4)')
+            im159, = a2.plot([], [], 'o-', label='Tape Placement - (R2H1)')
+            im160, = a2.plot([], [], 'o-', label='Tape Placement - (R2H2)')
+            im161, = a2.plot([], [], 'o-', label='Tape Placement - (R2H3)')
+            im162, = a2.plot([], [], 'o-', label='Tape Placement - (R2H4)')
+            im163, = a2.plot([], [], 'o-', label='Tape Placement - (R3H1)')
+            im164, = a2.plot([], [], 'o-', label='Tape Placement - (R3H2)')
+            im165, = a2.plot([], [], 'o-', label='Tape Placement - (R3H3)')
+            im166, = a2.plot([], [], 'o-', label='Tape Placement - (R3H4)')
+            im167, = a2.plot([], [], 'o-', label='Tape Placement - (R4H1)')
+            im168, = a2.plot([], [], 'o-', label='Tape Placement - (R4H2)')
+            im169, = a2.plot([], [], 'o-', label='Tape Placement - (R4H3)')
+            im170, = a2.plot([], [], 'o-', label='Tape Placement - (R4H4)')
+            # -----------------------------------------------------------------
+            im171, = a6.plot([], [], 'o-', label='Tape Placement')
+            im172, = a6.plot([], [], 'o-', label='Tape Placement')
+            im173, = a6.plot([], [], 'o-', label='Tape Placement')
+            im174, = a6.plot([], [], 'o-', label='Tape Placement')
+            im175, = a6.plot([], [], 'o-', label='Tape Placement')
+            im176, = a6.plot([], [], 'o-', label='Tape Placement')
+            im177, = a6.plot([], [], 'o-', label='Tape Placement')
+            im178, = a6.plot([], [], 'o-', label='Tape Placement')
+            im179, = a6.plot([], [], 'o-', label='Tape Placement')
+            im180, = a6.plot([], [], 'o-', label='Tape Placement')
+            im181, = a6.plot([], [], 'o-', label='Tape Placement')
+            im182, = a6.plot([], [], 'o-', label='Tape Placement')
+            im183, = a6.plot([], [], 'o-', label='Tape Placement')
+            im184, = a6.plot([], [], 'o-', label='Tape Placement')
+            im185, = a6.plot([], [], 'o-', label='Tape Placement')
+            im186, = a6.plot([], [], 'o-', label='Tape Placement')
+            # --------------------------------------------------[Roller Force]
+            im187, = a2.plot([], [], 'o-', label='Roller Force - (R1H1)')
+            im188, = a2.plot([], [], 'o-', label='Roller Force - (R1H2)')
+            im189, = a2.plot([], [], 'o-', label='Roller Force - (R1H3)')
+            im190, = a2.plot([], [], 'o-', label='Roller Force - (R1H4)')
+            im191, = a2.plot([], [], 'o-', label='Roller Force - (R2H1)')
+            im192, = a2.plot([], [], 'o-', label='Roller Force - (R2H2)')
+            im193, = a2.plot([], [], 'o-', label='Roller Force - (R2H3)')
+            im194, = a2.plot([], [], 'o-', label='Roller Force - (R2H4)')
+            im195, = a2.plot([], [], 'o-', label='Roller Force - (R3H1)')
+            im196, = a2.plot([], [], 'o-', label='Roller Force - (R3H2)')
+            im197, = a2.plot([], [], 'o-', label='Roller Force - (R3H3)')
+            im198, = a2.plot([], [], 'o-', label='Roller Force - (R3H4)')
+            im199, = a2.plot([], [], 'o-', label='Roller Force - (R4H1)')
+            im200, = a2.plot([], [], 'o-', label='Roller Force - (R4H2)')
+            im201, = a2.plot([], [], 'o-', label='Roller Force - (R4H3)')
+            im202, = a2.plot([], [], 'o-', label='Roller Force - (R4H4)')
+            # -----------------------------------------------------------------
+            im203, = a6.plot([], [], 'o-', label='Roller Force')
+            im204, = a6.plot([], [], 'o-', label='Roller Force')
+            im205, = a6.plot([], [], 'o-', label='Roller Force')
+            im206, = a6.plot([], [], 'o-', label='Roller Force')
+            im207, = a6.plot([], [], 'o-', label='Roller Force')
+            im208, = a6.plot([], [], 'o-', label='Roller Force')
+            im209, = a6.plot([], [], 'o-', label='Roller Force')
+            im210, = a6.plot([], [], 'o-', label='Roller Force')
+            im211, = a6.plot([], [], 'o-', label='Roller Force')
+            im212, = a6.plot([], [], 'o-', label='Roller Force')
+            im213, = a6.plot([], [], 'o-', label='Roller Force')
+            im214, = a6.plot([], [], 'o-', label='Roller Force')
+            im215, = a6.plot([], [], 'o-', label='Roller Force')
+            im216, = a6.plot([], [], 'o-', label='Roller Force')
+            im217, = a6.plot([], [], 'o-', label='Roller Force')
+            im218, = a6.plot([], [], 'o-', label='Roller Force')
+            # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 
         def synchronousEoL(dnv_Size, dnv_gType, fetchT):
             fetch_no = str(fetchT)  # entry value in string sql syntax
 
-            # Obtain Data from SQL Ropo ---------------------------[]
-            con_el = conn.cursor()
+            # Initialise SQL Data connection per listed Table --------------------[]
+            if EoLRep == 'DNV':
+                eol1, eol2, eol3, eol4 = conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor()
+            elif EoLRep == 'MGM':
+                eol1, eol2, eol3, eol4, eol5, eol6, eol7, eol8 = (conn.cursor(), conn.cursor(), conn.cursor(),
+                                                                  conn.cursor(), conn.cursor(), conn.cursor(),
+                                                                  conn.cursor(), conn.cursor())
+            else:
+                pass  # reserved for bespoke configuration
 
             """
             Load watchdog function with synchronous function every seconds
@@ -780,7 +1025,13 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
                         print("Visualization in Play Mode...")
 
                 else:
-                    rEoL = sel.sqlexec(smp_Sz, stp_Sz, con_el, ctData, fetch_no)  # perform DB connections
+                    # ------ Process data fetch sequences --------------------------#
+                    if EoLRep == 'DNV':
+                        rpTT, rpST, rpTG, rpRM = sel.dnv_sqlexec(smp_Sz, stp_Sz, eol1, eol2, eol3, eol4, T1, T2, T3, T4,  fetch_no)
+                    elif EoLRep == 'MGM':
+                        rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF = sel.mgm_sqlexec(smp_Sz, stp_Sz, eol1, eol2, eol3, eol4, eol5, eol6, eol7, eol8, T1, T2, T3, T4, T5, T6, T7, T8, fetch_no)
+                    else:
+                        pass            # reserved for bespoke user selection ------#
                     print("Visualization in Play Mode...")
                 print('\nUpdating....')
 
@@ -790,43 +1041,81 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
                 """
                 # TODO --- values for inhibiting the SQL processing
                 if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                    con_el.close()
+                    eol1.close()
+                    eol2.close()
+                    eol3.close()
+                    eol4.close()
+                    if EoLRep == 'MGM':
+                        eol5.close()
+                        eol6.close()
+                        eol7.close()
+                        eol8.close()
                     print('SQL End of File, connection closes after 30 mins...')
                     time.sleep(60)
                     continue
                 else:
                     print('\nUpdating....')
 
-            return eol_data
+            if EoLRep == 'DNV':
+                return rpTT, rpST, rpTG, rpRM
+            else:
+                return rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF
 
         # ================== End of synchronous Method ==========================
         def asynchronousEoL(db_freq):
-
             timei = time.time()  # start timing the entire loop
-            UsePLC_DBS = rType  # Query Type
 
-            # Tri-stream Data Pooling Method concat TT/TS/TG for visualisation ---#
-            eolData = synchronousEoL(smp_Sz, stp_Sz, db_freq)
+            # Obtain fetch SQl data from respective Tables ------------#
+            if EoLRep == 'DNV':
+                rdTT, rdST, rdTG, rdRM = synchronousEoL(smp_Sz, stp_Sz, db_freq)
+            else:
+                rdTT, rdST, rdTG, rdRM, rdLP, rdLA, rdTP, rdRF = synchronousEoL(smp_Sz, stp_Sz, db_freq)
 
             # ttData = synchronousTT(ttSize, ttgType, db_freq)  # data loading functions
             # rmData = synchronousTS(smp_Sz, stp_Sz, db_freq)   # Accumulated Gap Mean Profile
             # rmData = synchronousTG(smp_Sz, stp_Sz, db_freq)   # Accumulated Gap Mean Profile
             # --------------------------------------------------#
 
-            if UsePLC_DBS == 1:
-                import VarPLCtt as q_eol
-                viz_cycle = 10
-                # Call synchronous data function ---------------[]
-                columns = qt.validCols('EOL')                   # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(eolData, columns=columns)    # Include table data into python Dataframe
-                EL = q_eol.loadProcesValues(df1)                # Join data values under dataframe
+            import varSQL_DFeol as el                            # load SQL variables column names | rfVarSQL
 
+            viz_cycle = 150
+            if EoLRep == 'DNV':
+                g1 = eol.validCols(T1)                           # Construct Table Column (Tape Temp)
+                d1 = pd.DataFrame(rdTT, columns=g1)
+                g2 = eol.validCols(T2)                           # Construct Table Column (Sub Temp)
+                d2 = pd.DataFrame(rdST, columns=g2)
+                g3 = eol.validCols(T3)                           # Construct Table Column (Tape Gap)
+                d3 = pd.DataFrame(rdTG, columns=g3)
+                g4 = eol.validCols(T4)                           # Construct Table Column (Tape Gap)
+                d4 = pd.DataFrame(rdRM, columns=g4)
+                # Concatenate all columns -----------[]
+                df1 = pd.concat([d1, d2, d3, d4], axis=1)
+            elif EoLRep == 'MGM':
+                g1 = eol.validCols(T1)                          # Construct Table Column (Tape Temp)
+                d1 = pd.DataFrame(rdTT, columns=g1)
+                g2 = eol.validCols(T2)                          # Construct Table Column (Sub Temp)
+                d2 = pd.DataFrame(rdST, columns=g2)
+                g3 = eol.validCols(T3)                          # Construct Table Column (Tape Gap)
+                d3 = pd.DataFrame(rdTG, columns=g3)
+                g4 = eol.validCols(T4)                          # Construct Table Column (Tape Gap)
+                d4 = pd.DataFrame(rdRM, columns=g4)
+                # ---------------------------------
+                g5 = qpm.validCols(T5)                          # Laser Power
+                d5 = pd.DataFrame(rdLP, columns=g5)
+                g6 = qpm.validCols(T6)                          # Laser Angle
+                d6 = pd.DataFrame(rdLA, columns=g6)
+                g7= qpm.validCols(T7)                           # Tape Placement
+                d7 = pd.DataFrame( rdTP, columns=g7)
+                g8 = qpm.validCols(T8)                          # Roller Force
+                d8 = pd.DataFrame( rdRF, columns=g8)
+                # Concatenate all columns -----------[]
+                df1 = pd.concat([d1, d2, d3, d4, d5, d6, d7, d8], axis=1)
             else:
-                import VarSQLtt as q_eol                        # load SQL variables column names | rfVarSQL
-                viz_cycle = 150
-                g1 = qt.validCols('EOL')                        # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(eolData, columns=g1)         # Import into python Dataframe
-                EL = q_eol.loadProcesValues(df1)                # Join data values under dataframe
+                df1 = 0
+                pass
+
+            # ----- Access data element within the concatenated columns -------------------------[A]
+            EL = el.loadProcesValues(df1, EoLRep)
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -917,97 +1206,479 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
             im87.set_xdata(np.arange(db_freq))
             im88.set_xdata(np.arange(db_freq))
             im89.set_xdata(np.arange(db_freq))
-            # X Plot Y-Axis data points for XBar -----------------------------------------[  # Ring 1 ]
-            im10.set_ydata((EL[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((EL[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((EL[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((EL[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
-            # ------ Evaluate Pp for Ring 1 ---------#
-            # ---------------------------------------#
-            im14.set_ydata((EL[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((EL[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((EL[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((EL[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
-            # ---------------------------------------#
-            im18.set_ydata((EL[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((EL[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((EL[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((EL[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
-            # ---------------------------------------#
-            im22.set_ydata((EL[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((EL[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((EL[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((EL[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
-            # ---------------------------------------#
-            im26.set_ydata((EL[16]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((EL[17]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((EL[18]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((EL[19]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im30.set_ydata((EL[20]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((EL[21]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((EL[22]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((EL[23]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im34.set_ydata((EL[24]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((EL[25]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((EL[26]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((EL[27]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im38.set_ydata((EL[28]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((EL[29]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((EL[30]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((EL[31]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            # ---------------------------------------#
-            im42.set_ydata((EL[32]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im43.set_ydata((EL[33]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im44.set_ydata((EL[34]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im45.set_ydata((EL[35]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im46.set_ydata((EL[36]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im47.set_ydata((EL[37]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im48.set_ydata((EL[38]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im49.set_ydata((EL[39]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im50.set_ydata((EL[40]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im51.set_ydata((EL[41]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im52.set_ydata((EL[42]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im53.set_ydata((EL[43]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im54.set_ydata((EL[44]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im55.set_ydata((EL[45]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im56.set_ydata((EL[46]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im57.set_ydata((EL[47]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            # ---------------------------------------#
-            im58.set_ydata((EL[48]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im59.set_ydata((EL[49]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im60.set_ydata((EL[50]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im61.set_ydata((EL[51]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im62.set_ydata((EL[52]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im63.set_ydata((EL[53]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im64.set_ydata((EL[54]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im65.set_ydata((EL[55]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im66.set_ydata((EL[56]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im67.set_ydata((EL[57]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im68.set_ydata((EL[58]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im69.set_ydata((EL[59]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im70.set_ydata((EL[60]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im71.set_ydata((EL[61]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im72.set_ydata((EL[62]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im73.set_ydata((EL[63]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            # ---------------------------------------#
-            im74.set_ydata((EL[64]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im75.set_ydata((EL[65]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im76.set_ydata((EL[66]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im77.set_ydata((EL[67]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im78.set_ydata((EL[68]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im79.set_ydata((EL[69]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im80.set_ydata((EL[70]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+            # --------------------------------
+            im90.set_xdata(np.arange(db_freq))
+            im91.set_xdata(np.arange(db_freq))
+            im92.set_xdata(np.arange(db_freq))
+            im93.set_xdata(np.arange(db_freq))
+            im94.set_xdata(np.arange(db_freq))
+            im95.set_xdata(np.arange(db_freq))
+            im96.set_xdata(np.arange(db_freq))
+            im97.set_xdata(np.arange(db_freq))
+            im98.set_xdata(np.arange(db_freq))
+            im99.set_xdata(np.arange(db_freq))
+            im100.set_xdata(np.arange(db_freq))
+            im101.set_xdata(np.arange(db_freq))
+            im102.set_xdata(np.arange(db_freq))
+            im103.set_xdata(np.arange(db_freq))
+            im104.set_xdata(np.arange(db_freq))
+            im105.set_xdata(np.arange(db_freq))
+            im106.set_xdata(np.arange(db_freq))
+            # -------------------------------
+            im107.set_xdata(np.arange(db_freq))
+            im108.set_xdata(np.arange(db_freq))
+            im109.set_xdata(np.arange(db_freq))
+            im110.set_xdata(np.arange(db_freq))
+            im111.set_xdata(np.arange(db_freq))
+            im112.set_xdata(np.arange(db_freq))
+            im113.set_xdata(np.arange(db_freq))
+            im114.set_xdata(np.arange(db_freq))
+            im115.set_xdata(np.arange(db_freq))
+            im116.set_xdata(np.arange(db_freq))
+            im117.set_xdata(np.arange(db_freq))
+            im118.set_xdata(np.arange(db_freq))
+            im119.set_xdata(np.arange(db_freq))
+            im120.set_xdata(np.arange(db_freq))
+            im121.set_xdata(np.arange(db_freq))
+            im122.set_xdata(np.arange(db_freq))
+            im123.set_xdata(np.arange(db_freq))
+            # -------------------------------
+            im124.set_xdata(np.arange(db_freq))
+            im125.set_xdata(np.arange(db_freq))
+            im126.set_xdata(np.arange(db_freq))
+            im127.set_xdata(np.arange(db_freq))
+            im128.set_xdata(np.arange(db_freq))
+            im129.set_xdata(np.arange(db_freq))
+            im130.set_xdata(np.arange(db_freq))
+            im131.set_xdata(np.arange(db_freq))
+            im132.set_xdata(np.arange(db_freq))
+            im133.set_xdata(np.arange(db_freq))
+            im134.set_xdata(np.arange(db_freq))
+            im135.set_xdata(np.arange(db_freq))
+            im136.set_xdata(np.arange(db_freq))
+            im137.set_xdata(np.arange(db_freq))
+            im138.set_xdata(np.arange(db_freq))
+            im139.set_xdata(np.arange(db_freq))
+            im140.set_xdata(np.arange(db_freq))
+            # --------------------------------
+            im141.set_xdata(np.arange(db_freq))
+            im142.set_xdata(np.arange(db_freq))
+            im143.set_xdata(np.arange(db_freq))
+            im144.set_xdata(np.arange(db_freq))
+            im145.set_xdata(np.arange(db_freq))
+            im146.set_xdata(np.arange(db_freq))
+            im147.set_xdata(np.arange(db_freq))
+            im148.set_xdata(np.arange(db_freq))
+            im149.set_xdata(np.arange(db_freq))
+            im150.set_xdata(np.arange(db_freq))
+            im151.set_xdata(np.arange(db_freq))
+            im152.set_xdata(np.arange(db_freq))
+            im153.set_xdata(np.arange(db_freq))
+            im154.set_xdata(np.arange(db_freq))
+            im155.set_xdata(np.arange(db_freq))
+            im156.set_xdata(np.arange(db_freq))
+            im157.set_xdata(np.arange(db_freq))
+            # --------------------------------
+            im158.set_xdata(np.arange(db_freq))
+            im159.set_xdata(np.arange(db_freq))
+            im160.set_xdata(np.arange(db_freq))
+            im161.set_xdata(np.arange(db_freq))
+            im162.set_xdata(np.arange(db_freq))
+            im163.set_xdata(np.arange(db_freq))
+            im164.set_xdata(np.arange(db_freq))
+            im165.set_xdata(np.arange(db_freq))
+            im166.set_xdata(np.arange(db_freq))
+            im167.set_xdata(np.arange(db_freq))
+            im168.set_xdata(np.arange(db_freq))
+            im169.set_xdata(np.arange(db_freq))
+            im170.set_xdata(np.arange(db_freq))
+            im171.set_xdata(np.arange(db_freq))
+            im172.set_xdata(np.arange(db_freq))
+            im173.set_xdata(np.arange(db_freq))
+            im174.set_xdata(np.arange(db_freq))
+            # --------------------------------
+            im175.set_xdata(np.arange(db_freq))
+            im176.set_xdata(np.arange(db_freq))
+            im177.set_xdata(np.arange(db_freq))
+            im178.set_xdata(np.arange(db_freq))
+            im179.set_xdata(np.arange(db_freq))
+            im180.set_xdata(np.arange(db_freq))
+            im181.set_xdata(np.arange(db_freq))
+            im182.set_xdata(np.arange(db_freq))
+            im183.set_xdata(np.arange(db_freq))
+            im184.set_xdata(np.arange(db_freq))
+            im185.set_xdata(np.arange(db_freq))
+            im186.set_xdata(np.arange(db_freq))
+            im187.set_xdata(np.arange(db_freq))
+            im188.set_xdata(np.arange(db_freq))
+            im189.set_xdata(np.arange(db_freq))
+            im190.set_xdata(np.arange(db_freq))
+            im191.set_xdata(np.arange(db_freq))
+            # --------------------------------
+            im192.set_xdata(np.arange(db_freq))
+            im193.set_xdata(np.arange(db_freq))
+            im194.set_xdata(np.arange(db_freq))
+            im195.set_xdata(np.arange(db_freq))
+            im196.set_xdata(np.arange(db_freq))
+            im197.set_xdata(np.arange(db_freq))
+            im198.set_xdata(np.arange(db_freq))
+            im199.set_xdata(np.arange(db_freq))
+            im200.set_xdata(np.arange(db_freq))
+            im201.set_xdata(np.arange(db_freq))
+            im202.set_xdata(np.arange(db_freq))
+            im203.set_xdata(np.arange(db_freq))
+            im204.set_xdata(np.arange(db_freq))
+            im205.set_xdata(np.arange(db_freq))
+            im206.set_xdata(np.arange(db_freq))
+            im207.set_xdata(np.arange(db_freq))
+            im208.set_xdata(np.arange(db_freq))
+            # --------------------------------
+            im209.set_xdata(np.arange(db_freq))
+            im210.set_xdata(np.arange(db_freq))
+            im211.set_xdata(np.arange(db_freq))
+            im212.set_xdata(np.arange(db_freq))
+            im213.set_xdata(np.arange(db_freq))
+            im214.set_xdata(np.arange(db_freq))
+            im215.set_xdata(np.arange(db_freq))
+            im216.set_xdata(np.arange(db_freq))
+            im217.set_xdata(np.arange(db_freq))
+            im218.set_xdata(np.arange(db_freq))
 
-            im81.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im82.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im83.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im84.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im85.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im86.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im87.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im88.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            im89.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
-            # Compute entire Process Capability ------------------------------------------#
+            if EoLRep == 'DNV':
+                # X Plot Y-Axis data points for XBar ---------------------------------------------[ Mean T1 ]
+                im10.set_ydata((EL[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im11.set_ydata((EL[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im12.set_ydata((EL[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im13.set_ydata((EL[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                im14.set_ydata((EL[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im15.set_ydata((EL[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im16.set_ydata((EL[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im17.set_ydata((EL[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                im18.set_ydata((EL[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im19.set_ydata((EL[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im20.set_ydata((EL[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im21.set_ydata((EL[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                im22.set_ydata((EL[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im23.set_ydata((EL[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im24.set_ydata((EL[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im25.set_ydata((EL[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ---------------------------------------[T1 std Dev]
+                im26.set_ydata((EL[16]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im27.set_ydata((EL[17]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im28.set_ydata((EL[18]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im29.set_ydata((EL[19]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im30.set_ydata((EL[20]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im31.set_ydata((EL[21]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im32.set_ydata((EL[22]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im33.set_ydata((EL[23]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im34.set_ydata((EL[24]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im35.set_ydata((EL[25]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im36.set_ydata((EL[26]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im37.set_ydata((EL[27]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im38.set_ydata((EL[28]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im39.set_ydata((EL[29]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im40.set_ydata((EL[30]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im41.set_ydata((EL[31]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # -----------------------------------------------------------------------------[Mean T2]
+                im42.set_ydata((EL[32]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im43.set_ydata((EL[33]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im44.set_ydata((EL[34]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im45.set_ydata((EL[35]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im46.set_ydata((EL[36]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im47.set_ydata((EL[37]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im48.set_ydata((EL[38]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im49.set_ydata((EL[39]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im50.set_ydata((EL[40]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im51.set_ydata((EL[41]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im52.set_ydata((EL[42]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im53.set_ydata((EL[43]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im54.set_ydata((EL[44]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im55.set_ydata((EL[45]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im56.set_ydata((EL[46]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im57.set_ydata((EL[47]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                # ---------------------------------------[T2 std Dev]
+                im58.set_ydata((EL[48]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im59.set_ydata((EL[49]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im60.set_ydata((EL[50]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im61.set_ydata((EL[51]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im62.set_ydata((EL[52]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im63.set_ydata((EL[53]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im64.set_ydata((EL[54]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im65.set_ydata((EL[55]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im66.set_ydata((EL[56]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im67.set_ydata((EL[57]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im68.set_ydata((EL[58]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im69.set_ydata((EL[59]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im70.set_ydata((EL[60]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im71.set_ydata((EL[61]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im72.set_ydata((EL[62]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im73.set_ydata((EL[63]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # -----------------------------------------------------------------------------[Mean T3]
+                im74.set_ydata((EL[64]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im75.set_ydata((EL[65]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im76.set_ydata((EL[66]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im77.set_ydata((EL[67]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im78.set_ydata((EL[68]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im79.set_ydata((EL[69]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im80.set_ydata((EL[70]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                im81.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])
+                # ---------------------------------------[T3 std Dev]
+                im82.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im83.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im84.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im85.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im86.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im87.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im88.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im89.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # --------------------------------------------------------------------------- [Ramp (Sum9) T4]
+                # EL[80] ---------> 'tStamp' |  EL[85] --->PipeDir' | EL[86] ----> 'cLayer'
+                im90.set_ydata((EL[81]).rolling(window=smp_Sz, min_periods=1).sum()[0:db_freq])
+                im91.set_ydata((EL[82]).rolling(window=smp_Sz, min_periods=1).sum()[0:db_freq])
+                im92.set_ydata((EL[83]).rolling(window=smp_Sz, min_periods=1).sum()[0:db_freq])
+                im93.set_ydata((EL[84]).rolling(window=smp_Sz, min_periods=1).sum()[0:db_freq])
+                # Compute entire Process Capability ------------------------------------------#
+
+            elif EoLRep == 'MGM':
+                # X Plot Y-Axis data points for XBar -----------------------------------------[  # Ring 1 ]
+                im10.set_ydata((EL[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im11.set_ydata((EL[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im12.set_ydata((EL[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im13.set_ydata((EL[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ------ Evaluate Pp for Ring 1 ---------#
+                # ---------------------------------------#
+                im14.set_ydata((EL[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im15.set_ydata((EL[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im16.set_ydata((EL[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im17.set_ydata((EL[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ---------------------------------------#
+                im18.set_ydata((EL[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im19.set_ydata((EL[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im20.set_ydata((EL[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im21.set_ydata((EL[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ---------------------------------------#
+                im22.set_ydata((EL[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im23.set_ydata((EL[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im24.set_ydata((EL[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im25.set_ydata((EL[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ---------------------------------------#
+                im26.set_ydata((EL[16]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im27.set_ydata((EL[17]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im28.set_ydata((EL[18]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im29.set_ydata((EL[19]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im30.set_ydata((EL[20]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im31.set_ydata((EL[21]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im32.set_ydata((EL[22]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im33.set_ydata((EL[23]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im34.set_ydata((EL[24]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im35.set_ydata((EL[25]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im36.set_ydata((EL[26]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im37.set_ydata((EL[27]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im38.set_ydata((EL[28]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im39.set_ydata((EL[29]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im40.set_ydata((EL[30]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im41.set_ydata((EL[31]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # ---------------------------------------#
+                im42.set_ydata((EL[32]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im43.set_ydata((EL[33]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im44.set_ydata((EL[34]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im45.set_ydata((EL[35]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im46.set_ydata((EL[36]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im47.set_ydata((EL[37]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im48.set_ydata((EL[38]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im49.set_ydata((EL[39]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im50.set_ydata((EL[40]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im51.set_ydata((EL[41]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im52.set_ydata((EL[42]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im53.set_ydata((EL[43]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im54.set_ydata((EL[44]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im55.set_ydata((EL[45]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im56.set_ydata((EL[46]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im57.set_ydata((EL[47]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # ---------------------------------------#
+                im58.set_ydata((EL[48]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im59.set_ydata((EL[49]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im60.set_ydata((EL[50]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im61.set_ydata((EL[51]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im62.set_ydata((EL[52]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im63.set_ydata((EL[53]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im64.set_ydata((EL[54]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im65.set_ydata((EL[55]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im66.set_ydata((EL[56]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im67.set_ydata((EL[57]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im68.set_ydata((EL[58]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im69.set_ydata((EL[59]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im70.set_ydata((EL[60]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im71.set_ydata((EL[61]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im72.set_ydata((EL[62]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im73.set_ydata((EL[63]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # ---------------------------------------#
+                im74.set_ydata((EL[64]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im75.set_ydata((EL[65]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im76.set_ydata((EL[66]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im77.set_ydata((EL[67]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im78.set_ydata((EL[68]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im79.set_ydata((EL[69]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im80.set_ydata((EL[70]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                im81.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im82.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im83.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im84.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im85.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im86.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im87.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im88.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im89.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # Compute entire Process Capability ------------------------------------------#
+
+                # X Plot Y-Axis data points for XBar -----------------------------------------[  # Ring 1 ]
+                im90.set_ydata((EL[81]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im91.set_ydata((EL[82]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im92.set_ydata((EL[83]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im93.set_ydata((EL[84]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ------ Evaluate Pp for Ring 1 ---------#
+                # ---------------------------------------# start EL[87] ---[T5]
+                im94.set_ydata((EL[87]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im95.set_ydata((EL[88]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im96.set_ydata((EL[89]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im97.set_ydata((EL[90]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ---------------------------------------#
+                im98.set_ydata((EL[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im99.set_ydata((EL[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im100.set_ydata((EL[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im101.set_ydata((EL[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ---------------------------------------#
+                im102.set_ydata((EL[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 1
+                im103.set_ydata((EL[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 2
+                im104.set_ydata((EL[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 3
+                im105.set_ydata((EL[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # head 4
+                # ---------------------------------------#
+                im106.set_ydata((EL[16]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im107.set_ydata((EL[17]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im108.set_ydata((EL[18]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im109.set_ydata((EL[19]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im110.set_ydata((EL[20]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im111.set_ydata((EL[21]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im112.set_ydata((EL[22]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im113.set_ydata((EL[23]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im114.set_ydata((EL[24]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im115.set_ydata((EL[25]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im116.set_ydata((EL[26]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im117.set_ydata((EL[27]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im118.set_ydata((EL[28]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im119.set_ydata((EL[29]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im120.set_ydata((EL[30]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im121.set_ydata((EL[31]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # ---------------------------------------#
+                im122.set_ydata((EL[32]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im123.set_ydata((EL[33]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im124.set_ydata((EL[34]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im125.set_ydata((EL[35]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im126.set_ydata((EL[36]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im127.set_ydata((EL[37]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im128.set_ydata((EL[38]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im129.set_ydata((EL[39]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im130.set_ydata((EL[40]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im131.set_ydata((EL[41]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im132.set_ydata((EL[42]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im133.set_ydata((EL[43]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im134.set_ydata((EL[44]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im135.set_ydata((EL[45]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im136.set_ydata((EL[46]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im137.set_ydata((EL[47]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # ---------------------------------------#
+                im138.set_ydata((EL[48]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im139.set_ydata((EL[49]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im140.set_ydata((EL[50]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im141.set_ydata((EL[51]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im142.set_ydata((EL[52]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im143.set_ydata((EL[53]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im144.set_ydata((EL[54]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im145.set_ydata((EL[55]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im146.set_ydata((EL[56]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im147.set_ydata((EL[57]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im148.set_ydata((EL[58]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im149.set_ydata((EL[59]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im150.set_ydata((EL[60]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im151.set_ydata((EL[61]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im152.set_ydata((EL[62]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im153.set_ydata((EL[63]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                # ---------------------------------------#
+                im154.set_ydata((EL[64]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im155.set_ydata((EL[65]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im156.set_ydata((EL[66]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im157.set_ydata((EL[67]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im158.set_ydata((EL[68]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im159.set_ydata((EL[69]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im160.set_ydata((EL[70]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                im161.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im162.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im163.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im164.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im165.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im166.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im167.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im168.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im169.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                im170.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im171.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im172.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im173.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im174.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im175.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im176.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im177.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im178.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                im179.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im180.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im181.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im182.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im183.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im184.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im185.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im186.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im187.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                im188.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im189.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im190.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im191.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im192.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im193.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im194.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im195.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im196.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                im197.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im198.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im199.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im200.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im201.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im202.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im203.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im204.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im205.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                im206.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im207.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im208.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im209.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im210.set_ydata((EL[75]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im211.set_ydata((EL[76]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im212.set_ydata((EL[77]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im213.set_ydata((EL[78]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im214.set_ydata((EL[79]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                im215.set_ydata((EL[71]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im216.set_ydata((EL[72]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im217.set_ydata((EL[73]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+                im218.set_ydata((EL[74]).rolling(window=smp_Sz, min_periods=1).std()[0:db_freq])
+
+                # Compute entire Process Capability ------------------------------------------#
 
             # # Declare Plots attributes --------------------------------------------------------[]
 
@@ -2055,7 +2726,7 @@ class MonitorTabb(ttk.Frame):
                         dtRP, dtWS, dtCD = spm.dnv_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, T1, T2, T3, fetch_no)
 
                     elif monitorP == 'MGM':
-                        dtLP, dtLA, dtCD, dtRP, dtWS = spm.dnv_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, conE,
+                        dtLP, dtLA, dtCD, dtRP, dtWS = spm.mgm_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, conE,
                                                                       T4, T5, T6, T7, T8, fetch_no)
                     else:
                         dtLP, dtLA, dtCD, dtRP, dtWS = 0, 0, 0, 0, 0            # Assigned to Bespoke User Selection.
@@ -2094,28 +2765,28 @@ class MonitorTabb(ttk.Frame):
             else:
                 dtLP, dtLA, dtCD, dtRP, dtWS = synchronousP(smp_Sz, stp_Sz, db_freq)    # data loading functions
 
-            import VarSQLpm as pm                                                       # load SQL named columns
+            import varSQL_DFpm as pm                    # Contruct new data frame columns                                                # load SQL named columns
 
             viz_cycle = 150
             if monitorP == 'DNV':
-                g1 = qm.validCols(T1)                   # Roller Pressure
+                g1 = qpm.validCols(T1)                   # Roller Pressure
                 d1 = pd.DataFrame(dtRP, columns=g1)
-                g2 = qm.validCols(T2)                   # Tape Winding Speed
+                g2 = qpm.validCols(T2)                   # Tape Winding Speed
                 d2 = pd.DataFrame(dtWS, columns=g2)
-                g3 = qm.validCols(T3)                   # Cell Tension and Oven Temp
+                g3 = qpm.validCols(T3)                   # Cell Tension and Oven Temp
                 d3 = pd.DataFrame(dtCD, columns=g3)
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2, d3], axis=1)
             elif monitorP == 'MGM':
-                g1 = qm.validCols(T4)                   # Laser Power
+                g1 = qpm.validCols(T4)                   # Laser Power
                 d1 = pd.DataFrame(dtLP, columns=g1)
-                g2 = qm.validCols(T5)                   # Laser Angle
+                g2 = qpm.validCols(T5)                   # Laser Angle
                 d2 = pd.DataFrame(dtLA, columns=g2)
-                g3 = qm.validCols(T6)                   # Cell Tension & Oven Temp
+                g3 = qpm.validCols(T6)                   # Cell Tension & Oven Temp
                 d3 = pd.DataFrame(dtCD, columns=g3)
-                g4 = qm.validCols(T7)                   # Roller Pressure
+                g4 = qpm.validCols(T7)                   # Roller Pressure
                 d4 = pd.DataFrame(dtRP, columns=g4)
-                g5 = qm.validCols(T8)                   # Tape Winding Speed
+                g5 = qpm.validCols(T8)                   # Tape Winding Speed
                 d5 = pd.DataFrame(dtWS, columns=g5)
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2, d3, d4, d5], axis=1)

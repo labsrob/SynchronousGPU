@@ -6,7 +6,7 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
 Check SQL data columns ...
 """
-
+# sequel data columns for process monitors
 
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
