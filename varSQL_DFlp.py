@@ -11,15 +11,13 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlRF = [df1['R1H1RF'], df1['R1H2RF'],
-            df1['R1H3RF'], df1['R1H4RF'],
-            df1['R2H1RF'], df1['R2H2RF'],
-            df1['R2H3RF'], df1['R2H4RF'],
-            df1['R3H1RF'], df1['R3H2RF'],
-            df1['R3H3RF'], df1['R3H4RF'],
-            df1['R4H1RF'], df1['R4H2RF'],
-            df1['R4H3RF'], df1['R4H4RF']]
+    sqlLP = [df1['R1H1LP'], df1['R1H2LP'],
+            df1['R1H3LP'], df1['R1H4LP'],
+            df1['R2H1LP'], df1['R2H2LP'],
+            df1['R2H3LP'], df1['R2H4LP'],
+            df1['R3H1LP'], df1['R3H2LP'],
+            df1['R3H3LP'], df1['R3H4LP'],
+            df1['R4H1LP'], df1['R4H2LP'],
+            df1['R4H3LP'], df1['R4H4LP']]
 
-
-    return sqlRF
-
+    return sqlLP
