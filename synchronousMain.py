@@ -2349,7 +2349,7 @@ class MonitorTabb(ttk.Frame):
             T1 = WON + '_RP'    # Roller Pressure
             T2 = WON + '_WS'    # Tape Winding Speed
             T3 = WON + '_CT'    # Cell Tension & Oven Temp
-            # T3 = WON + '_OT'  # Oven Temp already incorporated in common process
+            T4 = WON + '_OT'    # Oven Temp already incorporated in common process
 
         elif int(LP) and int(LA) and int(CT) and int(OT) and int(RP) and int(WS):
             print('\n MGM 4 params condition met....', LP, LA, CT, OT, RP, WS)
@@ -2358,7 +2358,7 @@ class MonitorTabb(ttk.Frame):
             T3 = WON + '_CT'    # Cell Tension
             T4 = WON + '_RP'    # Roller Pressure
             T5 = WON + '_WS'    # Tape Winding Speed
-            # T4 = WON + '_OT'  # Oven Temp already incorporated in common process
+            T6 = WON + '_OT'    # Oven Temp already incorporated in common process
 
         else:
             # Bespoke user selection criteria -------------------------
@@ -2498,9 +2498,10 @@ class MonitorTabb(ttk.Frame):
             im39, = a2.plot([], [], 'o-', label='Winding Speed - (R4H2)')
             im40, = a2.plot([], [], 'o-', label='Winding Speed - (R4H3)')
             im41, = a2.plot([], [], 'o-', label='Winding Speed - (R4H4)')
-            # -------------------------------------------[Cell Tension & Oven Temp]
+            # ------------------------------------------------------[Cell Tension]
             im42, = a3.plot([], [], 'o-', label='Cell Tension (Southward)')
             im43, = a3.plot([], [], 'o-', label='Cell Tension (Northward)')
+            # -------------------------------------------------[Oven Temperature]
             im44, = a4.plot([], [], 'o-', label='Oven Temperature (Southward)')
             im45, = a4.plot([], [], 'o-', label='Oven Temperature (Northward)')
 
@@ -2677,10 +2678,10 @@ class MonitorTabb(ttk.Frame):
 
             # Obtain SQL Data Host Server ---------------------------[]
             if monitorP == 'DNV':
-                conA, conB, conC  = conn.cursor(), conn.cursor(), conn.cursor()
+                conA, conB, conC, conD  = conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor()
             elif monitorP == 'MGM':
-                conA, conB, conC, conD, conE = (conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor(),
-                                              conn.cursor())
+                conA, conB, conC, conD, conE, conF = (conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor(),
+                                                      conn.cursor(), conn.cursor())
             else:
                 pass  # reserved for bespoke configuration
 
@@ -2722,13 +2723,14 @@ class MonitorTabb(ttk.Frame):
                 else:
                     # Get list of relevant SQL Tables using conn() and execute real-time query --------------------[]
                     if monitorP == 'DNV':
-                        dtRP, dtWS, dtCD = spm.dnv_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, T1, T2, T3, fetch_no)
+                        dtRP, dtWS, dtCT, dtOT = spm.dnv_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, T1, T2, T3, T4,
+                                                                 fetch_no)
 
                     elif monitorP == 'MGM':
-                        dtLP, dtLA, dtCD, dtRP, dtWS = spm.mgm_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, conE,
-                                                                      T1, T2, T3, T4, T5, fetch_no)
+                        dtLP, dtCT, dtRP, dtLA, dtOT, dtWS = spm.mgm_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, conE,
+                                                                      conF, T1, T2, T3, T4, T5, T6, fetch_no)
                     else:
-                        dtLP, dtLA, dtCD, dtRP, dtWS = 0, 0, 0, 0, 0            # Assigned to Bespoke User Selection.
+                        dtLP, dtCT, dtRP, dtLA, dtOT, dtWS = 0, 0, 0, 0, 0, 0            # Assigned to Bespoke User Selection.
 
                 # ------ Inhibit iteration ----------------------------------------------------------[]
                 """
@@ -2749,20 +2751,20 @@ class MonitorTabb(ttk.Frame):
                     print('\nUpdating....')
 
             if monitorP == 'DNV':
-                return dtRP, dtWS, dtCD
+                return dtRP, dtWS, dtCT, dtOT
             else:
-                return dtLP, dtLA, dtCD, dtRP, dtWS
+                return dtLP, dtCT, dtRP, dtLA, dtOT, dtWS
 
         # ================== End of synchronous Method ==========================================================[]
 
         def asynchronousP(db_freq):
-            timei = time.time()                                                         # start timing the entire loop
+            timei = time.time()                                                                 # start timing the entire loop
 
             # declare asynchronous variables ------------------[]
             if monitorP == 'DNV':
-                dtRP, dtWS, dtCT = synchronousP(smp_Sz, stp_Sz, db_freq)                # data loading functions
+                dtRP, dtWS, dtCT, dtOT = synchronousP(smp_Sz, stp_Sz, db_freq)                  # data loading functions
             else:
-                dtLP, dtLA, dtCT, dtRP, dtWS = synchronousP(smp_Sz, stp_Sz, db_freq)    # data loading functions
+                dtLP, dtCT, dtRP, dtLA, dtOT, dtWS = synchronousP(smp_Sz, stp_Sz, db_freq)      # data loading functions
 
             import varSQL_DFpm as pm                    # Contruct new data frame columns                                                # load SQL named columns
 
@@ -2774,21 +2776,28 @@ class MonitorTabb(ttk.Frame):
                 d2 = pd.DataFrame(dtWS, columns=g2)
                 g3 = qpm.validCols(T3)                   # Cell Tension and Oven Temp
                 d3 = pd.DataFrame(dtCT, columns=g3)
+                g4 = qpm.validCols(T4)  # Cell Tension and Oven Temp
+                d4 = pd.DataFrame(dtOT, columns=g4)
+
                 # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2, d3], axis=1)
+                df1 = pd.concat([d1, d2, d3, d4], axis=1)
+
             elif monitorP == 'MGM':
-                g1 = qpm.validCols(T1)                   # Laser Power
+                g1 = qpm.validCols(T5)                   # Laser Power
                 d1 = pd.DataFrame(dtLP, columns=g1)
-                g2 = qpm.validCols(T2)                   # Laser Angle
-                d2 = pd.DataFrame(dtLA, columns=g2)
-                g3 = qpm.validCols(T3)                   # Cell Tension & Oven Temp
-                d3 = pd.DataFrame(dtCT, columns=g3)
-                g4 = qpm.validCols(T4)                   # Roller Pressure
-                d4 = pd.DataFrame(dtRP, columns=g4)
-                g5 = qpm.validCols(T5)                   # Tape Winding Speed
-                d5 = pd.DataFrame(dtWS, columns=g5)
+                g2 = qpm.validCols(T3)                   # Cell Tension
+                d2 = pd.DataFrame(dtCT, columns=g2)
+                g3 = qpm.validCols(T1)                   # Roller Pressure
+                d3 = pd.DataFrame(dtRP, columns=g3)
+                g4 = qpm.validCols(T6)                   # Laser Angle
+                d4 = pd.DataFrame(dtLA, columns=g4)
+                g5 = qpm.validCols(T4)                  # Oven Temperature
+                d5 = pd.DataFrame(dtOT, columns=g5)
+                g6 = qpm.validCols(T2)                   # Tape Winding Speed
+                d6 = pd.DataFrame(dtWS, columns=g6)
+
                 # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2, d3, d4, d5], axis=1)
+                df1 = pd.concat([d1, d2, d3, d4, d5, d6], axis=1)
             else:
                 df1 = 0
                 pass                                            # Reserve for process scaling -- RBL.
@@ -3713,7 +3722,7 @@ class rollerPressureX(ttk.Frame):            # -- Defines the tabbed region for 
 
 # ----------------------------------------------------------------------------------------------[]
 
-class laserPowerX(ttk.Frame):      # -- Defines the tabbed region for QA param - Tape Temperature --[]
+class laserPowerTabb(ttk.Frame):      # -- Defines the tabbed region for QA param - Tape Temperature --[]
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -5255,6 +5264,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         a1.set_title('Tape Temperature [XBar]', fontsize=12, fontweight='bold')
         a2.set_title('Tape Temperature [SDev]', fontsize=12, fontweight='bold')
         a3.set_title('Ramp Mapping Profile - [RMP]', fontsize=12, fontweight='bold')
+        a3.set_facecolor("blue")        # set background color to blue
+        zoom_factory(a3)                # Allow plot's image  zooming
 
         a3.set_ylabel("2D - Staked Layer Ramp Mapping")
         a3.set_xlabel("Sample Distance (mt)")
@@ -6143,7 +6154,7 @@ class substTempTabb(ttk.Frame):     # -- Defines the tabbed region for QA param 
         # canvas._tkcanvas.pack(expand=True)
 
 
-class tapePlacementX(ttk.Frame):     # -- Defines the tabbed region for QA param - Substrate Temperature --[]
+class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA param - Substrate Temperature --[]
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -6669,9 +6680,9 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
         im24, = a3.plot([], [], 'o-', label='Tape Gap Pol')
         im25, = a3.plot([], [], 'o-', label='Tape Gap Pol')
         # ------------------------------------------------------
-        im26 = a4.scatter([], [], s=gap_vol, marker='s', c=colors, cmap='rainbow', label='Gap Volume')
-        a4.legend(handles=im26.legend_elements()[0], labels=rlabel, title='Void Map (%)')
-
+        im26, = a3.plot([], [], 'o-', label='Tape Gap Pol')
+        # im26 = a4.plot([], [], s=gap_vol, marker='s', c=colors, cmap='rainbow')
+        # a4.legend(handles=im26.legend_elements()[0], labels=rlabel, title='Void Map (%)')
         # -------------------------------------------------------------------------#
         # TODO Call additional prolific functions ---[try pooling data from SQL repo]
         # loadSqlCumProfile(ttk.Frame)
@@ -6887,7 +6898,8 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             im24.set_xdata(np.arange(db_freq))
             im25.set_xdata(np.arange(db_freq))
             # -------------------------------- Profile Axes
-            im26.set_xdata(np.arange(db_freq))
+            # im26.set_xdata(np.arange(db_freq))
+            a4.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
             im10.set_ydata((TG[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
@@ -6934,7 +6946,9 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
             sLength = VM[5]
 
             gap_vol = (pAvgGap / sLength) * 100  # Percentage Void
-            im26.set_ydata((vLayerN),(gap_vol) [0:db_freq])  # ------------------------------ Profile A
+
+            # im26.set_ydata((vLayerN),(gap_vol) [0:db_freq])  # ------------------------------ Profile A
+            a4.set_ydata((vLayerN),(gap_vol) [0:db_freq])
 
             # # Declare Plots attributes ------------------------------------------------------------[]
             # XBar Mean Plot
@@ -7376,7 +7390,7 @@ class tapeGapPolTabb(ttk.Frame):       # -- Defines the tabbed region for QA par
 
 # FIXME -----------------------------------------------------------------------------------------------------[]
 
-class paramRollerForce(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
+class rollerForceTabb(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
@@ -7606,7 +7620,7 @@ class paramRollerForce(ttk.Frame):          # Load common Cascade and all object
         # canvas._tkcanvas.pack(expand=True)
 
 
-class paramCellTension(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
+class paramCellTensionX(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=1300, y=10)
@@ -7799,7 +7813,7 @@ class paramCellTension(ttk.Frame):          # Load common Cascade and all object
         # ------------------------------------------------------------------[]
 
 
-class paramLaserAngle(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
+class laserAngleTabb(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=1300, y=10)

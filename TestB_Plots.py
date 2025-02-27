@@ -52,7 +52,7 @@ ax2 = f.add_subplot(2, 1, 2)
 #    ax1 = f.add_subplot(2, 1, 1)
 #    ax2 = f.add_subplot(2, 1, 2)
 
-scatter = ax1.scatter(data=df, x='sDistanceX', y='Pipe LayersY', s='VoidPercent', marker='s', c=colors, cmap='rainbow', label='Gap Volume')
+scatter = ax1.scatter(data=df, x='sDistanceX', y='Pipe LayersY', s='VoidPercent', marker='s', c=colors, cmap='rainbow')
 
 ax1.set_facecolor("green")
 ax1.set_xlabel('Sample Distance')
