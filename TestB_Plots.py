@@ -40,7 +40,6 @@ dataY = df['Pipe LayersY']
 dataZ = df['VoidPercent']
 
 # plot the data -----------------------[]
-# f = Figure(figsize=(25, 8), dpi=100)
 f = plt.figure(figsize=(12, 8), dpi=100)
 f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.936, wspace=0.1, hspace=0.17)
 ax1 = f.add_subplot(2, 1, 1)
@@ -49,44 +48,35 @@ ax2 = f.add_subplot(2, 1, 2)
 
 # Enable scroll to zoom with the help of MPL
 # Interactions library function like ioff and zoom_factory.
-with plt.ioff():
-   ax1 = f.add_subplot(2, 1, 1)
-   ax2 = f.add_subplot(2, 1, 2)
-
-# ax1.scatter(data=df, x='sDistanceX', y='Pipe LayersY', s='VoidPercent', marker='s', c=colors, cmap='rainbow', label='Gap Volume')
-# ax1.colorbar()
+# with plt.ioff():
+#    ax1 = f.add_subplot(2, 1, 1)
+#    ax2 = f.add_subplot(2, 1, 2)
 
 scatter = ax1.scatter(data=df, x='sDistanceX', y='Pipe LayersY', s='VoidPercent', marker='s', c=colors, cmap='rainbow', label='Gap Volume')
+
 ax1.set_facecolor("green")
-
-# --------------------------------
-ax2.plot(dataX, dataY, marker='|', color='w', linestyle='', label='Ramp Volume')
-ax2.set_facecolor("blue")
-
-disconnect_zoomA = zoom_factory(ax1)
-disconnect_zoomB = zoom_factory(ax2)
-
 ax1.set_xlabel('Sample Distance')
-ax2.set_xlabel('Sample Distance')
-# ---------------------------------
 ax1.set_ylabel('Tape on Pipe Layer')
-ax2.set_ylabel('Tape on Pipe Layer')
-# ---------------------------------
 ax1.set_title('Tape Gap Volume Mapping')
-ax2.set_title('Ramp Position Mapping')
-# ax1.legend()
-# ax1.legend(ax1, loc='r', frame=False)
+# Useful utilities ---------#
+zoom_factory(ax1)           # Allow image zooming
+# pan_ = panhandler(ax1)    # Allow image panning
 
+rlabel = ['< 0', '0 - 2', '2 - 4', '4 - 6', '6 - 8',  '8 - 9', '9 - 10', 'above']
+ax1.legend(handles=scatter.legend_elements()[0], labels=rlabel, title='Void Map (%)')
+# ax1.colorbar()
+
+# --------------------------------[]
+ax2.plot(dataX, dataY, marker='|', color='w', linestyle='', label='Ramp Volume')
+
+ax2.set_facecolor("blue")
 ax2.legend()
-pan_handler = panhandler(f)
-
-rangelabel = ['< 0', '0 - 2', '2 - 4', '4 - 6', '6 - 8',  '8 - 9', '9 - 10', 'above']
-
-# produce a legend with a cross-section of sizes from the scatter ------[]
-# handles, labels = scatter.legend_elements(prop="sizes", alpha=0.2)
-# legend2 = ax1.legend(handles, labels, loc="upper left", title="Gap Volume")
-
-ax1.legend(handles=scatter.legend_elements()[0], labels=rangelabel)
+ax2.set_xlabel('Sample Distance')
+ax2.set_ylabel('Tape on Pipe Layer')
+ax2.set_title('Ramp Position Mapping')
+# Useful utilities ---------#
+zoom_factory(ax2)           # Allow image zooming
+# pan_ = panhandler(ax2)     # Allow image panning
 
 plt.show()
 
