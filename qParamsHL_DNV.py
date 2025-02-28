@@ -89,180 +89,6 @@ def errorNote():
     return
 
 
-def qpHLrp(pop, gSize, rpxUCL, rpxLCL, rpsUCL, rpsLCL, rpxUCL1, rpxLCL1, rpsUCL1, rpsLCL1, WONID):
-    global processID, val1, val2, val3, val4, val5, val6, val7, val8, val25
-
-    processID = WONID
-    # ------------------
-    sReg = StringVar(pop)
-
-    # Function performs dynamic calculations ---[]
-    def calculation(event=None):
-        global testVarRPa, testVarRPb
-
-        try:
-            # Compute XBar mean / center line ----------------------[LP]
-            if rpxUCL.get() and rpxLCL.get():
-                xBarMa = float(rpxLCL.get()) + ((float(rpxUCL.get()) - float(rpxLCL.get())) / 2)
-                sUCLa, sLCLa, sBarMa = loadConst(float(rpxUCL.get()), xBarMa, gSize)  # Compute S-Chart Mean
-                xUSLa = xBarMa + (float(rpxUCL.get()) - xBarMa) / 3 * 6
-                xLSLa = xBarMa - (xBarMa - float(rpxLCL.get())) / 3 * 6
-
-                # print('\nRoller Pressure (22mm): xMean/xUSL/xLSL:', xBarMa, xUSLa, xLSLa)
-                # Archiving values into dynamic List
-                testVarRPa = (dt_string, '22mm', rpxUCL.get(), rpxLCL.get(), rpsUCL.get(), rpsLCL.get(), round(xBarMa, 3),
-                              round(sBarMa, 3), round(xUSLa, 3), round(xLSLa, 3), '1-40')
-                # print('RF Historical:', testVarRPa)
-
-                # -------------------------------------------------------[for Tom Preston]
-                def click(event):
-                    cSelect = 1
-                    cSelectVar.append(cSelect)
-                    # print('Focus is selected......', cSelect)
-                    val3.config(state=NORMAL)
-                    val3.delete(0, END)
-                    val4.config(state=NORMAL)
-                    val4.delete(0, END)
-                    # allow new manual entry ----
-                    val3.get()
-                    val4.get()
-
-                val3.bind('<Button-1>', click)
-
-                # copy calculated values into user entry and allow edit--
-                if not cSelectVar:
-                    # print('Focus is NOT selected...')
-                    # val3.insert(0, round(sUCLa, 3))   # Allow static values
-                    rpsUCL.set(round(sUCLa, 3))  # allow dynamic updated values
-                    val3.config(state='readonly')
-                    rpsLCL.set(round(sLCLa, 3))
-                    val4.config(state='readonly')
-
-                else:
-                    # print('Focus is selected......')
-                    val3.get()  # delete(0, 'end')
-                    val4.get()
-                # -----------------------------------------------[End of function Tom Preston]
-                # Display values on user screen mat ----------------[1]
-                val1A["text"] = round(xBarMa, 3)
-                val2A["text"] = round(sBarMa, 3)
-                val3A["text"] = round(xUSLa, 3)
-                val4A["text"] = round(xLSLa, 3)
-            # ------------------------------------------------------[LA]
-            if rpxUCL1.get() and rpxLCL1.get():
-                xBarMb = float(rpxLCL1.get()) + ((float(rpxUCL1.get()) - float(rpxLCL1.get())) / 2)
-                sUCLb, sLCLb, sBarMb = loadConst(float(rpxUCL1.get()), xBarMb, gSize)  # Compute S-Chart Mean
-                xUSLb = xBarMb + (float(rpxUCL1.get()) - xBarMb) / 3 * 6
-                xLSLb = xBarMb - (xBarMb - float(rpxLCL.get())) / 3 * 6
-
-                # print('Roller Force (18mm): xMean/xUSL/xLSL:', xBarMb, xUSLb, xLSLb)
-                # Archiving values into dynamic List
-                testVarRPb = (dt_string, '18mm', rpxUCL1.get(), rpxLCL1.get(), rpsUCL1.get(), rpsLCL1.get(), round(xBarMb, 3),
-                              round(sBarMb, 3), round(xUSLb, 3), round(xLSLb, 3), '41+')
-                # print('RP Historical:', testVarRPb)
-
-                # -------------------------------------------------------[for Tom Preston]
-                def click(event):
-                    cSelect = 1
-                    cSelectVar.append(cSelect)
-                    # print('Focus is selected......', cSelect)
-                    val7.config(state=NORMAL)
-                    val7.delete(0, END)
-                    val8.config(state=NORMAL)
-                    val8.delete(0, END)
-                    # allow new manual entry ----
-                    val7.get()
-                    val8.get()
-
-                val7.bind('<Button-1>', click)
-
-                # copy calculated values into user entry and allow edit--
-                if not cSelectVar:
-                    # print('Focus is NOT selected...')
-                    # val3.insert(0, round(sUCLa, 3))   # Allow static values
-                    rpsUCL1.set(round(sUCLb, 3))  # allow dynamic updated values
-                    val7.config(state='readonly')
-                    rpsLCL1.set(round(sLCLb, 3))
-                    val8.config(state='readonly')
-
-                else:
-                    # print('Focus is selected......')
-                    val7.get()  # delete(0, 'end')
-                    val8.get()
-                # -----------------------------------------------[End of function Tom Preston]
-                # Display values on user screen mat ----------------[2]
-                val5A["text"] = round(xBarMb, 3)
-                val6A["text"] = round(sBarMb, 3)
-                val7A["text"] = round(xUSLb, 3)
-                val8A["text"] = round(xLSLb, 3)
-
-        except ValueError:
-            errorEntry()                            # call error alert on entry errors
-
-    # clear the content and allow entry of historical limits -------[]
-    # TODO -------------[LOAD METRICS FROM ENCRYPTED FILE]
-
-    # -----------[Compute stats UCL/LCL] -----------[ Laser Power]
-    val1 = Entry(pop, width=8, state='normal', textvariable=rpxUCL)
-    val1.place(x=70, y=80)
-    val2 = Entry(pop, width=8, state='normal', textvariable=rpxLCL)
-    val2.place(x=130, y=80)
-    # ----------------------
-    val3 = Entry(pop, width=8, state='normal', textvariable=rpsUCL)
-    val3.place(x=190, y=80)
-    val4 = Entry(pop, width=8, state='normal', textvariable=rpsLCL)
-    val4.place(x=250, y=80)
-
-    # --------------------------------------[ Lin/Row Two]
-    val5 = Entry(pop, width=8, state='normal', textvariable=rpxUCL1)
-    val5.place(x=70, y=102)
-    val6 = Entry(pop, width=8, state='normal', textvariable=rpxLCL1)
-    val6.place(x=130, y=102)
-    # -------------------------
-    val7 = Entry(pop, width=8, state='normal', textvariable=rpsUCL1)
-    val7.place(x=190, y=102)
-    val8 = Entry(pop, width=8, state='normal', textvariable=rpsLCL1)
-    val8.place(x=250, y=102)
-    val25 = Entry(pop, width=4, state='normal', textvariable=sReg, bg='yellow', bd=4)
-    val25.place(x=120, y=200)
-    sReg.set(3)
-    # Binder Label --------------------------------------------------------#
-    # Compute derived mean values for XBar/Sbar Plot & fill dynamically ----
-    val1A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val1A.place(x=308, y=80)
-    val2A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val2A.place(x=368, y=80)
-    # --------------------
-    val3A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val3A.place(x=428, y=80)
-    val4A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val4A.place(x=488, y=80)
-    # ------------------------------------ Line 2
-    val5A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val5A.place(x=308, y=102)
-    val6A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val6A.place(x=368, y=102)
-    # ------------------------
-    val7A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val7A.place(x=428, y=102)
-    val8A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val8A.place(x=488, y=102)
-    # -----------------------
-
-    # ------------------ Binding properties ----------------------[]
-    val1.bind("<KeyRelease>", calculation)
-    val2.bind("<KeyRelease>", calculation)
-    val3.bind("<KeyRelease>", calculation)
-    val4.bind("<KeyRelease>", calculation)
-    # ----- Line Row 2
-    val5.bind("<KeyRelease>", calculation)
-    val6.bind("<KeyRelease>", calculation)
-    val7.bind("<KeyRelease>", calculation)
-    val8.bind("<KeyRelease>", calculation)
-    # ------------------------------------
-
-    return processID
-
 
 def qpHLtt(pop, gSize, ttxUCL, ttxLCL, ttsUCL, ttsLCL, ttxUCL1, ttxLCL1,  ttsUCL1, ttsLCL1, ttxUCL2, ttxLCL2, ttsUCL2,\
            ttsLCL2, ttxUCL3, ttxLCL3, ttsUCL3, ttsLCL3, ttxUCL4, ttxLCL4, ttsUCL4, ttsLCL4, WONID):
@@ -1051,109 +877,6 @@ def qpHLst(pop, gSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, xUCL
     return processID
 
 
-def qpHLws(pop, gSize, wsxUCL, wsxLCL, wssUCL, wssLCL, WONID):
-    global processID, val1, val2, val3, val4, val25
-
-    processID = WONID
-    # ------------------
-    sReg = StringVar(pop)
-
-    # Function performs dynamic calculations ---[]
-    def calculation(event=None):
-        global testVarWS
-
-        try:
-            # Compute XBar mean / center line ----------------------[LP]
-            if wsxUCL.get() and wsxLCL.get():
-                xBarMa = float(wsxLCL.get()) + ((float(wsxUCL.get()) - float(wsxLCL.get())) / 2)
-                sUCLa, sLCLa, sBarMa = loadConst(float(wsxUCL.get()), xBarMa, gSize)  # Compute S-Chart Mean
-                xUSLa = xBarMa + (float(wsxUCL.get()) - xBarMa) / 3 * 6
-                xLSLa = xBarMa - (xBarMa - float(wsxLCL.get())) / 3 * 6
-
-                # print('\nTape Speed: xMean/xUSL/xLSL:', xBarMa, xUSLa, xLSLa)
-                # print('Computed sMean/sUCL/sLCL:', sBarMa, sUCLa, sLCLa)
-                # Archiving values into dynamic List
-                testVarWS = (dt_string, '**', wsxUCL.get(), wsxLCL.get(), wssUCL.get(), wssLCL.get(), round(xBarMa, 3), round(sBarMa, 3),
-                             round(xUSLa, 3), round(xLSLa, 3), '**')
-
-                # print('TS Historical:', testVarWS)
-
-                # -------------------------------------------------------[for Tom Preston]
-                def click(event):
-                    cSelect = 1
-                    cSelectVar.append(cSelect)
-                    # print('Focus is selected......', cSelect)
-                    val3.config(state=NORMAL)
-                    val3.delete(0, END)
-                    val4.config(state=NORMAL)
-                    val4.delete(0, END)
-                    # allow new manual entry ----
-                    val3.get()
-                    val4.get()
-
-                val3.bind('<Button-1>', click)
-
-                # copy calculated values into user entry and allow edit--
-                if not cSelectVar:
-                    # print('Focus is NOT selected...')
-                    # val3.insert(0, round(sUCLa, 3))   # Allow static values
-                    wssUCL.set(round(sUCLa, 3))  # allow dynamic updated values
-                    val3.config(state='readonly')
-                    wssLCL.set(round(sLCLa, 3))
-                    val4.config(state='readonly')
-
-                else:
-                    # print('Focus is selected......')
-                    val3.get()  # delete(0, 'end')
-                    val4.get()
-                # -----------------------------------------------[End of function Tom Preston]
-                # Display values on user screen mat ---------[1]
-                val1A["text"] = round(xBarMa, 3)
-                val2A["text"] = round(sBarMa, 3)
-                val3A["text"] = round(xUSLa, 3)
-                val4A["text"] = round(xLSLa, 3)
-
-        except ValueError:
-            errorEntry()        # call error alert on entry errors
-
-    # clear the content and allow entry of historical limits -------
-    # TODO -------------[LOAD METRICS FROM ENCRYPTED FILE]
-
-    # -----------[Compute stats UCL/LCL] -----------[ Laser Power]
-    val1 = Entry(pop, width=8, state='normal', textvariable=wsxUCL)
-    val1.place(x=70, y=80)
-    val2 = Entry(pop, width=8, state='normal', textvariable=wsxLCL)
-    val2.place(x=130, y=80)
-    # ----------------------
-    val3 = Entry(pop, width=8, state='normal', textvariable=wssUCL)
-    val3.place(x=190, y=80)
-    val4 = Entry(pop, width=8, state='normal', textvariable=wssLCL)
-    val4.place(x=250, y=80)
-    val25 = Entry(pop, width=4, state='normal', textvariable=sReg, bg='yellow', bd=4)
-    val25.place(x=120, y=200)
-    sReg.set(3)
-    # Binder Label --------------------------------------------------------#
-    # Compute derived mean values for XBar/Sbar Plot & fill dynamically ----
-    val1A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val1A.place(x=308, y=80)
-    val2A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val2A.place(x=368, y=80)
-    # --------------------
-    val3A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val3A.place(x=428, y=80)
-    val4A = Label(pop, width=7, state='normal', font=("bold", 10))
-    val4A.place(x=488, y=80)
-
-    # ------------------ Binding properties ----------------------[]
-    val1.bind("<KeyRelease>", calculation)
-    val2.bind("<KeyRelease>", calculation)
-    val3.bind("<KeyRelease>", calculation)
-    val4.bind("<KeyRelease>", calculation)
-    # -------
-
-    return processID
-
-
 def qpHLtg(pop, gSize, tgxUCL, tgxLCL, tgsUCL, tgsLCL, WONID):
     global processID, val1, val2, val3, val4, val25
 
@@ -1259,28 +982,7 @@ def qpHLtg(pop, gSize, tgxUCL, tgxLCL, tgsUCL, tgsLCL, WONID):
 def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
 
     # ------------------------------[]
-    if processID == 'RP':
-        # --------------------------[RP]
-        rpA = testVarRPa
-        rpB = testVarRPb
-        rpC = ""
-        rpD = ""
-        rpE = ""
-
-        # --------------- set rows data to readonly then save
-        canvasBlank = [val1, val2, val3, val4, val5, val6, val7, val8]
-        for line in canvasBlank:
-            line.config(state="readonly")
-        # ------------------------ Codefy ----------------[]
-        try:
-            # print("Attempting to encrypt config values...")
-            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), enHL, enAL, enFO, rpA, rpB, rpC, rpD, rpE)
-
-        except ValueError:
-            print(processID + ' - Error: Encryption utility encounters error!')
-            errorNote()             # response to save button when entry field is empty
-
-    elif processID == "TT":
+    if processID == "TT":
         ttA = testVarTTa
         ttB = testVarTTb
         ttC = testVarTTc
@@ -1320,25 +1022,6 @@ def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
         try:
             print("Attempting to encrypt config values...")
             encryptMetricsQP(WON, processID, sSize, gType, val25.get(), enHL, enAL, enFO, stA, stB, stC, stD, stE)
-
-        except ValueError:
-            print(processID + ' - Error: Encryption utility encounters error!')
-            errorNote()             # response to save button when entry field is empty
-
-    elif processID == "WS":
-        wsA = testVarWS
-        wsB = ""
-        wsC = ""
-        wsD = ""
-        wsE = ""
-        # --------------- set rows data to readonly then save
-        canvasBlank = [val1, val2, val3, val4]
-        for line in canvasBlank:
-            line.config(state="readonly")
-        # ------------------------ Codefy ----------------[]
-        try:
-            # print("Attempting to encrypt config values...")
-            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), enHL, enAL, enFO, wsA, wsB, wsC, wsD, wsE)
 
         except ValueError:
             print(processID + ' - Error: Encryption utility encounters error!')
@@ -1393,58 +1076,6 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
         tgI = 0
         tgJ = 0
 
-    elif processID == 'TP':
-        tpA = onetimepad.encrypt(str(sSize), 'random')
-        tpB = onetimepad.encrypt(str(gType), 'random')
-        tpK = onetimepad.encrypt(str(sCyc), 'random')
-        tpC = onetimepad.encrypt(str(enDNV), 'random')
-        tpD = onetimepad.encrypt(str(enMGM), 'random')
-        tpE = onetimepad.encrypt(str(enAUT), 'random')
-        tpF = onetimepad.encrypt(str(lineA), 'random')
-        tpG = 0  # Do nothing -- Can be used for future scalability
-        tpH = 0
-        tpI = 0
-        tpJ = 0
-
-    elif processID == 'LA':
-        laA = onetimepad.encrypt(str(sSize), 'random')
-        laB = onetimepad.encrypt(str(gType), 'random')
-        laK = onetimepad.encrypt(str(sCyc), 'random')
-        laC = onetimepad.encrypt(str(enDNV), 'random')
-        laD = onetimepad.encrypt(str(enMGM), 'random')
-        laE = onetimepad.encrypt(str(enAUT), 'random')
-        laF = onetimepad.encrypt(str(lineA), 'random')
-        laG = 0                                            # Do nothing -- Can be used for future scalability
-        laH = 0
-        laI = 0
-        laJ = 0
-
-    elif processID == 'RF':
-        rfA = onetimepad.encrypt(str(sSize), 'random')
-        rfB = onetimepad.encrypt(str(gType), 'random')
-        rfK = onetimepad.encrypt(str(sCyc), 'random')
-        rfC = onetimepad.encrypt(str(enDNV), 'random')
-        rfD = onetimepad.encrypt(str(enMGM), 'random')
-        rfE = onetimepad.encrypt(str(enAUT), 'random')
-        rfF = onetimepad.encrypt(str(lineA), 'random')
-        rfG = onetimepad.encrypt(str(lineB), 'random')
-        rfH = 0                                            # Do nothing -- Can be used for future scalability
-        rfI = 0
-        rfJ = 0
-
-    elif processID == 'LP':
-        lpA = onetimepad.encrypt(str(sSize), 'random')
-        lpB = onetimepad.encrypt(str(gType), 'random')
-        lpK = onetimepad.encrypt(str(sCyc), 'random')
-        lpC = onetimepad.encrypt(str(enDNV), 'random')
-        lpD = onetimepad.encrypt(str(enMGM), 'random')
-        lpE = onetimepad.encrypt(str(enAUT), 'random')
-        lpF = onetimepad.encrypt(str(lineA), 'random')
-        lpG = onetimepad.encrypt(str(lineB), 'random')
-        lpH = 0                                            # Do nothing -- Can be used for future scalability
-        lpI = 0
-        lpJ = 0
-
     elif processID == 'TT':
         ttA = onetimepad.encrypt(str(sSize), 'random')
         ttB = onetimepad.encrypt(str(gType), 'random')
@@ -1476,22 +1107,8 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
     # Open text file and save historical details -----------#
     iniName = "hisLim"+processID+".INI"
     with open(iniName, 'a') as configfile:                                 # append to config file
-        if processID == 'TP':
-            if not config.has_section(processID +"HL_" + WONID):
-                config.add_section(processID +"HL_" + WONID)
-                config.set(processID + "HL_" + WONID, "SmpleSize", str(tpA))
-                config.set(processID + "HL_" + WONID, "GroupType", str(tpB))
-                config.set(processID + "HL_" + WONID, "SmplSpace", str(tpK))
-                config.set(processID + "HL_" + WONID, "EnableDNV", str(tpC))
-                config.set(processID + "HL_" + WONID, "EnableAUT", str(tpD))
-                config.set(processID + "HL_" + WONID, "EnableMGM", str(tpE))
-                config.set(processID + "HL_" + WONID, "Size" + processID + "d1", str(tpF))
-                config.set(processID + "HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
-            config.write(configfile)
-            usedVar = ("TPHL_" + WONID)
-            config.remove_section(usedVar)      # Required to correct Parser class bug - Dr labs discovered the bug
 
-        elif processID == 'TG':
+        if processID == 'TG':
             if not config.has_section(processID +"HL_" + WONID):
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(tgA))
@@ -1504,23 +1121,6 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
                 config.set(processID + "HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
             config.write(configfile)
             usedVar = ("TGHL_" + WONID)
-            config.remove_section(usedVar)
-            # print('Deleting unused variables...')
-
-        elif processID == 'RF':
-            if not config.has_section(processID +"HL_" + WONID):
-                config.add_section(processID +"HL_" + WONID)
-                config.set(processID + "HL_" + WONID, "SmpleSize", str(rfA))
-                config.set(processID + "HL_" + WONID, "GroupType", str(rfB))
-                config.set(processID + "HL_" + WONID, "SmplSpace", str(rfK))
-                config.set(processID + "HL_" + WONID, "EnableDNV", str(rfC))
-                config.set(processID + "HL_" + WONID, "EnableAUT", str(rfD))
-                config.set(processID + "HL_" + WONID, "EnableMGM", str(rfE))
-                config.set(processID + "HL_" + WONID, "Size20" + processID + "d1", str(rfF))
-                config.set(processID + "HL_" + WONID, "Size18" + processID + "d2", str(rfG))
-                config.set(processID + "HL_" + WONID, "EndOfConfig", str("-" * 172)+"["+dt_string+"]")
-            config.write(configfile)
-            usedVar = ("RFHL_" + WONID)
             config.remove_section(usedVar)
             # print('Deleting unused variables...')
 
@@ -1586,63 +1186,7 @@ def decryptpProcessLim(WONID, processID):
     try:
         limX = config_object[processID + "HL_" + WONID]
 
-        if processID == 'RF':       # Roller Force (Not applicable on DNV Reqs)
-            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
-            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
-            # ----------------------------------------------------------
-            tapeA = onetimepad.decrypt(limX['size20'+processID+'d1'], 'random')
-            tapeB = onetimepad.decrypt(limX['size18'+processID+'d2'], 'random')
-            tapeC = 0
-            tapeD = 0
-            tapeE = 0
-
-        elif processID == 'LP':     # Laser Power (Not applicable on DNV Reqs)
-            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
-            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
-            # ----------------------------------------------------------
-            tapeA = onetimepad.decrypt(limX['size20' + processID + 'd1'], 'random')
-            tapeB = onetimepad.decrypt(limX['size18' + processID + 'd2'], 'random')
-            tapeC = 0
-            tapeD = 0
-            tapeE = 0
-
-        elif processID == 'TG':  # Tape Gag (Polarisation)
-            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
-            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
-            # ----------------------------------------------------------
-            tapeA = onetimepad.decrypt(limX['Size'+processID+'d1'], 'random')
-            tapeB = 0
-            tapeC = 0
-            tapeD = 0
-            tapeE = 0
-
-        elif processID == 'TP':  # Tape Placement Error (Keyance) (Not applicable on DNV Reqs)
-            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
-            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
-            # ----------------------------------------------------------
-            tapeA = onetimepad.decrypt(limX['Size' + processID + 'd1'], 'random')
-            tapeB = 0
-            tapeC = 0
-            tapeD = 0
-            tapeE = 0
-
-        elif processID == 'LA': # Laser Angle (Not applicable on DNV Reqs)
+        if processID == 'TG':  # Tape Gag (Polarisation)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
             gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
