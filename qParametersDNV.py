@@ -18,12 +18,7 @@ def save_mMetrics():
 
 
 def editPHL():
-    if pTy == 'RP':
-        s_data.config(state="normal")                   # enable safe button on entry
-        sRegime.config(state="normal")                  # enable data entry
-        mx.qpHLrp(popmodal, sSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, WON)
-        e_data.config(state="disabled")     # prevent accidental entry clearance by use of edit button once!
-    elif pTy == 'TT':                       # Tape Temp
+    if pTy == 'TT':                       # Tape Temp
         s_data.config(state="normal")
         sRegime.config(state="normal")      # enable data entry
         mx.qpHLtt(popmodal, sSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, xUCL2, xLCL2,  sUCL2, sLCL2, xUCL3, xLCL3,  sUCL3, sLCL3, xUCL4, xLCL4, sUCL4, sLCL4, WON)
@@ -33,12 +28,7 @@ def editPHL():
         sRegime.config(state="normal")      # enable data entry
         mx.qpHLst(popmodal, sSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, xUCL2, xLCL2,  sUCL2, sLCL2, xUCL3, xLCL3,  sUCL3, sLCL3, xUCL4, xLCL4, sUCL4, sLCL4, WON)
         e_data.config(state="disabled")
-    elif pTy == 'WS':                       # Winding Temp
-        s_data.config(state="normal")
-        sRegime.config(state="normal")      # enable data entry
-        mx.qpHLws(popmodal, sSize, xUCL, xLCL, sUCL, sLCL, WON)
-        e_data.config(state="disabled")
-    elif pTy == 'TG':                       # Tape Ga
+    elif pTy == 'TG':                       # Tape Gap
         s_data.config(state="normal")
         sRegime.config(state="normal")      # enable data entry
         mx.qpHLtg(popmodal, sSize, xUCL, xLCL, sUCL, sLCL, WON)

@@ -5,37 +5,46 @@
 # Copyright (C) 2023-2025, Robbie Labs
 # Cascade (Multiple screen ) View
 # --------------------------------------------------------------------------#
+
+import numpy as np
+import pandas as pd
+import spcWatchDog as wd
+# -------PLC/SQL Query -------#
 import time
 import os
 import sys
 from datetime import datetime
-
 from time import gmtime, strftime
+import signal
 import numpy as np
 import pandas as pd
 from tkinter import *
 from tkinter import ttk
+from threading import *
+from tkinter.simpledialog import askstring
 import matplotlib.pyplot as plt
 from multiprocessing import Process, freeze_support, set_start_method
 from matplotlib.figure import Figure
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-
 LARGE_FONT = ("Verdana", 12, 'bold')
 import matplotlib.patches as patches
-import loadSPCConfig as ty
-import qParamsHL as mq
-
+import qParamsHL_DNV as mq
+import rtP_Evaluator as tq
 # -------PLC/SQL Query --------#
-import selDataColsOEE as qo
-import selDataColsCT as qc
-import selDataColsRF as qf
-# ----- DNV Params ------
-import selDataColsRP as qp
-import selDataColsTT as qt
-import selDataColsST as qs
-import selDataColsWS as qw
-import selDataColsTG as qg
+import selDataColsEV as qev     # Environmental Values
+import selDataColsLA as qla     # Laser Angle
+import selDataColsLP as qlp     # Laser Power
+import selDataColsRC as qrc     # Ramp Count
+import selDataColsRF as qrf     # Roller Force
+import selDataColsRM as qrm     # Ramp Mapping
+import selDataColsST as qst     # Substrate Temperature
+import selDataColsTG as qtg     # Tape Gap Void
+import selDataColsTP as qtp     # Tape Placement error
+import selDataColsTT as qtt     # Tape Temperature
+import selDataColsVC as qvc     # void (gap) count
+import selDataColsVM as qvm     # Void mapping
+import selDataColsEoL as eol    # End of Layer
 # -----------------------------#
 
 import subprocess
@@ -45,10 +54,10 @@ try:
 except Exception:
     print('No Nvidia GPU in system!')
 
-
+# -------------------------------#
 pPos = str(3345)
 layer = str(10)
-
+# -------------------------------#
 WON = "275044"
 eSMC = 'Getting started...'
 countA = '01'
@@ -56,11 +65,67 @@ countB = '02'
 countC = '03'
 countD = '04'
 countE = '05'
-# ---------------------------------------------- Common to all Process Procedures -------------------------[]
+countF = '06'
+countG = '07'
+countH = '08'
+# --------------------------------------- Common to all Process Procedures -------------------------[]
 cpTapeW, cpLayerNo, runType = [], [], []
 UsePLC_DBS = True
-runStatus = 0
 hostConn = 0
+runStatus = 0
+
+# --------------
+gap_vol = 0
+ramp_vol = 0
+vCount = 1000
+pExLayer = 100
+pLength = 10000
+# ---------------
+
+# XBar Constants ------------------------------[]
+A3 = [0.975, 0.789, 0.680, 0.6327, 0.606, 0.5525]       # 10, 15, 20, 23, 25, 30  sample sizes respectively
+B3 = [0.284, 0.428, 0.510, 0.5452, 0.565, 0.6044]       # 10, 15, 20, 23, 25, 30  sample sizes respectively
+B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
+
+UsePLC_DBS = True                                       # specify SQl Query or PLC DB Query is in use
+processWON = []
+
+# ------------- Dummy values ----------------------[]
+pPos = '6.2345'
+layer = '03'
+WON = "275044"
+sel_SS = "30"
+sel_gT = "S-Domino"
+eSMC = 'Tape laying process in progress...'
+# ------------------ Auto canvass configs -------[]
+y_start = 110
+y_incmt = 30
+rtValues = []
+# ---- Common to all Process Procedures ---[]
+pRecipe = ""
+# Call function for configuration file ----[]
+sSize, gType, sStart, sStops, OT, CT, RP, LA, WS, TG, ST, LP = mp.decryptMetricspP(WON)
+print('\nDecrypted Prod Parameters:', OT, CT, RP, LA, WS, TG, ST, LP)
+# -----------------------------------------[]
+if OT and CT and RP and WS:
+    pRecipe = 'DNV'
+elif LP and LA and TG and WS:
+    pRecipe = 'MGM'
+else:
+    pRecipe = 'USR'
+# ----------------------------------------------[ XXXX ]
+
+smp_Sz = int(sSize)                                   # Allow SCADA User to specify window sample size
+stp_Sz = gType                                        # Step Size (smp_St) Domino or Discrete group steps
+# ----------------------------------------------------[]
+if stp_Sz == 'GS-Discrete':
+    viz_cycle = 100
+elif stp_Sz == 'SS-Domino':
+    viz_cycle = 500
+else:
+    viz_cycle = 10
+print('\nGroup Type:', stp_Sz, 'Sample Size:', smp_Sz)
+# ----------------------------------------------------[]
 
 # -------------------------[ OEE Class module ] --------------------------[]
 # class common_OEE(ttk.Frame):
@@ -226,62 +291,62 @@ hostConn = 0
 #         canvas._tkcanvas.pack(expand=True)
 
 
-def RollerPressure(vCounter, pType):
+def rfProcessParam(vCounter, pType):
 
     root = Tk()
     root.title('mPipe Production: Synchronous SPC - Viz: ' + vCounter)
     root.geometry("1800x800")
 
     # Load Quality Historical Values ---------------[]
-    rpSize, rpgType, rpSspace, rpHL, rpAL, rpFO, rpParam1, rpParam2, dud3, dud4, dud5 = mq.decryptpProcessLim(WON, 'RP')
+    rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, dud3, dud4, dud5 = mq.decryptpProcessLim(WON, 'RF')
     # Break down each element to useful list -------[Roller Pressure]
 
-    if rpHL and rpParam1 and rpParam2:  # Roller Pressure TODO - layer metrics to guide TCP01
-        rpPerf = '$Pp_{k' + str(rpSize) + '}$'      # Using estimated or historical Mean
-        rplabel = 'Pp'
+    if rfHL and rfParam1 and rfParam2:  # Roller Pressure TODO - layer metrics to guide TCP01
+        rfPerf = '$Pp_{k' + str(rfSize) + '}$'      # Using estimated or historical Mean
+        rflabel = 'Pp'
         # -------------------------------
-        rpOne = rpParam1.split(',')                 # split into list elements
-        rpTwo = rpParam1.split(',')
-        dTaperp = rpOne[1].strip("' ")              # defined Tape Width
-        dLayer = rpOne[10].strip("' ")              # Defined Tape Layer
+        rfOne = rfParam1.split(',')                 # split into list elements
+        rfTwo = rfParam1.split(',')
+        dTaperf = rfOne[1].strip("' ")              # defined Tape Width
+        dLayer = rfOne[10].strip("' ")              # Defined Tape Layer
         # Load historical limits for the process----#
         if cpLayerNo == 40:                         # '22mm'|'18mm',  1-40 | 41+
-            rpUCL = float(rpOne[2].strip("' "))     # Strip out the element of the list
-            rpLCL = float(rpOne[3].strip("' "))
-            rpMean = float(rpOne[4].strip("' "))
-            rpDev = float(rpOne[5].strip("' "))
+            rfUCL = float(rfOne[2].strip("' "))     # Strip out the element of the list
+            rfLCL = float(rfOne[3].strip("' "))
+            rfMean = float(rfOne[4].strip("' "))
+            rfDev = float(rfOne[5].strip("' "))
             # --------------------------------
-            sUCLrp = float(rpOne[6].strip("' "))
-            sLCLrp = float(rpOne[7].strip("' "))
+            sUCLrf = float(rfOne[6].strip("' "))
+            sLCLrf = float(rfOne[7].strip("' "))
             # --------------------------------
-            rpUSL = (rpUCL - rpMean) / 3 * 6
-            rpLSL = (rpMean - rpLCL) / 3 * 6
+            rfUSL = (rfUCL - rfMean) / 3 * 6
+            rfLSL = (rfMean - rfLCL) / 3 * 6
             # --------------------------------
         else:
-            rpUCL = float(rpTwo[2].strip("' "))     # Strip out the element of the list
-            rpLCL = float(rpTwo[3].strip("' "))
-            rpMean = float(rpTwo[4].strip("' "))
-            rpDev = float(rpTwo[5].strip("' "))
+            rfUCL = float(rfTwo[2].strip("' "))     # Strip out the element of the list
+            rfLCL = float(rfTwo[3].strip("' "))
+            rfMean = float(rfTwo[4].strip("' "))
+            rfDev = float(rfTwo[5].strip("' "))
             # --------------------------------
-            sUCLrp = float(rpTwo[6].strip("' "))
-            sLCLrp = float(rpTwo[7].strip("' "))
+            sUCLrf = float(rfTwo[6].strip("' "))
+            sLCLrf = float(rfTwo[7].strip("' "))
             # -------------------------------
-            rpUSL = (rpUCL - rpMean) / 3 * 6
-            rpLSL = (rpMean - rpLCL) / 3 * 6
+            rfUSL = (rfUCL - rfMean) / 3 * 6
+            rfLSL = (rfMean - rfLCL) / 3 * 6
             # -------------------------------
     else:  # Computes Shewhart constants (Automatic Limits)
-        rpUCL = 0
-        rpLCL = 0
-        rpMean = 0
-        rpDev = 0
-        sUCLrp = 0
-        sLCLrp = 0
-        rpUSL = 0
-        rpLSL = 0
-        rpPerf = '$Cp_{k' + str(rpSize) + '}$'  # Using Automatic group Mean
-        rplabel = 'Cp'
+        rfUCL = 0
+        rfLCL = 0
+        rfMean = 0
+        rfDev = 0
+        sUCLrf = 0
+        sLCLrf = 0
+        rfUSL = 0
+        rfLSL = 0
+        rfPerf = '$Cp_{k' + str(rfSize) + '}$'  # Using Automatic group Mean
+        rflabel = 'Cp'
 
-    label = ttk.Label(root, text='DNV Parameter [RP] - [' + pType + ' Mode] - ' + strftime("%a, %d %b %Y", gmtime()), font=LARGE_FONT)
+    label = ttk.Label(root, text='Roller Force [RF] - [' + pType + ' Mode] - ' + strftime("%a, %d %b %Y", gmtime()), font=LARGE_FONT)
     label.pack(pady=10, padx=10)
 
     # Define Axes ---------------------#
@@ -297,24 +362,30 @@ def RollerPressure(vCounter, pType):
     # Declare Plots attributes -----------------------------[]
     plt.rcParams.update({'font.size': 7})
     # Calibrate limits for X-moving Axis -------------------#
-    YScale_minRP, YScale_maxRP = rpLSL - 8.5, rpUSL + 8.5   # Roller Force
-    sBar_minRP, sBar_maxRP = sLCLrp - 80, sUCLrp + 80       # Calibrate Y-axis for S-Plot
-    window_Xmin, window_Xmax = 0, (int(rpSize) + 3)         # windows view = visible data points
+    YScale_minRF, YScale_maxRF = rfLSL - 8.5, rfUSL + 8.5   # Roller Force
+    sBar_minRF, sBar_maxRF = sLCLrf - 80, sUCLrf + 80       # Calibrate Y-axis for S-Plot
+    window_Xmin, window_Xmax = 0, (int(rfSize) + 3)         # windows view = visible data points
+
+    # ----------------------------------------------------------#
+    # Real-Time Parameter according to updated requirements ----# 28/Feb/2025
+    T1 = WON + '_RF'  # Laser Power
+    # ----------------------------------------------------------#
 
     # Declare Plots attributes --------------------------------#
     a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
     a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
-    a1.set_title('Roller Pressure [XBar Plot]', fontsize=12, fontweight='bold')
-    a2.set_title('Roller Pressure [S Plot]', fontsize=12, fontweight='bold')
+    a1.set_title('Roller Pressure [XBar]', fontsize=12, fontweight='bold')
+    a2.set_title('Roller Pressure [StDev]', fontsize=12, fontweight='bold')
     a1.grid(color="0.5", linestyle='-', linewidth=0.5)
     a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-    a1.legend(loc='upper right', title='Roller Pressure Control Plot')
+    a1.legend(loc='upper right', title='Roller Force')
     a2.legend(loc='upper right', title='Sigma curve')
+
     # Initialise runtime limits --------------------------------#
-    a1.set_ylim([YScale_minRP, YScale_maxRP], auto=True)
+    a1.set_ylim([YScale_minRF, YScale_maxRF], auto=True)
     a1.set_xlim([window_Xmin, window_Xmax])
     # ----------------------------------------------------------#
-    a2.set_ylim([sBar_minRP, sBar_maxRP], auto=True)
+    a2.set_ylim([sBar_minRF, sBar_maxRF], auto=True)
     a2.set_xlim([window_Xmin, window_Xmax])
 
     # ---------------------------------------------------------[]
@@ -325,44 +396,44 @@ def RollerPressure(vCounter, pType):
     # ---------------------------------------------------------[]
     # Define Plot area and axes -
     # ---------------------------------------------------------#
-    im10, = a1.plot([], [], 'o-.', label='Roller Pressure(N) - (R1H1)')
-    im11, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R1H2)')
-    im12, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R1H3)')
-    im13, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R1H4)')
-    im14, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im15, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im16, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im17, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
+    im10, = a1.plot([], [], 'o-', label='Roller Force - (R1H1)')
+    im11, = a1.plot([], [], 'o-', label='Roller Force - (R1H2)')
+    im12, = a1.plot([], [], 'o-', label='Roller Force - (R1H3)')
+    im13, = a1.plot([], [], 'o-', label='Roller Force - (R1H4)')
+    im14, = a2.plot([], [], 'o-', label='Roller Force')
+    im15, = a2.plot([], [], 'o-', label='Roller Force')
+    im16, = a2.plot([], [], 'o-', label='Roller Force')
+    im17, = a2.plot([], [], 'o-', label='Roller Force')
 
-    im18, = a1.plot([], [], 'o-.', label='Roller Pressure(N) - (R2H1)')
-    im19, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R2H2)')
-    im20, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R2H3)')
-    im21, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R2H4)')
-    im22, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im23, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im24, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im25, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
+    im18, = a1.plot([], [], 'o-', label='Roller Force - (R2H1)')
+    im19, = a1.plot([], [], 'o-', label='Roller Force - (R2H2)')
+    im20, = a1.plot([], [], 'o-', label='Roller Force - (R2H3)')
+    im21, = a1.plot([], [], 'o-', label='Roller Force - (R2H4)')
+    im22, = a2.plot([], [], 'o-', label='Roller Force')
+    im23, = a2.plot([], [], 'o-', label='Roller Force')
+    im24, = a2.plot([], [], 'o-', label='Roller Force')
+    im25, = a2.plot([], [], 'o-', label='Roller Force')
 
-    im26, = a1.plot([], [], 'o-.', label='Roller Pressure(N) - (R3H1)')
-    im27, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R3H2)')
-    im28, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R3H3)')
-    im29, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R3H4)')
-    im30, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im31, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im32, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im33, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
+    im26, = a1.plot([], [], 'o-', label='Roller Force - (R3H1)')
+    im27, = a1.plot([], [], 'o-', label='Roller Force - (R3H2)')
+    im28, = a1.plot([], [], 'o-', label='Roller Force - (R3H3)')
+    im29, = a1.plot([], [], 'o-', label='Roller Force - (R3H4)')
+    im30, = a2.plot([], [], 'o-', label='Roller Force')
+    im31, = a2.plot([], [], 'o-', label='Roller Force')
+    im32, = a2.plot([], [], 'o-', label='Roller Force')
+    im33, = a2.plot([], [], 'o-', label='Roller Force')
 
-    im34, = a1.plot([], [], 'o-.', label='Roller Pressure(N) - (R4H1)')
-    im35, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R4H2)')
-    im36, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R4H3)')
-    im37, = a1.plot([], [], 'o-', label='Roller Pressure(N) - (R4H4)')
-    im38, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im39, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im40, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
-    im41, = a2.plot([], [], 'o-', label='Roller Pressure(N)')
+    im34, = a1.plot([], [], 'o-', label='Roller Force - (R4H1)')
+    im35, = a1.plot([], [], 'o-', label='Roller Force - (R4H2)')
+    im36, = a1.plot([], [], 'o-', label='Roller Force - (R4H3)')
+    im37, = a1.plot([], [], 'o-', label='Roller Force - (R4H4)')
+    im38, = a2.plot([], [], 'o-', label='Roller Force')
+    im39, = a2.plot([], [], 'o-', label='Roller Force')
+    im40, = a2.plot([], [], 'o-', label='Roller Force')
+    im41, = a2.plot([], [], 'o-', label='Roller Force')
 
     # Statistical Feed ---------------------------------------[]
-    a3.text(0.466, 0.945, 'Performance Feed - RP', fontsize=16, fontweight='bold', ha='center', va='center',
+    a3.text(0.466, 0.945, 'Performance Feed - RF', fontsize=16, fontweight='bold', ha='center', va='center',
             transform=a3.transAxes)
     # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
     rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
@@ -370,17 +441,17 @@ def RollerPressure(vCounter, pType):
     a3.add_patch(rect1)
     a3.add_patch(rect2)
     # ------- Process Performance Pp (the spread)---------------------
-    a3.text(0.145, 0.804, rplabel, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
+    a3.text(0.145, 0.804, rflabel, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
     a3.text(0.328, 0.658, '#Pp', fontsize=28, fontweight='bold', ha='center', transform=a3.transAxes)
-    a3.text(0.650, 0.820, 'Ring ' + rplabel + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
+    a3.text(0.650, 0.820, 'Ring ' + rflabel + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
     a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
     a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
     a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
     a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
     # ------- Process Performance Ppk (Performance)--------------------#
-    a3.text(0.145, 0.403, rpPerf, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
+    a3.text(0.145, 0.403, rfPerf, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
     a3.text(0.328, 0.282, '#Ppk', fontsize=28, fontweight='bold', ha='center', transform=a3.transAxes)
-    a3.text(0.640, 0.420, 'Ring ' + rpPerf + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
+    a3.text(0.640, 0.420, 'Ring ' + rfPerf + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
     # -----------------------------------------------------------------#
     a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
     a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
@@ -392,15 +463,16 @@ def RollerPressure(vCounter, pType):
     a3.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a3.transAxes)
 
     # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-    def synchronousRP(wsSize, wsgType, fetchT):
-        fetch_no = str(fetchT)  # entry value in string sql syntax
+    def synchronousRP(rfSize, rfgType, fetchT):
+        fetch_no = str(fetchT)          # entry value in string sql syntax
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:  # Load CommsPlc class once
-            import CommsSql as q
+        if not inUseAlready:            # Load Comms Plc class once
+            import CommsPlc as q
             q.DAQ_connect(1, 0)
         else:
-            qRP = conn.cursor()
+            con_rf = conn.cursor()
+
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
         """
         Load watchdog function with synchronous function every seconds
@@ -415,26 +487,12 @@ def RollerPressure(vCounter, pType):
         # Define PLC/SMC error state -------------------------------------------#
 
         while True:
-            # print('Indefinite looping...')
-            if not UsePLC_DBS:                                  # Not Using PLC Data
-                import ArrayRP_sqlRLmethod as lq                # DrLabs optimization method
-                inProgress = True                               # True for RetroPlay mode
-                print('\nAsynchronous controller activated...')
-                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+            if UsePLC_DBS:  # Not Using PLC Data
+                import plcArrayRLmethodRF as srf  # DrLabs optimization method
 
-                # Get list of relevant SQL Tables using conn() --------------------[]
-                rpData = lq.sqlexec(rpSize, rpgType, qRP, tblID, fetchT)
-                if keyboard.is_pressed("Alt+Q"):                # Terminate file-fetch
-                    qRP.close()
-                    print('SQL End of File, connection closes after 30 mins...')
-                    time.sleep(60)
-                    continue
-                else:
-                    print('\nUpdating....')
-
-            else:
-                inProgress = False  # False for Real-time mode
+                inProgress = True  # True for RetroPlay mode
                 print('\nSynchronous controller activated...')
+
                 if not sysRun:
                     sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
                 print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
@@ -452,39 +510,78 @@ def RollerPressure(vCounter, pType):
 
                 # Play visualization ----------------------------------------------[]
                 print("Visualization in Play Mode...")
-                # play(nudge)     # audible alert
-
                 # -----------------------------------------------------------------[]
-                # Allow selective runtime parameter selection on production critical process
-                procID = 'RP'
-                rpData = q.paramDataRequest(procID, rpSize, rpgType, fetch_no)
 
-        return rpData
+                # Allow selective runtime parameter selection on production critical process
+                procID = 'RF'
+                rfData = srf.paramDataRequest(procID, rfSize, rfgType, fetch_no)
+
+            else:
+                import sqlArrayRLmethodRF as srf     # DrLabs optimization method
+
+                inProgress = True  # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                if keyboard.is_pressed("Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        print("\nVisualization in Paused Mode...")
+                    else:
+                        autoSpcPause = False
+                        print("Visualization in Real-time Mode...")
+                else:
+                    # Get list of relevant SQL Tables using conn() --------------------[]
+                    rfData = srf.sqlexec(rfSize, rfgType, con_rf, T1, fetchT)
+
+                # ------ Inhibit iteration ----------------------------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class ---------------------
+                """
+                # TODO --- values for inhibiting the SQL processing
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    con_rf.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
+
+        return rfData
 
     # ================== End of synchronous Method ==========================
-    def asynchronousRP(db_freq):
-
+    def asynchronousRF(db_freq):
         timei = time.time()  # start timing the entire loop
-        UsePLC_DBS = pType  # Query Type
 
         # Call data loader Method---------------------------#
-        rpData = synchronousRP(rpSize, rpgType, db_freq)  # data loading functions
+        rfData = synchronousRP(rfSize, rfgType, db_freq)  # data loading functions
+        # --------------------------------------------------#
+
         if UsePLC_DBS == 1:
-            import VarPLCrf as qrf
+            import VarPLCrf as rf
+
             viz_cycle = 10
             # Call synchronous data function ---------------[]
-            columns = qp.validCols('RP')                    # Load defined valid columns for PLC Data
-            df1 = pd.DataFrame(rpData, columns=columns)     # Include table data into python Dataframe
-            RP = qrf.loadProcesValues(df1)                  # Join data values under dataframe
+            columns = qrf.validCols(T1)                    # Load defined valid columns for PLC Data
+            df1 = pd.DataFrame(rfData, columns=columns)    # Include table data into python Dataframe
+            RF = rf.loadProcesValues(df1)                  # Join data values under dataframe
 
         else:
-            import rfVarSQL as qrf                          # load SQL variables column names | rfVarSQL
+            import rfVarSQL as rf                          # load SQL variables column names | rfVarSQL
+
             viz_cycle = 150
-            g1 = qp.validCols('RP')                         # Construct Data Column selSqlColumnsTFM.py
-            df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
-            RP = qrf.loadProcesValues(df1)                  # Join data values under dataframe
+            g1 = qrf.validCols(T1)                         # Construct Data Column selSqlColumnsTFM.py
+            df1 = pd.DataFrame(rfData, columns=g1)         # Import into python Dataframe
+            RF = rf.loadProcesValues(df1)                  # Join data values under dataframe
+
         print('\nSQL Content', df1.head(10))
-        print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+        print("Memory Usage:", df1.info(verbose=False))    # Check memory utilization
 
         # -------------------------------------------------------------------------------------[]
         # Plot X-Axis data points -------- X Plot
@@ -523,64 +620,64 @@ def RollerPressure(vCounter, pType):
         im41.set_xdata(np.arange(db_freq))
 
         # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-        im10.set_ydata((RP[0]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 1
-        im11.set_ydata((RP[1]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 2
-        im12.set_ydata((RP[2]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 3
-        im13.set_ydata((RP[3]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 4
+        im10.set_ydata((RF[0]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 1
+        im11.set_ydata((RF[1]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 2
+        im12.set_ydata((RF[2]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 3
+        im13.set_ydata((RF[3]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 4
         # ------ Evaluate Pp for Ring 1 ---------#
-        mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(rpHL, rpSize, 'RP')
+        mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(rfHL, rfSize, 'RF')
         # ---------------------------------------#
-        im14.set_ydata((RP[4]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 1
-        im15.set_ydata((RP[5]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 2
-        im16.set_ydata((RP[6]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 3
-        im17.set_ydata((RP[7]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 4
+        im14.set_ydata((RF[4]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 1
+        im15.set_ydata((RF[5]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 2
+        im16.set_ydata((RF[6]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 3
+        im17.set_ydata((RF[7]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 4
         # ------ Evaluate Pp for Ring 2 ---------#
-        mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(rpHL, rpSize, 'RP')
+        mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(rfHL, rfSize, 'RF')
         # ---------------------------------------#
-        im18.set_ydata((RP[8]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 1
-        im19.set_ydata((RP[9]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 2
-        im20.set_ydata((RP[10]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 3
-        im21.set_ydata((RP[11]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 4
+        im18.set_ydata((RF[8]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 1
+        im19.set_ydata((RF[9]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 2
+        im20.set_ydata((RF[10]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 3
+        im21.set_ydata((RF[11]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 4
         # ------ Evaluate Pp for Ring 3 ---------#
-        mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(rpHL, rpSize, 'RP')
+        mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(rfHL, rfSize, 'RF')
         # ---------------------------------------#
-        im22.set_ydata((RP[12]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 1
-        im23.set_ydata((RP[13]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 2
-        im24.set_ydata((RP[14]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 3
-        im25.set_ydata((RP[15]).rolling(window=rpSize, min_periods=1).mean()[0:db_freq])  # head 4
+        im22.set_ydata((RF[12]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 1
+        im23.set_ydata((RF[13]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 2
+        im24.set_ydata((RF[14]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 3
+        im25.set_ydata((RF[15]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 4
         # ------ Evaluate Pp for Ring 4 ---------#
-        mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(rpHL, rpSize, 'RP')
+        mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(rfHL, rfSize, 'RF')
         # ---------------------------------------#
         # S Plot Y-Axis data points for StdDev ----------------------------------------
-        im26.set_ydata((RP[0]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im27.set_ydata((RP[1]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im28.set_ydata((RP[2]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im29.set_ydata((RP[3]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
+        im26.set_ydata((RF[0]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im27.set_ydata((RF[1]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im28.set_ydata((RF[2]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im29.set_ydata((RF[3]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
 
-        im30.set_ydata((RP[4]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im31.set_ydata((RP[5]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im32.set_ydata((RP[6]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im33.set_ydata((RP[7]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
+        im30.set_ydata((RF[4]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im31.set_ydata((RF[5]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im32.set_ydata((RF[6]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im33.set_ydata((RF[7]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
 
-        im34.set_ydata((RP[8]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im35.set_ydata((RP[9]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im36.set_ydata((RP[10]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im37.set_ydata((RP[11]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
+        im34.set_ydata((RF[8]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im35.set_ydata((RF[9]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im36.set_ydata((RF[10]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im37.set_ydata((RF[11]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
 
-        im38.set_ydata((RP[12]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im39.set_ydata((RP[13]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im40.set_ydata((RP[14]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
-        im41.set_ydata((RP[15]).rolling(window=rpSize, min_periods=1).std()[0:db_freq])
+        im38.set_ydata((RF[12]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im39.set_ydata((RF[13]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im40.set_ydata((RF[14]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+        im41.set_ydata((RF[15]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
         # Compute entire Process Capability -----------#
-        if not rpHL:
-            mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLa, dLCLa, ppT, pkT, xline, sline = tq.tAutoPerf(rpSize, mnA, mnB,
+        if not rfHL:
+            mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLa, dLCLa, ppT, pkT, xline, sline = tq.tAutoPerf(rfSize, mnA, mnB,
                                                                                                   mnC, mnD, sdA,
                                                                                                   sdB, sdC, sdD)
         else:
-            xline, sline = rpMean, rpDev
+            xline, sline = rfMean, rfDev
             mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLa, dLCLa, ppT, pkT = tq.tManualPerf(mnA, mnB, mnC, mnD, sdA, sdB,
-                                                                                      sdC, sdD, rpUSL, rpLSL, rpUCL,
-                                                                                       rpLCL)
+                                                                                      sdC, sdD, rfUSL, rfLSL, rfUCL,
+                                                                                       rfLCL)
 
         # # Declare Plots attributes --------------------------------------------------------[]
         # XBar Mean Plot
@@ -591,9 +688,9 @@ def RollerPressure(vCounter, pType):
         # ---------------------- sBar_minTT, sBar_maxTT -------[]
         # Define Legend's Attributes  ----
         a2.axhline(y=sline, color="blue", linestyle="--", linewidth=0.8)
-        a2.axhspan(sLCLrp, sUCLrp, facecolor='#F9C0FD', edgecolor='#F9C0FD')        # 1 Sigma Span
-        a2.axhspan(sUCLrp, sBar_maxRP, facecolor='#CCCCFF', edgecolor='#CCCCFF')    # 1 Sigma above the Mean
-        a2.axhspan(sBar_minRP, sLCLrp, facecolor='#CCCCFF', edgecolor='#CCCCFF')
+        a2.axhspan(sLCLrf, sUCLrf, facecolor='#F9C0FD', edgecolor='#F9C0FD')        # 1 Sigma Span
+        a2.axhspan(sUCLrf, sBar_maxRF, facecolor='#CCCCFF', edgecolor='#CCCCFF')    # 1 Sigma above the Mean
+        a2.axhspan(sBar_minRF, sLCLrf, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
         # Setting up the parameters for moving windows Axes ---------------------------------[]
         if db_freq > window_Xmax:
@@ -605,13 +702,13 @@ def RollerPressure(vCounter, pType):
 
         # Set trip line for individual time-series plot -----------------------------------[R1]
         import triggerModule as sigma
-        sigma.trigViolations(a1, UsePLC_DBS, 'RP', YScale_minRP, YScale_maxRP, xucT, xlcT, xusT, xlsT, mnT, sdT)
+        sigma.trigViolations(a1, UsePLC_DBS, 'RF', YScale_minRF, YScale_maxRF, xucT, xlcT, xusT, xlsT, mnT, sdT)
 
         timef = time.time()
         lapsedT = timef - timei
         print(f"\nProcess Interval: {lapsedT} sec\n")
 
-        ani = FuncAnimation(fig, asynchronousRP, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
+        ani = FuncAnimation(fig, asynchronousRF, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
                             blit=False)
         plt.tight_layout()
         plt.show()
@@ -624,8 +721,8 @@ def RollerPressure(vCounter, pType):
 
 
 # -----------------------------------------------------------------------------------------
-def TapeTemperature(vCounter, pType):
-    # def LaserPressure(hMeanC, hDevC, hLCLc, hUCLc, hUSLc, hLSLc, dLCLc, dUCLc, plabel, PPerf, pPos, layer, eSMC):
+def ttProcessParam(vCounter, pType):
+
     root = Tk()
     root.title('mPipe Production: Synchronous SPC - Viz: ' + vCounter)
     root.geometry("1800x800")
@@ -728,19 +825,17 @@ def TapeTemperature(vCounter, pType):
 
     # ------------------------------------[End of Tape Temperature Abstraction]
     label = ttk.Label(root,
-                      text='DNV Parameter [TT] - [' + pType + ' Mode] - ' + strftime("%a, %d %b %Y", gmtime()),
+                      text='Tape Temperature [TT] - [' + pType + ' Mode] - ' + strftime("%a, %d %b %Y", gmtime()),
                       font=LARGE_FONT)
     label.pack(pady=10, padx=10)
 
     # Define Axes ---------------------#
     fig = Figure(figsize=(25, 13), dpi=100)
-
     # fig = Figure(figsize=(self.winfo_screenwidth(), self.winfo_screenheight()), dpi=100)
     fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
-    a1 = fig.add_subplot(2, 5, (1, 4))                      # X Bar Plot
-    a2 = fig.add_subplot(2, 5, (8, 9))                      # Ramp Profile
-    a3 = fig.add_subplot(2, 5, (6, 7))                      # S Bar Plot
-    a4 = fig.add_subplot(2, 5, (5, 10))                     # Performance Feeed
+    a1 = fig.add_subplot(2, 6, (1, 3))                        # xbar plot
+    a2 = fig.add_subplot(2, 6, (7, 9))                        # s bar plot
+    a3 = fig.add_subplot(2, 6, (4, 12))                       # void mapping profile
 
     # Declare Plots attributes -----------------------------[]
     plt.rcParams.update({'font.size': 7})
@@ -748,103 +843,91 @@ def TapeTemperature(vCounter, pType):
     YScale_minTT, YScale_maxTT = ttLSL - 8.5, ttUSL + 8.5   # Roller Force
     sBar_minTT, sBar_maxTT = sLCLtt - 80, sUCLtt + 80       # Calibrate Y-axis for S-Plot
     window_Xmin, window_Xmax = 0, (int(ttSize) + 3)         # windows view = visible data points
+    # ----------------------------------------------------------#
+    YScale_minRM, YScale_maxRM = 0, pExLayer                # Valid layer number
+    window_XminRM, window_XmaxRM = 0, pLength               # Get details from SCADA PIpe Recipe TODO[1]
+
+    # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
+    if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
+        print('\n DNV 4 params condition met....', OT, CT, RP, WS)
+        T1 = WON + '_TT'  # Tape Temperature
+        T2 = WON + '_RM'  # Ramp Profile Mapping
+    else:
+        pass
 
     # Declare Plots attributes --------------------------------#
     a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-    a3.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
-    a1.set_title('Tape Temperature [XBar Plot]', fontsize=12, fontweight='bold')
-    a3.set_title('Tape Temperature [S Plot]', fontsize=12, fontweight='bold')
-    a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-    a3.grid(color="0.5", linestyle='-', linewidth=0.5)
-    a1.legend(loc='upper right', title='Tape Temperature Control Plot')
-    a3.legend(loc='upper right', title='Sigma curve')
-    a2.legend(loc='upper right', title='Ramp Profile')
-    a2.set_ylabel("Cumulated & Nominal Layer")
-    a2.set_xlabel("Sample Distance (mt)")
+    a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
 
-    # Initialise runtime limits --------------------------------#
+    a1.set_title('Tape Temperature [XBar]', fontsize=12, fontweight='bold')
+    a2.set_title('Tape Temperature [StDev]', fontsize=12, fontweight='bold')
+    a3.set_title('Ramp Mapping Profile - [RMP]', fontsize=12, fontweight='bold')
+    a3.set_facecolor("blue")            # set background color to blue
+    zoom_factory(a3)                    # Allow plot's image  zooming
+
+    a3.set_ylabel("2D - Staked Layer Ramp Mapping")
+    a3.set_xlabel("Sample Distance (mt)")
+
+    a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+    a2.grid(color="0.5", linestyle='-', linewidth=0.5)
+    a3.grid(color="0.5", linestyle='-', linewidth=0.5)
+
+    a1.legend(loc='upper right', title='Tape Temperature')
+    a2.legend(loc='upper right', title='Sigma Plot')
+    a3.legend(loc='upper right', title='Temp Ramp Profile')
+    # ----------------------------------------------------------#
     a1.set_ylim([YScale_minTT, YScale_maxTT], auto=True)
     a1.set_xlim([window_Xmin, window_Xmax])
     # ----------------------------------------------------------#
     a2.set_ylim([sBar_minTT, sBar_maxTT], auto=True)
     a2.set_xlim([window_Xmin, window_Xmax])
-
-    # ---------------------------------------------------------[]
-    a4.cla()
-    a4.get_yaxis().set_visible(False)
-    a4.get_xaxis().set_visible(False)
+    # --------------------------------------------------------[]
+    a3.set_ylim([YScale_minRM, YScale_maxRM], auto=True)
+    a3.set_xlim([window_XminRM, window_XmaxRM])
 
     # ---------------------------------------------------------[]
     # Define Plot area and axes -
     # ---------------------------------------------------------#
-    im10, = a1.plot([], [], 'o-.', label='Tape Temp(°C) - (R1H1)')
-    im11, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R1H2)')
-    im12, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R1H3)')
-    im13, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R1H4)')
-    im14, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im15, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im16, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im17, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
+    im10, = a1.plot([], [], 'o-', label='Tape Temp - (R1H1)')
+    im11, = a1.plot([], [], 'o-', label='Tape Temp - (R1H2)')
+    im12, = a1.plot([], [], 'o-', label='Tape Temp - (R1H3)')
+    im13, = a1.plot([], [], 'o-', label='Tape Temp - (R1H4)')
+    im14, = a2.plot([], [], 'o-', label='Tape Temp')
+    im15, = a2.plot([], [], 'o-', label='Tape Temp')
+    im16, = a2.plot([], [], 'o-', label='Tape Temp')
+    im17, = a2.plot([], [], 'o-', label='Tape Temp')
 
-    im18, = a1.plot([], [], 'o-.', label='Tape Temp(°C) - (R2H1)')
-    im19, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R2H2)')
-    im20, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R2H3)')
-    im21, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R2H4)')
-    im22, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im23, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im24, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im25, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
+    im18, = a1.plot([], [], 'o-', label='Tape Temp - (R2H1)')
+    im19, = a1.plot([], [], 'o-', label='Tape Temp - (R2H2)')
+    im20, = a1.plot([], [], 'o-', label='Tape Temp - (R2H3)')
+    im21, = a1.plot([], [], 'o-', label='Tape Temp - (R2H4)')
+    im22, = a2.plot([], [], 'o-', label='Tape Temp')
+    im23, = a2.plot([], [], 'o-', label='Tape Temp')
+    im24, = a2.plot([], [], 'o-', label='Tape Temp')
+    im25, = a2.plot([], [], 'o-', label='Tape Temp')
 
-    im26, = a1.plot([], [], 'o-.', label='Tape Temp(°C) - (R3H1)')
-    im27, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R3H2)')
-    im28, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R3H3)')
-    im29, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R3H4)')
-    im30, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im31, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im32, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im33, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
+    im26, = a1.plot([], [], 'o-', label='Tape Temp - (R3H1)')
+    im27, = a1.plot([], [], 'o-', label='Tape Temp - (R3H2)')
+    im28, = a1.plot([], [], 'o-', label='Tape Temp - (R3H3)')
+    im29, = a1.plot([], [], 'o-', label='Tape Temp - (R3H4)')
+    im30, = a2.plot([], [], 'o-', label='Tape Temp')
+    im31, = a2.plot([], [], 'o-', label='Tape Temp')
+    im32, = a2.plot([], [], 'o-', label='Tape Temp')
+    im33, = a2.plot([], [], 'o-', label='Tape Temp')
 
-    im34, = a1.plot([], [], 'o-.', label='Tape Temp(°C) - (R4H1)')
-    im35, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R4H2)')
-    im36, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R4H3)')
-    im37, = a1.plot([], [], 'o-', label='Tape Temp(°C) - (R4H4)')
-    im38, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im39, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im40, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    im41, = a3.plot([], [], 'o-', label='Tape Temp(°C)')
-    # --------------- Ramp Profile ---------------------------
-    im42, = a2.plot([], [], 'o-', label='Cumulated Ramp')
-    im43, = a2.plot([], [], 'o-', label='Nominal Ramp')
-
-    # Statistical Feed ------------------------------------[]
-    a4.text(0.466, 0.945, 'Performance Feed - TT', fontsize=16, fontweight='bold', ha='center', va='center',
-            transform=a4.transAxes)
-    # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
-    rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
-    rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
-    a4.add_patch(rect1)
-    a4.add_patch(rect2)
-    # ------- Process Performance Pp (the spread)---------------------
-    a4.text(0.145, 0.804, ttlabel, fontsize=12, fontweight='bold', ha='center', transform=a4.transAxes)
-    a4.text(0.328, 0.658, '#Pp', fontsize=28, fontweight='bold', ha='center', transform=a4.transAxes)
-    a4.text(0.650, 0.820, 'Ring ' + ttlabel + ' Data', fontsize=14, ha='left', transform=a4.transAxes)
-    a4.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a4.transAxes)
-    a4.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a4.transAxes)
-    a4.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a4.transAxes)
-    a4.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a4.transAxes)
-    # ------- Process Performance Ppk (Performance)--------------------#
-    a4.text(0.145, 0.403, ttPerf, fontsize=12, fontweight='bold', ha='center', transform=a4.transAxes)
-    a4.text(0.328, 0.282, '#Ppk', fontsize=28, fontweight='bold', ha='center', transform=a4.transAxes)
-    a4.text(0.640, 0.420, 'Ring ' + ttPerf + ' Data', fontsize=14, ha='left', transform=a4.transAxes)
-    # -----------------------------------------------------------------#
-    a4.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a4.transAxes)
-    a4.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a4.transAxes)
-    a4.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a4.transAxes)
-    a4.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a4.transAxes)
-    # ----- Pipe Position and SMC Status -----
-    a4.text(0.080, 0.090, 'Pipe Position: ' + pPos + '    Processing Layer #' + layer, fontsize=12, ha='left',
-            transform=a4.transAxes)
-    a4.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a4.transAxes)
+    im34, = a1.plot([], [], 'o-', label='Tape Temp - (R4H1)')
+    im35, = a1.plot([], [], 'o-', label='Tape Temp - (R4H2)')
+    im36, = a1.plot([], [], 'o-', label='Tape Temp - (R4H3)')
+    im37, = a1.plot([], [], 'o-', label='Tape Temp - (R4H4)')
+    im38, = a2.plot([], [], 'o-', label='Tape Temp')
+    im39, = a2.plot([], [], 'o-', label='Tape Temp')
+    im40, = a2.plot([], [], 'o-', label='Tape Temp')
+    im41, = a2.plot([], [], 'o-', label='Tape Temp')
+    # --------------- Temperature Ramp Profile -------------------[ Important ]
+    im42 = a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 1 Ramp')
+    im43 = a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 2 Ramp')
+    im44 = a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 3 Ramp')
+    im45 = a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 4 Ramp')
 
     # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
     def synchronousTT(ttSize, ttgType, fetchT):
@@ -855,11 +938,12 @@ def TapeTemperature(vCounter, pType):
             import CommsSql as q
             q.DAQ_connect(1, 0)
         else:
-            qRP = conn.cursor()
+            con_tt = conn.cursor()
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
         """
         Load watchdog function with synchronous function every seconds
         """
+
         # Initialise RT variables ---[]
         autoSpcRun = True
         autoSpcPause = False
@@ -871,8 +955,9 @@ def TapeTemperature(vCounter, pType):
 
         while True:
             # print('Indefinite looping...')
-            if not UsePLC_DBS:                                  # Not Using PLC Data
-                import ArrayRP_sqlRLmethod as lq                # DrLabs optimization method
+            if UsePLC_DBS:                                      # Not Using PLC Data
+                import plcArrayRLmethodTT as pdA                # DrLabs optimization method
+
                 inProgress = True                               # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
                 print('DrLabs' + "' Runtime Optimisation is Enabled!")
@@ -1154,7 +1239,7 @@ def TapeTemperature(vCounter, pType):
 
 
 # -------------------------------------------------------------------------[]
-def SubstrateTemp(vCounter, pType):
+def stProcessParam(vCounter, pType):
     # def LaserPressure(hMeanC, hDevC, hLCLc, hUCLc, hUSLc, hLSLc, dLCLc, dUCLc, plabel, PPerf, pPos, layer, eSMC):
     root = Tk()
     root.title('mPipe Production: Synchronous SPC - Viz: ' + vCounter)
@@ -1982,7 +2067,7 @@ def WindingSpeed(vCounter, pType):
     root.mainloop()
 
 
-def tapeGap(vCounter, pType):
+def tgProcessParam(vCounter, pType):
     # def LaserPressure(hMeanC, hDevC, hLCLc, hUCLc, hUSLc, hLSLc, dLCLc, dUCLc, plabel, PPerf, pPos, layer, eSMC):
     root = Tk()
     root.title('mPipe Production: Synchronous SPC - Viz: ' + vCounter)
@@ -2027,7 +2112,7 @@ def tapeGap(vCounter, pType):
 
     # -----------------------------------------------------[End of Tape Gap]
     label = ttk.Label(root,
-                      text='DNV Parameter [TG] - [' + pType + ' Mode] - ' + strftime("%a, %d %b %Y", gmtime()),
+                      text='Tape Gap Parameter [TG] - [' + pType + ' Mode] - ' + strftime("%a, %d %b %Y", gmtime()),
                       font=LARGE_FONT)
     label.pack(pady=10, padx=10)
 
@@ -2482,29 +2567,47 @@ def tapeGap(vCounter, pType):
 
 # ---------------------- Port windows into parallel processing ----------[]
 
-def myMain(qType):
-    # global pType
-    pType = qType
-    # runType.append(pType)
-    print('\nP-Type..:', pType)
-    # if GPU -------------------------------------------------#
-    p1 = Process(target=RollerPressure, args=(countA, pType))           #, name="CascadeRF")
-    p2 = Process(target=TapeTemperature, args=(countB, pType))          #, name="CascadeTT")
-    p3 = Process(target=SubstrateTemp, args=(countC, pType))            #, name="CascadeST")
-    p4 = Process(target=WindingSpeed, args=(countD, pType))             # , name="CascadeTS")
-    p5 = Process(target=tapeGap, args=(countE, pType))                  #, name="CascadeTG")
+def myMain(qType, ProcID, daq):
+    global pType, conn
 
-    p1.start()                                                          # Quality parameter 1
-    p2.start()                                                          # Quality parameter 2
-    p3.start()                                                          # Quality parameter 3
-    p4.start()                                                          # Quality parameter 4
-    p5.start()                                                          # Quality parameter 5
+    pType = qType
+    conn = daq
+
+    print('\nP-Type..:', pType)
+    if ProcID == 'DNV':
+        # if GPU -------------------------------------------------#
+        p1 = Process(target=ttProcessParam, args=(countA, pType))          #, name="CascadeTT")
+        p2 = Process(target=stProcessParam, args=(countB, pType))          #, name="CascadeST")
+        p3 = Process(target=tgProcessParam, args=(countC, pType))          #, name="CascadeTG")
+        # -------------------------------
+        p1.start()  # Quality parameter 1
+        p2.start()  # Quality parameter 2
+        p3.start()  # Quality parameter 3
+    else:
+        # if GPU -------------------------------------------------#
+        p1 = Process(target=lpProcessParam, args=(countA, pType))           # , name="CascadeRF")
+        p2 = Process(target=laProcessParam, args=(countB, pType))           # , name="CascadeTT")
+        p3 = Process(target=tpProcessParam, args=(countC, pType))           # , name="CascadeST")
+        p4 = Process(target=rfProcessParam, args=(countD, pType))           # , name="CascadeTS")
+        p5 = Process(target=ttProcessParam, args=(countE, pType))           # , name="CascadeTG")
+        p6 = Process(target=stProcessParam, args=(countF, pType))           # , name="CascadeTG")
+        p7 = Process(target=tgProcessParam, args=(countG, pType))           # , name="CascadeTG")
+
+        p1.start()                                                          # Quality parameter 1
+        p2.start()                                                          # Quality parameter 2
+        p3.start()                                                          # Quality parameter 3
+        p4.start()                                                          # Quality parameter 4
+        p5.start()                                                          # Quality parameter 5
+        p6.start()  # Quality parameter 4
+        p7.start()
     # --------------------- Join the threads -------------------#
     print('\nP1 #:', p1)
     print('P2 #:', p2)
     print('P3 #:', p3)
-    print('P4 #:', p4)
-    print('P5 #:', p5)
+    # print('P4 #:', p4)
+    # print('P5 #:', p5)
+    # print('P5 #:', p6)
+    # print('P5 #:', p7)
     # print('Proces 1', p1.pid) # display only the process number(int)
     # print('Proces 2', p2.pid)
     # print('Proces 3', p3.pid)
