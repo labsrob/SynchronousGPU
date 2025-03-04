@@ -3335,56 +3335,56 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 # ---------------------- Port windows into parallel processing ----------[]
 
 def myMain(qType, ProcID):
-    global pType, pParam, smp_Sz, stp_Sz
+    global pType, pParam, smp_Sz, stp_Sz # , p1, p2, p3, p4, p5, p6, p7
 
     pType = qType
-    # conn = daq
     pParam = ProcID
 
     # print('\nP-Type..:', pType)
     if ProcID == 'DNV':
         # if GPU -------------------------------------------------#
-        p1 = Process(target=ttProcessParam, args=(countA, pType))          #, name="CascadeTT")
-        p2 = Process(target=stProcessParam, args=(countB, pType))          #, name="CascadeST")
-        p3 = Process(target=tgProcessParam, args=(countC, pType))          #, name="CascadeTG")
+        p1 = Process(target=ttProcessParam, args=(countA, pType))          # name="CascadeTT")
+        p2 = Process(target=stProcessParam, args=(countB, pType))          # name="CascadeST")
+        p3 = Process(target=tgProcessParam, args=(countC, pType))          # name="CascadeTG")
         p4 = 0
         p5 = 0
         p6 = 0
         p7 = 0
-        # -------------------------------
-        p1.start()  # Quality parameter 1
-        p2.start()  # Quality parameter 2
-        p3.start()  # Quality parameter 3
+        # --------------------------------------------------------#
+        p1.start()                                                          # Quality parameter 1
+        p2.start()                                                          # Quality parameter 2
+        p3.start()                                                          # Quality parameter 3
 
     elif ProcID == 'MGM':
         # if GPU -------------------------------------------------#
-        p1 = Process(target=lpProcessParam, args=(countA, pType))           # , name="CascadeRF")
-        p2 = Process(target=laProcessParam, args=(countB, pType))           # , name="CascadeTT")
-        p3 = Process(target=tpProcessParam, args=(countC, pType))           # , name="CascadeST")
-        p4 = Process(target=rfProcessParam, args=(countD, pType))           # , name="CascadeTS")
-        p5 = Process(target=ttProcessParam, args=(countE, pType))           # , name="CascadeTG")
-        p6 = Process(target=stProcessParam, args=(countF, pType))           # , name="CascadeTG")
-        p7 = Process(target=tgProcessParam, args=(countG, pType))           # , name="CascadeTG")
+        p1 = Process(target=lpProcessParam, args=(countA, pType))           # name="CascadeRF")
+        p2 = Process(target=laProcessParam, args=(countB, pType))           # name="CascadeTT")
+        p3 = Process(target=tpProcessParam, args=(countC, pType))           # name="CascadeST")
+        p4 = Process(target=rfProcessParam, args=(countD, pType))           # name="CascadeTS")
+        p5 = Process(target=ttProcessParam, args=(countE, pType))           # name="CascadeTG")
+        p6 = Process(target=stProcessParam, args=(countF, pType))           # name="CascadeTG")
+        p7 = Process(target=tgProcessParam, args=(countG, pType))           # name="CascadeTG")
 
         p1.start()                                                          # Quality parameter 1
         p2.start()                                                          # Quality parameter 2
         p3.start()                                                          # Quality parameter 3
         p4.start()                                                          # Quality parameter 4
         p5.start()                                                          # Quality parameter 5
-        p6.start()  # Quality parameter 4
+        p6.start()                                                          # Quality parameter 4
         p7.start()
+
     else:
         pass
+
     # --------------------- Join the threads -------------------#
-    print('\nP1 #:', p1)
-    print('P2 #:', p2)
-    print('P3 #:', p3)
+    # print('\nP1 #:', p1)
+    # print('P2 #:', p2)
+    # print('P3 #:', p3)
     # print('Proces 1', p1.pid)   # display only the process number(int)
     # print('Proces 2', p2.pid)
     # print('Proces 3', p3.pid)
     # print('Proces 1', p4.pid)
-    # # --------------------- Join the threads -----------------#
-
+    # --------------------- Join the threads -----------------#
     # returned values for evaluation and closing out of the process
 
     return p1, p2, p3, p4, p5, p6, p7

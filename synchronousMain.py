@@ -335,6 +335,7 @@ def menuExit():
 # ------------------------------------------------------------------------------------[ MAIN PROGRAM ]
 
 def tabbed_cascadeMode():  # Limited Tab default screen with multiple independent screens
+    global p1, p2, p3, p4, p5, p6, p7
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
@@ -342,6 +343,7 @@ def tabbed_cascadeMode():  # Limited Tab default screen with multiple independen
     s = ttk.Style()
     s.theme_use('default')  # Options: ('clam', 'alt', 'default', 'classic')
     s.configure('TNotebook.Tab', background="green3", foreground="black")
+
     # s.map("TNotebook", background=[("selected", "red3")]) ------------------------------------------#
     s.map("TNotebook.Tab", background=[("selected", "lightblue")], foreground=[("selected", "red")])
     # Hover color if needed....-----------------------------------------------------------------------#
@@ -351,16 +353,18 @@ def tabbed_cascadeMode():  # Limited Tab default screen with multiple independen
     common_climateProfile()                                     # environmental factors
     common_gapCount()                                           # Void gap count curve
 
-    # Load class object from CascadeSwticher Method ---[x]
+    # Load class object from Cascade Switcher Method -----------[x]
     import CascadeSwitcher as cs
-    p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe) # runtimeType, process RecipeType
+    p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe)      # runtimeType, process RecipeType
+    # ----------------------------------------------------------[]
 
-    # Set up embedding notebook (tabs) ----------------[B]
+    # Set up embedding notebook (tabs) ------------------------[B]
     notebook = ttk.Notebook(root, width=2500, height=850)       # Declare Tab overall Screen size
     notebook.grid(column=0, row=0, padx=10, pady=450)           # Tab's spatial position on the Parent
     tab1 = ttk.Frame(notebook)
     tab2 = ttk.Frame(notebook)
     tab3 = ttk.Frame(notebook)
+
     # Define common Tabb for DNV/MGM Procedure  ----------------#
     notebook.add(tab1, text="[Runtime Monitoring]")             # Default Min/Max x1
     notebook.add(tab2, text="EoL Report System")                # Report
@@ -9902,12 +9906,7 @@ def userMenu():     # listener, myplash
             if messagebox.askokcancel("Warning!!!", "Current Visualisation will be lost!"):
                 tabb_clearOut()                                           # Clear out existing Tabbed View
                 tabbed_cascadeMode()                                      # Default limited tabbed common screen
-
                 print('\nStarting new GPU thread...')
-                # call function for parallel pipeline --------------------#
-                import CascadeSwitcher as cs
-                p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe)
-                print('Proces 1', p1.pid, p2.pid, p3.pid, p4.pid, p5.pid, p6.pid, p7.pid)
                 exit_bit.append(1)
 
             else:
@@ -9924,10 +9923,6 @@ def userMenu():     # listener, myplash
             # --- start parallel thread ----------------------------------#
             # cascadeViews()                                              # Critical Production Params
             tabbed_cascadeMode()                                          # Default limited tabbed common screen + Casc
-
-            import CascadeSwitcher as cs
-            p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe)        # call function for parallel pipeline
-            print('Proces 2', p1.pid, p2.pid, p3.pid, p4.pid, p5.pid, p6.pid, p7.pid)
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
@@ -9941,10 +9936,6 @@ def userMenu():     # listener, myplash
             # --- start parallel thread --------------------------------#
             # cascadeViews()                                            # Critical Production Params
             tabbed_cascadeMode()                                        # Provide limited Tabb and multiple screen
-
-            import CascadeSwitcher as cs
-            p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe)      # call function for parallel pipeline
-            print('Proces 3', p1.pid, p2.pid, p3.pid, p4.pid, p5.pid, p6.pid, p7.pid)
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
