@@ -31,9 +31,6 @@ LARGE_FONT = ("Verdana", 12, 'bold')
 import matplotlib.patches as patches
 from mpl_interactions import ioff, panhandler, zoom_factory
 
-import qParamsHL_DNV as dq
-import qParamsHL_MGM as mq
-
 import rtP_Evaluator as tq
 # -------PLC/SQL Query --------#
 import selDataColsEV as qev     # Environmental Values
@@ -50,6 +47,9 @@ import selDataColsVC as qvc     # void (gap) count
 import selDataColsVM as qvm     # Void mapping
 import selDataColsEoL as eol    # End of Layer
 # -----------------------------#
+import pParamsHL as dd
+# import qParamsHL_DNV as dnv
+# import qParamsHL_MGM as mgm
 
 import subprocess
 try:
@@ -64,14 +64,14 @@ layer = str(10)
 # -------------------------------#
 WON = "275044"
 eSMC = 'Getting started...'
-countA = '01'
-countB = '02'
-countC = '03'
-countD = '04'
-countE = '05'
-countF = '06'
-countG = '07'
-countH = '08'
+countA = '02'
+countB = '03'
+countC = '04'
+countD = '05'
+countE = '06'
+countF = '07'
+countG = '08'
+countH = '09'
 # --------------------------------------- Common to all Process Procedures -------------------------[]
 cpTapeW, cpLayerNo, runType = [], [], []
 UsePLC_DBS = True
@@ -108,27 +108,32 @@ rtValues = []
 
 # ---- Common to all Process Procedures ---[]
 pRecipe = ""
+# Call function and load WON specification -----[]
+mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP = dd.decryptMetricsGeneral(WON)
+print('\nDecrypted Prod Parameters:', mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP)
 
-# Call function for configuration file ----[]
-if pParam == 'DNV':
-    sSize, gType, sSpace, enDNV, enAuto, enMGM, d1, d2, d3, d4, d5 = dq.decryptMetricspP(WON)
-elif pParam == 'MGM':
-    sSize, gType, sSpace, enDNV, enAuto, enMGM, d1, d2, d3, d4, d5 = mq.decryptMetricspP(WON)
+# ----------------------------------------------[]
+if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA) and not int(TP) and not int(RF):
+    pRecipe = 'DNV'
+    import qParamsHL_DNV as dnv
+elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
+    pRecipe = 'MGM'
+    import qParamsHL_MGM as mgm
 else:
-    pass            # reserved for user selection or bespoke selection
-print('\nDecrypted Prod Parameters:', d1, d2, d3, d4, d5)
+    pRecipe = 'USR'
+# ----------------------------------------------[]
 
 # ----------------------------------------------[ XXXX ]
-smp_Sz = int(sSize)                                   # Allow SCADA User to specify window sample size
-stp_Sz = gType                                        # Step Size (smp_St) Domino or Discrete group steps
-# ----------------------------------------------------[]
-if stp_Sz == 'GS-Discrete':
-    viz_cycle = 100
-elif stp_Sz == 'SS-Domino':
-    viz_cycle = 500
-else:
-    viz_cycle = 10
-print('\nGroup Type:', stp_Sz, 'Sample Size:', smp_Sz)
+# smp_Sz = int(sSize)                                   # Allow SCADA User to specify window sample size
+# stp_Sz = gType                                        # Step Size (smp_St) Domino or Discrete group steps
+# # ----------------------------------------------------[]
+# if stp_Sz == 'GS-Discrete':
+#     viz_cycle = 100
+# elif stp_Sz == 'SS-Domino':
+#     viz_cycle = 500
+# else:
+#     viz_cycle = 10
+# print('\nGroup Type:', stp_Sz, 'Sample Size:', smp_Sz)
 # ----------------------------------------------------[]
 
 
@@ -139,8 +144,13 @@ def rfProcessParam(vCounter, pType):
     root.geometry("1800x800")
 
     # Load Quality Historical Values ---------------[]
-    rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, dud3, dud4, dud5 = mq.decryptpProcessLim(WON, 'RF')
-    # Break down each element to useful list -------[Roller Pressure]
+    if pRecipe == 'DNV':
+        rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON,
+                                                                                                                   'RF')
+    else:
+        rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+                                                                                                                   'RF')
+    # Break down each element to useful list -------[Roller force]
 
     if rfHL and rfParam1 and rfParam2:  # Roller Pressure TODO - layer metrics to guide TCP01
         rfPerf = '$Pp_{k' + str(rfSize) + '}$'      # Using estimated or historical Mean
@@ -569,10 +579,14 @@ def ttProcessParam(vCounter, pType):
     root.geometry("1800x800")
 
     # Load Quality Historical Values -----------[]
-    ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = mq.decryptpProcessLim(
-        WON, 'TT')
-
+    if pRecipe == 'DNV':
+        ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = dnv.decryptpProcessLim(WON,
+                                                                                                                   'TT')
+    else:
+        ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = mgm.decryptpProcessLim(WON,
+                                                                                                                   'TT')
     # Break down each element to useful list ---------------[Tape Temperature]
+
     if ttHL and ttParam1 and ttParam2 and ttParam3 and ttParam4 and ttParam5:  #
         ttPerf = '$Pp_{k' + str(ttSize) + '}$'          # Using estimated or historical Mean
         ttlabel = 'Pp'
@@ -688,15 +702,11 @@ def ttProcessParam(vCounter, pType):
     YScale_minRM, YScale_maxRM = 0, pExLayer                # Valid layer number
     window_XminRM, window_XmaxRM = 0, pLength               # Get details from SCADA PIpe Recipe TODO[1]
 
-    # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-    if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
-        print('\n DNV 4 params condition met....', OT, CT, RP, WS)
-        T1 = WON + '_TT'  # Tape Temperature
-        T2 = WON + '_RM'  # Ramp Profile Mapping
-    else:
-        pass
-
-    # Declare Plots attributes --------------------------------#
+    # Real-Time Parameter according to updated requirements -# 07/Feb/2025
+    T1 = WON + '_TT'  # Tape Temperature
+    T2 = WON + '_RM'  # Ramp Profile Mapping
+    # -------------------------------------------------------#
+    # Declare Plots attributes ------------------------------#
     a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
     a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
 
@@ -1119,10 +1129,16 @@ def stProcessParam(vCounter, pType):
     root = Tk()
     root.title('mPipe Production: Synchronous SPC - Viz: ' + vCounter)
     root.geometry("1800x800")
-    # Load Quality Historical Values -----------[]
-    stSize, stgType, stSspace, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = mq.decryptpProcessLim(
-        WON, 'ST')
+
+    # Load Quality Historical Values ---------------------------------------[]
+    if pRecipe == 'DNV':
+        stSize, stgType, stSspace, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = dnv.decryptpProcessLim(
+            WON, 'ST')
+    else:
+        stSize, stgType, stSspace, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = mgm.decryptpProcessLim(
+            WON, 'ST')
     # Break down each element to useful list -----------[Substrate Temperature]
+
     if stHL and stParam1 and stParam2 and stParam3 and stParam4 and stParam5:
         stPerf = '$Pp_{k' + str(stSize) + '}$'  # Using estimated or historical Mean
         stlabel = 'Pp'
@@ -1590,8 +1606,12 @@ def tgProcessParam(vCounter, pType):
     root.title('mPipe Production: Synchronous SPC - Viz: ' + vCounter)
     root.geometry("1800x800")
 
-    # dimensions of the main window --------------------------------------[]
-    tgSize, tggType, tgSspace, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = mq.decryptpProcessLim(WON, 'TG')
+    # Load Quality Historical Values ---------------------------------------[]
+    if pRecipe == 'DNV':
+        tgSize, tggType, tgSspace, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON, 'TG')
+    else:
+        tgSize, tggType, tgSspace, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+                                                                                                                'TG')
 # Break down each element to useful list ----------------[Winding Speed]
 
     # Break down each element to useful list ---------------------[Tape Gap]
@@ -1624,7 +1644,7 @@ def tgProcessParam(vCounter, pType):
         sLCLtg = 0
         tgUSL = 0
         tgLSL = 0
-        tgPerf = '$Cp_{k' + str(sSize) + '}$'  # Using Automatic group Mean
+        tgPerf = '$Cp_{k' + str(tgSize) + '}$'  # Using Automatic group Mean
         tglabel = 'Cp'
 
     # ------------------------------------[End of Winding Speed Abstraction]
@@ -1637,17 +1657,17 @@ def tgProcessParam(vCounter, pType):
     fig = Figure(figsize=(25, 13), dpi=100)
     fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
     # ----------------------------------[]
-    a1 = fig.add_subplot(2, 6, (1, 3))        # xbar plot
-    a3 = fig.add_subplot(2, 6, (7, 9))        # s bar plot
-    a4 = fig.add_subplot(2, 6, (4, 12))       # void mapping profile
+    a1 = fig.add_subplot(2, 6, (1, 3))                      # xbar plot
+    a3 = fig.add_subplot(2, 6, (7, 9))                      # s bar plot
+    a4 = fig.add_subplot(2, 6, (4, 12))                     # void mapping profile
 
-    # Declare Plots attributes ---------------------------------[]
+    # Declare Plots attributes ----------------------------[]
     plt.rcParams.update({'font.size': 7})
-    # Calibrate limits for X-moving Axis -----------------------#
+    # Calibrate limits for X-moving Axis -------------------#
     YScale_minTG, YScale_maxTG = tgLSL - 8.5, tgUSL + 8.5   # Roller Force
     sBar_minTG, sBar_maxTG = sLCLtg - 80, sUCLtg + 80       # Calibrate Y-axis for S-Plot
-    window_Xmin, window_Xmax = 0, (smp_Sz + 3)              # windows view = visible data points
-    # ----------------------------------------------------------#
+    window_Xmin, window_Xmax = 0, 45              # windows view = visible data points
+    # ------------------------------------------------------#
     YScale_minVM, YScale_maxVM = 0, 80                      # Valid Void Mapping
     window_XminVM, window_XmaxVM = 0, 100000                # Get details from SCADA PIpe Recipe TODO[1]
 
@@ -1716,11 +1736,11 @@ def tgProcessParam(vCounter, pType):
     # a4.legend(handles=im26.legend_elements()[0], labels=rlabel, title='Void Map (%)')
 
     # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-    def synchronousTG(wsSize, wsgType, fetchT):
-        fetch_no = str(fetchT)      # entry value in string sql syntax
+    def synchronousTG(tgSize, tggType, fetchT):
+        fetch_no = str(fetchT)                  # entry value in string sql syntax
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:  # Load CommsPlc class once
+        if not inUseAlready:                # Load CommsPlc class once
             import CommsSql as q
             con_tg = q.DAQ_connect(1, 0)
         else:
@@ -1742,9 +1762,9 @@ def tgProcessParam(vCounter, pType):
         while True:
             # print('Indefinite looping...')
             if UsePLC_DBS:  # Not Using PLC Data
-                import plcArrayRLmethodTG as pdC  # DrLabs optimization method
+                import plcArrayRLmethodTG as pdC                # DrLabs optimization method
 
-                inProgress = True  # True for RetroPlay mode
+                inProgress = True                               # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
                 print('DrLabs' + "' Runtime Optimisation is Enabled!")
 
@@ -1764,18 +1784,18 @@ def tgProcessParam(vCounter, pType):
                     print("Visualization in Real-time Mode...")
                     # Get list of relevant SQL Tables using conn() --------------------[]
                     # tgData = pdC.sqlexec(smp_Sz, smp_St, con_tg, T1, fetchT)  # get details from PLC array
-                    tgData = q.paramDataRequest('TG', smp_Sz, smp_St, fetch_no)
+                    tgData = q.paramDataRequest('TG', tgSize, tggType, fetch_no)
 
             else:
                 import sqlArrayRLmethodTG as pdC
 
-                inProgress = False  # False for Real-time mode
+                inProgress = False                                  # False for Real-time mode
                 print('\nSynchronous controller activated...')
+
                 if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()     # Retrieve MSC from Watchdog
                 print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
-                # Either of the 2 combo variables are assigned to trigger routine pause
                 if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
                     print('\nProduction is pausing...')
                     if not autoSpcPause:
@@ -1787,7 +1807,7 @@ def tgProcessParam(vCounter, pType):
                         autoSpcPause = False
                     print("Visualization in Play Mode...")
                 else:
-                    tgData = pdC.sqlexec(smp_Sz, smp_St, con_tg, T1, fetchT)
+                    tgData = pdC.sqlexec(tgSize, tggType, con_tg, T1, fetchT)
                     print("Visualization in Play Mode...")
                 print('\nUpdating....')
 
@@ -1807,8 +1827,8 @@ def tgProcessParam(vCounter, pType):
         return tgData
 
     # ================== End of synchronous Method ==========================
-    def synchronousMP(db_freq):
-        timei = time.time()                                 # start timing the entire loop
+    def synchronousMP(tgSize, tggType, fetchT):
+        fetch_no = str(fetchT)                                 # start timing the entire loop
 
         # Obtain Data from SQL Repo ---------------------------[]
         con_vm = conn.cursor()  # Void mapping
@@ -1824,17 +1844,17 @@ def tgProcessParam(vCounter, pType):
         # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
         sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
         # Define PLC/SMC error state -------------------------------------------#
+
         while True:
-            # Latch on SQL Query only a
-            import sqlArrayRLmethodVM as svm  # DrLabs optimization method
+            import sqlArrayRLmethodVM as svm                    # DrLabs optimization method
 
-            inProgress = False  # True for RetroPlay mode
+            inProgress = False                                  # True for RetroPlay mode
             print('\nAsynchronous controller activated...')
-            if not sysRun:
-                sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
 
-            # Get list of relevant SQL Tables using conn() --------------------[]
-            if keyboard.is_pressed("Ctrl"):  # Terminate file-fetch
+            if not sysRun:
+                sysRun, msctcp, msc_rt = wd.autoPausePlay()     # Retrieve MSC from Watchdog
+
+            if keyboard.is_pressed("Ctrl"):                     # Terminate file-fetch
                 print('\nProduction is pausing...')
                 if not autoSpcPause:
                     autoSpcRun = not autoSpcRun
@@ -1850,8 +1870,9 @@ def tgProcessParam(vCounter, pType):
                 continue
 
             else:
-                vm_profile = svm.sqlexec(smp_Sz, stp_Sz, con_vm, T2, fetchT)  # perform DB connections
-                print('\nUpdating....')
+                vm_profile = svm.sqlexec(tgSize, tggType, con_vm, T2, fetchT)  # perform DB connections
+                print("Visualization in Play Mode...")
+            print('\nUpdating....')
 
             # ------ Inhibit iteration ----------------------------------------------------------[]
             """
@@ -1874,33 +1895,33 @@ def tgProcessParam(vCounter, pType):
         timei = time.time()  # start timing the entire loop
 
         # Bi-stream Data Pooling Method ----------------------#
-        tgData = synchronousTG(smp_Sz, stp_Sz, db_freq)  # PLC synchronous Data loading method1
-        vmData = synchronousMP(smp_Sz, stp_Sz, db_freq)  # Dr Labs Method for Void Mapping Profile
+        tgData = synchronousTG(tgSize, tggType, db_freq)  # PLC synchronous Data loading method1
+        vmData = synchronousMP(tgSize, tggType, db_freq)  # Dr Labs Method for Void Mapping Profile
         # ----------------------------------------------------#
 
         if UsePLC_DBS == 1:
             import VarPLCtg as tg
 
             viz_cycle = 10
-            columns = qtg.validCols('TG')  # Load defined valid columns for PLC Data
+            columns = qtg.validCols('TG')           # Load defined valid columns for PLC Data
             df1 = pd.DataFrame(tgData, columns=columns)  # Include table data into python Dataframe
-            TG = tg.loadProcesValues(df1)  # Join data values under dataframe
+            TG = tg.loadProcesValues(df1)           # Join data values under dataframe
 
         else:
-            import VarSQLtg as tg  # load SQL variables column names | rfVarSQL
+            import VarSQLtg as tg                   # load SQL variables column names | rfVarSQL
 
             viz_cycle = 150
-            g1 = qtg.validCols('TG')  # Construct Data Column selSqlColumnsTFM.py
+            g1 = qtg.validCols('TG')                # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(tgData, columns=g1)  # Import into python Dataframe
-            TG = tg.loadProcesValues(df1)  # Join data values under dataframe
+            TG = tg.loadProcesValues(df1)           # Join data values under dataframe
 
         # Compulsory VoidMap function call -- SQL loader -[B]
-        import VarSQLvm as vm  # load SQL variables column names | rfVarSQL
+        import VarSQLvm as vm                       # load SQL variables column names | rfVarSQL
 
         viz_cycle = 150
-        g1 = qvm.validCols('VM')  # Construct Data Column selSqlColumnsTFM.py
-        df1 = pd.DataFrame(vmData, columns=g1)  # Import into python Dataframe
-        VM = vm.loadProcesValues(df1)  # Join data values under dataframe
+        g1 = qvm.validCols('VM')                    # Construct Data Column selSqlColumnsTFM.py
+        df1 = pd.DataFrame(vmData, columns=g1)      # Import into python Dataframe
+        VM = vm.loadProcesValues(df1)               # Join data values under dataframe
 
         print('\nDataFrame Content', df1.head(10))  # Preview Data frame head
         print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
@@ -2025,15 +2046,21 @@ def tpProcessParam(vCounter, pType):  # Tape Placement
     root.title('mPipe Production: Synchronous SPC - Viz: ' + vCounter)
     root.geometry("1800x800")
 
-    # Load metrics from config -----------------------------------[Tape Gap]
-    tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mq.decryptpProcessLim(WON, 'TG')
+    # Load metrics from config -----------------------------------[Tape Placement Error]
+    if pRecipe == 'DNV':
+        tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON,
+                                                                                                                'TP')
+    else:
+        tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+                                                                                                                'TP')
+
     # Break down each element to useful list ---------------------[Tape Gap]
 
     if tpHL and tpParam1:
         tgPerf = '$Pp_{k' + str(tpSize) + '}$'                   # Estimated or historical Mean
         tglabel = 'Pp'
         # -------------------------------
-        tgOne = tpParam1.split(',')                             # split into list elements
+        tpOne = tpParam1.split(',')                             # split into list elements
         dTapetp = tpOne[1].strip("' ")                          # defined Tape Width
         dLayer = tpOne[10].strip("' ")                          # Defined Tape Layer
 
@@ -2167,7 +2194,7 @@ def tpProcessParam(vCounter, pType):  # Tape Placement
     a3.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a3.transAxes)
 
     # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-    def synchronousTP(tgSize, tggType, fetchT):
+    def synchronousTP(tpSize, tpgType, fetchT):
         fetch_no = str(fetchT)          # entry value in string sql syntax
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
@@ -2222,11 +2249,11 @@ def tpProcessParam(vCounter, pType):  # Tape Placement
 
                 inProgress = False  # False for Real-time mode
                 print('\nSynchronous controller activated...')
+
                 if not sysRun:
                     sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
                 print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
-                # Either of the 2 combo variables are assigned to trigger routine pause
                 if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
                     print('\nProduction is pausing...')
                     if not autoSpcPause:
@@ -2261,8 +2288,6 @@ def tpProcessParam(vCounter, pType):  # Tape Placement
 
     def asynchronousTP(db_freq):
         timei = time.time()  # start timing the entire loop
-
-        # declare asynchronous variables ------------------[]
 
         # Call data loader Method---------------------------#
         tpData = synchronousTP(tpSize, tpgType, db_freq)  # data loading functions
@@ -2309,30 +2334,30 @@ def tpProcessParam(vCounter, pType):  # Tape Placement
         im25.set_xdata(np.arange(db_freq))
 
         # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
-        im10.set_ydata((TG[0]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 1
-        im11.set_ydata((TG[1]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 2
-        im12.set_ydata((TG[2]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 3
-        im13.set_ydata((TG[3]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 4
+        im10.set_ydata((TP[0]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 1
+        im11.set_ydata((TP[1]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 2
+        im12.set_ydata((TP[2]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 3
+        im13.set_ydata((TP[3]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 4
         # ------ Evaluate Pp for Segments ---------#
-        mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(tpHL, tpSize, 'TG')
+        mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(tpHL, tpSize, 'TP')
         # ---------------------------------------#
-        im14.set_ydata((TG[4]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 1
-        im15.set_ydata((TG[5]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 2
-        im16.set_ydata((TG[6]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 3
-        im17.set_ydata((TG[7]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 4
+        im14.set_ydata((TP[4]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 1
+        im15.set_ydata((TP[5]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 2
+        im16.set_ydata((TP[6]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 3
+        im17.set_ydata((TP[7]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # Segment 4
         # ------ Evaluate Pp for Ring 2 ---------#
-        mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(tpHL, tpSize, 'TG')
+        mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(tpHL, tpSize, 'TP')
 
         # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
-        im18.set_ydata((TG[0]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-        im19.set_ydata((TG[1]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-        im20.set_ydata((TG[2]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-        im21.set_ydata((TG[3]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+        im18.set_ydata((TP[0]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+        im19.set_ydata((TP[1]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+        im20.set_ydata((TP[2]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+        im21.set_ydata((TP[3]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
 
-        im22.set_ydata((TG[4]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-        im23.set_ydata((TG[5]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-        im24.set_ydata((TG[6]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-        im25.set_ydata((TG[7]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+        im22.set_ydata((TP[4]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+        im23.set_ydata((TP[5]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+        im24.set_ydata((TP[6]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+        im25.set_ydata((TP[7]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
 
         if not tpHL:
             mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(tpSize, mnA,
@@ -2368,7 +2393,7 @@ def tpProcessParam(vCounter, pType):  # Tape Placement
 
         # Set trip line for individual time-series plot -----------------------------------[R1]
         import triggerModule as sigma
-        sigma.trigViolations(a1, UsePLC_DBS, 'TG', YScale_minTP, YScale_maxTP, xucT, xlcT, xusT, xlsT, mnT, sdT)
+        sigma.trigViolations(a1, UsePLC_DBS, 'TP', YScale_minTP, YScale_maxTP, xucT, xlcT, xusT, xlsT, mnT, sdT)
 
         timef = time.time()
         lapsedT = timef - timei
@@ -2395,12 +2420,16 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
     root.geometry("1800x800")
 
     # Load Quality Historical Values -----------[]
-    lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = mq.decryptpProcessLim(
+    if pRecipe == 'DNV':
+        lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = dnv.decryptpProcessLim(
         WON, 'LP')
-
+    else:
+        lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = mgm.decryptpProcessLim(
+            WON, 'LP')
     # Break down each element to useful list ---------------[Tape Temperature]
+
     if lpHL and lpParam1 and lpParam2 and lpParam3 and lpParam4 and lpParam5:  #
-        lpPerf = '$Pp_{k' + str(sSize) + '}$'  # Using estimated or historical Mean
+        lpPerf = '$Pp_{k' + str(lpSize) + '}$'  # Using estimated or historical Mean
         lplabel = 'Pp'
         # -------------------------------
         One = lpParam1.split(',')  # split into list elements
@@ -2487,12 +2516,13 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
         sLCLlp = 0
         lpUSL = 0
         lpLSL = 0
-        lpPerf = '$Cp_{k' + str(sSize) + '}$'  # Using Automatic group Mean
+        lpPerf = '$Cp_{k' + str(lpSize) + '}$'  # Using Automatic group Mean
         lplabel = 'Cp'
 
     # ------------------------------------[End of Tape Temperature Abstraction]
-    # ------------------------------------[End of Tape Temperature Abstraction]
-    label = ttk.Label(root, text='[' + pType + ' Mode]', font=LARGE_FONT)
+    label = ttk.Label(root,
+                      text='Laser Power [LP] - [' + pType + ' Mode] - ' + strftime("%a, %d %b %Y", gmtime()),
+                      font=LARGE_FONT)
     label.pack(padx=10, pady=5)
 
     # Define Axes ---------------------#
@@ -2507,9 +2537,9 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
     # Declare Plots attributes --------------------------------[H]
     plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
     # Calibrate limits for X-moving Axis -----------------------#
-    YScale_minLP, YScale_maxLP = lpLSL - 8.5, lpUSL + 8.5  # Roller Force
-    sBar_minLP, sBar_maxLP = sLCLlp - 80, sUCLlp + 80  # Calibrate Y-axis for S-Plot
-    window_Xmin, window_Xmax = 0, (int(lpSize) + 3)  # windows view = visible data points
+    YScale_minLP, YScale_maxLP = lpLSL - 8.5, lpUSL + 8.5   # Roller Force
+    sBar_minLP, sBar_maxLP = sLCLlp - 80, sUCLlp + 80       # Calibrate Y-axis for S-Plot
+    window_Xmin, window_Xmax = 0, (int(lpSize) + 3)         # windows view = visible data points
 
     # ----------------------------------------------------------#
     # Real-Time Parameter according to updated requirements ----# 27/Feb/2025
@@ -2519,6 +2549,7 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
     # Initialise runtime limits
     a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
     a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+
     a1.set_title('Laser Power [XBar]', fontsize=12, fontweight='bold')
     a2.set_title('Laser Power [StDev]', fontsize=12, fontweight='bold')
 
@@ -2610,10 +2641,10 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
 
     # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
     def synchronousLP(lpSize, lpgType, fetchT):
-        fetch_no = str(fetchT)  # entry value in string sql syntax
+        fetch_no = str(fetchT)              # entry value in string sql syntax
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:  # Load CommsPlc class once
+        if not inUseAlready:                # Load CommsPlc class once
             import CommsSql as q
             q.DAQ_connect(1, 0)
         else:
@@ -2633,7 +2664,7 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
         # Define PLC/SMC error state -------------------------------------------#
 
         while True:
-            if UsePLC_DBS:  # Not Using PLC Data
+            if UsePLC_DBS:
                 import plcArrayRLmethodLP as slp  # DrLabs optimization method
 
                 inProgress = False  # False for Real-time mode
@@ -2649,21 +2680,17 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
                     if not autoSpcPause:
                         autoSpcRun = not autoSpcRun
                         autoSpcPause = True
-                        # play(error)                            # Pause mode with audible Alert
                         print("\nVisualization in Paused Mode...")
                 else:
                     autoSpcPause = False
-
-                # Play visualization ----------------------------------------------[]
-                print("Visualization in Play Mode...")
+                    print("Visualization in Play Mode...")
                 # -----------------------------------------------------------------[]
 
                 # Allow selective runtime parameter selection on production critical process
-                procID = 'LP'
-                lpData = slp.paramDataRequest(procID, lpSize, lpgType, fetch_no)
+                lpData = slp.paramDataRequest('LP', lpSize, lpgType, fetch_no)
 
             else:
-                import sqlArrayRLmethodLP as slp  # DrLabs optimization method
+                import sqlArrayRLmethodLP as slp     # DrLabs optimization method
 
                 inProgress = True  # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
@@ -2681,7 +2708,7 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
                         print("\nVisualization in Paused Mode...")
                     else:
                         autoSpcPause = False
-                        print("Visualization in Real-time Mode...")
+                    print("Visualization in Real-time Mode...")
                 else:
                     # Get list of relevant SQL Tables using conn() --------------------[]
                     lpData = slp.sqlexec(lpSize, lpgType, con_lp, T1, fetchT)
@@ -2877,8 +2904,12 @@ def laProcessParam(vCounter, pType):  # Tape Placement
     root.title('mPipe Production: Synchronous SPC - Viz: ' + vCounter)
     root.geometry("1800x800")
 
-    # Load metrics from config -----------------------------------[Tape Gap]
-    laSize, lagType, laSspace, laHL, laAL, latFO, laParam1, dud2, dud3, dud4, dud5 = mq.decryptpProcessLim(WON, 'LA')
+    # Load metrics from config -----------------------------------[]
+    if pRecipe == 'DNV':
+        laSize, lagType, laSspace, laHL, laAL, latFO, laParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON, 'LA')
+    else:
+        laSize, lagType, laSspace, laHL, laAL, latFO, laParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+                                                                                                                'LA')
     # Break down each element to useful list ---------------------[Tape Gap]
 
     if laHL and laParam1:
@@ -2937,10 +2968,10 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 
     # ----------------------------------------------------------#
     # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-    T1 = WON + '_LA'  # Laser Angle
+    T1 = WON + '_LA'                                            # Laser Angle
     # ----------------------------------------------------------#
 
-    # Declare Plots attributes --------------------------------#
+    # Declare Plots attributes ---------------------------------#
     a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
     a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
     a1.set_title('Laser Angle [XBar]', fontsize=12, fontweight='bold')
@@ -3303,14 +3334,14 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 
 # ---------------------- Port windows into parallel processing ----------[]
 
-def myMain(qType, ProcID, daq):
-    global pType, conn, pParam
+def myMain(qType, ProcID):
+    global pType, pParam, smp_Sz, stp_Sz
 
     pType = qType
-    conn = daq
+    # conn = daq
     pParam = ProcID
 
-    print('\nP-Type..:', pType)
+    # print('\nP-Type..:', pType)
     if ProcID == 'DNV':
         # if GPU -------------------------------------------------#
         p1 = Process(target=ttProcessParam, args=(countA, pType))          #, name="CascadeTT")
@@ -3324,6 +3355,7 @@ def myMain(qType, ProcID, daq):
         p1.start()  # Quality parameter 1
         p2.start()  # Quality parameter 2
         p3.start()  # Quality parameter 3
+
     elif ProcID == 'MGM':
         # if GPU -------------------------------------------------#
         p1 = Process(target=lpProcessParam, args=(countA, pType))           # , name="CascadeRF")
@@ -3347,26 +3379,23 @@ def myMain(qType, ProcID, daq):
     print('\nP1 #:', p1)
     print('P2 #:', p2)
     print('P3 #:', p3)
-    # print('P4 #:', p4)
-    # print('P5 #:', p5)
-    # print('P5 #:', p6)
-    # print('P5 #:', p7)
-    # print('Proces 1', p1.pid) # display only the process number(int)
+    # print('Proces 1', p1.pid)   # display only the process number(int)
     # print('Proces 2', p2.pid)
     # print('Proces 3', p3.pid)
     # print('Proces 1', p4.pid)
     # # --------------------- Join the threads -----------------#
-    # p1.join()
-    # p2.join()
-    # p3.join()
-    # p4.join()
+
     # returned values for evaluation and closing out of the process
 
     return p1, p2, p3, p4, p5, p6, p7
 
 # -------------------------------------------------------------------------------------------------------- [if on GPU]
-# https://docs.python.org/3/library/multiprocessing.html#multiprocessing-programming
-# 1. Avoid shared state
+"""
+# NOTE: Parallel programing is beautiful when you observe the rule of Best Practice:
+https://docs.python.org/3/library/multiprocessing.html#multiprocessing-programming
+R. Labs
+"""
+# 1. In parallel programming, avoid shared state for multiple objects
 # 2. Stick to using queues or pipes for communication between processes
 # 3. Ensure that the arguments to the methods of proxies are picklable
 # 4. Do not use a proxy object from more than one thread unless you protect it with a lock
@@ -3378,7 +3407,6 @@ def myMain(qType, ProcID, daq):
 # 10. However, global variables which are just module level constants cause no problems
 # 11. Safe importing of main module - Protect the “entry point” of the program by using if __name__ == '__main__':
 # -------------------------------------------------------------------------------------[]
-# Main construct provides a standard entry point to stand alone app; best practice
 
 # if __name__ == '__main__':
 #     freeze_support()            # omitted if the program will be run normally instead of frozen

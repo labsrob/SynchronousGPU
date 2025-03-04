@@ -115,8 +115,9 @@ def encryptMetricspP(WON, eLA, eLP, eCT, eOT, eRP, eWS, eSP, shiftS, shiftE, LP,
         # Prevent duplicated instance ------ [TODO]
         # Prevent duplicated keys -----------[TODO]
 
-        if not config.has_section("WorkOrderNumber_"+WONID):
-            config.add_section("WorkOrderNumber_"+WONID)
+        if not config.has_section("WorkOrderNumber_" + WONID):
+            config.add_section("WorkOrderNumber_" + WONID)
+
             # Plot type Min/Max or Control Charts -------
             config.set("WorkOrderNumber_" + WONID, "monitor_LA", str(af1))
             config.set("WorkOrderNumber_" + WONID, "monitor_LP", str(af2))
@@ -126,14 +127,14 @@ def encryptMetricspP(WON, eLA, eLP, eCT, eOT, eRP, eWS, eSP, shiftS, shiftE, LP,
             config.set("WorkOrderNumber_" + WONID, "monitor_WS", str(af6))
             config.set("WorkOrderNumber_" + WONID, "monitor_SP", str(af7))
 
-        if not config.has_section("ShiftPattern_"+WONID):
-            config.add_section("ShiftPattern_"+WONID)
+        if not config.has_section("ShiftPattern_" + WONID):
+            config.add_section("ShiftPattern_" + WONID)
             # Plot type Min/Max or Control Charts -------
-            config.set("ShiftPattern_"+WONID, "shiftBegn", str(cf3))
-            config.set("ShiftPattern_"+WONID, "ShiftEnds", str(cf4))
+            config.set("ShiftPattern_" + WONID, "shiftBegn", str(cf3))
+            config.set("ShiftPattern_" + WONID, "ShiftEnds", str(cf4))
 
-        if not config.has_section("ProdParameters_"+WONID):
-            config.add_section("ProdParameters_"+WONID)
+        if not config.has_section("ProdParameters_" + WONID):
+            config.add_section("ProdParameters_" + WONID)
             # Plot type Min/Max or Control Charts -------
             config.set("ProdParameters_" + WONID, "Laser_pwr", str(cf5))
             config.set("ProdParameters_" + WONID, "Laser_ang", str(cf6))
@@ -143,7 +144,7 @@ def encryptMetricspP(WON, eLA, eLP, eCT, eOT, eRP, eWS, eSP, shiftS, shiftE, LP,
             config.set("ProdParameters_" + WONID, "Tape_Temp", str(cf9))
             config.set("ProdParameters_" + WONID, "Subs_temp", str(cfA))
             config.set("ProdParameters_" + WONID, "Tape_void", str(cfB))
-            config.set("ProdParameters_" + WONID, "Spool_ten", str(cfC))
+            config.set("ProdParameters_" + WONID, "Temp_Ramp", str(cfC))
             config.set("ProdParameters_" + WONID, "[" + dt_string + "]", str("-" * 172) + "EndOfConfig.")
         else:
             pass
@@ -186,7 +187,7 @@ def decryptMetricsGeneral(WONID):
             TT = onetimepad.decrypt(limpParams["Tape_Temp"], 'random')
             ST = onetimepad.decrypt(limpParams["Subs_temp"], 'random')
             TG = onetimepad.decrypt(limpParams["Tape_void"], 'random')
-            SP = onetimepad.decrypt(limpParams["Spool_ten"], 'random')
+            SP = onetimepad.decrypt(limpParams["Temp_Ramp"], 'random')
 
         except KeyError:
             print('Configuration File or Key is missing. Loading default values...')
@@ -230,6 +231,6 @@ def decryptMetricsGeneral(WONID):
         TG = 0
         SP = 0
 
-    print('Fetch Data:','\n', dCT, '\n', dOT, '\n', sStart, '\n', sStops, '\n',  RF, '\n', TT)
+    # print('Fetch Data:','\n', dCT, '\n', dOT, '\n', sStart, '\n', sStops, '\n',  RF, '\n', TT)
 
     return dLA, dLP, dCT, dOT, dRP, dWS, dSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP

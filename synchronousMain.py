@@ -60,8 +60,9 @@ from mpl_interactions import ioff, panhandler, zoom_factory
 # --------------------------
 import pParamsHL as dd
 import pWON_finder as sqld
-import qParametersDNV as hla
-import qParametersMGM as hlb
+
+# import qParametersDNV as hla
+# import qParametersMGM as hlb
 # ------------------------------------------------------------------------[]
 tabConfig = []
 cpTapeW, cpLayerNo, runType = [], [], []
@@ -134,12 +135,14 @@ mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, S
 print('\nDecrypted Prod Parameters:', mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP)
 
 # ----------------------------------------------[]
-# if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA) and not int(TP) and not int(RF):
-#     pRecipe = 'DNV'
-# elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
-#     pRecipe = 'MGM'
-# else:
-#     pRecipe = 'USR'
+if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA) and not int(TP) and not int(RF):
+    pRecipe = 'DNV'
+    import qParamsHL_DNV as prc
+elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
+    pRecipe = 'MGM'
+    import qParamsHL_MGM as prc
+else:
+    pRecipe = 'USR'
 # ----------------------------------------------[]
 
 def generate_pdf(data):
@@ -350,7 +353,7 @@ def tabbed_cascadeMode():  # Limited Tab default screen with multiple independen
 
     # Load class object from CascadeSwticher Method ---[x]
     import CascadeSwitcher as cs
-    p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe, conn) # runtimeType, process RecipeType
+    p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe) # runtimeType, process RecipeType
 
     # Set up embedding notebook (tabs) ----------------[B]
     notebook = ttk.Notebook(root, width=2500, height=850)       # Declare Tab overall Screen size
@@ -622,13 +625,13 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
         window_Xmin, window_Xmax = 0, 13                        # windows view = visible data points
         # ------------------------------------------------------#
         # Load SQL Query Table ---------------------------------#
-        if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
+        if pRecipe == 'DNV':
             EoLRep = 'DNV'
             T1 = WON + '_TT'  # Identify Table
             T2 = WON + '_ST'  # Identify Table
             T3 = WON + '_TG'  # Identify Table
             T4 = WON + '_RM'  # Identify Table
-        elif int(LP) and int(LA) and int(CT) and int(OT) and int(RP) and int(WS):
+        elif pRecipe == 'MGM':
             EoLRep = 'MGM'
             T5 = WON + '_LP'  # Identify Table
             T6 = WON + '_LA'  # Identify Table
@@ -2422,7 +2425,7 @@ class MonitorTabb(ttk.Frame):
         # rT6dx = eoF[6]  # SQL data table index = 0 unless SPC stalled or relaunched.
         # Monitoring Parameters --------------------------------------------#
         # Element in the Monitoring Parameter plot
-        if int(OT) and int(CT) and int(RP) and int(WS) and not int(LA) and not int(LP):
+        if int(mCT) and int(mOT) and int(mRP) and int(mWS):
             monitorP = 'DNV'
             a1.grid(color="0.5", linestyle='-', linewidth=0.5)
             a2.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2438,7 +2441,7 @@ class MonitorTabb(ttk.Frame):
             a2.set_ylabel("Tape Winding Speed - m/s")       # Angle measured in Degrees
             a3.set_ylabel("Cell Tension Force - N.m")       # Tension measured in Newton
             a4.set_ylabel("Oven Temperature - °C")          # Oven Temperature in Degrees Celsius
-        elif int(LP) and int(LA) and int(CT) and int(OT) and int(RP) and int(WS):
+        elif int(mLP) and int(mLA) and int(mCT) and int(mOT) and int(mRP) and int(mWS):
             monitorP = 'MGM'
             a1.grid(color="0.5", linestyle='-', linewidth=0.5)
             a2.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -5066,15 +5069,9 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
-        if pRecipe == 'DNV':
-            import qParamsHL_DNV as qp
-        elif pRecipe == 'MGM':
-            import qParamsHL_MGM as qp
-        else:
-            pass
 
         # Load Quality Historical Values -----------[]
-        ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = qp.decryptpProcessLim(
+        ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = prc.decryptpProcessLim(
             WON, 'TT')
 
         # Break down each element to useful list ---------------[Tape Temperature]
@@ -9886,8 +9883,8 @@ def userMenu():     # listener, myplash
 
     # -------------------------------- APP MENU PROCEDURE START ------------------------------------------------[]
     def viewTypeA():    # enforce selection integrity ------------------[Cascade Tabb View]
-        global p1, p2, p3, p4, p5, HeadA, rType                             # declare as global variables
-        #
+        global p1, p2, p3, p4, p5, p6, p7, HeadA, rType                 # declare as global variables
+
         # Define run Type -------------[]
         if runType == 1:
             rType = 'Synchro'
@@ -9909,7 +9906,8 @@ def userMenu():     # listener, myplash
                 print('\nStarting new GPU thread...')
                 # call function for parallel pipeline --------------------#
                 import CascadeSwitcher as cs
-                p1, p2, p3, p4, p5 = cs.myMain(rType)
+                p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe)
+                print('Proces 1', p1.pid, p2.pid, p3.pid, p4.pid, p5.pid, p6.pid, p7.pid)
                 exit_bit.append(1)
 
             else:
@@ -9928,7 +9926,8 @@ def userMenu():     # listener, myplash
             tabbed_cascadeMode()                                          # Default limited tabbed common screen + Casc
 
             import CascadeSwitcher as cs
-            p1, p2, p3, p4, p5 = cs.myMain(rType)                          # call function for parallel pipeline
+            p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe)        # call function for parallel pipeline
+            print('Proces 2', p1.pid, p2.pid, p3.pid, p4.pid, p5.pid, p6.pid, p7.pid)
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
@@ -9944,8 +9943,8 @@ def userMenu():     # listener, myplash
             tabbed_cascadeMode()                                        # Provide limited Tabb and multiple screen
 
             import CascadeSwitcher as cs
-
-            p1, p2, p3, p4, p5 = cs.myMain(rType)                       # call function for parallel pipeline
+            p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe)      # call function for parallel pipeline
+            print('Proces 3', p1.pid, p2.pid, p3.pid, p4.pid, p5.pid, p6.pid, p7.pid)
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
@@ -9957,7 +9956,7 @@ def userMenu():     # listener, myplash
 
         return HeadA, HeadB, closeV
 
-    def viewTypeB():
+    def viewTypeB():        # Tabbed View (This is configured for remote users)
         global HeadA, HeadB, closeV, rType
         # Define run Type ---------------------[TODO]
         if runType == 1:
@@ -9974,24 +9973,24 @@ def userMenu():     # listener, myplash
             process.entryconfig(3, state='normal')
 
             if messagebox.askokcancel("Warning!!!", "Current Visualisation will be lost!"):
-                casc_clearOut()                                     # clear out visualisation frame
-                tabbed_canvas()                                     # Call Canvas binding function
-                exit_bit.append(0)                                  # Keep a byte into empty list
+                casc_clearOut()                                           # clear out visualisation frame
+                tabbed_canvas()                                           # Call Canvas binding function
+                exit_bit.append(0)                                        # Keep a byte into empty list
             else:
-                process.entryconfig(0, state='disabled')        # revert to original state
-                process.entryconfig(1, state='normal')          # revert to original state
+                process.entryconfig(0, state='disabled')            # revert to original state
+                process.entryconfig(1, state='normal')              # revert to original state
 
-            HeadA, HeadB, closeV = 0, 1, 0      # call embedded functions
+            HeadA, HeadB, closeV = 0, 1, 0                                # call embedded functions
 
         elif process.entrycget(3, 'state') == 'disabled':
             process.entryconfig(1, state='disabled')
             process.entryconfig(0, state='normal')
             process.entryconfig(3, state='normal')
 
-            tabbed_canvas()                     # Tabbed Visualisation
+            tabbed_canvas()                                                 # Tabbed Visualisation
             exit_bit.append(0)
 
-            HeadA, HeadB, closeV = 0, 1, 0      # call embedded functions
+            HeadA, HeadB, closeV = 0, 1, 0                                  # call embedded functions
 
         elif (process.entrycget(0, 'state') == 'normal'
                   and process.entrycget(1, 'state') == 'normal'
@@ -10015,7 +10014,7 @@ def userMenu():     # listener, myplash
     def tabb_clearOut():
         # evaluate how many widget is in use and clear accordingly
         inUse = len(root.winfo_children())
-        print('TP2', inUse)
+
         if inUse == 9:
             # root.winfo_children()[9].destroy()
             root.winfo_children()[8].destroy()
@@ -10038,36 +10037,53 @@ def userMenu():     # listener, myplash
 
     def casc_clearOut():
         # https://www.geeksforgeeks.org/python-different-ways-to-kill-a-thread/
-        # inUse = len(root.winfo_children())
+        inUse = len(root.winfo_children())
         # -------------
-        # print('\n******************************')
-        # print('Get PPID', os.getppid())                         # Parent ID 37248
-        # print('Get PID', os.getpid())                           # Child ID 52692
-        # # print('Get GID', os.getegid())
-        # print('Get CWDB', os.getcwdb())                         # b'C:\\CuttingEdge\\BETA_ver3.6'
-        # print('Get CWD', os.getcwd())                           # C:\CuttingEdge\BETA_ver3.6
-        # print('Get INDENT', get_ident())                        # 32356
-        # print('Get Native ID', get_native_id())                 # 32356
-        # print('Current Thread Name', current_thread().name)     # MainThread
-        # print('Current Thread Ident', current_thread().ident)   # Current Thread 32356
+        print('\n******************************')
+        print('Whats in Use', inUse)
+        print('Get PPID', os.getppid())                         # Parent ID 37248
+        print('Get PID', os.getpid())                           # Child ID 52692
+        print('Get CWDB', os.getcwdb())                         # b'C:\\CuttingEdge\\BETA_ver3.6'
+        print('Get CWD', os.getcwd())                           # C:\CuttingEdge\BETA_ver3.6
+        print('Get INDENT', get_ident())                        # 32356
+        print('Get Native ID', get_native_id())                 # 32356
+        print('Current Thread Name', current_thread().name)     # MainThread
+        print('Current Thread Ident', current_thread().ident)   # Current Thread 32356
 
         try:
-            kill_process(p5.pid)        # convert process into pid number, usually and integer number
-            kill_process(p4.pid)
-            kill_process(p3.pid)
-            kill_process(p2.pid)
-            kill_process(p1.pid)
+            if pRecipe == 'DNV':
+                kill_process(p3.pid)
+                kill_process(p2.pid)
+                kill_process(p1.pid)
+            else:
+                kill_process(p7.pid)  # convert process into pid number
+                kill_process(p6.pid)
+                kill_process(p5.pid)                                  # convert process into pid number
+                kill_process(p4.pid)
+                kill_process(p3.pid)
+                kill_process(p2.pid)
+                kill_process(p1.pid)
         except OSError:
+            print(f'Process {p7} failed to terminate!')
+            print(f'Process {p6} failed to terminate!')
             print(f'Process {p5} failed to terminate!')
             print(f'Process {p4} failed to terminate!')
             print(f'Process {p3} failed to terminate!')
             print(f'Process {p2} failed to terminate!')
             print(f'Process {p1} failed to terminate!')
-            print(f'Process {p1} failed to terminate!')
-        # clear out all children process ---
-        root.winfo_children()[3].destroy()
-        root.winfo_children()[2].destroy()
-        root.winfo_children()[1].destroy()
+        # clear out all children process --[]
+        if pRecipe == 'DNV':
+            root.winfo_children()[3].destroy()
+            root.winfo_children()[2].destroy()
+            root.winfo_children()[1].destroy()
+        else:
+            root.winfo_children()[7].destroy()
+            root.winfo_children()[6].destroy()
+            root.winfo_children()[5].destroy()
+            root.winfo_children()[4].destroy()
+            root.winfo_children()[3].destroy()
+            root.winfo_children()[2].destroy()
+            root.winfo_children()[1].destroy()
 
     def closeViews():
         # enforce category selection integrity ---------------------#
