@@ -48,8 +48,6 @@ import selDataColsVM as qvm     # Void mapping
 import selDataColsEoL as eol    # End of Layer
 # -----------------------------#
 import pParamsHL as dd
-# import qParamsHL_DNV as dnv
-# import qParamsHL_MGM as mgm
 
 import subprocess
 try:
@@ -108,11 +106,12 @@ rtValues = []
 
 # ---- Common to all Process Procedures ---[]
 pRecipe = ""
+
 # Call function and load WON specification -----[]
 mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP = dd.decryptMetricsGeneral(WON)
 print('\nDecrypted Prod Parameters:', mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP)
 
-# ----------------------------------------------[]
+# ----------------------------------------------[A]
 if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA) and not int(TP) and not int(RF):
     pRecipe = 'DNV'
     import qParamsHL_DNV as dnv
@@ -339,13 +338,13 @@ def rfProcessParam(vCounter, pType):
 
         while True:
             if UsePLC_DBS:  # Not Using PLC Data
-                import plcArrayRLmethodRF as srf  # DrLabs optimization method
+                import plcArrayRLmethodRF as srf                    # DrLabs optimization method
 
-                inProgress = True  # True for RetroPlay mode
+                inProgress = True                                   # True for RetroPlay mode
                 print('\nSynchronous controller activated...')
 
                 if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()     # Retrieve MSC from Watchdog
                 print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 # Either of the 2 combo variables are assigned to trigger routine pause
@@ -411,7 +410,7 @@ def rfProcessParam(vCounter, pType):
         timei = time.time()  # start timing the entire loop
 
         # Call data loader Method---------------------------#
-        rfData = synchronousRP(rfSize, rfgType, db_freq)  # data loading functions
+        rfData = synchronousRP(rfSize, rfgType, db_freq)    # data loading functions
         # --------------------------------------------------#
 
         if UsePLC_DBS == 1:

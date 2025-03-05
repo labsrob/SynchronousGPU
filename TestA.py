@@ -399,66 +399,67 @@ from cryptography.fernet import Fernet
 
 # -------------------------------------------------------------------
 
-import tkinter as tk
-from tkinter import ttk
-from fpdf import FPDF
-
-# Function to generate PDF
-def generate_pdf(data):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("helvetica", size=12)
-
-    # Create table header -------------------------------------[]
-    for header in ["TCP01", "Actual", "Nominal", "Std Dev", "Tolerance +/-", "Status"]:
-        pdf.cell(30, 10, header, 1)
-    pdf.ln()
-
-    # Create table label --------------------------------------[]
-    for label in ['Ring1', 'Ring2', 'Ring3', 'Ring4']:
-        pdf.cell(30, 10, label, 1)
-    pdf.ln()
-
-    # Create table rows ---------------------------------------[]
-    for row in data:
-        for item in row:
-            pdf.cell(30, 10, str(item), 1)
-        pdf.ln()
-
-    pdf.output("QualityEOL.pdf")
-
-
-def get_data():
-    data = []
-    for i in range(4):
-        row = [entry.get() for entry in entries[i]]
-        # row1 = r1_actual.get(), r1_nominal.get(), r1_stdDev.get(), r1_tolerance.get(), r1_status.get()
-        # row2 = r2_actual.get(), r2_nominal.get(), r2_stdDev.get(), r2_tolerance.get(), r2_status.get()
-        # row3 = r3_actual.get(), r3_nominal.get(), r3_stdDev.get(), r3_tolerance.get(), r3_status.get()
-        # row4 = r4_actual.get(), r4_nominal.get(), r4_stdDev.get(), r4_tolerance.get(), r4_status.get()
-
-        data.append(row)
-    generate_pdf(data)
-
-# Create main window -----------------------[]
-root = tk.Tk()
-root.title("6 Column Table")
-
-# Create table -----------------------------[]
-entries = []
-for i in range(5):  # Example: 5 rows
-    row_entries = []
-    for j in range(6):  # 6 columns
-        entry = tk.Entry(root)
-        entry.grid(row=i, column=j)
-        row_entries.append(entry)
-    entries.append(row_entries)
-
-# Create button to generate PDF
-generate_button = tk.Button(root, text="Generate PDF Report", command=get_data)
-# generate_button.grid(row=6, columnspan=6)
-generate_button.place(x=170, y=110)
-
-# Run the application
-root.mainloop()
+# import tkinter as tk
+# from tkinter import ttk
+# from fpdf import FPDF
+#
+#
+# def generate_pdf(data):
+#     pdf = FPDF()
+#     pdf.add_page()
+#     pdf.set_font("helvetica", size=12)
+#
+#     # Create table header -------------------------------------[]
+#     for header in ["TCP01", "Actual", "Nominal", "Std Dev", "Tolerance +/-", "Status"]:
+#         pdf.cell(30, 10, header, 1)
+#     pdf.ln()
+#
+#     # Create table label --------------------------------------[]
+#     for label in ['Ring1', 'Ring2', 'Ring3', 'Ring4']:
+#         pdf.cell(30, 10, label, 1)
+#     pdf.ln()
+#
+#     # Create table rows ---------------------------------------[]
+#     for row in data:
+#         for item in row:
+#             pdf.cell(30, 10, str(item), 1)
+#         pdf.ln()
+#
+#     pdf.output("QualityEOL.pdf")
+#
+#
+# def get_data():  # Function to generate PDF
+#     data = []
+#     for i in range(4):
+#         row = [entry.get() for entry in entries[i]]
+#         # row1 = r1_actual.get(), r1_nominal.get(), r1_stdDev.get(), r1_tolerance.get(), r1_status.get()
+#         # row2 = r2_actual.get(), r2_nominal.get(), r2_stdDev.get(), r2_tolerance.get(), r2_status.get()
+#         # row3 = r3_actual.get(), r3_nominal.get(), r3_stdDev.get(), r3_tolerance.get(), r3_status.get()
+#         # row4 = r4_actual.get(), r4_nominal.get(), r4_stdDev.get(), r4_tolerance.get(), r4_status.get()
+#
+#         data.append(row)
+#     generate_pdf(data)
+#
+# # Create main window -----------------------[]
+# root = tk.Tk()
+# root.title("6 Column Table")
+#
+# # Create table -----------------------------[]
+# entries = []
+# for i in range(5):  # Example: 5 rows
+#     row_entries = []
+#     for j in range(6):  # 6 columns
+#         entry = tk.Entry(root)
+#         entry.grid(row=i, column=j)
+#         row_entries.append(entry)
+#     entries.append(row_entries)
+#
+# # Create button to generate PDF
+# generate_button = tk.Button(root, text="Generate PDF Report", command=get_data)
+# # generate_button.grid(row=6, columnspan=6)
+# generate_button.place(x=170, y=110)
+#
+# # Run the application
+# root.mainloop()
 # ------------------------------------------[]
+

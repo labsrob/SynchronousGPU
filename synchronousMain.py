@@ -34,7 +34,8 @@ import selDataColsOT as qot     # Oven Temperature
 import selDataColsWA as qwa     # winding angle
 import selDataColsOE as qoe     # OEE TechnipFMC
 # -------------------------#
-
+import pdfkit
+from fpdf import FPDF
 import time
 import os
 import sys
@@ -60,9 +61,9 @@ from mpl_interactions import ioff, panhandler, zoom_factory
 # --------------------------
 import pParamsHL as dd
 import pWON_finder as sqld
-
-# import qParametersDNV as hla
-# import qParametersMGM as hlb
+# -------------------------
+import qParametersDNV as hla
+import qParametersMGM as hlb
 # ------------------------------------------------------------------------[]
 tabConfig = []
 cpTapeW, cpLayerNo, runType = [], [], []
@@ -134,52 +135,134 @@ pRecipe = ""
 mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP = dd.decryptMetricsGeneral(WON)
 print('\nDecrypted Prod Parameters:', mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP)
 
-# ----------------------------------------------[]
+# ----------------------------------------------[A]
 if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA) and not int(TP) and not int(RF):
     pRecipe = 'DNV'
-    import qParamsHL_DNV as prc
+    import qParamsHL_DNV as dnv
 elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
     pRecipe = 'MGM'
-    import qParamsHL_MGM as prc
+    import qParamsHL_MGM as mgm
 else:
     pRecipe = 'USR'
 # ----------------------------------------------[]
 
 def generate_pdf(data):
+    # --------------------------------------[]
+    from pylab import title, figure, xlabel, ylabel, xticks, bar, legend, axis, savefig
+    # Initialise dataframe from Tables -----[]
+    df = pd.DataFrame()
+    df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']
+    df["Actual"] = [4.6, 4.5, 4.7, 4.5]
+    df["Nominal"] = [4.5, 4.5, 4.5, 4.5]
+    df["StdDev"] = [0.25, 0.16, 0.27, 0.32]
+    df["Tolerance"] = [0.5, 0.4, 0.39, 0.42]
+    df["Status"] = ['CHECK', 'OK', 'OK', 'OK']
+
+    title("EoL Report Chart")
+    xlabel('Ring Analytics')
+    ylabel('Rated Quality')
+
+    a = [1.0, 2.0, 3.0, 4.0]
+    # a = a.sort()
+    n = [x - 0.5 for x in a]
+    s = [x - 0.3 for x in a]
+
+    proj = 12332
+    pID = 3222
+    oID = 'TC'
+    dID = datetime.datetime.now()
+    lID = 24
+    processID = 'ROLLER PRESSURE'
+
+    xticks(a, df['RingID'])
+    bar(a, df['Actual'], width=0.3, color="blue", label="Actual")
+    bar(n, df['Nominal'], width=0.3, color="#51eb87", label="Nominal")
+    bar(s, df["StdDev"], width=0.3, color="#eb379c", label="StDev")
+
+    legend()
+    axis([0, 4, 0, 5])
+    savefig('barchart.png')
+
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("helvetica", size=12)
+    pdf.set_xy(0, 0)
+    pdf.set_font('arial', 'B', 14)
+    pdf.cell(60)
+    pdf.cell(75, 10, "End of Layer (EoL) Report", 0, 2, 'C')
+    pdf.cell(90, 10, " ", 0, 2, 'C')
 
-    # Create table header -------------------------------------[]
-    for header in ["TCP01", "Actual", "Nominal", "Std Dev", "Tolerance +/-", "Status"]:
-        pdf.cell(30, 10, header, 1)
-    pdf.ln()
+    pdf.cell(-40)
+    pdf.cell(5, 10, "Customer Project ID: " + (str(proj)), 0, 2, 'L')
+    pdf.cell(5, 10, "Pipe ID                      : " + (str(pID)), 0, 2, 'L')
+    pdf.cell(5, 10, "Operators ID            : " + (str(oID)), 0, 2, 'L')
+    pdf.cell(5, 10, "Date Time                : " + (str(dID)), 0, 2, 'L')
+    pdf.cell(5, 10, "Layer Number         : " + (str(lID)), 0, 2, 'L')
+    # pdf.cell(5, 10, "Process Name         : " + (str(processID)), 0, 2, 'L')
 
-    # Create table label --------------------------------------[]
-    for label in ['Ring1', 'Ring2', 'Ring3', 'Ring4']:
-        pdf.cell(30, 10, label, 1)
-    pdf.ln()
+    pdf.cell(40)
+    pdf.cell(90, 10, " ", 0, 2, 'C')
+    # draw a rectangle over the text area for Report header ----
+    pdf.rect(x=20.0, y=20.5, w=150.0, h=50, style='')
+    # construct report header
+    pdf.cell(-40)
+    pdf.cell(5, 10, (str(processID)), 0, 2, 'L')
+    pdf.cell(35, 8, 'RingID', 1, 0, 'C')
+    pdf.cell(25, 8, 'Actual', 1, 0, 'C')
+    pdf.cell(25, 8, 'Nominal', 1, 0, 'C')
+    pdf.cell(25, 8, "StdDev", 1, 0, 'C')
+    pdf.cell(20, 8, "Tol(±)", 1, 0, 'C')
+    pdf.cell(20, 8, "Status", 1, 2, 'C')
+    pdf.set_font('arial', '', 12)
+    pdf.cell(-130)
 
-    # Create table rows ---------------------------------------[]
-    for row in data:
-        for item in row:
-            pdf.cell(30, 10, str(item), 1)
-        pdf.ln()
+    for i in range(0, len(df)):
+        print('Iteration ...')
+        pdf.cell(35, 8, '%s' % (str(df.RingID.iloc[i])), 1, 0, 'C')  # 1: Next line under
+        pdf.cell(25, 8, '%s' % (str(df.Actual.iloc[i])), 1, 0, 'C')  # 0: to the right
+        pdf.cell(25, 8, '%s' % (str(df.Nominal.iloc[i])), 1, 0, 'C')
+        pdf.cell(25, 8, '%s' % (str(df.StdDev.iloc[i])), 1, 0, 'C')
+        pdf.cell(20, 8, '%s' % (str(df.Tolerance.iloc[i])), 1, 0, 'C')
+        if str(df["Status"].iloc[i]) == "OK":
+            pdf.set_fill_color(0, 255, 0)
+            pdf.cell(20, 8, '%s' % (str(df["Status"].iloc[i])), 1, 2, 'C', 1)
+        else:
+            pdf.set_fill_color(255, 255, 0)
+            pdf.cell(20, 8, '%s' % (str(df["Status"].iloc[i])), 1, 2, 'C', 1)
+        pdf.cell(-130)  # newly added for testing
+    pdf.cell(90, 20, " ", 0, 2, 'C')  # 2: place new line below
+
+    pdf.cell(-30)
+    pdf.image('barchart.png', x=10, y=135, w=0, h=130, type='', link='')
+
+    # pdf.set_font('arial', '', 8)
+    pdf.set_font('helvetica', '', 7)
+    with pdf.rotation(angle=90, x=3, y=280):
+        pdf.text(10, 280, "Statistical Process Control generated report - " + (str(dID)))
 
     pdf.output("QualityEOL.pdf")
 
 
 def get_data():
     data = []
-    for i in range(4):
-        row = [entry.get() for entry in entries[i]]
-        # row1 = r1_actual.get(), r1_nominal.get(), r1_stdDev.get(), r1_tolerance.get(), r1_status.get()
-        # row2 = r2_actual.get(), r2_nominal.get(), r2_stdDev.get(), r2_tolerance.get(), r2_status.get()
-        # row3 = r3_actual.get(), r3_nominal.get(), r3_stdDev.get(), r3_tolerance.get(), r3_status.get()
-        # row4 = r4_actual.get(), r4_nominal.get(), r4_stdDev.get(), r4_tolerance.get(), r4_status.get()
 
-        data.append(row)
-    generate_pdf(data)
+    # initiate SQL connection ---------[]
+    row0 = 'End of Layer (EoL) Report'
+    row1 = ''
+    row2 = 'Customer Project No:'
+    row3 = 'Pipe ID No:'
+    row4 = 'Layer ID No:'
+    row5 = 'Date & Time'
+    row6 = 'Operators ID:'
+    # Table -------------------------------------------[]
+    row7 = "TCP01", "Actual", "Nominal", "Std Dev", "Tolerance +/-", "Status"
+    row8 = 'Ring1', r1_actual.get(), r1_nominal.get(), r1_stdDev.get(), r1_tolerance.get(), r1_status.get()
+    row9 = 'Ring2', r2_actual.get(), r2_nominal.get(), r2_stdDev.get(), r2_tolerance.get(), r2_status.get()
+    row10 = 'Ring3', r3_actual.get(), r3_nominal.get(), r3_stdDev.get(), r3_tolerance.get(), r3_status.get()
+    row11 = 'Ring4', r4_actual.get(), r4_nominal.get(), r4_stdDev.get(), r4_tolerance.get(), r4_status.get()
+
+    data.append(row0)
+
+    generate_pdf(data, d1, d2, d3, d4, d5, d6, d7)
 
     # -------------------------------------------------[]
 
@@ -2336,6 +2419,7 @@ class MonitorTabb(ttk.Frame):
         self.createWidgets()
 
     def createWidgets(self):
+
         # Load Quality Historical Values -----------[]
         label = ttk.Label(self, text='[' + rType + ' Mode]', font=LARGE_FONT)
         label.pack(padx=10, pady=5)
@@ -2349,6 +2433,7 @@ class MonitorTabb(ttk.Frame):
             a2 = f.add_subplot(2, 4, (3, 4))        # Winding Speed
             a3 = f.add_subplot(2, 4, (5, 6))        # Cell Tension
             a4 = f.add_subplot(2, 4, (7, 8))        # Oven Temperature
+
             # Load Query Tables --------------------#
             T1 = WON + '_RP'                        # Roller Pressure
             T2 = WON + '_WS'                        # Tape Winding Speed
@@ -2445,6 +2530,7 @@ class MonitorTabb(ttk.Frame):
             a2.set_ylabel("Tape Winding Speed - m/s")       # Angle measured in Degrees
             a3.set_ylabel("Cell Tension Force - N.m")       # Tension measured in Newton
             a4.set_ylabel("Oven Temperature - °C")          # Oven Temperature in Degrees Celsius
+
         elif int(mLP) and int(mLA) and int(mCT) and int(mOT) and int(mRP) and int(mWS):
             monitorP = 'MGM'
             a1.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2500,9 +2586,11 @@ class MonitorTabb(ttk.Frame):
         # Initialise runtime limits --------------------------------#
         a1.set_ylim([YScale_minMT, YScale_maxMT], auto=True)
         a1.set_xlim([window_Xmin, window_Xmax])
+
         # Model data -----------------------------------------------[]
         a1.plot([172, 48, 64, 59, 50, 136, 112, 223, 91, 320])
         # ----------------------------------------------------------[]
+
         # Define Plot area and axes -
         if monitorP == 'DNV':
             # -----------------------------------------------------[Roller Force]
@@ -3196,11 +3284,16 @@ class laserPowerTabb(ttk.Frame):
     def create_widgets(self):
         """Create the widgets for the GUI"""
         # Load Quality Historical Values -----------[]
-        lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = mq.decryptpProcessLim(
-            WON, 'LP')
+        if pRecipe == 'DNV':
+            lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = dnv.decryptpProcessLim(
+                WON, 'LP')
+        else:
+            lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = mgm.decryptpProcessLim(
+                WON, 'LP')
         # Break down each element to useful list ---------------[Tape Temperature]
+
         if lpHL and lpParam1 and lpParam2 and lpParam3 and lpParam4 and lpParam5:  #
-            lpPerf = '$Pp_{k' + str(sSize) + '}$'  # Using estimated or historical Mean
+            lpPerf = '$Pp_{k' + str(lpSize) + '}$'  # Using estimated or historical Mean
             lplabel = 'Pp'
             # -------------------------------
             One = lpParam1.split(',')                   # split into list elements
@@ -3287,7 +3380,7 @@ class laserPowerTabb(ttk.Frame):
             sLCLlp = 0
             lpUSL = 0
             lpLSL = 0
-            lpPerf = '$Cp_{k' + str(sSize) + '}$'  # Using Automatic group Mean
+            lpPerf = '$Cp_{k' + str(lpSize) + '}$'  # Using Automatic group Mean
             lplabel = 'Cp'
 
         # ------------------------------------[End of Tape Temperature Abstraction]
@@ -3681,11 +3774,15 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
     def create_widgets(self):
         """Create the widgets for the GUI"""
         # Load Quality Historical Values -----------[]
-        laSize, lagType, laSspace, laHL, laAL, laFO, laParam1, laParam2, laParam3, laParam4, laParam5 = mq.decryptpProcessLim(
-            WON, 'LA')
+        if pRecipe == 'DNV':
+            laSize, lagType, laSspace, laHL, laAL, laFO, laParam1, laParam2, laParam3, laParam4, laParam5 = dnv.decryptpProcessLim(
+                WON, 'LA')
+        else:
+            laSize, lagType, laSspace, laHL, laAL, laFO, laParam1, laParam2, laParam3, laParam4, laParam5 = mgm.decryptpProcessLim(
+                WON, 'LA')
         # Break down each element to useful list ---------------[Tape Temperature]
         if laHL and laParam1 and laParam2 and laParam3 and laParam4 and laParam5:  #
-            laPerf = '$Pp_{k' + str(sSize) + '}$'  # Using estimated or historical Mean
+            laPerf = '$Pp_{k' + str(laSize) + '}$'  # Using estimated or historical Mean
             lalabel = 'Pp'
             # -------------------------------
             One = laParam1.split(',')                   # split into list elements
@@ -3772,7 +3869,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
             sLCLla = 0
             laUSL = 0
             laLSL = 0
-            laPerf = '$Cp_{k' + str(sSize) + '}$'  # Using Automatic group Mean
+            laPerf = '$Cp_{k' + str(laSize) + '}$'  # Using Automatic group Mean
             lalabel = 'Cp'
 
         # ------------------------------------[End of Tape Temperature Abstraction]
@@ -4164,11 +4261,17 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
     def create_widgets(self):
         """Create the widgets for the GUI"""
         # --------------------------------------------------------------------[]
-        tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mq.decryptpProcessLim(WON, 'WS')
+        if pRecipe == 'DNV':
+            tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON,
+                                                                                                                    'TP')
+        else:
+            tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+                                                                                                                   'TP')
+
         # Break down each element to useful list ----------------[Winding Speed]
 
         if tpHL and tpParam1:  # Roller Pressure TODO - layer metrics to guide TCP01
-            tpPerf = '$Pp_{k' + str(sSize) + '}$'               # Using estimated or historical Mean
+            tpPerf = '$Pp_{k' + str(tpSize) + '}$'               # Using estimated or historical Mean
             tplabel = 'Pp'
             # -------------------------------
             tpOne = tpParam1.split(',')                 # split into list elements
@@ -4586,11 +4689,16 @@ class rollerForceTabb(ttk.Frame):
     def create_widgets(self):
         """Create the widgets for the GUI"""
         # Load Quality Historical Values -----------[]
-        rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = mq.decryptpProcessLim(
-            WON, 'RF')
+        if pRecipe == 'DNV':
+            rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = dnv.decryptpProcessLim(
+                WON, 'RF')
+        else:
+            rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = mgm.decryptpProcessLim(
+                WON, 'RF')
         # Break down each element to useful list ---------------[Tape Temperature]
+
         if rfHL and rfParam1 and rfParam2 and rfParam3 and rfParam4 and rfParam5:  #
-            rfPerf = '$Pp_{k' + str(sSize) + '}$'  # Using estimated or historical Mean
+            rfPerf = '$Pp_{k' + str(rfSize) + '}$'  # Using estimated or historical Mean
             rflabel = 'Pp'
             # -------------------------------
             One = rfParam1.split(',')                   # split into list elements
@@ -4677,7 +4785,7 @@ class rollerForceTabb(ttk.Frame):
             sLCLrf = 0
             rfUSL = 0
             rfLSL = 0
-            rfPerf = '$Cp_{k' + str(sSize) + '}$'  # Using Automatic group Mean
+            rfPerf = '$Cp_{k' + str(rfSize) + '}$'  # Using Automatic group Mean
             rflabel = 'Cp'
 
         # ------ [End of Historical abstraction -------]
@@ -5075,8 +5183,12 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         """Create the widgets for the GUI"""
 
         # Load Quality Historical Values -----------[]
-        ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = prc.decryptpProcessLim(
-            WON, 'TT')
+        if pRecipe == 'DNV':
+            ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = dnv.decryptpProcessLim(
+                WON, 'TT')
+        else:
+            ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = mgm.decryptpProcessLim(
+                WON, 'TT')
 
         # Break down each element to useful list ---------------[Tape Temperature]
         if ttHL and ttParam1 and ttParam2 and ttParam3 and ttParam4 and ttParam5:  #
@@ -9887,7 +9999,7 @@ def userMenu():     # listener, myplash
 
     # -------------------------------- APP MENU PROCEDURE START ------------------------------------------------[]
     def viewTypeA():    # enforce selection integrity ------------------[Cascade Tabb View]
-        global p1, p2, p3, p4, p5, p6, p7, HeadA, rType                 # declare as global variables
+        global HeadA, rType                 # declare as global variables
 
         # Define run Type -------------[]
         if runType == 1:
@@ -9915,10 +10027,10 @@ def userMenu():     # listener, myplash
 
             HeadA, HeadB, closeV = 1, 0, 0
 
-        elif process.entrycget(3, 'state') == 'disabled':        # If Closed Display state is disabled
-            process.entryconfig(0, state='disabled')                    # select and disable Cascade View command
-            process.entryconfig(1, state='normal')                      # set tabb view command to normal
-            process.entryconfig(3, state='normal')                      # set close display to normal
+        elif process.entrycget(3, 'state') == 'disabled':    # If Closed Display state is disabled
+            process.entryconfig(0, state='disabled')                # select and disable Cascade View command
+            process.entryconfig(1, state='normal')                  # set tabb view command to normal
+            process.entryconfig(3, state='normal')                  # set close display to normal
 
             # --- start parallel thread ----------------------------------#
             # cascadeViews()                                              # Critical Production Params
@@ -10163,5 +10275,18 @@ def userMenu():     # listener, myplash
 if __name__ == '__main__':
     # This code will only be executed if the script is run as the main program
     root = Tk()
+
+    # Create table -----------------------------[]
+    entries = []
+    for i in range(5):              # Example: 5 rows
+        row_entries = []
+        for j in range(6):          # 6 columns
+            entry = tk.Entry(root)
+            entry.grid(row=i, column=j)
+            row_entries.append(entry)
+        entries.append(row_entries)
+    # -------------------------------------------[]
+    # Load menu functions
     userMenu()
+
     root.mainloop()
