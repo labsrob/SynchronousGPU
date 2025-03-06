@@ -92,12 +92,13 @@ def errorNote():
 
 def qpHLtt(pop, gSize, ttxUCL, ttxLCL, ttsUCL, ttsLCL, ttxUCL1, ttxLCL1,  ttsUCL1, ttsLCL1, ttxUCL2, ttxLCL2, ttsUCL2,\
            ttsLCL2, ttxUCL3, ttxLCL3, ttsUCL3, ttsLCL3, ttxUCL4, ttxLCL4, ttsUCL4, ttsLCL4, WONID):
+
     global processID, val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, \
-        val14, val15, val16, val17, val18, val19, val20, val25
+        val14, val15, val16, val17, val18, val19, val20, val25, val26
 
     processID = WONID
     # ------------------
-    sReg = StringVar(pop)
+    sReg, pReg = StringVar(pop), StringVar(pop)
 
     # Function performs dynamic calculations ---[]
     def calculation(event=None):
@@ -400,9 +401,14 @@ def qpHLtt(pop, gSize, ttxUCL, ttxLCL, ttsUCL, ttsLCL, ttxUCL1, ttxLCL1,  ttsUCL
     val19.place(x=190, y=168)
     val20 = Entry(pop, width=8, textvariable=ttsLCL4, state=pState)  # Lower control limit
     val20.place(x=250, y=168)
+    # ------------------------------------------------------------------[]
     val25 = Entry(pop, width=4, state='normal', textvariable=sReg, bg='yellow', bd=4)
-    val25.place(x=120, y=200)
-    sReg.set(3)
+    val25.place(x=105, y=200)
+    sReg.set('40dp')
+    # ------------------------------------------------------------------[]
+    val26 = Entry(pop, width=4, state='normal', textvariable=pReg, bg='green2', bd=4)
+    val26.place(x=245, y=200)
+    pReg.set('04dp')
     # Binder Label --------------------------------------------------------#
     # Compute derived mean values for XBar/Sbar Plot & fill dynamically ---- [Trim values = x - 2]
     val1A = Label(pop, width=7, state='normal', font=("bold", 10))
@@ -484,11 +490,11 @@ def qpHLtt(pop, gSize, ttxUCL, ttxLCL, ttsUCL, ttsLCL, ttxUCL1, ttxLCL1,  ttsUCL
 
 def qpHLst(pop, gSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, xUCL2, xLCL2,  sUCL2, sLCL2, xUCL3, xLCL3,  sUCL3, sLCL3, xUCL4, xLCL4, sUCL4, sLCL4, WONID):
     global processID, val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, \
-        val14, val15, val16, val17, val18, val19, val20, val25
+        val14, val15, val16, val17, val18, val19, val20, val25, val26
 
     processID = WONID
     # ------------------
-    sReg = StringVar(pop)
+    sReg, pReg = StringVar(pop), StringVar(pop)
 
     # Function performs dynamic calculations ---[]
     def calculation(event=None):
@@ -795,9 +801,14 @@ def qpHLst(pop, gSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, xUCL
     val19.place(x=190, y=168)
     val20 = Entry(pop, width=8, textvariable=sLCL4, state=pState)  # Lower control limit
     val20.place(x=250, y=168)
+    # ------------------------------------------------------------------[]
     val25 = Entry(pop, width=4, state='normal', textvariable=sReg, bg='yellow', bd=4)
-    val25.place(x=120, y=200)
-    sReg.set(3)
+    val25.place(x=105, y=200)
+    sReg.set('40dp')
+    # ------------------------------------------------------------------[]
+    val26 = Entry(pop, width=4, state='normal', textvariable=pReg, bg='green2', bd=4)
+    val26.place(x=245, y=200)
+    pReg.set('04dp')
     # Binder Label --------------------------------------------------------#
     # Compute derived mean values for XBar/Sbar Plot & fill dynamically ---- [Trim values = x - 2]
     val1A = Label(pop, width=7, state='normal', font=("bold", 10))
@@ -878,11 +889,11 @@ def qpHLst(pop, gSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, xUCL
 
 
 def qpHLtg(pop, gSize, tgxUCL, tgxLCL, tgsUCL, tgsLCL, WONID):
-    global processID, val1, val2, val3, val4, val25
+    global processID, val1, val2, val3, val4, val25, val26
 
     processID = WONID
     # ------------------
-    sReg = IntVar(pop)
+    sReg, pReg = IntVar(pop), IntVar(pop)
 
     # Function performs dynamic calculations ---[]
     def calculation(event=None):
@@ -953,9 +964,15 @@ def qpHLtg(pop, gSize, tgxUCL, tgxLCL, tgsUCL, tgsLCL, WONID):
     val3.place(x=190, y=80)
     val4 = Entry(pop, width=8, state='normal', textvariable=tgsLCL)
     val4.place(x=250, y=80)
+    # ------------------------------------------------------------------[]
     val25 = Entry(pop, width=4, state='normal', textvariable=sReg, bg='yellow', bd=4)
-    val25.place(x=120, y=200)
-    sReg.set(3)
+    val25.place(x=105, y=200)
+    sReg.set('60dp')
+    # ------------------------------------------------------------------[]
+    val26 = Entry(pop, width=4, state='normal', textvariable=pReg, bg='green2', bd=4)
+    val26.place(x=245, y=200)
+    pReg.set('06dp')
+
     # Binder Label --------------------------------------------------------#
     # Compute derived mean values for XBar/Sbar Plot & fill dynamically ----
     val1A = Label(pop, width=7, state='normal', font=("bold", 10))
@@ -997,7 +1014,7 @@ def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
         # ------------------------ Codefy ----------------[]
         try:
             # print("Attempting to encrypt config values...")
-            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), enHL, enAL, enFO, ttA, ttB, ttC, ttD, ttE)
+            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), val26.get(), enHL, enAL, enFO, ttA, ttB, ttC, ttD, ttE)
 
         except ValueError:
             print(processID + ' - Error: Encryption utility encounters error!')
@@ -1021,7 +1038,7 @@ def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
         # ------------------------ Codefy ----------------[]
         try:
             print("Attempting to encrypt config values...")
-            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), enHL, enAL, enFO, stA, stB, stC, stD, stE)
+            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), val26.get(), enHL, enAL, enFO, stA, stB, stC, stD, stE)
 
         except ValueError:
             print(processID + ' - Error: Encryption utility encounters error!')
@@ -1042,7 +1059,7 @@ def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
 
         try:
             print("\nActivating the encryption utility")
-            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), enHL, enAL, enFO, tgA, tgB, tgC, tgD, tgE)
+            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), val26.get(), enHL, enAL, enFO, tgA, tgB, tgC, tgD, tgE)
 
         except ValueError:
             print(processID + ' - Error: Encryption utility encounters error!')
@@ -1054,7 +1071,7 @@ def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
     return
 
 
-def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, lineA, lineB, lineC, lineD, lineE):
+def encryptMetricsQP(WON, processID, sSize, gType, sCyc, pCyc, enDNV, enMGM, enAUT, lineA, lineB, lineC, lineD, lineE):
     WONID = WON
     # objective of cryptography is to provide basic security concepts in data exchange & integrity
     # initialise object instance ---
@@ -1067,6 +1084,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
         tgA = onetimepad.encrypt(str(sSize), 'random')
         tgB = onetimepad.encrypt(str(gType), 'random')
         tgK = onetimepad.encrypt(str(sCyc), 'random')
+        tgP = onetimepad.encrypt(str(pCyc), 'random')
         tgC = onetimepad.encrypt(str(enDNV), 'random')
         tgD = onetimepad.encrypt(str(enMGM), 'random')
         tgE = onetimepad.encrypt(str(enAUT), 'random')
@@ -1080,6 +1098,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
         ttA = onetimepad.encrypt(str(sSize), 'random')
         ttB = onetimepad.encrypt(str(gType), 'random')
         ttK = onetimepad.encrypt(str(sCyc), 'random')
+        ttP = onetimepad.encrypt(str(pCyc), 'random')
         ttC = onetimepad.encrypt(str(enDNV), 'random')
         ttD = onetimepad.encrypt(str(enMGM), 'random')
         ttE = onetimepad.encrypt(str(enAUT), 'random')
@@ -1093,6 +1112,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
         stA = onetimepad.encrypt(str(sSize), 'random')
         stB = onetimepad.encrypt(str(gType), 'random')
         stK = onetimepad.encrypt(str(sCyc), 'random')
+        stP = onetimepad.encrypt(str(pCyc), 'random')
         stC = onetimepad.encrypt(str(enDNV), 'random')
         stD = onetimepad.encrypt(str(enMGM), 'random')
         stE = onetimepad.encrypt(str(enAUT), 'random')
@@ -1113,7 +1133,8 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(tgA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(tgB))
-                config.set(processID + "HL_" + WONID, "SmplSpace", str(tgK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(tgK))
+                config.set(processID + "HL_" + WONID, "SEOPSpace", str(tgP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(tgC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(tgD))
                 config.set(processID + "HL_" + WONID, "EnableMGM", str(tgE))
@@ -1129,7 +1150,8 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(ttA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(ttB))
-                config.set(processID + "HL_" + WONID, "SmplSpace", str(ttK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(ttK))
+                config.set(processID + "HL_" + WONID, "SEOPSpace", str(ttP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(ttC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(ttD))
                 config.set(processID + "HL_" + WONID, "EnableMGM", str(ttE))
@@ -1149,7 +1171,8 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, enDNV, enMGM, enAUT, li
                 config.add_section(processID +"HL_"+WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(stA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(stB))
-                config.set(processID + "HL_" + WONID, "SmplSpace", str(stK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(stK))
+                config.set(processID + "HL_" + WONID, "SEOPSpace", str(stP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(stC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(stD))
                 config.set(processID + "HL_" + WONID, "EnableMGM", str(stE))
@@ -1189,7 +1212,8 @@ def decryptpProcessLim(WONID, processID):
         if processID == 'TG':  # Tape Gag (Polarisation)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
             gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
@@ -1203,7 +1227,8 @@ def decryptpProcessLim(WONID, processID):
         elif processID == 'TT':     # Tape Temperature
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
             gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
@@ -1217,7 +1242,8 @@ def decryptpProcessLim(WONID, processID):
         elif processID == 'ST':     # Substrate Temperature
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SmplSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
             gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
@@ -1235,7 +1261,8 @@ def decryptpProcessLim(WONID, processID):
         print('Configuration file is missing. Loading default values...')
         gen10 = 0
         gen20 = 0
-        gen25 = 3
+        gen25 = 0   # EOL Sample Space
+        gen26 = 0   # EOP sample space
         gen30 = 0
         gen40 = 0
         gen50 = 0
@@ -1246,5 +1273,5 @@ def decryptpProcessLim(WONID, processID):
         tapeE = 0
         # errorNote()
 
-    return gen10, gen20, gen25, gen30, gen40, gen50, tapeA, tapeB, tapeC, tapeD, tapeE
+    return gen10, gen20, gen25, gen26, gen30, gen40, gen50, tapeA, tapeB, tapeC, tapeD, tapeE
 

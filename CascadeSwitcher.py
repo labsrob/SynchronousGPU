@@ -122,19 +122,6 @@ else:
     pRecipe = 'USR'
 # ----------------------------------------------[]
 
-# ----------------------------------------------[ XXXX ]
-# smp_Sz = int(sSize)                                   # Allow SCADA User to specify window sample size
-# stp_Sz = gType                                        # Step Size (smp_St) Domino or Discrete group steps
-# # ----------------------------------------------------[]
-# if stp_Sz == 'GS-Discrete':
-#     viz_cycle = 100
-# elif stp_Sz == 'SS-Domino':
-#     viz_cycle = 500
-# else:
-#     viz_cycle = 10
-# print('\nGroup Type:', stp_Sz, 'Sample Size:', smp_Sz)
-# ----------------------------------------------------[]
-
 
 def rfProcessParam(vCounter, pType):
 
@@ -144,10 +131,10 @@ def rfProcessParam(vCounter, pType):
 
     # Load Quality Historical Values ---------------[]
     if pRecipe == 'DNV':
-        rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON,
+        rfSize, rfgType, rfSEoL, rfSEoP, rfHL, rfAL, rfFO, rfParam1, rfParam2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON,
                                                                                                                    'RF')
     else:
-        rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+        rfSize, rfgType, rfSEoL, rfSEoP, rfHL, rfAL, rfFO, rfParam1, rfParam2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
                                                                                                                    'RF')
     # Break down each element to useful list -------[Roller force]
 
@@ -579,10 +566,10 @@ def ttProcessParam(vCounter, pType):
 
     # Load Quality Historical Values -----------[]
     if pRecipe == 'DNV':
-        ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = dnv.decryptpProcessLim(WON,
+        ttSize, ttgType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = dnv.decryptpProcessLim(WON,
                                                                                                                    'TT')
     else:
-        ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = mgm.decryptpProcessLim(WON,
+        ttSize, ttgType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = mgm.decryptpProcessLim(WON,
                                                                                                                    'TT')
     # Break down each element to useful list ---------------[Tape Temperature]
 
@@ -1131,10 +1118,10 @@ def stProcessParam(vCounter, pType):
 
     # Load Quality Historical Values ---------------------------------------[]
     if pRecipe == 'DNV':
-        stSize, stgType, stSspace, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = dnv.decryptpProcessLim(
+        stSize, stgType, stSEoL, stSEoP, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = dnv.decryptpProcessLim(
             WON, 'ST')
     else:
-        stSize, stgType, stSspace, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = mgm.decryptpProcessLim(
+        stSize, stgType, stSEoL, stSEoP, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = mgm.decryptpProcessLim(
             WON, 'ST')
     # Break down each element to useful list -----------[Substrate Temperature]
 
@@ -1607,9 +1594,9 @@ def tgProcessParam(vCounter, pType):
 
     # Load Quality Historical Values ---------------------------------------[]
     if pRecipe == 'DNV':
-        tgSize, tggType, tgSspace, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON, 'TG')
+        tgSize, tggType, tgSEoL, tgSEoP, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON, 'TG')
     else:
-        tgSize, tggType, tgSspace, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+        tgSize, tggType, tgSEoL, tgSEoP, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
                                                                                                                 'TG')
 # Break down each element to useful list ----------------[Winding Speed]
 
@@ -2047,10 +2034,10 @@ def tpProcessParam(vCounter, pType):  # Tape Placement
 
     # Load metrics from config -----------------------------------[Tape Placement Error]
     if pRecipe == 'DNV':
-        tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON,
+        tpSize, tpgType, tpSEoL, tpSEoP, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON,
                                                                                                                 'TP')
     else:
-        tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+        tpSize, tpgType, tpSEoL, tpSEoP, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
                                                                                                                 'TP')
 
     # Break down each element to useful list ---------------------[Tape Gap]
@@ -2420,10 +2407,10 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
 
     # Load Quality Historical Values -----------[]
     if pRecipe == 'DNV':
-        lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = dnv.decryptpProcessLim(
+        lpSize, lpgType, lpSEoL, lpSEoP, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = dnv.decryptpProcessLim(
         WON, 'LP')
     else:
-        lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = mgm.decryptpProcessLim(
+        lpSize, lpgType, lpSEoL, lpSEoP, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = mgm.decryptpProcessLim(
             WON, 'LP')
     # Break down each element to useful list ---------------[Tape Temperature]
 
@@ -2905,9 +2892,9 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 
     # Load metrics from config -----------------------------------[]
     if pRecipe == 'DNV':
-        laSize, lagType, laSspace, laHL, laAL, latFO, laParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON, 'LA')
+        laSize, lagType, laSEoL, laSEoP, laHL, laAL, latFO, laParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON, 'LA')
     else:
-        laSize, lagType, laSspace, laHL, laAL, latFO, laParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+        laSize, lagType, laSEoL, laSEoP, laHL, laAL, latFO, laParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
                                                                                                                 'LA')
     # Break down each element to useful list ---------------------[Tape Gap]
 

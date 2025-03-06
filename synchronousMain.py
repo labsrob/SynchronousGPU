@@ -24,15 +24,14 @@ import selDataColsTT as qtt     # Tape Temperature
 import selDataColsVC as qvc     # void (gap) count
 import selDataColsVM as qvm     # Void mapping
 import selDataColsEoL as eol    # End of Layer
-
 # ----- DNV/MGM Params ---#
 import selDataColsPM as qpm     # Production Monitors
-import selDataColsRP as qrp     # Roller Pressure
-import selDataColsWS as qws     # Tape winding Speed
-import selDataColsCT as qct     # Cell Tension
-import selDataColsOT as qot     # Oven Temperature
-import selDataColsWA as qwa     # winding angle
-import selDataColsOE as qoe     # OEE TechnipFMC
+# import selDataColsRP as qrp     # Roller Pressure
+# import selDataColsWS as qws     # Tape winding Speed
+# import selDataColsCT as qct     # Cell Tension
+# import selDataColsOT as qot     # Oven Temperature
+# import selDataColsWA as qwa     # winding angle
+# import selDataColsOE as qoe     # OEE TechnipFMC
 # -------------------------#
 import pdfkit
 from fpdf import FPDF
@@ -112,7 +111,8 @@ exit_bit = []                                           # enable the close out o
 A3 = [0.975, 0.789, 0.680, 0.6327, 0.606, 0.5525]       # 10, 15, 20, 23, 25, 30  sample sizes respectively
 B3 = [0.284, 0.428, 0.510, 0.5452, 0.565, 0.6044]       # 10, 15, 20, 23, 25, 30  sample sizes respectively
 B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
-
+# ----------------------------------------------[]
+plcConnex = []
 UsePLC_DBS = True                                       # specify SQl Query or PLC DB Query is in use
 processWON = []
 
@@ -132,16 +132,21 @@ rtValues = []
 pRecipe = ""
 
 # Call function and load WON specification -----[]
-mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP = dd.decryptMetricsGeneral(WON)
-print('\nDecrypted Prod Parameters:', mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP)
+mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, TR = dd.decryptMetricsGeneral(WON)
+print('\nDecrypted MGM Parameters:', mLA, mLP, LP, LA, TP, RF)
+print('\nDecrypted DNV Parameters:', mCT, mOT, mRP, mWS, TT, ST, TG, TR)
 
 # ----------------------------------------------[A]
-if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA) and not int(TP) and not int(RF):
+if int(TT) and int(ST) and int(TG) and int(TR):
     pRecipe = 'DNV'
     import qParamsHL_DNV as dnv
-elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
+    print('processing DNV parameters...')
+
+elif int(LP) and int(LA) and int(TP) and int(RF):
     pRecipe = 'MGM'
     import qParamsHL_MGM as mgm
+    print('processing MGM parameters...')
+
 else:
     pRecipe = 'USR'
 # ----------------------------------------------[]
@@ -149,6 +154,7 @@ else:
 def generate_pdf(data):
     # --------------------------------------[]
     from pylab import title, figure, xlabel, ylabel, xticks, bar, legend, axis, savefig
+
     # Initialise dataframe from Tables -----[]
     df = pd.DataFrame()
     df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']
@@ -216,7 +222,7 @@ def generate_pdf(data):
     pdf.cell(-130)
 
     for i in range(0, len(df)):
-        print('Iteration ...')
+        print('Iteration ...')   # Instead of ln=2 use new_x=XPos.LEFT, new_y=YPos.NEXT.
         pdf.cell(35, 8, '%s' % (str(df.RingID.iloc[i])), 1, 0, 'C')  # 1: Next line under
         pdf.cell(25, 8, '%s' % (str(df.Actual.iloc[i])), 1, 0, 'C')  # 0: to the right
         pdf.cell(25, 8, '%s' % (str(df.Nominal.iloc[i])), 1, 0, 'C')
@@ -502,7 +508,7 @@ def tabbed_canvas():   # Tabbed Common Classes -------------------[TABBED ]
     # ------------------------------------------ DNV Statistical Process Parameters -----[]
     if int(TT) and int(ST) and int(TG):
         pRecipe = 'DNV'
-        print('\nAm hee DNV....')
+
         notebook.add(tab1, text="Tape Temperature")         # Stats x16
         notebook.add(tab2, text="Substrate Temperature")    # Stats x16
         notebook.add(tab3, text="Tape Gap Polarisation")    # Stats x4 per Ring
@@ -514,7 +520,7 @@ def tabbed_canvas():   # Tabbed Common Classes -------------------[TABBED ]
 
     elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
         pRecipe = 'MGM'
-        print('\nAm hee MGM....')
+
         notebook.add(tab1, text="Laser Power")              # Stats
         notebook.add(tab2, text="Laser Angle")              # Stats
         notebook.add(tab3, text="Roller Force")             # Stats
@@ -682,7 +688,24 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
         self.createWidgets()
 
     def createWidgets(self):
+        # Load settings -------
+        # Load metrics from config -----------------------------------[]
+        if pRecipe == 'DNV':
+            import qParamsHL_DNV as dnv
+            ttSize, ttgType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'TT')
+            stSize, stgType, stSEoL, stSEoP, stHL, stAL, stFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'ST')
+            tgSize, tggType, tgSEoL, tgSEoP, tgHL, tgAL, tgFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'TG')
+        else:
+            import qParamsHL_MGM as mgm
+            lpSize, lpType, lpSEoL, lpSEoP, lpHL, lpAL, lpFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'LP')
+            laSize, laType, laSEoL, laSEoP, laHL, laAL, laFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'LA')
+            tpSize, tpType, tpSEoL, tpSEoP, tpHL, tpAL, tpFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'TP')
+            rfSize, rfType, rfSEoL, rfSEoP, rfHL, rfAL, rfFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'RF')
+            ttSize, ttType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'TT')
+            stSize, stType, stSEoL, stSEoP, stHL, stAL, stFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'ST')
+            tgSize, tgType, tgSEoL, tgSEoP, tgHL, tgAL, tgFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'TG')
 
+        # ----------------------
         label = ttk.Label(self, text='[End of Layer Summary - ' + rType + ' Mode]', font=LARGE_FONT)
         label.pack(padx=10, pady=5)
         # ----------------------------------#
@@ -1097,7 +1120,7 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
             # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 
         def synchronousEoL(dnv_Size, dnv_gType, fetchT):
-            fetch_no = str(fetchT)  # entry value in string sql syntax
+            fetch_no = str(fetchT)                                  # entry value in string sql syntax
 
             # Initialise SQL Data connection per listed Table --------------------[]
             if EoLRep == 'DNV':
@@ -1115,15 +1138,14 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
             # Initialise variables ---[]
             autoSpcRun = True
             autoSpcPause = False
-            import keyboard  # for temporary use
+            import keyboard                                         # for temporary use
 
             # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
             sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
             # Define PLC/SMC error state -------------------------------------------#
 
             while True:
-                # Latch on SQL Query only a
-                import sqlArrayRLmethodEoL as sel                  # DrLabs optimization method
+                import sqlArrayRLmethodEoL as sel                   # DrLabs optimization method
 
                 inProgress = False                                  # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
@@ -1148,9 +1170,9 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
                 else:
                     # ------ Process data fetch sequences --------------------------#
                     if EoLRep == 'DNV':
-                        rpTT, rpST, rpTG, rpRM = sel.dnv_sqlexec(smp_Sz, stp_Sz, eol1, eol2, eol3, eol4, T1, T2, T3, T4,  fetch_no)
+                        rpTT, rpST, rpTG, rpRM = sel.dnv_sqlexec(dnv_Size, dnv_gType, eol1, eol2, eol3, eol4, T1, T2, T3, T4,  fetch_no)
                     elif EoLRep == 'MGM':
-                        rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF = sel.mgm_sqlexec(smp_Sz, stp_Sz, eol1, eol2, eol3, eol4, eol5, eol6, eol7, eol8, T1, T2, T3, T4, T5, T6, T7, T8, fetch_no)
+                        rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF = sel.mgm_sqlexec(dnv_Size, dnv_gType, eol1, eol2, eol3, eol4, eol5, eol6, eol7, eol8, T1, T2, T3, T4, T5, T6, T7, T8, fetch_no)
                     else:
                         pass            # reserved for bespoke user selection ------#
                     print("Visualization in Play Mode...")
@@ -1183,14 +1205,14 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
                 return rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF
 
         # ================== End of synchronous Method ==========================
-        def asynchronousEoL(db_freq):
-            timei = time.time()  # start timing the entire loop
+        def asynchronousEoL(dnv_Size, dnv_gType, db_freq):
+            timei = time.time()                                 # start timing the entire loop
 
-            # Obtain fetch SQl data from respective Tables ------------#
+            # Obtain fetch SQl data from respective Tables -----#
             if EoLRep == 'DNV':
-                rdTT, rdST, rdTG, rdRM = synchronousEoL(smp_Sz, stp_Sz, db_freq)
+                rdTT, rdST, rdTG, rdRM = synchronousEoL(dnv_Size, dnv_gType, db_freq)
             else:
-                rdTT, rdST, rdTG, rdRM, rdLP, rdLA, rdTP, rdRF = synchronousEoL(smp_Sz, stp_Sz, db_freq)
+                rdTT, rdST, rdTG, rdRM, rdLP, rdLA, rdTP, rdRF = synchronousEoL(dnv_Size, dnv_gType, db_freq)
 
             # ttData = synchronousTT(ttSize, ttgType, db_freq)  # data loading functions
             # rmData = synchronousTS(smp_Sz, stp_Sz, db_freq)   # Accumulated Gap Mean Profile
@@ -1906,7 +1928,7 @@ class common_rampCount(ttk.Frame):
         window_Xmin, window_Xmax = 0, pExLayer                      # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        rcData = WON + '_RC'                                         # Identify Table
+        rcData = WON + '_RC'                                        # Identify Table
         # ----------------------------------------------------------#
 
         a1.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -5184,13 +5206,14 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
-            ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = dnv.decryptpProcessLim(
-                WON, 'TT')
+            import qParamsHL_DNV as qp
         else:
-            ttSize, ttgType, ttSspace, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = mgm.decryptpProcessLim(
+            import qParamsHL_MGM as qp
+        # ------------------------------------------[]
+        ttSize, ttgType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = qp.decryptpProcessLim(
                 WON, 'TT')
-
         # Break down each element to useful list ---------------[Tape Temperature]
+
         if ttHL and ttParam1 and ttParam2 and ttParam3 and ttParam4 and ttParam5:  #
             ttPerf = '$Pp_{k' + str(ttSize) + '}$'      # Using estimated or historical Mean
             ttlabel = 'Pp'
@@ -5744,14 +5767,12 @@ class substTempTabb(ttk.Frame):
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
             import qParamsHL_DNV as qp
-        elif pRecipe == 'MGM':
-            import qParamsHL_MGM as qp
         else:
-            pass
-
-        stSize, stgType, stSspace, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = qp.decryptpProcessLim(
-            WON, 'ST')
-
+            import qParamsHL_MGM as qp
+        # -----------------------------------------
+        stSize, stgType, stSEoL, stSEoP, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = qp.decryptpProcessLim(
+                WON, 'ST')
+        # -----------------------------------------
         # Break down each element to useful list -----------[Substrate Temperature]
         if stHL and stParam1 and stParam2 and stParam3 and stParam4 and stParam5:
             stPerf = '$Pp_{k' + str(stSize) + '}$'  # Using estimated or historical Mean
@@ -6229,13 +6250,10 @@ class tapeGapPolTabb(ttk.Frame):
         """Create the widgets for the GUI"""
         if pRecipe == 'DNV':
             import qParamsHL_DNV as qp
-        elif pRecipe == 'MGM':
-            import qParamsHL_MGM as qp
         else:
-            pass
-
+            import qParamsHL_MGM as qp
         # Load metrics from config -----------------------------------[Tape Gap]
-        tgSize, tggType, tgSspace, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = qp.decryptpProcessLim(WON, 'TG')
+        tgSize, tggType, tgSEoL, tgSEoP, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = qp.decryptpProcessLim(WON, 'TG')
 
         # Break down each element to useful list ---------------------[Tape Gap]
         if tgHL and tgParam1:
@@ -6676,15 +6694,20 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
     def create_widgets(self):
         """Create the widgets for the GUI"""
         # --------------------------------------------------------------------[]
-        tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mq.decryptpProcessLim(WON, 'TG')
+        if pRecipe == 'DNV':
+            import qParamsHL_DNV as qp
+        else:
+            import qParamsHL_MGM as qp
+        # Load metrics from config -----------------------------------[Tape Gap]
+        tpSize, tpType, tpSEoL, tpSEoP, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = qp.decryptpProcessLim(WON, 'TP')
 
-        # Break down each element to useful list ----------------[Winding Speed]
+        # Break down each element to useful list ----------------[Tape Placement]
 
         if tpHL and tpParam1:
-            tgPerf = '$Pp_{k' + str(tpSize) + '}$'  # Estimated or historical Mean
-            tglabel = 'Pp'
+            tpPerf = '$Pp_{k' + str(tpSize) + '}$'  # Estimated or historical Mean
+            tplabel = 'Pp'
             # -------------------------------
-            tgOne = tpParam1.split(',')  # split into list elements
+            tpOne = tpParam1.split(',')  # split into list elements
             dTapetp = tpOne[1].strip("' ")  # defined Tape Width
             dLayer = tpOne[10].strip("' ")  # Defined Tape Layer
 
@@ -6907,7 +6930,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
             timei = time.time()                                 # start timing the entire loop
 
             # Call data loader Method---------------------------#
-            tpData = synchronousTP(tpSize, tpgType, db_freq)    # data loading functions
+            tpData = synchronousTP(tpSize, tpType, db_freq)    # data loading functions
             # --------------------------------------------------#
 
             if UsePLC_DBS == 1:
@@ -7036,10 +7059,6 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
 #                                                                                                                    #
 # ===================================================================================================================#
 
-
-
-# FIXME -----------------------------------------------------------------------------------------------------[]
-
 class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -7048,12 +7067,18 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
 
     def createWidgetsRF(self):
 
-        # Load Quality Historical Values -----------[]
-        rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = mq.decryptpProcessLim(
+        # Load metrics from config -----------------------------------[]
+        if pRecipe == 'DNV':
+            import qParamsHL_DNV as qp
+        else:
+            import qParamsHL_MGM as qp
+        # ------------------------------------------------------------[]
+        rfSize, rfgType, rfSEoL, rfSEoP, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = qp.decryptpProcessLim(
             WON, 'RF')
-        # Break down each element to useful list ---------------[Tape Temperature]
+        # Break down each element to useful list -----[Tape Temperature]
+
         if rfHL and rfParam1 and rfParam2 and rfParam3 and rfParam4 and rfParam5:  #
-            rfPerf = '$Pp_{k' + str(sSize) + '}$'  # Using estimated or historical Mean
+            rfPerf = '$Pp_{k' + str(rfSize) + '}$'  # Using estimated or historical Mean
             rflabel = 'Pp'
             # -------------------------------------[]
             One = rfParam1.split(',')  # split into list elements
@@ -7140,7 +7165,7 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
             sLCLrf = 0
             rfUSL = 0
             rfLSL = 0
-            rfPerf = '$Cp_{k' + str(sSize) + '}$'  # Using Automatic group Mean
+            rfPerf = '$Cp_{k' + str(rfSize) + '}$'  # Using Automatic group Mean
             rflabel = 'Cp'
 
         # ------ [End of Historical abstraction -------]
@@ -7530,6 +7555,14 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
         self.createWidgetsCT()
 
     def createWidgetsCT(self):
+
+        # Load metrics from config -----------------------------------[]
+        if pRecipe == 'DNV':
+            import qParamsHL_DNV as qp
+        else:
+            import qParamsHL_MGM as qp
+        # ------------------------------------------------------------[]
+
         label = ttk.Label(self, text="JIT - End of Layer Processing", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
@@ -7547,55 +7580,42 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
         window_Xmin, window_Xmax = 0, (int(sSize) + 3)              # windows view = visible data points
         # ----------------------------------------------------------#
 
-        if pMinMax:
-            a1 = fig.add_subplot(1, 1, 1)
+        a1 = fig.add_subplot(2, 2, (1, 2))  # Cell Tension X Bar Plot
+        a2 = fig.add_subplot(2, 2, (3, 4))  # Cell Tension s Plot
 
-            # Declare Plots attributes -----------------------------------------[]
-            a1.set_title('Just inTime EoL Report', fontsize=12, fontweight='bold')
+        # Declare Plots attributes -----------------------------------------[]
+        a1.set_title('Cell Tension [XBar Plot]', fontsize=12, fontweight='bold')
+        a2.set_title('Cell Tension [SBar Plot]', fontsize=12, fontweight='bold')
+        # Apply grid lines -----
+        a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
 
-            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a1.legend(loc='upper right', title='Cell Tension (N.mm2)')
-            # Initialise runtime limits
-            a1.set_ylabel("Min/Max Value Plot - N.mm2")
-            a1.axhline(y=hMeanB, color="red", linestyle="-", linewidth=1)
+        # Common properties -------------------------------------------------#
+        a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
+        a2.set_ylabel("Sample Deviation [" + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+        a1.legend(loc='upper right', title='Cell Tension Control Plot')
+        a2.legend(loc='upper right', title='Sigma curve')
+        # ----------------------------
+        # a1.legend(loc='upper left')
+        # axp.legend(loc='upper left')
 
-        elif pContrl:
-            a1 = fig.add_subplot(2, 2, (1, 2))  # Cell Tension X Bar Plot
-            a2 = fig.add_subplot(2, 2, (3, 4))  # Cell Tension s Plot
+        # Define limits for X Bar Plots -----------------------#
+        a1.axhline(y=hMeanB, color="green", linestyle="-", linewidth=1)
+        a1.axhspan(hLCLb, hUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
+        # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
+        a1.axhspan(hUCLb, hUSLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
+        a1.axhspan(hLSLb, hLCLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
+        # clean up when Mean line changes ---
+        a1.axhspan(hUSLb, hUSLb + 10, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+        a1.axhspan(hLSLb - 10, hLSLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
 
-            # Declare Plots attributes -----------------------------------------[]
-            a1.set_title('Cell Tension [XBar Plot]', fontsize=12, fontweight='bold')
-            a2.set_title('Cell Tension [SBar Plot]', fontsize=12, fontweight='bold')
-            # Apply grid lines -----
-            a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a2.grid(color="0.5", linestyle='-', linewidth=0.5)
+        # Define limits for S Bar Plot -----------------------#
+        a2.axhline(y=hDevB, color="green", linestyle="-", linewidth=1)
+        a2.axhspan(dLCLb, dUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
 
-            # Common properties -------------------------------------------------#
-            a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-            a2.set_ylabel("Sample Deviation [" + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
-            a1.legend(loc='upper right', title='Cell Tension Control Plot')
-            a2.legend(loc='upper right', title='Sigma curve')
-            # ----------------------------
-            # a1.legend(loc='upper left')
-            # axp.legend(loc='upper left')
-
-            # Define limits for X Bar Plots -----------------------#
-            a1.axhline(y=hMeanB, color="green", linestyle="-", linewidth=1)
-            a1.axhspan(hLCLb, hUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
-            # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-            a1.axhspan(hUCLb, hUSLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            a1.axhspan(hLSLb, hLCLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            # clean up when Mean line changes ---
-            a1.axhspan(hUSLb, hUSLb + 10, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-            a1.axhspan(hLSLb - 10, hLSLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-
-            # Define limits for S Bar Plot -----------------------#
-            a2.axhline(y=hDevB, color="green", linestyle="-", linewidth=1)
-            a2.axhspan(dLCLb, dUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
-
-            # clean up when Mean line changes ---
-            a2.axhspan(dUCLb, dUCLb + 0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-            a2.axhspan(dLCLb - 0.05, dLCLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+        # clean up when Mean line changes ---
+        a2.axhspan(dUCLb, dUCLb + 0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+        a2.axhspan(dLCLb - 0.05, dLCLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
 
         # Model data --------------------------------------------------[]
         a1.plot([105, 120, 114, 109, 110, 86, 102, 103, 101, 100])
@@ -7773,167 +7793,6 @@ class cascadeCommonViewsRPT(ttk.Frame):                                # End of 
         # toolbar.update()
         # canvas._tkcanvas.pack(expand=True)
 
-
-class cascadeCommonViewsOEE(ttk.Frame):
-    def __init__(self, master=None):
-        ttk.Frame.__init__(self, master)
-        self.place(x=10, y=800)
-        self.createWidgets()
-
-    def createWidgets(self):
-        # -----------------------------------
-        f = Figure(figsize=(6, 5), dpi=100)
-        f.subplots_adjust(left=0.045, bottom=0, right=0.988, top=0.929, wspace=0.202)
-        a3 = f.add_subplot(1, 1, 1)
-
-        # Model data --------------------------------------------------[]
-        a3.cla()
-        a3.get_yaxis().set_visible(False)
-        a3.get_xaxis().set_visible(False)
-        if not runStatus:
-            a3.pie([1, 7, 0, 5, 9, 6], shadow=True)
-
-        # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
-        def synchronousOEE(smp_Sz, smp_St, fetchT):
-            fetch_no = str(fetchT)  # entry value in string sql syntax
-            # Obtain SQL Data Host Server ---------------------------[]
-            qRP = conn.cursor()
-
-            # Evaluate conditions for SQL Data Fetch ---------------[A]
-            """
-            Load watchdog function with synchronous function every seconds
-            """
-            # Initialise RT variables ---[]
-            autoSpcRun = True
-            autoSpcPause = False
-            import keyboard  # for temporary use
-
-            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-            # Define PLC/SMC error state -------------------------------------------#
-
-            while True:
-                # print('Indefinite looping...')
-                import sqlArrayRLmethodOE as oe                             # DrLabs optimization method
-                inProgress = True                                           # True for RetroPlay mode
-                print('\nAsynchronous controller activated...')
-                print('DrLabs' + "' Runtime Optimisation is Enabled!")
-
-                # Get list of relevant SQL Tables using conn() ---------[TODO] Data fetch only at unique stoppages
-                oeData = oe.sqlexec(smp_Sz, smp_St, qRP, tblID, fetchT)     # perform DB connections
-                if keyboard.is_pressed("Alt+Q"):                            # Terminate file-fetch
-                    qRP.close()
-                    print('SQL End of File, connection closes after 30 mins...')
-                    time.sleep(60)
-                    continue
-                else:
-                    print('\nUpdating....')
-
-            return oeData
-
-        # ================== End of synchronous Method ==========================
-        def asynchronousOEE(db_freq):
-
-            timei = time.time()                                 # start timing the entire loop
-            # Call data loader Method---------------------------#
-            oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
-
-            import VarSQLoe as qoe                              # load SQL variables column names | rfVarSQL
-            viz_cycle = 150
-            g1 = qo.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
-            df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe
-            OE = qoe.loadProcesValues(df3)                      # Join data values under dataframe
-            print('\nDataFrame Content', df3.head(10))          # Preview Data frame head
-            print("Memory Usage:", df3.info(verbose=False))     # Check memory utilization
-
-            # --------------------------------
-            # Allow the following code to run despite not on DNV condition ----------------#
-            # TODO replace with process variable
-            cLayer = OE[1]
-            status = OE[3]
-            curLayer = list(set(cLayer))            # shuffle list to obtain unique layer number at a time
-            if len(curLayer) > 1:
-                lastE = len(curLayer)
-                curLayer = curLayer[lastE - 1]      # print the last index element
-            # ---------------------------------
-            # if VarPerHeadA or VarPerHeadB or VariProcess:
-            OTlayr.append(curLayer[0])              # Post values into static array
-            EPpos.append('N/A')                     # Insert pipe position is available
-            pStatus.append(status)
-            print('\nTP05[Layer/Status]:', curLayer[0], status)
-            # ----------------------------------------------------------------------------#
-            print('\nTesting loop...')
-            # Obtain current local time string ------------------------[]
-            cTime = strftime("%H:%M:%S")
-
-            # Convert current time string to datetime object ----------[]
-            currentTime = str(datetime.strptime(cTime, "%H:%M:%S").time())
-            print('\nCurrent Time:', currentTime)
-
-            # Compute essential variables ------------------------------- TODO verify filter *****
-            dayShiftTime = df3[(df3['TimeLine'] >= sStart) & (df3['TimeLine'] <= currentTime)]
-
-            totalRun = dayShiftTime.copy()
-            totalRun = totalRun.drop_duplicates(subset='TimeLine', keep='first')
-            # print('Total Run:', totalRun)
-
-            # Convert Shift start time to string format -----------------
-            shiftStartTime = str(datetime.strptime(sStart, "%H:%M:%S").time())
-            shiftEndTime = str(datetime.strptime(sStops, "%H:%M:%S").time())
-            print("Shift Starts:", shiftStartTime)
-            print("Shift Ends @:", shiftEndTime)
-
-            # Compute production lapse time -----------------------------
-            TShiftSec = datetime.strptime(sStops, '%H:%M:%S') - datetime.strptime(shiftStartTime, '%H:%M:%S')
-            ShiftinSec = TShiftSec.total_seconds()  # Convert values into seconds
-            print('=' * 22)
-            print('Shift Hours:', ShiftinSec, '(Sec)')
-
-            deltaT = datetime.strptime(str(currentTime), '%H:%M:%S') - datetime.strptime(shiftStartTime, '%H:%M:%S')
-            opTime = deltaT.total_seconds()  # Convert values into seconds
-            print('\n********* SUMMARY **********')
-            print('Operation Time:', opTime, '(Sec)')
-
-            # Compute downtime in seconds -------------------------------
-            downtime = totalRun['Duration(Sec)'].sum()
-            print('TCP1 Down Time:', float(downtime), '(Sec)')
-
-            # Computer work time relative to total shift hours ----------
-            prodTime = (opTime - downtime)
-            print('Net Production:', prodTime, '(Sec)')
-            print('-' * 28)
-
-            endShiftHour = (ShiftinSec - prodTime)
-            pieData = np.array([endShiftHour, prodTime, downtime])
-            segexplode = [0, 0, 0.1]
-
-            ind_metric = ['Current Shift', 'Production Time', 'OEE Time']
-            # Pie Chart Plot ---------------------
-            mycol = ['#4c72b0', 'green', 'orange']          # add colors
-            a3.pie(pieData, labels=ind_metric, startangle=90, explode=segexplode, shadow=True, autopct='%1.1f%%',
-                    colors=mycol, textprops={'fontsize': 10})
-            if not HeadA:   # if HeadA (synchronous)
-                a3.set_title('Post Production Status', fontsize=12, fontweight='bold')
-            else:
-                a3.set_title('Machine Live Status Analysis', fontsize=12, fontweight='bold')
-
-            # No trigger module processing - Production parameter is for monitoring purposes only.
-            timef = time.time()
-            lapsedT = timef - timei
-            print(f"\nProcess Interval: {lapsedT} sec\n")
-
-            ani = FuncAnimation(f, asynchronousOEE, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
-                                blit=False)
-            plt.tight_layout()
-            plt.show()
-        # -------------------------------------------------------------[]
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.get_tk_widget().pack(expand=False)
-
-        # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True)
 
 # ====================================================== MAIN PIPELINE ===========================================[]
 # qType = 0   # default play mode
@@ -8533,7 +8392,6 @@ def userMenu():     # listener, myplash
         else:
             pLA.set(0)
 
-
     def runChecksB():
         if pTT.get():
             pTT.set(1)
@@ -8577,6 +8435,9 @@ def userMenu():     # listener, myplash
             hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
         else:
             pTG.set(0)
+
+    def eolpConfigs():
+        pass
 
 
     def dnvConfigs():
@@ -8883,9 +8744,13 @@ def userMenu():     # listener, myplash
         Label(pop, text='[Configure Quality Parameters]', font=("bold", 10)).place(x=10,
                                                                              y=(y_start + 5) + (y_incmt * 3))  # 320 | 7
 
+        # --------------------------------------------------------------------------------------------#
         dnv_butt = Button(pop, text="DNV Key Parameters", wraplength=90, justify=CENTER, width=12,
                           height=3, font=("bold", 12), command=dnvConfigs, state=cState)
         dnv_butt.place(x=240, y=3 + y_start + y_incmt * 4)  # 350 | 8
+        # --------------------------------------------------------------------------------------------#
+        EoLP_butt = Button(pop, text=" EoL/EoP Sampling ", width=15, command=eolpConfigs, state='normal')
+        EoLP_butt.place(x=240, y=3 + y_start + y_incmt * 6.6)
         # --------------------------------------------------------------------------------------------#
         mgm_butt = Button(pop, text="MGM Key Parameters", wraplength=90, justify=CENTER, width=12,
                               height=3, font=("bold", 12), command=mgmConfigs, state=cState)
@@ -10276,15 +10141,15 @@ if __name__ == '__main__':
     # This code will only be executed if the script is run as the main program
     root = Tk()
 
-    # Create table -----------------------------[]
-    entries = []
-    for i in range(5):              # Example: 5 rows
-        row_entries = []
-        for j in range(6):          # 6 columns
-            entry = tk.Entry(root)
-            entry.grid(row=i, column=j)
-            row_entries.append(entry)
-        entries.append(row_entries)
+    # # Create table -----------------------------[]
+    # entries = []
+    # for i in range(5):              # Example: 5 rows
+    #     row_entries = []
+    #     for j in range(6):          # 6 columns
+    #         entry = tk.Entry(root)
+    #         entry.grid(row=i, column=j)
+    #         row_entries.append(entry)
+    #     entries.append(row_entries)
     # -------------------------------------------[]
     # Load menu functions
     userMenu()

@@ -1145,18 +1145,26 @@ def paramsEntry(modal, gSize, gMode, defHL, defAL, defMG, pLP, pLA, pTP, pRF, pT
     # TODO --------------------------------- Insert dynamic calculations for Mean, SD & USL []
 
     # Add Button for making selection -----------------------------------------------------[]
-    Label(modal, text='Sample Space [' + pTy + ']:').place(x=10, y=200)
-    Label(modal, text='sec').place(x=150, y=200)
+    Label(modal, text='EoL Sample [' + pTy + ']:').place(x=10, y=200)
+    # Label(modal, text='sec').place(x=150, y=200)
+
     sRegime = Entry(modal, width=4, state='disabled', textvariable=sReg, bg='yellow', bd=4)
-    sRegime.place(x=120, y=200)
+    sRegime.place(x=105, y=200)
+    # ------------------------------------------------------------------------
+    Label(modal, text='EoP Sample [' + pTy + ']:').place(x=150, y=200)
+    # Label(modal, text='sec').place(x=150, y=200)
 
-    e_data = Button(modal, text="Edit " + pTy + " Metrics", width=13, bg="red", fg="white", command=editPHL)
-    e_data.place(x=220, y=200)
+    pRegime = Entry(modal, width=4, state='disabled', textvariable=sReg, bg='purple', bd=4)
+    pRegime.place(x=245, y=200)
+    # ------------------------------------------------------------------------
 
-    s_data = Button(modal, text="Save " + pTy + " Metrics", width=13, bg="blue", fg="white", state=pbutton, command=save_mMetrics)
-    s_data.place(x=350, y=200)
+    e_data = Button(modal, text="Edit " + pTy + " Metrics", width=12, bg="red", fg="white", command=editPHL)
+    e_data.place(x=320, y=200)
+
+    s_data = Button(modal, text="Save " + pTy + " Metrics", width=12, bg="blue", fg="white", state=pbutton, command=save_mMetrics)
+    s_data.place(x=420, y=200)
 
     x_data = Button(modal, text="Exit Lookup", command=modal.destroy)
-    x_data.place(x=530, y=200)
+    x_data.place(x=630, y=200)
 
     modal.mainloop()
