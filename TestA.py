@@ -462,4 +462,80 @@ from cryptography.fernet import Fernet
 # # Run the application
 # root.mainloop()
 # ------------------------------------------[]
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import ipywidgets as widgets
+import seaborn as sns
 
+# Get dataset
+data_url = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/cases_deaths/total_deaths_per_million.csv"
+df = pd.read_csv(data_url, index_col=0, parse_dates=[0], engine='python')
+
+# na values = 0
+df.fillna(0, inplace=True)
+df.head()
+
+# add year-week column
+df['Year_Week'] = df.index.to_period('W').strftime('%Y-%U')
+
+# keep only last day of week and change to datetime type
+df = df.groupby(df['Year_Week']).last('1D')
+df.index = pd.to_datetime(df.index + '-0', format='%Y-%U-%w')
+
+# drop columns that aren't a country
+df_country = df.drop(['World',
+                      'Africa',
+                      'Asia',
+                      'Europe',
+                      'European Union',
+                      'High income',
+                      'Low income',
+                      'Lower middle income',
+                      'North America',
+                      'South America',
+                      'Upper middle income'],
+                     axis=1)
+
+
+# create function to update plot based on selected country
+def update_plot(country):
+    ax.clear()  # clear existing plot
+    ax.plot(df.index, df_country[country])  # plot selected country
+
+    # set x-axis tick locations and labels
+    xticks = pd.date_range(start=df_country.index[0].strftime('%Y-01-01'), end=df_country.index[-1], freq='AS')
+    xticklabels = [x.strftime('%Y') for x in xticks]
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(xticklabels)
+    ax.set_title(f"Total deaths per million ({country})")  # update plot title
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Deaths per million")
+    fig.canvas.draw()  # redraw canvas
+
+
+# create drop-down menu with country names as options
+country_dropdown = widgets.Dropdown(
+    options=df_country.columns,
+    value=df_country.columns[0],
+    description='Country'
+)
+
+# create plot
+fig, ax = plt.subplots()
+update_plot(country_dropdown.value)  # initial plot
+
+# set up widget interaction
+output = widgets.Output()
+display(country_dropdown, output)
+
+
+def on_change(change):
+    if change['type'] == 'change' and change['name'] == 'value':
+        with output:
+            output.clear_output()
+            update_plot(change['new'])
+            display(fig)
+
+
+country_dropdown.observe(on_change)

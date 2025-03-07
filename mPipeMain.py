@@ -271,6 +271,7 @@ def mainRun(conn, ret, stad, stpd, Sqlfmt, HeadA, HeadB, viewTFM, oEE, rp, ts, t
     if UsePLC_DBS:
         import CommsPlc as q
         smp_SCADA = q.readString(89, 80, 0)
+
         if smp_SCADA == 'Discrete':
             smp_St = 2                              # Sample step of 2
             viz_cycle = 10

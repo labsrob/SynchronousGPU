@@ -234,7 +234,7 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T
 
     # ------------------------------------------------------------------------------------[]
     # Procedure ----------------------------------[A]
-    dataTT = daq1.execute('SELECT * FROM ' + T1).fetchmany(n2fetch)
+    dataTT = daq1.execute('SELECT * FROM ' + T1).fetchall() # fetchmany(n2fetch)
     if len(dataTT) != 0:
         for result in dataTT:
             result = list(result)
@@ -272,7 +272,7 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T
     daq1.close()
 
     # Tape Winding procedure ----------------------------------[B]
-    dataTS = daq2.execute('SELECT * FROM ' + T2).fetchmany(n2fetch)
+    dataTS = daq2.execute('SELECT * FROM ' + T2).fetchall() # fetchmany(n2fetch)
     if len(dataTS) != 0:
         for result in dataTS:
             result = list(result)
@@ -310,7 +310,7 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T
     daq2.close()
 
     # Procedure ----------------------------------[A]
-    dataTG = daq3.execute('SELECT * FROM ' + T3).fetchmany(n2fetch)
+    dataTG = daq3.execute('SELECT * FROM ' + T3).fetchall() # fetchmany(n2fetch)
     if len(dataTG) != 0:
         for result in dataTG:
             result = list(result)
@@ -348,7 +348,7 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T
     daq1.close()
 
     # Cell Tension & Oven Temperature procedure ----------------------------[B]
-    dataRM = daq4.execute('SELECT * FROM ' + T4).fetchmany(n2fetch)
+    dataRM = daq4.execute('SELECT * FROM ' + T4).fetchall() # fetchmany(n2fetch)
     if len(dataRM) != 0:
         for result in dataRM:
             result = list(result)
@@ -386,7 +386,7 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T
     daq4.close()
 
     # Roller Force procedure ----------------------------------[A]
-    dataLP = daq5.execute('SELECT * FROM ' + T5).fetchmany(n2fetch)
+    dataLP = daq5.execute('SELECT * FROM ' + T5).fetchall() # fetchmany(n2fetch)
     if len(dataLP) != 0:
         for result in dataLP:
             result = list(result)
@@ -422,8 +422,10 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T
         time.sleep(5)
     daq5.close()
 
-    # Laser Angle procedure ----------------------------------[B]
-    dataLA = daq6.execute('SELECT * FROM ' + T6).fetchmany(n2fetch)
+    # FIXME Laser Angle procedure ----------------------------------[B]
+    # dataLA = daq6.execute('SELECT TOP ' + fetch_no + ' * FROM ' + rT3).fetchall()
+
+    dataLA = daq6.execute('SELECT * FROM ' + T6).fetchall()     # fetchmany(n2fetch)
     if len(dataLA) != 0:
         for result in dataLA:
             result = list(result)
@@ -461,7 +463,7 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T
     daq6.close()
 
     # Cell Tension Procedure ----------------------------------[D]
-    dataTP = daq7.execute('SELECT * FROM ' + T7).fetchmany(n2fetch)
+    dataTP = daq7.execute('SELECT * FROM ' + T7).fetchall() # fetchmany(n2fetch)
     if len(dataTP) != 0:
         for result in dataTP:
             result = list(result)
@@ -499,7 +501,7 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T
     daq7.close()
 
     # Position Error Procedure ----------------------------------[E]
-    dataRF = daq8.execute('SELECT * FROM ' + T8).fetchmany(n2fetch)
+    dataRF = daq8.execute('SELECT * FROM ' + T8).fetchall() # fetchmany(n2fetch)
     if len(dataRF) != 0:
         for result in dataRF:
             result = list(result)
