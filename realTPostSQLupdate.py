@@ -8,28 +8,28 @@ from datetime import datetime
 import os
 
 
-def sigmaErrorLog(md, layer, pID, pX, pD, pU, pL, rID, v1, v2, v3, v4, pPos):
+def sigmaErrorLog(md, layer, pID, rID, v1, v2, v3, v4, pPos):
 
-    rtitle = ('============================ TCP01 FMEA - ['+md+'] Reports ======================================================\n')
-    rheader = ('Time'+'\t\t'+'Layer#'+'\t'+'pID'+'\t'+'pMean'+'\t'+'pDev'+'\t'+'UCL'+'\t'+'LCL'+'\t'+'RingID'+'\t'+'Head1'+'\t'+'Head2'+'\t'+'Head3'+'\t'+'Head4'+'\t'+'EstPos'+'\n')
+    rtitle = ('============================ TCP01 EoP - ['+md+'] Reports ======================================================\n')
+    rheader = ('Time'+'\t\t'+'Layer#'+'\t'+'pID'+'\t'+'RingID'+'\t'+'Head1'+'\t'+'Head2'+'\t'+'Head3'+'\t'+'Head4'+'\t'+'EstPos'+'\n')
     rdemaca = ("------------------------------------------------------------------------------------------------------\n")
-    fileName = datetime.now().strftime('FM_Repo '+"%Y-%m-%d")
+    fileName = datetime.now().strftime('EoP_Quality '+"%Y-%m-%d")
     event = datetime.now().strftime("%H:%M.%S")
-    SigmaLog = str(fileName)
+    runLog = str(fileName)
 
-    filepath = '.\\FMEA_Log\\'+SigmaLog+".txt"
+    filepath = '.\\EoP_Reports\\' + runLog + ".txt"
     old_report = os.path.isfile(filepath)
 
-    if not old_report:                                      # if doing a new report...
-        f = open('.\\FMEA_Log\\'+SigmaLog+".txt", "a")      # Open new file and ...
-        f.write(rtitle)                                     # Insert a Title
-        f.write(rheader)                                    # Insert new header
-        f.write(rdemaca)                                    # Insert demarcator
-    else:                                                   # if it's an existing report
-        f = open('.\\FMEA_Log\\' + SigmaLog + ".txt", "a")  # Just open the file for a write operations
+    if not old_report:                                          # if doing a new report...
+        f = open('.\\EoP_Reports\\' + runLog + ".txt", "a")     # Open new file and ...
+        f.write(rtitle)                                         # Insert a Title
+        f.write(rheader)                                        # Insert new header
+        f.write(rdemaca)                                        # Insert demarcator
+    else:                                                       # if it's an existing report
+        f = open('.\\EoP_Reports\\' + runLog + ".txt", "a")     # Just open the file for a write operations
 
     # initialise a tab delimited data and insert corresponding values in string format --------------------------[]
-    f.write(event+'\t'+str(layer)+'\t'+pID+'\t'+pX+'\t'+pD+'\t'+pU+'\t'+pL+'\t'+rID+'\t'+str(v1)+'\t'+str(v2)+'\t'+str(v3)+'\t'+str(v4)+'\t'+str(pPos)+'\n')
+    f.write(event+'\t'+str(layer)+'\t'+pID+'\t'+rID+'\t'+str(v1)+'\t'+str(v2)+'\t'+str(v3)+'\t'+str(v4)+'\t'+str(pPos)+'\n')
     f.close()
 
 

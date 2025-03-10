@@ -38,6 +38,7 @@ from fpdf import FPDF
 import time
 import os
 import sys
+import math
 from datetime import datetime
 from time import gmtime, strftime
 import signal
@@ -70,7 +71,7 @@ OTlayr, EPpos, pStatus = [], [], []
 HeadA, HeadB, vTFM = 0, 0, 0
 hostConn = 0
 runStatus = 0
-
+qMarker_rpt = 0.1
 # -------------
 gap_vol = 0
 ramp_vol = 0
@@ -156,16 +157,46 @@ def generate_pdf(data):
     # --------------------------------------[]
     from pylab import title, figure, xlabel, ylabel, xticks, bar, legend, axis, savefig
 
-    # Initialise dataframe from Tables -----[]
-    df = pd.DataFrame()
-    df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']
-    df["Actual"] = [4.6, 4.5, 4.7, 4.5]
-    df["Nominal"] = [4.5, 4.5, 4.5, 4.5]
-    df["StdDev"] = [0.25, 0.16, 0.27, 0.32]
-    df["Tolerance"] = [0.5, 0.4, 0.39, 0.42]
-    df["Status"] = ['CHECK', 'OK', 'OK', 'OK']
+    # Initialise dataframe from Tables
+    rID = ' Layer (EoP)'
 
-    title("EoL Report Chart")
+    df = pd.DataFrame()
+
+    df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']
+    df["Actual"] = [2.2, 2.0, 2.8, 2.1]
+    df["Nominal"] = [1.8, 1.9, 2.2, 2.2]
+    df["StdDev"] = [round(((df['Actual'][0] - df['Nominal'][0]) / math.sqrt(2)), 2),
+                    round(((df['Actual'][1] - df['Nominal'][1]) / math.sqrt(2)), 2),
+                    round(((df['Actual'][2] - df['Nominal'][2]) / math.sqrt(2)), 2),
+                    round(((df['Actual'][3] - df['Nominal'][3]) / math.sqrt(2)), 2)]
+    # df["StdDev"] = [0.25, 0.16, 0.27, 0.32]
+    df["Tolerance"] = [round(((df['Actual'][0] - df['Nominal'][0]) / df['Nominal'][0]), 2),
+                       round(((df['Actual'][1] - df['Nominal'][1]) / df['Nominal'][1]), 2),
+                       round(((df['Actual'][2] - df['Nominal'][2]) / df['Nominal'][2]), 2),
+                       round(((df['Actual'][3] - df['Nominal'][3]) / df['Nominal'][3]), 2)]
+    # df["Tolerance"] = [0.5, 0.4, 0.39, 0.42]
+    if df['Tolerance'][0] > qMarker_rpt:
+        A = 'CHECK'
+    else:
+        A = 'OK'
+    # -----------------
+    if df['Tolerance'][1] > qMarker_rpt:
+        B = 'CHECK'
+    else:
+        B = 'OK'
+    # -----------------
+    if df['Tolerance'][2] > qMarker_rpt:
+        C = 'CHECK'
+    else:
+        C = 'OK'
+    # -----------------
+    if df['Tolerance'][3] > qMarker_rpt:
+        D = 'CHECK'
+    else:
+        D = 'OK'
+    # --------------------------
+    df["Status"] = [A, B, C, D]
+    title(rID + " Report")
     xlabel('Ring Analytics')
     ylabel('Rated Quality')
 
@@ -179,7 +210,9 @@ def generate_pdf(data):
     oID = 'TC'
     dID = datetime.datetime.now()
     lID = 24
+    # ---------------------------[]
     processID = 'ROLLER PRESSURE'
+    # ---------------------------[]
 
     xticks(a, df['RingID'])
     bar(a, df['Actual'], width=0.3, color="blue", label="Actual")
@@ -251,6 +284,16 @@ def generate_pdf(data):
 
 def get_data():
     data = []
+
+    # Define dataframe columns ---------------------------------------------------------[]
+    colu = ['TimeLine', 'CurrentLayer', 'TransitionCode', 'Description', 'Duration(Sec)']
+    df3 = pd.DataFrame(dX3, columns=colu)  # porte sql data into dataframe
+    cLayer = df3['CurrentLayer']  # .tail(1)
+    status = df3['Description'][1]  # .tail(1)
+    curLayer = list(set(cLayer))
+
+    # connect to SQL tabel EoL, perform minimal statistic and print report
+    T1 = processWON + '_EoL'  # Identify Table
 
     # initiate SQL connection ---------[]
     row0 = 'End of Layer (EoL) Report'
@@ -735,7 +778,8 @@ def readEoP(text_widget, rptID):        # End of Pipe Report
 # --------------- Defines the collective one screen structure -------------------------------------[]
 
 
-class collectiveEoL(ttk.Frame):                                # End of Layer Progressive Report Tabb
+class collectiveEoL(ttk.Frame):
+    # End of Layer Progress Report Tabb. Plot Mean/stdev for each parameter, generate QA-EoL nominal values per process
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)

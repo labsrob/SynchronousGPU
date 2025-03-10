@@ -24,6 +24,7 @@ def chartOEE(Start_Day, FinishDay, dX3):
     cLayer = df3['CurrentLayer']        # .tail(1)
     status = df3['Description'][1]      # .tail(1)
     curLayer = list(set(cLayer))        # shuffle list to obtain unique layer number at a time
+
     if len(curLayer) > 1:
         lastE = len(curLayer)
         curLayer = curLayer[lastE - 1]  # print the last index element
