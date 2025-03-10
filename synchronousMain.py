@@ -112,14 +112,15 @@ A3 = [0.975, 0.789, 0.680, 0.6327, 0.606, 0.5525]       # 10, 15, 20, 23, 25, 30
 B3 = [0.284, 0.428, 0.510, 0.5452, 0.565, 0.6044]       # 10, 15, 20, 23, 25, 30  sample sizes respectively
 B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
 # ----------------------------------------------[]
+
 plcConnex = []
 UsePLC_DBS = True                                       # specify SQl Query or PLC DB Query is in use
-processWON = []
+processWON = ["20240507", "20240508"]                   # Dynamically obtain WON from Host PLC
 
 # ------------- Dummy values -------------------[]
 pPos = '6.2345'
 layer = '03'
-WON = "275044"
+# WON = "20240507"
 sel_SS = "30"
 sel_gT = "S-Domino"
 eSMC = 'Tape laying process in progress...'
@@ -132,7 +133,7 @@ rtValues = []
 pRecipe = ""
 
 # Call function and load WON specification -----[]
-mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, TR = dd.decryptMetricsGeneral(WON)
+mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, TR = dd.decryptMetricsGeneral(processWON[0])
 print('\nDecrypted MGM Parameters:', mLA, mLP, LP, LA, TP, RF)
 print('\nDecrypted DNV Parameters:', mCT, mOT, mRP, mWS, TT, ST, TG, TR)
 
@@ -692,7 +693,7 @@ def plotView(titleMean):
     im17, = a2.plot([], [], 'o-', label='Roller Force')
 
 
-def readEoP(text_widget, rptID):
+def readEoP(text_widget, rptID):        # End of Pipe Report
     # file_path = filedialog.askopenfilename(title='Select a Text File', filetypes=[('Text files&quot', '*.txt')])
 
     file_path = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\FMEA_Log\\'+ rptID +'.txt'
@@ -742,6 +743,7 @@ class collectiveEoL(ttk.Frame):                                # End of Layer Pr
 
     def createWidgets(self):
         # Load settings -------
+        WON = processWON[0]
         # Load metrics from config -----------------------------------[]
         if pRecipe == 'DNV':
             import qParamsHL_DNV as dnv
@@ -1928,7 +1930,7 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
                 label = ttk.Label(self, text='Roller Force', width=16, font=14, background='#fff') #, justify='center')
                 label.place(x=1540, y=54)
 
-                rpt = "RPT_RF_20240507" # + str(processWON[0])
+                rpt = "RPT_RF_" + str(processWON[0])
                 readEoP(text_widget, rpt)                              # Open txt file from FMEA folder
 
             elif selected_option == "Tape Temperature":
@@ -2020,7 +2022,7 @@ class common_rampCount(ttk.Frame):
         window_Xmin, window_Xmax = 0, pExLayer                      # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        rcData = WON + '_RC'                                        # Identify Table
+        rcData = processWON[0] + '_RC'                             # Identify Table
         # ----------------------------------------------------------#
 
         a1.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2201,7 +2203,7 @@ class common_climateProfile(ttk.Frame):
         window_Xmin, window_Xmax = 0, 30                            # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        evData = WON + '_EV'                                        # Enviromental variables
+        evData = processWON[0] + '_EV'                                        # Enviromental variables
         # ----------------------------------------------------------#
 
         a2.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2384,7 +2386,7 @@ class common_gapCount(ttk.Frame):
         window_Xmin, window_Xmax = 0, pExLayer                      # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        vData = WON + '_VC'                                         # Void Count
+        vData = processWON[0] + '_VC'                                         # Void Count
         # ----------------------------------------------------------#
 
         a3.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2549,10 +2551,10 @@ class MonitorTabb(ttk.Frame):
             a4 = f.add_subplot(2, 4, (7, 8))        # Oven Temperature
 
             # Load Query Tables --------------------#
-            T1 = WON + '_RP'                        # Roller Pressure
-            T2 = WON + '_WS'                        # Tape Winding Speed
-            T3 = WON + '_CT'                        # Cell Tension & Oven Temp
-            T4 = WON + '_OT'                        # Oven Temp already incorporated in common process
+            T1 = processWON[0] + '_RP'                        # Roller Pressure
+            T2 = processWON[0] + '_WS'                        # Tape Winding Speed
+            T3 = processWON[0] + '_CT'                        # Cell Tension & Oven Temp
+            T4 = processWON[0] + '_OT'                        # Oven Temp already incorporated in common process
             # --------------------------------------#
 
         elif pRecipe == 'MGM':
@@ -2566,12 +2568,12 @@ class MonitorTabb(ttk.Frame):
             a5 = f.add_subplot(2, 6, (9, 10))       # Oven Temperature
             a6 = f.add_subplot(2, 6, (11, 12))      # Winding Speed
             # --------------------------------------#
-            T1 = WON + '_LP'                        # Laser Power
-            T2 = WON + '_LA'                        # Laser Angle
-            T3 = WON + '_CT'                        # Cell Tension
-            T4 = WON + '_RP'                        # Roller Pressure
-            T5 = WON + '_WS'                        # Tape Winding Speed
-            T6 = WON + '_OT'                        # Oven Temp already incorporated in common process
+            T1 = processWON[0] + '_LP'                        # Laser Power
+            T2 = processWON[0] + '_LA'                        # Laser Angle
+            T3 = processWON[0] + '_CT'                        # Cell Tension
+            T4 = processWON[0] + '_RP'                        # Roller Pressure
+            T5 = processWON[0] + '_WS'                        # Tape Winding Speed
+            T6 = processWON[0] + '_OT'                        # Oven Temp already incorporated in common process
             # --------------------------------------#
         else:
             print('\n Users params condition met....')
@@ -2583,32 +2585,32 @@ class MonitorTabb(ttk.Frame):
                 a1 = f.add_subplot(1, 4, (1, 2))    # Cell Tension
                 a2 = f.add_subplot(1, 4, (3, 4))    # Oven Temperature
                 # ----------------------------------#
-                T1 = WON + '_OT'                    # Oven Temperature
-                T2 = WON + '_CT'                    # Cell Tension
+                T1 = processWON[0] + '_OT'                    # Oven Temperature
+                T2 = processWON[0] + '_CT'                    # Cell Tension
                 # ----------------------------------#
 
             elif int(LP) and int(LA):
                 a1 = f.add_subplot(1, 4, (1, 2))    # Laser Power
                 a2 = f.add_subplot(1, 4, (3, 4))    # Laser Angle
                 # ----------------------------------#
-                T1 = WON + '_RP'                    # Roller Pressure
-                T2 = WON + '_WS'                    # Tape Winding Speed
+                T1 = processWON[0] + '_RP'                    # Roller Pressure
+                T2 = processWON[0] + '_WS'                    # Tape Winding Speed
                 # ----------------------------------#
 
             elif int(RP) and int(WS):
                 a1 = f.add_subplot(1, 4, (1, 2))    # Roller Pressure
                 a2 = f.add_subplot(1, 4, (3, 4))    # Tape Winding Speed
                 # ----------------------------------#
-                T1 = WON + '_LP'                    # Laser Power
-                T2 = WON + '_LA'                    # Laser Angle
+                T1 = processWON[0] + '_LP'                    # Laser Power
+                T2 = processWON[0] + '_LA'                    # Laser Angle
                 # ----------------------------------#
 
             elif int(ST) and int(TG):
                 a1 = f.add_subplot(1, 4, (1, 2))    # Spooling Tension
                 a2 = f.add_subplot(1, 4, (3, 4))    # Gap Polarising Error
                 # ----------------------------------#
-                T1 = WON + '_WS'  # Winding Speed
-                T2 = WON + '_TG'  # Tape Gap Pol
+                T1 = processWON[0] + '_WS'  # Winding Speed
+                T2 = processWON[0] + '_TG'  # Tape Gap Pol
                 # ----------------------------------#
         # Declare Plots attributes -----------------[]
         plt.rcParams.update({'font.size': 7})        # Reduce font size to 7pt for all legends
@@ -3400,10 +3402,10 @@ class laserPowerTabb(ttk.Frame):
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
             lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = dnv.decryptpProcessLim(
-                WON, 'LP')
+                processWON[0], 'LP')
         else:
             lpSize, lpgType, lpSspace, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = mgm.decryptpProcessLim(
-                WON, 'LP')
+                processWON[0], 'LP')
         # Break down each element to useful list ---------------[Tape Temperature]
 
         if lpHL and lpParam1 and lpParam2 and lpParam3 and lpParam4 and lpParam5:  #
@@ -3519,7 +3521,7 @@ class laserPowerTabb(ttk.Frame):
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 27/Feb/2025
-        T1 = WON + '_LP'  # Laser Power
+        T1 = processWON[0] + '_LP'  # Laser Power
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -3890,10 +3892,10 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
             laSize, lagType, laSspace, laHL, laAL, laFO, laParam1, laParam2, laParam3, laParam4, laParam5 = dnv.decryptpProcessLim(
-                WON, 'LA')
+                processWON[0], 'LA')
         else:
             laSize, lagType, laSspace, laHL, laAL, laFO, laParam1, laParam2, laParam3, laParam4, laParam5 = mgm.decryptpProcessLim(
-                WON, 'LA')
+                processWON[0], 'LA')
         # Break down each element to useful list ---------------[Tape Temperature]
         if laHL and laParam1 and laParam2 and laParam3 and laParam4 and laParam5:  #
             laPerf = '$Pp_{k' + str(laSize) + '}$'  # Using estimated or historical Mean
@@ -4010,7 +4012,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
         if int(LP) and int(LA) and int(CT) and int(OT) and int(RP) and int(WS):
             print('\n MGM params condition met....', OT, CT, RP, WS)
-            T1 = WON + '_LA'  # Laser Power
+            T1 = processWON[0] + '_LA'  # Laser Power
         else:
             pass
 
@@ -4376,10 +4378,10 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         """Create the widgets for the GUI"""
         # --------------------------------------------------------------------[]
         if pRecipe == 'DNV':
-            tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(WON,
+            tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(processWON[0],
                                                                                                                     'TP')
         else:
-            tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(WON,
+            tpSize, tpgType, tpSspace, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(processWON[0],
                                                                                                                    'TP')
 
         # Break down each element to useful list ----------------[Winding Speed]
@@ -4438,7 +4440,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 27/Feb/2025
-        T1 = WON + '_TP'  # Tape Placement Error
+        T1 = processWON[0] + '_TP'  # Tape Placement Error
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -4805,10 +4807,10 @@ class rollerForceTabb(ttk.Frame):
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
             rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = dnv.decryptpProcessLim(
-                WON, 'RF')
+                processWON[0], 'RF')
         else:
             rfSize, rfgType, rfSspace, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = mgm.decryptpProcessLim(
-                WON, 'RF')
+                processWON[0], 'RF')
         # Break down each element to useful list ---------------[Tape Temperature]
 
         if rfHL and rfParam1 and rfParam2 and rfParam3 and rfParam4 and rfParam5:  #
@@ -4924,7 +4926,7 @@ class rollerForceTabb(ttk.Frame):
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 28/Feb/2025
-        T1 = WON + '_RF'        # Laser Power
+        T1 = processWON[0] + '_RF'        # Laser Power
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -5303,7 +5305,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             import qParamsHL_MGM as qp
         # ------------------------------------------[]
         ttSize, ttgType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = qp.decryptpProcessLim(
-                WON, 'TT')
+                processWON[0], 'TT')
         # Break down each element to useful list ---------------[Tape Temperature]
 
         if ttHL and ttParam1 and ttParam2 and ttParam3 and ttParam4 and ttParam5:  #
@@ -5422,8 +5424,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         window_XminRM, window_XmaxRM = 0, pLength                   # Get details from SCADA PIpe Recipe TODO[1]
 
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-        T1 = WON + '_TT'        # Tape Temperature
-        T2 = WON + '_RM'        # Ramp Profile Mapping
+        T1 = processWON[0] + '_TT'        # Tape Temperature
+        T2 = processWON[0] + '_RM'        # Ramp Profile Mapping
         # ----------------------------------------------------------#
 
         # Initialise runtime limits --------------------------------#
@@ -5863,7 +5865,7 @@ class substTempTabb(ttk.Frame):
             import qParamsHL_MGM as qp
         # -----------------------------------------
         stSize, stgType, stSEoL, stSEoP, stHL, stAL, stFO, stParam1, stParam2, stParam3, stParam4, stParam5 = qp.decryptpProcessLim(
-                WON, 'ST')
+                processWON[0], 'ST')
         # -----------------------------------------
         # Break down each element to useful list -----------[Substrate Temperature]
         if stHL and stParam1 and stParam2 and stParam3 and stParam4 and stParam5:
@@ -5976,7 +5978,7 @@ class substTempTabb(ttk.Frame):
         window_Xmin, window_Xmax = 0, (int(stSize) + 3)             # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        T1 = WON + '_ST'  # Identify Table
+        T1 = processWON[0] + '_ST'  # Identify Table
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -6345,7 +6347,7 @@ class tapeGapPolTabb(ttk.Frame):
         else:
             import qParamsHL_MGM as qp
         # Load metrics from config -----------------------------------[Tape Gap]
-        tgSize, tggType, tgSEoL, tgSEoP, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = qp.decryptpProcessLim(WON, 'TG')
+        tgSize, tggType, tgSEoL, tgSEoP, tgHL, tgAL, tgtFO, tgParam1, dud2, dud3, dud4, dud5 = qp.decryptpProcessLim(processWON[0], 'TG')
 
         # Break down each element to useful list ---------------------[Tape Gap]
         if tgHL and tgParam1:
@@ -6404,8 +6406,8 @@ class tapeGapPolTabb(ttk.Frame):
         window_XminVM, window_XmaxVM = 0, pLength                   # Get details from SCADA PIpe Recipe TODO[1]
 
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-        T1 = WON + '_TG'        # Tape Placement
-        T2 = WON + '_VM'        # Void Mapping
+        T1 = processWON[0] + '_TG'        # Tape Placement
+        T2 = processWON[0] + '_VM'        # Void Mapping
         # ----------------------------------------------------------#
 
         # Initialise runtime limits --------------------------------#
@@ -6791,7 +6793,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         else:
             import qParamsHL_MGM as qp
         # Load metrics from config -----------------------------------[Tape Gap]
-        tpSize, tpType, tpSEoL, tpSEoP, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = qp.decryptpProcessLim(WON, 'TP')
+        tpSize, tpType, tpSEoL, tpSEoP, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = qp.decryptpProcessLim(processWON[0], 'TP')
 
         # Break down each element to useful list ----------------[Tape Placement]
 
@@ -6850,7 +6852,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-        T1 = WON + '_TP'  # Tape Placement
+        T1 = processWON[0] + '_TP'  # Tape Placement
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -7166,7 +7168,7 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
             import qParamsHL_MGM as qp
         # ------------------------------------------------------------[]
         rfSize, rfgType, rfSEoL, rfSEoP, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = qp.decryptpProcessLim(
-            WON, 'RF')
+            processWON[0], 'RF')
         # Break down each element to useful list -----[Tape Temperature]
 
         if rfHL and rfParam1 and rfParam2 and rfParam3 and rfParam4 and rfParam5:  #
@@ -7281,7 +7283,7 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 28/Feb/2025
-        T1 = WON + '_RF'                                            # Roller Force
+        T1 = processWON[0] + '_RF'                                            # Roller Force
         # ----------------------------------------------------------#
 
         # Common properties -------------------------------------------------#
@@ -7983,10 +7985,10 @@ def userMenu():     # listener, myplash
             x = len(rtValues) - 1                               # Use the last index
 
             # Encrypt configuration on production params -------#
-            mp.saveMetricspP(WON, sel_SS, sel_gT, sSta, sEnd, rtValues[x][0], rtValues[x][1], rtValues[x][2],
+            mp.saveMetricspP(processWON[0], sel_SS, sel_gT, sSta, sEnd, rtValues[x][0], rtValues[x][1], rtValues[x][2],
                              rtValues[x][3], rtValues[x][4], rtValues[x][5], rtValues[x][6], rtValues[x][7])
         else:
-            mp.saveMetricspP(WON, sel_SS, sel_gT, sSta, sEnd, OT, CT, RP, LA, WS, TG, ST, LP)
+            mp.saveMetricspP(processWON[0], sel_SS, sel_gT, sSta, sEnd, OT, CT, RP, LA, WS, TG, ST, LP)
         return
 
 
@@ -9763,7 +9765,7 @@ def userMenu():     # listener, myplash
 
     def retroPlay():
         # Declare global variable available to all processes
-        global stpd, WON, processID, OEEdataID, hostConn
+        global stpd, processWON, processID, OEEdataID, hostConn
 
         if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
             import CommsSql as hs

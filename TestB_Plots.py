@@ -12,11 +12,13 @@ import pandas as pd
 from matplotlib.colors import Normalize
 
 path = ('C:\\Users\\DevEnv\\OneDrive - Magma Global LTD\\Documents\\Development DOCUMENTS\\Technical Reqs Docs\\Tape Gap Measurements\\testFile.csv')
+# path = ('C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\FMEA_Log\\RPT_ST_20240507.csv')
 csv_file = (path)
 
 df = pd.read_csv(csv_file)
-print('Test Print', df.head())
-print('Test2:', df['VoidPercent'])
+print('\nTest Print\n', df.head())
+
+# print('Test2:', df['VoidPercent'])
 # df['VoidPercent'].plot()
 
 import seaborn as sns
@@ -175,3 +177,21 @@ plt.show()
 # plt.legend(handles=scatter.legend_elements()[0], labels=classes)
 #
 # plt.show()
+
+
+
+# ----------------------------------------------------------------------------------------------[]
+
+path = ('C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\FMEA_Log\\RPT_ST_20240507.csv')
+csv_file = (path)
+
+df = pd.read_csv(csv_file)
+print('\nTest Print\n', df.head())
+
+dataA = df['Time']
+dataB = df['Layer#']
+dataC = df['pSP Actual']
+dataD = df['rID']
+dataE = df['pMeasured']
+dataF = df['pDev']
+

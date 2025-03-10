@@ -6,46 +6,37 @@
 # Cascade (Multiple screen ) View
 # --------------------------------------------------------------------------#
 
-import numpy as np
-import pandas as pd
-import spcWatchDog as wd
 # -------PLC/SQL Query -------#
 import time
-import os
-import sys
-from datetime import datetime
+from multiprocessing import Process
 from time import gmtime, strftime
-import signal
-import numpy as np
-import pandas as pd
 from tkinter import *
 from tkinter import ttk
-from threading import *
-from tkinter.simpledialog import askstring
+
 import matplotlib.pyplot as plt
-from multiprocessing import Process, freeze_support, set_start_method
-from matplotlib.figure import Figure
+import numpy as np
+import pandas as pd
 from matplotlib.animation import FuncAnimation
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.figure import Figure
+
+import spcWatchDog as wd
+
 LARGE_FONT = ("Verdana", 12, 'bold')
 import matplotlib.patches as patches
-from mpl_interactions import ioff, panhandler, zoom_factory
+from mpl_interactions import zoom_factory
 
 import rtP_Evaluator as tq
 # -------PLC/SQL Query --------#
-import selDataColsEV as qev     # Environmental Values
 import selDataColsLA as qla     # Laser Angle
 import selDataColsLP as qlp     # Laser Power
-import selDataColsRC as qrc     # Ramp Count
 import selDataColsRF as qrf     # Roller Force
 import selDataColsRM as qrm     # Ramp Mapping
 import selDataColsST as qst     # Substrate Temperature
 import selDataColsTG as qtg     # Tape Gap Void
 import selDataColsTP as qtp     # Tape Placement error
 import selDataColsTT as qtt     # Tape Temperature
-import selDataColsVC as qvc     # void (gap) count
 import selDataColsVM as qvm     # Void mapping
-import selDataColsEoL as eol    # End of Layer
 # -----------------------------#
 import pParamsHL as dd
 
