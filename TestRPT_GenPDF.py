@@ -15,10 +15,18 @@ df = pd.DataFrame()
 df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']
 df["Actual"] = [2.2, 2.0, 2.8, 2.1]
 df["Nominal"] = [1.8, 1.9, 2.2, 2.2]
-df["StdDev"] = [round(((df['Actual'][0] - df['Nominal'][0])/math.sqrt(2)), 2), round(((df['Actual'][1] - df['Nominal'][1])/math.sqrt(2)), 2), round(((df['Actual'][2] - df['Nominal'][2])/math.sqrt(2)), 2),  round(((df['Actual'][3] - df['Nominal'][3])/math.sqrt(2)), 2)]
+
+df["StdDev"] = [round(((df['Actual'][0] - df['Nominal'][0]) / math.sqrt(2)), 2),
+                    round(((df['Actual'][1] - df['Nominal'][1]) / math.sqrt(2)), 2),
+                    round(((df['Actual'][2] - df['Nominal'][2]) / math.sqrt(2)), 2),
+                    round(((df['Actual'][3] - df['Nominal'][3]) / math.sqrt(2)), 2)]
 # df["StdDev"] = [0.25, 0.16, 0.27, 0.32]
-df["Tolerance"] = [round(((df['Actual'][0] - df['Nominal'][0])/df['Nominal'][0]), 2), round(((df['Actual'][1] - df['Nominal'][1])/df['Nominal'][1]),2), round(((df['Actual'][2] - df['Nominal'][2])/df['Nominal'][2]), 2), round(((df['Actual'][3] - df['Nominal'][3])/df['Nominal'][3]), 2)]
+df["Tolerance"] = [round(((df['Actual'][0] - df['Nominal'][0]) / df['Nominal'][0]), 2),
+                   round(((df['Actual'][1] - df['Nominal'][1]) / df['Nominal'][1]), 2),
+                   round(((df['Actual'][2] - df['Nominal'][2]) / df['Nominal'][2]), 2),
+                   round(((df['Actual'][3] - df['Nominal'][3]) / df['Nominal'][3]), 2)]
 # df["Tolerance"] = [0.5, 0.4, 0.39, 0.42]
+# ------------------------------------------------------------------------------------------
 if df['Tolerance'][0] > 0.1:
     A = 'CHECK'
 else:

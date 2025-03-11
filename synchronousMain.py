@@ -153,28 +153,28 @@ else:
     pRecipe = 'USR'
 # ----------------------------------------------[]
 
-def generate_pdf(data):
+def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, SetPt, Value, Stdev, Tvalu, usrID):
     # --------------------------------------[]
     from pylab import title, figure, xlabel, ylabel, xticks, bar, legend, axis, savefig
 
-    # Initialise dataframe from Tables
-    rID = ' Layer (EoP)'
+    # Initialise dataframe from Tables ----------
+    reportID = rptID
+    proj = custm
+    pID = cPipe
+    oID = usrID
+    dID = datetime.datetime.now()
+    lID = layrN
+    # ---------------------------[]
+    processID = cProc
+    # ---------------------------[]
 
     df = pd.DataFrame()
+    df['RingID'] = [ringA, ringB, ringC, ringD]
+    df["Actual"] = [SetPt[0], SetPt[1], SetPt[2], SetPt[3]]
+    df["Nominal"] = [Value[0], Value[1], Value[2], Value[3]]
+    df["StdDev"] = [Stdev[0], Stdev[1], Stdev[2], Stdev[3]]
+    df["Tolerance"] = [Tvalu[0], Tvalu[1], Tvalu[2], Tvalu[3]]
 
-    df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']
-    df["Actual"] = [2.2, 2.0, 2.8, 2.1]
-    df["Nominal"] = [1.8, 1.9, 2.2, 2.2]
-    df["StdDev"] = [round(((df['Actual'][0] - df['Nominal'][0]) / math.sqrt(2)), 2),
-                    round(((df['Actual'][1] - df['Nominal'][1]) / math.sqrt(2)), 2),
-                    round(((df['Actual'][2] - df['Nominal'][2]) / math.sqrt(2)), 2),
-                    round(((df['Actual'][3] - df['Nominal'][3]) / math.sqrt(2)), 2)]
-    # df["StdDev"] = [0.25, 0.16, 0.27, 0.32]
-    df["Tolerance"] = [round(((df['Actual'][0] - df['Nominal'][0]) / df['Nominal'][0]), 2),
-                       round(((df['Actual'][1] - df['Nominal'][1]) / df['Nominal'][1]), 2),
-                       round(((df['Actual'][2] - df['Nominal'][2]) / df['Nominal'][2]), 2),
-                       round(((df['Actual'][3] - df['Nominal'][3]) / df['Nominal'][3]), 2)]
-    # df["Tolerance"] = [0.5, 0.4, 0.39, 0.42]
     if df['Tolerance'][0] > qMarker_rpt:
         A = 'CHECK'
     else:
@@ -194,9 +194,11 @@ def generate_pdf(data):
         D = 'CHECK'
     else:
         D = 'OK'
-    # --------------------------
+
+    # -- Construct new validation method ----
     df["Status"] = [A, B, C, D]
-    title(rID + " Report")
+
+    title(reportID + " Report")
     xlabel('Ring Analytics')
     ylabel('Rated Quality')
 
@@ -204,15 +206,6 @@ def generate_pdf(data):
     # a = a.sort()
     n = [x - 0.5 for x in a]
     s = [x - 0.3 for x in a]
-
-    proj = 12332
-    pID = 3222
-    oID = 'TC'
-    dID = datetime.datetime.now()
-    lID = 24
-    # ---------------------------[]
-    processID = 'ROLLER PRESSURE'
-    # ---------------------------[]
 
     xticks(a, df['RingID'])
     bar(a, df['Actual'], width=0.3, color="blue", label="Actual")
@@ -283,36 +276,35 @@ def generate_pdf(data):
 
 
 def get_data():
-    data = []
-
-    # Define dataframe columns ---------------------------------------------------------[]
-    colu = ['TimeLine', 'CurrentLayer', 'TransitionCode', 'Description', 'Duration(Sec)']
-    df3 = pd.DataFrame(dX3, columns=colu)  # porte sql data into dataframe
-    cLayer = df3['CurrentLayer']  # .tail(1)
-    status = df3['Description'][1]  # .tail(1)
-    curLayer = list(set(cLayer))
+    rgdata, spData, nData, stdDt, tolernc = [], [], [], [], []
 
     # connect to SQL tabel EoL, perform minimal statistic and print report
     T1 = processWON + '_EoL'  # Identify Table
 
-    # initiate SQL connection ---------[]
-    row0 = 'End of Layer (EoL) Report'
-    row1 = ''
-    row2 = 'Customer Project No:'
-    row3 = 'Pipe ID No:'
-    row4 = 'Layer ID No:'
-    row5 = 'Date & Time'
-    row6 = 'Operators ID:'
-    # Table -------------------------------------------[]
-    row7 = "TCP01", "Actual", "Nominal", "Std Dev", "Tolerance +/-", "Status"
-    row8 = 'Ring1', r1_actual.get(), r1_nominal.get(), r1_stdDev.get(), r1_tolerance.get(), r1_status.get()
-    row9 = 'Ring2', r2_actual.get(), r2_nominal.get(), r2_stdDev.get(), r2_tolerance.get(), r2_status.get()
-    row10 = 'Ring3', r3_actual.get(), r3_nominal.get(), r3_stdDev.get(), r3_tolerance.get(), r3_status.get()
-    row11 = 'Ring4', r4_actual.get(), r4_nominal.get(), r4_stdDev.get(), r4_tolerance.get(), r4_status.get()
+    # Define dataframe columns ---------------------------------------------------------[]
+    colu = ['tStamp', 'Pipe', 'pID', 'cID', 'yID', 'rR1', 'rR2', 'rR3', 'rR4', 'pSP', 'pRV', 'pDV', 'pTo', 'oID']
+    df3 = pd.DataFrame(dX3, columns=colu)               # porte sql data into dataframe
 
-    data.append(row0)
+    if T1:
+        rptID = ' Layer (EoL)'
+    else:
+        rptID = ' Layer (EoP)'
 
-    generate_pdf(data, d1, d2, d3, d4, d5, d6, d7)
+    cPipe = df3['Pipe']     # PIpe ID
+    cProc = df3['pID']      # Process ID
+    custm = df3['cID']      # Customer ID
+    layrN = df3['yID']      # Layer ID
+    ringA = df3['rH1']      # Head 1
+    ringB = df3['rH2']      # Head 2
+    ringC = df3['rH3']      # Head 3
+    ringD = df3['rH4']      # Head 4
+    SetPt = df3['pSP']      # Process Set Point values
+    Value = df3['pRV']      # Process Measured values
+    Stdev = df3['pDV']      # Standard Deviation
+    Tvalu = df3['pTo']      # Tolerance
+    usrID = df3['oID']      # User ID
+
+    generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, SetPt, Value, Stdev, Tvalu, usrID)
 
     # -------------------------------------------------[]
 
