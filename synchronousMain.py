@@ -276,7 +276,7 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
 
 
 def get_data():
-    rgdata, spData, nData, stdDt, tolernc = [], [], [], [], []
+    sptDat, valuDat, stdDat, tolDat = [], [], [], []
 
     # connect to SQL tabel EoL, perform minimal statistic and print report
     T1 = processWON + '_EoL'  # Identify Table
@@ -304,7 +304,12 @@ def get_data():
     Tvalu = df3['pTo']      # Tolerance
     usrID = df3['oID']      # User ID
 
-    generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, SetPt, Value, Stdev, Tvalu, usrID)
+    sptDat.append(SetPt)
+    valuDat.append(Value)
+    stdDat.append(Stdev)
+    tolDat.append(Tvalu)
+
+    generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, sptDat, valuDat, stdDat, tolDat, usrID)
 
     # -------------------------------------------------[]
 

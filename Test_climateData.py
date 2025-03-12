@@ -1,9 +1,11 @@
+
 # 2023 (C) Crown Copyright, Met Office. All rights reserved.
 #
 # This file is part of Weather DataHub and is released under the
 # BSD 3-Clause license.
 # See LICENSE in the root of the repository for full licensing details.
 # (c) Met Office 2023
+
 #########################################################################################
 #
 #           Client API key, latitude and longitude are the only mandatory parameters.
@@ -21,6 +23,7 @@ import requests
 import argparse
 import time
 import sys
+import json
 import logging as log
 
 log.basicConfig(filename='ss_download.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
@@ -34,7 +37,7 @@ def retrieve_forecast(baseUrl, timesteps, requestHeaders, latitude, longitude, e
     headers = {'accept': "application/json"}
     headers.update(requestHeaders)
     params = {
-        'excludeParameterMetadata': excludeMetadata,
+        # 'excludeParameterMetadata': excludeMetadata,
         'includeLocationName': includeLocation,
         'latitude': latitude,
         'longitude': longitude
@@ -56,8 +59,30 @@ def retrieve_forecast(baseUrl, timesteps, requestHeaders, latitude, longitude, e
                 sys.exit()
 
     req.encoding = 'utf-8'
+    print('REPLY:', req)
+    # print('REPLY:', req.headers)
+    print('\nREPLY1:', req.text)
+    print('REPLY2:', " '" + req.text + "' \n")
 
-    print(req.text)
+    data = json.loads(req.text)
+    print('SData1', data)
+
+    print('\nSData2', data['type'])
+    print('SData3', data['features'])
+    # print('SData5', data['properties'])
+    # # print('SData4', data['geometry'])
+    # json.dumps(data, indent=4)
+
+    # json.dumps(req, indent=4)
+    # json.dumps(req.text, indent=4, separators=(". ", " = "))
+    # json.dumps(req, indent=4, sort_keys=True)
+
+
+    # print('Test', x)
+    # y = json.loads(x)
+
+    # json.dumps(x, indent=4, separators=(". ", " = "))
+    # print(req.headers["longitude"])
 
 
 if __name__ == "__main__":
@@ -139,6 +164,4 @@ if __name__ == "__main__":
         sys.exit()
 
     retrieve_forecast(base_url, timesteps, requestHeaders, latitude, longitude, excludeMetadata, includeLocation)
-
-
 
