@@ -835,9 +835,218 @@ class collectiveEoL(ttk.Frame):
         if pRecipe == 'DNV':
             EoLRep = 'DNV'
             T1 = WON + '_TT'  # Identify Table
+            # -- Find out total number of column record per Ring ---
+            r1Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R1H1TT]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T1) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            r2Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R2H1TT]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T1) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            r3Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R3H1TT]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T1) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            r4Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R4H1TT]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T1) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+           # --------------------------------------------[]
+            sEoL_regime = 0.5               # Sample 50% of the available total samples
+            ttr1 = r1Rec * sEoL_regime
+            ttr2 = r2Rec * sEoL_regime
+            ttr3 = r3Rec * sEoL_regime
+            ttr4 = r4Rec * sEoL_regime
+            # select columns values and randomise
+            r1Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(ttr1) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T1) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()' ).fetchone()
+            r2Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(ttr2) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T1) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            r3Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(ttr3) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T1) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            r4Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(ttr4) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T1) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            # ------------------------------------[]
             T2 = WON + '_ST'  # Identify Table
+            # ------------------------------------[]
+            # -- Find out total number of column record per Ring ---
+            s1Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R1H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            s2Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R2H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            s3Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R3H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            s4Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R4H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            # --------------------------------------------[]
+            sEoL_regime = 0.5  # Sample 50% of the available total samples
+            str1 = r1Rec * sEoL_regime
+            str2 = r2Rec * sEoL_regime
+            str3 = r3Rec * sEoL_regime
+            str4 = r4Rec * sEoL_regime
+            # select columns values and randomise
+            s1Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str1) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+            s2Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str2) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            s3Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str3) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            s4Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str4) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            # ------------------------------------[]
             T3 = WON + '_TG'  # Identify Table
+            # ------------------------------------[]
+            # -- Find out total number of column record per Ring ---
+            g1Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R1H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            g2Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R2H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            g3Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R3H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            g4Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R4H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            # --------------------------------------------[]
+            gEoL_regime = 0.5  # Sample 50% of the available total samples
+            gtr1 = r1Rec * sEoL_regime
+            gtr2 = r2Rec * sEoL_regime
+            gstr3 = r3Rec * sEoL_regime
+            gtr4 = r4Rec * sEoL_regime
+            # select columns values and randomise
+            g1Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str1) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+            g2Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str2) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            g3Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str3) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            g4Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str4) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            # ------------------------------------[TODO]
             T4 = WON + '_RM'  # Identify Table
+            # ------------------------------------[]
+            # -- Find out total number of column record per Ring ---
+            s1Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R1H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            s2Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R2H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            s3Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R3H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            s4Rec = conA.execute(
+                'Select count(' + "'" '%' + str([R4H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
+
+            # --------------------------------------------[]
+            sEoL_regime = 0.5  # Sample 50% of the available total samples
+            str1 = r1Rec * sEoL_regime
+            str2 = r2Rec * sEoL_regime
+            str3 = r3Rec * sEoL_regime
+            str4 = r4Rec * sEoL_regime
+            # select columns values and randomise
+            s1Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str1) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+            s2Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str2) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            s3Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str3) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
+            s4Rc = conB.execute(
+                'Select TOP ' + "'" '%' + str(str4) + '%' "'" ' FROM ' + "'" '%' + str(
+                    T2) + '%' "'" ' where '
+                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
+                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+
         elif pRecipe == 'MGM':
             EoLRep = 'MGM'
             T5 = WON + '_LP'  # Identify Table
