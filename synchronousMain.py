@@ -834,229 +834,24 @@ class collectiveEoL(ttk.Frame):
         # Load SQL Query Table ---------------------------------#
         if pRecipe == 'DNV':
             EoLRep = 'DNV'
-            T1 = WON + '_TT'  # Identify Table
-            # -- Find out total number of column record per Ring ---
-            r1Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R1H1TT]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T1) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
 
-            r2Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R2H1TT]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T1) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            r3Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R3H1TT]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T1) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            r4Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R4H1TT]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T1) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-           # --------------------------------------------[]
-            sEoL_regime = 0.5               # Sample 50% of the available total samples
-            ttr1 = r1Rec * sEoL_regime
-            ttr2 = r2Rec * sEoL_regime
-            ttr3 = r3Rec * sEoL_regime
-            ttr4 = r4Rec * sEoL_regime
-            # select columns values and randomise
-            r1Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(ttr1) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T1) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()' ).fetchone()
-            r2Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(ttr2) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T1) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            r3Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(ttr3) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T1) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            r4Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(ttr4) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T1) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            # ------------------------------------[]
-            T2 = WON + '_ST'  # Identify Table
-            # ------------------------------------[]
-            # -- Find out total number of column record per Ring ---
-            s1Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R1H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            s2Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R2H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            s3Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R3H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            s4Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R4H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            # --------------------------------------------[]
-            sEoL_regime = 0.5  # Sample 50% of the available total samples
-            str1 = r1Rec * sEoL_regime
-            str2 = r2Rec * sEoL_regime
-            str3 = r3Rec * sEoL_regime
-            str4 = r4Rec * sEoL_regime
-            # select columns values and randomise
-            s1Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str1) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-            s2Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str2) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            s3Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str3) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            s4Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str4) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            # ------------------------------------[]
-            T3 = WON + '_TG'  # Identify Table
-            # ------------------------------------[]
-            # -- Find out total number of column record per Ring ---
-            g1Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R1H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            g2Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R2H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            g3Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R3H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            g4Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R4H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            # --------------------------------------------[]
-            gEoL_regime = 0.5  # Sample 50% of the available total samples
-            gtr1 = r1Rec * sEoL_regime
-            gtr2 = r2Rec * sEoL_regime
-            gstr3 = r3Rec * sEoL_regime
-            gtr4 = r4Rec * sEoL_regime
-            # select columns values and randomise
-            g1Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str1) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-            g2Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str2) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            g3Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str3) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            g4Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str4) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            # ------------------------------------[TODO]
-            T4 = WON + '_RM'  # Identify Table
-            # ------------------------------------[]
-            # -- Find out total number of column record per Ring ---
-            s1Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R1H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            s2Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R2H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            s3Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R3H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            s4Rec = conA.execute(
-                'Select count(' + "'" '%' + str([R4H1ST]) + '%' "'" ') AS ValidTotal from ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(layerNo) + '%' "'").fetchone()
-
-            # --------------------------------------------[]
-            sEoL_regime = 0.5  # Sample 50% of the available total samples
-            str1 = r1Rec * sEoL_regime
-            str2 = r2Rec * sEoL_regime
-            str3 = r3Rec * sEoL_regime
-            str4 = r4Rec * sEoL_regime
-            # select columns values and randomise
-            s1Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str1) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-            s2Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str2) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            s3Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str3) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-
-            s4Rc = conB.execute(
-                'Select TOP ' + "'" '%' + str(str4) + '%' "'" ' FROM ' + "'" '%' + str(
-                    T2) + '%' "'" ' where '
-                          ' ' + "'" '%' + str(cLayer) + ' = ' + "'" '%' + str(
-                    layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+            T1 = WON + '_TT'    # Identify Table
+            T2 = WON + '_ST'    # Identify Table
+            T3 = WON +'_TG'     # Table Identity
+            T4 = WON + '_RM'    # Identify Table
 
         elif pRecipe == 'MGM':
             EoLRep = 'MGM'
+
+            T1 = WON + '_TT'  # Identify Table
+            T2 = WON + '_ST'  # Identify Table
+            T3 = WON + '_TG'  # Table Identity
+            T4 = WON + '_RM'  # Identify Table
             T5 = WON + '_LP'  # Identify Table
             T6 = WON + '_LA'  # Identify Table
             T7 = WON + '_TP'  # Identify Table
             T8 = WON + '_RF'  # Identify Table
-            T1 = WON + '_TT'  # Identify Table
-            T2 = WON + '_ST'  # Identify Table
-            T3 = WON + '_TG'  # Identify Table
-            T4 = WON + '_RM'  # Identify Table
+
         else:
             pass
         # ----------------------------------------------------------#
@@ -1405,8 +1200,7 @@ class collectiveEoL(ttk.Frame):
             im205, = a6.plot([], [], 'o-', label='Roller Force')
             # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 
-        def synchronousEoL(dnv_Size, dnv_gType, fetchT):
-            fetch_no = str(fetchT)                                  # entry value in string sql syntax
+        def synchronousEoL(layerNo):
 
             # Initialise SQL Data connection per listed Table --------------------[]
             if EoLRep == 'DNV':
@@ -1433,81 +1227,49 @@ class collectiveEoL(ttk.Frame):
             while True:
                 import sqlArrayRLmethodEoL as sel                   # DrLabs optimization method
 
-                inProgress = False                                  # True for RetroPlay mode
-                print('\nAsynchronous controller activated...')
-
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()     # Retrieve MSC from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
-
-                # Get list of relevant SQL Tables using conn() --------------------[]
-                if keyboard.is_pressed(
-                        "Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:  # Terminate file-fetch
-                    print('\nProduction is pausing...')
-                    if not autoSpcPause:
-                        autoSpcRun = not autoSpcRun
-                        autoSpcPause = True
-                        print("\nVisualization in Paused Mode...")
-
-                    else:
-                        autoSpcPause = False
-                        print("Visualization in Play Mode...")
-
+                # ------ Process data fetch sequences --------------------------#
+                if EoLRep == 'DNV':
+                    rpTT, rpST, rpTG, rpRM, ttRa, stRb, tgRc, rmRd = sel.dnv_sqlexec(eol1, eol2, eol3, eol4, T1, T2, T3, T4,  layerNo)
                 else:
-                    # ------ Process data fetch sequences --------------------------#
-                    if EoLRep == 'DNV':
-                        rpTT, rpST, rpTG, rpRM = sel.dnv_sqlexec(dnv_Size, dnv_gType, eol1, eol2, eol3, eol4, T1, T2, T3, T4,  fetch_no)
-                    elif EoLRep == 'MGM':
-                        rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF = sel.mgm_sqlexec(dnv_Size, dnv_gType, eol1, eol2, eol3, eol4, eol5, eol6, eol7, eol8, T1, T2, T3, T4, T5, T6, T7, T8, fetch_no)
-                    else:
-                        pass            # reserved for bespoke user selection ------#
-                    print("Visualization in Play Mode...")
-                print('\nUpdating....')
+                    rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF = sel.mgm_sqlexec(eol1, eol2, eol3, eol4, eol5, eol6,
+                                                                                     eol7, eol8, T1, T2, T3, T4, T5, T6,
+                                                                                     T7, T8, layerNo)
 
-                # ------ Inhibit iteration ----------------------------------------------------------[]
-                """
-                # Set condition for halting real-time plots in watchdog class ---------------------
-                """
-                # TODO --- values for inhibiting the SQL processing
-                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                    eol1.close()
-                    eol2.close()
-                    eol3.close()
-                    eol4.close()
-                    if EoLRep == 'MGM':
-                        eol5.close()
-                        eol6.close()
-                        eol7.close()
-                        eol8.close()
-                    print('SQL End of File, connection closes after 30 mins...')
-                    time.sleep(60)
-                    continue
-                else:
-                    print('\nUpdating....')
+                if rpTT > 0 and rpST > 0 and rpTG > 0 and rpRM > 0:
+                    break
 
             if EoLRep == 'DNV':
-                return rpTT, rpST, rpTG, rpRM
+                 return rpTT, rpST, rpTG, rpRM
             else:
                 return rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF
 
         # ================== End of synchronous Method ==========================
-        def asynchronousEoL(dnv_Size, dnv_gType, db_freq):
+        def asynchronousEoL(layerNo):
+
             timei = time.time()                                 # start timing the entire loop
 
             # Obtain fetch SQl data from respective Tables -----#
             if EoLRep == 'DNV':
-                rdTT, rdST, rdTG, rdRM = synchronousEoL(dnv_Size, dnv_gType, db_freq)
+                rdTT, rdST, rdTG, rdRM, ttRa, stRb, tgRc, rmRd = synchronousEoL(layerNo)
+                dbA = range(0, ttRa)
+                dbB = range(0, stRb)
+                dbC = range(0, tgRc)
+                dbD = range(0, rmRd)
             else:
-                rdTT, rdST, rdTG, rdRM, rdLP, rdLA, rdTP, rdRF = synchronousEoL(dnv_Size, dnv_gType, db_freq)
+                rdTT, rdST, rdTG, rdRM, rdLP, rdLA, rdTP, rdRF, Ra, Rb, Rc, Rd, Re, Rf, Rg, Rh = synchronousEoL(layerNo)
+                dbA = range(0, Ra)
+                dbB = range(0, Rb)
+                dbC = range(0, Rc)
+                dbD = range(0, Rd)
+                dbE = range(0, Re)
+                dbF = range(0, Rf)
+                dbG = range(0, Rg)
+                dbH = range(0, Rh)
 
-            # ttData = synchronousTT(ttSize, ttgType, db_freq)  # data loading functions
-            # rmData = synchronousTS(smp_Sz, stp_Sz, db_freq)   # Accumulated Gap Mean Profile
-            # rmData = synchronousTG(smp_Sz, stp_Sz, db_freq)   # Accumulated Gap Mean Profile
             # --------------------------------------------------#
 
             import varSQL_DFeol as el                            # load SQL variables column names | rfVarSQL
 
-            viz_cycle = 150
             if EoLRep == 'DNV':
                 g1 = eol.validCols(T1)                           # Construct Table Column (Tape Temp)
                 d1 = pd.DataFrame(rdTT, columns=g1)
@@ -1519,6 +1281,7 @@ class collectiveEoL(ttk.Frame):
                 d4 = pd.DataFrame(rdRM, columns=g4)
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2, d3, d4], axis=1)
+
             elif EoLRep == 'MGM':
                 g1 = eol.validCols(T1)                          # Construct Table Column (Tape Temp)
                 d1 = pd.DataFrame(rdTT, columns=g1)
@@ -1550,22 +1313,22 @@ class collectiveEoL(ttk.Frame):
 
             # -------------------------------------------------------------------------------------[]
             # Plot X-Axis data points -------- X Plot
-            im10.set_xdata(np.arange(db_freq))
-            im11.set_xdata(np.arange(db_freq))
-            im12.set_xdata(np.arange(db_freq))
-            im13.set_xdata(np.arange(db_freq))
-            im14.set_xdata(np.arange(db_freq))
-            im15.set_xdata(np.arange(db_freq))
-            im16.set_xdata(np.arange(db_freq))
-            im17.set_xdata(np.arange(db_freq))
-            im18.set_xdata(np.arange(db_freq))
-            im19.set_xdata(np.arange(db_freq))
-            im20.set_xdata(np.arange(db_freq))
-            im21.set_xdata(np.arange(db_freq))
-            im22.set_xdata(np.arange(db_freq))
-            im23.set_xdata(np.arange(db_freq))
-            im24.set_xdata(np.arange(db_freq))
-            im25.set_xdata(np.arange(db_freq))
+            im10.set_xdata(np.arange(dbA))
+            im11.set_xdata(np.arange(dbA))
+            im12.set_xdata(np.arange(dbA))
+            im13.set_xdata(np.arange(dbA))
+            im14.set_xdata(np.arange(dbA))
+            im15.set_xdata(np.arange(dbA))
+            im16.set_xdata(np.arange(dbA))
+            im17.set_xdata(np.arange(dbA))
+            im18.set_xdata(np.arange(dbA))
+            im19.set_xdata(np.arange(dbA))
+            im20.set_xdata(np.arange(dbA))
+            im21.set_xdata(np.arange(dbA))
+            im22.set_xdata(np.arange(dbA))
+            im23.set_xdata(np.arange(dbA))
+            im24.set_xdata(np.arange(dbA))
+            im25.set_xdata(np.arange(dbA))
             # ------------------------------- S Plot
             im26.set_xdata(np.arange(db_freq))
             im27.set_xdata(np.arange(db_freq))
@@ -2072,7 +1835,7 @@ class collectiveEoL(ttk.Frame):
                 im205.set_ydata((EL[102]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
                 # Compute entire Process Capability ------------------------------------------#
 
-            # Setting up the parameters for moving windows Axes ---------------------------------[]
+            # Setting up the parameters for moving windows Axes -----------------------------[]
             if db_freq > window_Xmax:
                 a1.set_xlim(db_freq - window_Xmax, db_freq)
                 a2.set_xlim(db_freq - window_Xmax, db_freq)
@@ -2080,16 +1843,13 @@ class collectiveEoL(ttk.Frame):
                 a1.set_xlim(0, window_Xmax)
                 a2.set_xlim(0, window_Xmax)
 
-            # Set trip line for individual time-series plot -----------------------------------[R1]
-            # import triggerModule as sigma
-            # sigma.trigViolations(a1, UsePLC_DBS, 'EOL', YScale_minEOL, YScale_maxEOL, xucT, xlcT, xusT, xlsT, mnT, sdT)
+            # Set trip line for individual time-series plot -------------------------------[R1]
 
+            # -------------------------------------------------------------------------------[]
             timef = time.time()
             lapsedT = timef - timei
             print(f"\nProcess Interval: {lapsedT} sec\n")
 
-            ani = FuncAnimation(f, asynchronousEoL, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
-                                blit=False)
             plt.tight_layout()
             plt.show()
 

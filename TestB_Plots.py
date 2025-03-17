@@ -162,36 +162,36 @@ plt.show()
 # plt.show()
 
 # -------------------------------------------------------------------------------------------------------------------[]
-# import matplotlib.pyplot as plt
-# from matplotlib.colors import ListedColormap
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+
+x = [1, 3, 4, 6, 7, 9]
+y = [0, 0, 5, 8, 8, 8]
+
+classes = ['A', 'B', 'C']
+values = [0, 0, 1, 2, 2, 2]
+
+colors = ListedColormap(['r','b','g'])
+
+scatter = plt.scatter(x, y, c=values, cmap=colors)
+plt.legend(handles=scatter.legend_elements()[0], labels=classes)
+
+plt.show()
+
+
 #
-# x = [1, 3, 4, 6, 7, 9]
-# y = [0, 0, 5, 8, 8, 8]
+# # ----------------------------------------------------------------------------------------------[]
 #
-# classes = ['A', 'B', 'C']
-# values = [0, 0, 1, 2, 2, 2]
+# path = ('C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\FMEA_Log\\RPT_ST_20240507.csv')
+# csv_file = (path)
 #
-# colors = ListedColormap(['r','b','g'])
+# df = pd.read_csv(csv_file)
+# print('\nTest Print\n', df.head())
 #
-# scatter = plt.scatter(x, y, c=values, cmap=colors)
-# plt.legend(handles=scatter.legend_elements()[0], labels=classes)
-#
-# plt.show()
-
-
-
-# ----------------------------------------------------------------------------------------------[]
-
-path = ('C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\FMEA_Log\\RPT_ST_20240507.csv')
-csv_file = (path)
-
-df = pd.read_csv(csv_file)
-print('\nTest Print\n', df.head())
-
-dataA = df['Time']
-dataB = df['Layer#']
-dataC = df['pSP Actual']
-dataD = df['rID']
-dataE = df['pMeasured']
-dataF = df['pDev']
+# dataA = df['Time']
+# dataB = df['Layer#']
+# dataC = df['pSP Actual']
+# dataD = df['rID']
+# dataE = df['pMeasured']
+# dataF = df['pDev']
 
