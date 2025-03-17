@@ -165,7 +165,7 @@ plt.show()
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 
-x = [1, 3, 4, 6, 7, 9]
+x = range(0, 6) # [1, 3, 4, 6, 7, 9]
 y = [0, 0, 5, 8, 8, 8]
 
 classes = ['A', 'B', 'C']
