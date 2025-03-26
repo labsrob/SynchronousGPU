@@ -11,14 +11,14 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlWS = [df1['R1H1WS(m/s)'], df1['R1H2WS(m/s)'],
-            df1['R1H3WS(m/s)'], df1['R1H4WS(m/s)'],
-            df1['R2H1WS(m/s)'], df1['R2H2WS(m/s)'],
-            df1['R2H3WS(m/s)'], df1['R2H4WS(m/s)'],
-            df1['R3H1WS(m/s)'], df1['R3H2WS(m/s)'],
-            df1['R3H3WS(m/s)'], df1['R3H4WS(m/s)'],
-            df1['R4H1WS(m/s)'], df1['R4H2WS(m/s)'],
-            df1['R4H3WS(m/s)'], df1['R4H4WS(m/s)']]
+    sqlWS = [df1['cLayer'], df1['R1H1WS'], df1['R1H2WS'],
+            df1['R1H3WS'], df1['R1H4WS'],
+            df1['R2H1WS'], df1['R2H2WS'],
+            df1['R2H3WS'], df1['R2H4WS'],
+            df1['R3H1WS'], df1['R3H2WS'],
+            df1['R3H3WS'], df1['R3H4WS'],
+            df1['R4H1WS'], df1['R4H2WS'],
+            df1['R4H3WS'], df1['R4H4WS']]
 
 
     return sqlWS

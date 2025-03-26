@@ -13,7 +13,7 @@ Author: Dr Robert Labs
 # pull data from simotion and Met Office for location specific data
 
 def loadProcesValues(df1):
-    sqlEV = [df1['tStamp'], df1['cTensionA'], df1['cTensionB'], df1['cRTemp'],
-             df1['cHumid'], df1['locTemp'], df1['locHumid'], df1['UVIndex']]
+    sqlEV = [df1['tStamp'], df1['cLayer'], df1['cTensionA'], df1['cTensionB'], df1['cRTemp'],
+             df1['cHumid'], df1['fDTemp'], df1['fHumid'], df1['locTemp'], df1['locHumid'], df1['UVIndex']]
 
     return sqlEV

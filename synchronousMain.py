@@ -290,19 +290,31 @@ def get_data():
     else:
         rptID = ' Layer (EoP)'
 
-    cPipe = df3['Pipe']     # PIpe ID
-    cProc = df3['pID']      # Process ID
-    custm = df3['cID']      # Customer ID
-    layrN = df3['yID']      # Layer ID
-    ringA = df3['rH1']      # Head 1
-    ringB = df3['rH2']      # Head 2
-    ringC = df3['rH3']      # Head 3
-    ringD = df3['rH4']      # Head 4
-    SetPt = df3['pSP']      # Process Set Point values
-    Value = df3['pRV']      # Process Measured values
-    Stdev = df3['pDV']      # Standard Deviation
-    Tvalu = df3['pTo']      # Tolerance
-    usrID = df3['oID']      # User ID
+    cPipe = df3['Pipe']         # PIpe ID
+    cProc = df3['pID']          # Process ID
+    custm = df3['cID']          # Customer ID
+    usrID = df3['oID']          # User ID
+    # --------------------------#
+    layrNO = df3['LyID']        # Layer ID
+
+    ring1A = df3['R1SP']        # Head 1
+    ring1B = df3['R1NV']        # Head 2
+
+    ring2A = df3['R2SP']        # Head 1
+    ring2B = df3['R2NV']        # Head 2
+
+    ring3A = df3['R3SP']        # Head 1
+    ring3B = df3['R3NV']        # Head 2
+
+    ring4A = df3['R4SP']        # Head 1
+    ring4B = df3['R4NV']        # Head 2
+
+    # --------------------------#
+    SetPt = df3['pSP']          # Process Set Point values (Average all the ring values)
+    Value = df3['pRV']          # Process Measured values (ringValue/Average total ring0
+    Stdev = df3['pDV']          # Standard Deviation
+    Tvalu = df3['pTo']          # Tolerance
+
 
     sptDat.append(SetPt)
     valuDat.append(Value)
@@ -1892,13 +1904,21 @@ class collectiveEoL(ttk.Frame):
             # Set trip line for individual time-series plot -------------------------------[R1]
 
             # -------------------------------------------------------------------------------[]
-            timef = time.time()
-            lapsedT = timef - timei
-            print(f"\nProcess Interval: {lapsedT} sec\n")
 
             plt.tight_layout()
             plt.show()
-
+        # --------------------------- QA REPORT ------------------------[]
+        # ring1SP = avg(head1 + head2 + head3 + head4)
+        # ring2SP = avg(head1 + head2 + head3 + head4)
+        # ring3SP = avg(head1 + head2 + head3 + head4)
+        # ring4SP = avg(head1 + head2 + head3 + head4)
+        # tRingSP = ring1SP + ring2SP + ring3SP + ring4SP
+        # # -------------------------------------------
+        # ring1NV = ring1SP / tRingSP
+        # ring2NV = ring2SP / tRingSP
+        # ring3NV = ring3SP / tRingSP
+        # ring4NV = ring4SP / tRingSP
+        # ---------------- Call objective function -----
         # -----Canvas update --------------------------------------------[]
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)

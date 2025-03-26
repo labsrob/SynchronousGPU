@@ -11,8 +11,10 @@ weatherVar = 'lat=50.844853&lon=-1.116545&appid=ba8d89fa4ac773e35670847cca5154e2
 
 wVar = 'lat=latit&lon=longi&appid=APIKey'
 
-'https://api.openweathermap.org/data/2.5/weather?lat=50.844853&lon=-1.116545&appid=ba8d89fa4ac773e35670847cca5154e2'
+# 'https://api.openweathermap.org/data/2.5/weather?lat=50.844853&lon=-1.116545&appid=ba8d89fa4ac773e35670847cca5154e2'
 
+'https://pro.openweathermap.org/data/2.5/forecast/climate?lat=50.844853&lon=-1.116545&appid=ba8d89fa4ac773e35670847cca5154e2'
+# 'https://pro.openweathermap.org/data/2.5/forecast/climate?zip=PO64PX,UK&appid=ba8d89fa4ac773e35670847cca5154e2'
 #####################################
 # by Johannes Kinzig (M. Sc.)		#
 # https://johanneskinzig.de			#

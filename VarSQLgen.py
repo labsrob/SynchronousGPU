@@ -9,17 +9,11 @@ Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
 
-
+# pull data from simotion and Met Office for location specific data
 def loadProcesValues(df1):
-    sqlST = [df1['cLayer'], df1['R1H1ST'], df1['R1H2ST'],
-            df1['R1H3ST'], df1['R1H4ST'],
-            df1['R2H1ST'], df1['R2H2ST'],
-            df1['R2H3ST'], df1['R2H4ST'],
-            df1['R3H1ST'], df1['R3H2ST'],
-            df1['R3H3ST'], df1['R3H4ST'],
-            df1['R4H1ST'], df1['R4H2ST'],
-            df1['R4H3ST'], df1['R4H4ST']]
+    sqlGEN = [df1['tStamp'], df1['cTensX'], df1['oTempA'], df1['oTempB'],
+              df1['iTempA'], df1['iTempB'], df1['wSpedA'], df1['wSpedB'],
+              df1['wSpedC'], df1['wSpedD'], df1['PipeDi'], df1['cLayer']]
 
-
-    return sqlST
+    return sqlGEN
 

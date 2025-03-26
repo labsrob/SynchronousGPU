@@ -11,7 +11,7 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlTT = [df1['R1H1TT'], df1['R1H2TT'],
+    sqlTT = [df1['cLayer'], df1['R1H1TT'], df1['R1H2TT'],
              df1['R1H3TT'], df1['R1H4TT'],
              df1['R2H1TT'], df1['R2H2TT'],
              df1['R2H3TT'], df1['R2H4TT'],

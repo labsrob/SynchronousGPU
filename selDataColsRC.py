@@ -11,7 +11,7 @@ Ramp count data
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'RC':
-        columns = ['sCentre', 'R1Count', 'R2Count', 'R3Count', 'R4Count', 'PipeDir', 'cLayer']
+        columns = ['sCentre', 'RMCount', 'RAMPosA', 'RAMPosB', 'RAMPosC', 'RAMPosD', 'PipeDir', 'cLayer']
     else:
         print('Invalid Columns or Query error...')
 

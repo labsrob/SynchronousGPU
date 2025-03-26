@@ -4,14 +4,18 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
-Cell Tension measured in Newton per metre (N/m)
+Check SQL data columns ...
 """
 
 
 def validCols(pParam):
-    # print('Detected RingHead Combo:', configH) 1 Mpa = 1 (N/mm2)
-    if pParam == 'CT':
-        columns = ['tStamp', 'cTensA', 'cTensB', 'PipeDi']
+    # print('Detected RingHead Combo:', configH)
+    if pParam == 'EOLRP':
+        columns = [ # Tape Temperature --------------[]
+                   'tStamp', 'LyID', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
+
+
     else:
         print('Invalid Columns or Query error...')
 

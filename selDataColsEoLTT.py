@@ -4,17 +4,18 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
-Laser Angle measured in Degres
+Check SQL data columns ...
 """
 
 
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'LA':
-        columns = ['cLayer', 'R1H1LA', 'R1H2LA', 'R1H3LA', 'R1H4LA',
-                   'R2H1LA', 'R2H2LA', 'R2H3LA', 'R2H4LA',
-                   'R3H1LA', 'R3H2LA', 'R3H3LA', 'R3H4LA',
-                   'R4H1LA', 'R4H2LA',' R4H3LA', 'R4H4LA']
+    if pParam == 'EOLTT':
+        columns = [ # Tape Temperature --------------[]
+                   'tStamp', 'LyID', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
+
+
     else:
         print('Invalid Columns or Query error...')
 

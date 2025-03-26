@@ -12,7 +12,7 @@ Author: Dr Robert Labs
 def loadProcesValues(df1):
     sqlOE = [df1['tStamp'], df1['cLayer'], df1['tCode'],
              df1['Desc'], df1['Lapsed'], df1['PipePos'],
-             df1['nDiam'], df1['Ovality'], df1['tChange']]
+             df1['nDiam'], df1['Ovality'], df1['tChange'], df1['rmCount'], df1['uMessag']]
 
     return sqlOE
 

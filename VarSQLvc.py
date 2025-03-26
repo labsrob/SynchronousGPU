@@ -11,7 +11,7 @@ Author: Dr Robert Labs
 # ========================= VOID COUNT DATA TABLE ========================================#
 
 def loadProcesValues(df1):
-    sqlVC = [df1['sCentre'], df1['V1Count'], df1['V2Count'], df1['V3Count'],
-             df1['V4Count'], df1['PipeDir'], df1['cLayer']]
+    sqlVC = [df1['sCentre'], df1['VDCount'], df1['VODPosA'], df1['VODPosB'],
+             df1['VODPosC'], df1['VODPosD'], df1['PipeDir'], df1['cLayer']]
 
     return sqlVC

@@ -4,14 +4,18 @@ Select Columns
 
 Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
-YTape Void count data
+Check SQL data columns ...
 """
 
 
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'OT':
-        columns = ['tStamp', 'oTempA', 'oTempB', 'PipeDi']
+    if pParam == 'EOLTP':
+        columns = [ # Tape Temperature --------------[]
+                   'tStamp', 'LyID', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
+
+
     else:
         print('Invalid Columns or Query error...')
 

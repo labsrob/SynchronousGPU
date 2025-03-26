@@ -11,7 +11,7 @@ Author: Dr Robert Labs
 # ========================= RAMP COUNT DATA TABLE ========================================#
 
 def loadProcesValues(df1):
-    sqlRC = [df1['sCentre'], df1['R1Count'], df1['R2Count'], df1['R3Count'],
-             df1['R4Count'], df1['PipeDir'], df1['cLayer']]
+    sqlRC = [df1['sCentre'], df1['RMCount'], df1['RAMPosA'], df1['RAMPosB'],
+             df1['RAMPosC'], df1['RAMPosD'], df1['PipeDir'], df1['cLayer']]
 
     return sqlRC

@@ -11,15 +11,13 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlST = [df1['cLayer'], df1['R1H1ST'], df1['R1H2ST'],
-            df1['R1H3ST'], df1['R1H4ST'],
-            df1['R2H1ST'], df1['R2H2ST'],
-            df1['R2H3ST'], df1['R2H4ST'],
-            df1['R3H1ST'], df1['R3H2ST'],
-            df1['R3H3ST'], df1['R3H4ST'],
-            df1['R4H1ST'], df1['R4H2ST'],
-            df1['R4H3ST'], df1['R4H4ST']]
+    sqlWA = [df1['cLayer'], df1['R1H1WA'], df1['R1H2WA'],
+            df1['R1H3WA'], df1['R1H4WA'],
+            df1['R2H1WA'], df1['R2H2WA'],
+            df1['R2H3WA'], df1['R2H4WA'],
+            df1['R3H1WA'], df1['R3H2WA'],
+            df1['R3H3WA'], df1['R3H4WA'],
+            df1['R4H1WA'], df1['R4H2WA'],
+            df1['R4H3WA'], df1['R4H4WA']]
 
-
-    return sqlST
-
+    return sqlWA

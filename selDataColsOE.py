@@ -11,7 +11,7 @@ Overall Equipment Efficiency measured by composite/derived factors
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'OE':
-        columns = ['tStamp', 'cLayer', 'tCode', 'Desc', 'Lapsed', 'PipePos', 'nDiam', 'Ovality', 'tChange', 'uMessag']
+        columns = ['tStamp', 'cLayer', 'tCode', 'Desc', 'Lapsed', 'PipePos', 'nDiam', 'Ovality', 'tChange', 'rmCount', 'uMessag']
     else:
         print('Invalid Columns or Query error...')
 

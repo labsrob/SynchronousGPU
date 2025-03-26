@@ -13,7 +13,7 @@ import spcWatchDog as wd
 
 # -------PLC/SQL Query -------#
 import selDataColsOEE as qo
-import selDataColsCT as qc
+import selDataColsGEN as qc
 # import selDataColsRF as qf
 # ----- DNV Params ------
 import selDataColsTG as qg

@@ -12,13 +12,13 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    plcST = [df1['R1H1ST(°C)'], df1['R1H2ST(°C)'],
-            df1['R1H3ST(°C)'], df1['R1H4ST(°C)'],
-            df1['R2H1ST(°C)'], df1['R2H2ST(°C)'],
-            df1['R2H3ST(°C)'], df1['R2H4ST(°C)'],
-            df1['R3H1ST(°C)'], df1['R3H2ST(°C)'],
-            df1['R3H3ST(°C)'], df1['R3H4ST(°C)'],
-            df1['R4H1ST(°C)'], df1['R4H2ST(°C)'],
-            df1['R4H3ST(°C)'], df1['R4H4ST(°C)']]
+    plcST = [df1['R1H1ST'], df1['R1H2ST'],
+            df1['R1H3ST'], df1['R1H4ST'],
+            df1['R2H1ST'], df1['R2H2ST'],
+            df1['R2H3ST'], df1['R2H4ST'],
+            df1['R3H1ST'], df1['R3H2ST'],
+            df1['R3H3ST'], df1['R3H4ST'],
+            df1['R4H1ST'], df1['R4H2ST'],
+            df1['R4H3ST'], df1['R4H4ST']]
 
     return plcST

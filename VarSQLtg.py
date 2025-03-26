@@ -11,11 +11,10 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlRF = [df1['GaugeA1'], df1['GaugeA2'],
-             df1['GaugeA3'], df1['GaugeA4'],
-             df1['GaugeB1'], df1['GaugeB2'],
-             df1['GaugeB3'], df1['GaugeB4']]
+    sqlTG = [df1['tStamp'], df1['cLayer'], df1['sCount'], df1['sCenter'], df1['PipePos'],
+             df1['GaugeA1'], df1['GaugeA2'], df1['GaugeA3'], df1['GaugeA4'], df1['GaugeB1'],
+             df1['GaugeB2'], df1['GaugeB3'], df1['GaugeB4'], df1['PipeDir']]
 
 
-    return sqlRF
+    return sqlTG
 

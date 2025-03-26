@@ -11,14 +11,14 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    plcRF = [df1['R1H1RF(N)'], df1['R1H2RF(N)'],
-            df1['R1H3RF(N)'], df1['R1H4RF(N)'],
-            df1['R2H1RF(N)'], df1['R2H2RF(N)'],
-            df1['R2H3RF(N)'], df1['R2H4RF(N)'],
-            df1['R3H1RF(N)'], df1['R3H2RF(N)'],
-            df1['R3H3RF(N)'], df1['R3H4RF(N)'],
-            df1['R4H1RF(N)'], df1['R4H2RF(N)'],
-            df1['R4H3RF(N)'], df1['R4H4RF(N)']]
+    plcRF = [df1['R1H1RF'], df1['R1H2RF'],
+            df1['R1H3RF'], df1['R1H4RF'],
+            df1['R2H1RF'], df1['R2H2RF'],
+            df1['R2H3RF'], df1['R2H4RF'],
+            df1['R3H1RF'], df1['R3H2RF'],
+            df1['R3H3RF'], df1['R3H4RF'],
+            df1['R4H1RF'], df1['R4H2RF'],
+            df1['R4H3RF'], df1['R4H4RF']]
 
 
     return plcRF
