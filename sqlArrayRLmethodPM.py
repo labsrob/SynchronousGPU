@@ -13,12 +13,12 @@ idx = count()
 now = datetime.now()
 
 dataList0 = []
-dRP, dWS, dCT, dOT, dLP, dLA = [], [], [], [], [], []
+dGEN, dRP, dLP, dLA = [], [], [], []
 
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def dnv_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, T1, T2, T3, T4, fetch_no):
+def dnv_sqlexec(nGZ, grp_step, daq1, daq2, T1, T2, fetch_no):
     """
     NOTE:
     """
@@ -48,7 +48,45 @@ def dnv_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, T1, T2, T3, T4, fetch_no)
     # ------------------------------------------------------------------------------------[]
 
     # Roller Pressure procedure ----------------------------------[A]
-    dataRP = daq1.execute('SELECT * FROM ' + T1).fetchmany(n2fetch)
+    dataGEN = daq1.execute('SELECT * FROM ' + T1).fetchmany(n2fetch)
+    if len(dataGEN) != 0:
+        for result in dataGEN:
+            result = list(result)
+            if UseRowIndex:
+                dataList0.append(next(idx))
+            else:
+                now = time.strftime("%H:%M:%S")
+                dataList0.append(time.strftime(now))
+            dGEN.append(result)
+
+            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
+            # Step processing rate >1 ---[static window]
+            if group_step > 1 and len(dGEN) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
+                del dGEN[0:(len(dRP) - nGZ)]
+
+            # Step processing rate >1 ---[moving window]
+            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dGEN[0:(len(dGEN) - fetch_no)]
+
+            # Step processing rate =1 ---[static window]
+            elif group_step == 1 and len(dGEN) >= (nGZ + n2fetch) and fetch_no <= 21:
+                del dGEN[0:(len(dGEN) - nGZ)]  # delete overflow data
+
+            # Step processing rate =1 ---[moving window]
+            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dGEN[0:(len(dGEN) - fetch_no)]
+
+            else:  # len(dL1) < nGZ:
+                pass
+        # print("Step List1:", len(dL1), dL1)       FIXME:
+    else:
+        print('Process EOF reached...')
+        print('SPC Halting for 5 Minutes...')
+        time.sleep(5)
+    daq1.close()
+
+    # Tape Winding procedure ----------------------------------[B]
+    dataRP = daq2.execute('SELECT * FROM ' + T2).fetchmany(n2fetch)
     if len(dataRP) != 0:
         for result in dataRP:
             result = list(result)
@@ -78,44 +116,6 @@ def dnv_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, T1, T2, T3, T4, fetch_no)
 
             else:  # len(dL1) < nGZ:
                 pass
-        # print("Step List1:", len(dL1), dL1)       FIXME:
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-    daq1.close()
-
-    # Tape Winding procedure ----------------------------------[B]
-    dataWS = daq2.execute('SELECT * FROM ' + T2).fetchmany(n2fetch)
-    if len(dataWS) != 0:
-        for result in dataWS:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dWS.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dWS) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dWS[0:(len(dWS) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dWS[0:(len(dWS) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dWS) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dWS[0:(len(dWS) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dWS[0:(len(dWS) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
 
     else:
         print('Process EOF reached...')
@@ -124,89 +124,11 @@ def dnv_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, T1, T2, T3, T4, fetch_no)
 
     daq2.close()
 
-    # Cell Tension & Oven Temperature procedure ----------------------------[B]
-    dataCT = daq3.execute('SELECT * FROM ' + T3).fetchmany(n2fetch)
-    if len(dataCT) != 0:
-        for result in dataCT:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dCT.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dCT) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dCT[0:(len(dCT) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dCT[0:(len(dCT) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dCT) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dCT[0:(len(dCT) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dCT[0:(len(dCT) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-        # print("Step List1:", len(dL1), dL1)       FIXME:
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
-    daq3.close()
-
-    # Oven Temperature procedure ----------------------------[B]
-    dataOT = daq4.execute('SELECT * FROM ' + T4).fetchmany(n2fetch)
-    if len(dataOT) != 0:
-        for result in dataOT:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dOT.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dOT) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dOT[0:(len(dOT) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dOT[0:(len(dOT) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dOT) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dOT[0:(len(dOT) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dOT[0:(len(dOT) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-        # print("Step List1:", len(dL1), dL1)       FIXME:
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
-    daq4.close()
-
-    return dRP, dWS, dCT, dOT
+    return dGEN, dRP
 # -------------------------------------------------------------------------------------------------------------[XXXXXXX]
 
 
-def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, T1, T2, T3, T4, T5, T6, fetch_no):
+def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, T1, T2, T3, T4, fetch_no):
     """
     NOTE:
     """
@@ -234,9 +156,84 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, T1, T2, T3, T
             n2fetch = nGZ                                   # fetch twice
 
     # ------------------------------------------------------------------------------------[]
+    dataGEN = daq1.execute('SELECT * FROM ' + T1).fetchmany(n2fetch)
+    if len(dataGEN) != 0:
+        for result in dataGEN:
+            result = list(result)
+            if UseRowIndex:
+                dataList0.append(next(idx))
+            else:
+                now = time.strftime("%H:%M:%S")
+                dataList0.append(time.strftime(now))
+            dGEN.append(result)
+
+            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
+            # Step processing rate >1 ---[static window]
+            if group_step > 1 and len(dGEN) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
+                del dGEN[0:(len(dRP) - nGZ)]
+
+            # Step processing rate >1 ---[moving window]
+            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dGEN[0:(len(dGEN) - fetch_no)]
+
+            # Step processing rate =1 ---[static window]
+            elif group_step == 1 and len(dGEN) >= (nGZ + n2fetch) and fetch_no <= 21:
+                del dGEN[0:(len(dGEN) - nGZ)]  # delete overflow data
+
+            # Step processing rate =1 ---[moving window]
+            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dGEN[0:(len(dGEN) - fetch_no)]
+
+            else:  # len(dL1) < nGZ:
+                pass
+        # print("Step List1:", len(dL1), dL1)       FIXME:
+    else:
+        print('Process EOF reached...')
+        print('SPC Halting for 5 Minutes...')
+        time.sleep(5)
+    daq1.close()
+
+    # Position Error Procedure ----------------------------------[E]
+    dataRP = daq2.execute('SELECT * FROM ' + T2).fetchmany(n2fetch)
+    if len(dataRP) != 0:
+        for result in dataRP:
+            result = list(result)
+            if UseRowIndex:
+                dataList0.append(next(idx))
+            else:
+                now = time.strftime("%H:%M:%S")
+                dataList0.append(time.strftime(now))
+            dRP.append(result)
+
+            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
+            # Step processing rate >1 ---[static window]
+            if group_step > 1 and len(dRP) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
+                del dRP[0:(len(dRP) - nGZ)]
+
+            # Step processing rate >1 ---[moving window]
+            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dRP[0:(len(dRP) - fetch_no)]
+
+            # Step processing rate =1 ---[static window]
+            elif group_step == 1 and len(dRP) >= (nGZ + n2fetch) and fetch_no <= 21:
+                del dRP[0:(len(dRP) - nGZ)]  # delete overflow data
+
+            # Step processing rate =1 ---[moving window]
+            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dRP[0:(len(dRP) - fetch_no)]
+
+            else:  # len(dL1) < nGZ:
+                pass
+
+    else:
+        print('Process EOF reached...')
+        print('SPC Halting for 5 Minutes...')
+        time.sleep(5)
+
+    daq2.close()
 
     # Roller Force procedure ----------------------------------[A]
-    dataLP = daq1.execute('SELECT * FROM ' + T1).fetchmany(n2fetch)
+    dataLP = daq1.execute('SELECT * FROM ' + T3).fetchmany(n2fetch)
     if len(dataLP) != 0:
         for result in dataLP:
             result = list(result)
@@ -271,84 +268,6 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, T1, T2, T3, T
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    daq1.close()
-
-    # Cell Tension Procedure ----------------------------------[D]
-    dataCT = daq2.execute('SELECT * FROM ' + T2).fetchmany(n2fetch)
-    if len(dataCT) != 0:
-        for result in dataCT:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dCT.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dCT) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dCT[0:(len(dCT) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dCT[0:(len(dCT) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dCT) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dCT[0:(len(dCT) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dCT[0:(len(dCT) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
-    daq2.close()
-
-    # Position Error Procedure ----------------------------------[E]
-    dataRP = daq3.execute('SELECT * FROM ' + T3).fetchmany(n2fetch)
-    if len(dataRP) != 0:
-        for result in dataRP:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dRP.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dRP) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dRP[0:(len(dRP) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dRP[0:(len(dRP) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dRP) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dRP[0:(len(dRP) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dRP[0:(len(dRP) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
     daq3.close()
 
     # Laser Angle procedure ----------------------------------[B]
@@ -390,82 +309,4 @@ def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, T1, T2, T3, T
 
     daq4.close()
 
-    # Laser Angle procedure ----------------------------------[B]
-    dataOT = daq5.execute('SELECT * FROM ' + T5).fetchmany(n2fetch)
-    if len(dataOT) != 0:
-        for result in dataOT:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dOT.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dOT) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dOT[0:(len(dOT) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dOT[0:(len(dOT) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dOT) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dOT[0:(len(dOT) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dOT[0:(len(dOT) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
-    daq5.close()
-
-    # Tape Speed Procedure ----------------------------------[F]
-    dataWS = daq6.execute('SELECT * FROM ' + T6).fetchmany(n2fetch)
-    if len(dataWS) != 0:
-        for result in dataWS:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dWS.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dWS) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dWS[0:(len(dCT) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dWS[0:(len(dCT) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dWS) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dWS[0:(len(dWS) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dWS[0:(len(dWS) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
-    daq6.close()
-
-    return dLP, dCT, dRP, dLA, dOT, dWS
+    return dGEN, dRP, dLP, dLA

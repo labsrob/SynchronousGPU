@@ -6160,19 +6160,23 @@ def mainRun(conn, ret, stad, stpd, Sqlfmt, HeadA, HeadB, viewTFM, oEE, rp, ts, t
             df3 = pd.DataFrame(dX3, columns=colu)  # porte sql data into dataframe
             # --------------------------------
             # Allow the following code to run despite not on DNV condition ----------------#
-            # TODO replace with process variable
+
+            # TODO replace with process variable --------#
             cLayer = df3['CurrentLayer']        # .tail(1)
             status = df3['Description'][1]      # .tail(1)
             curLayer = list(set(cLayer))        # shuffle list to obtain unique layer number at a time
+
             if len(curLayer) > 1:
                 lastE = len(curLayer)
                 curLayer = curLayer[lastE - 1]  # print the last index element
+
             # ---------------------------------
             # if VarPerHeadA or VarPerHeadB or VariProcess:
-            OTlayr.append(curLayer[0])      # Post values into static array
-            EPpos.append('N/A')             # Insert pipe position is available
+            OTlayr.append(curLayer[0])          # Post values into static array
+            EPpos.append('N/A')                 # Insert pipe position is available
             pStatus.append(status)
             print('\nTP05[Layer/Status]:', curLayer[0], status)
+
             # ----------------------------------------------------------------------------#
             # DNVspecify and VariProcess or not DNVspecify and VarPerHeadA or VarPerHeadB:
             if not DNVspecify and VarPerHeadA or not DNVspecify and VarPerHeadB or VariProcess and DNVspecify:

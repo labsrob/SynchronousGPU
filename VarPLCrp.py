@@ -12,7 +12,7 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    plcRP = [df1['R1H1RPF'], df1['R1H2RP'],
+    plcRP = [df1['R1H1RP'], df1['R1H2RP'],
             df1['R1H3RP'], df1['R1H4RP'],
             df1['R2H1RP'], df1['R2H2RP'],
             df1['R2H3RP'], df1['R2H4RP'],

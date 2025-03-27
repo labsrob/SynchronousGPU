@@ -1847,8 +1847,8 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, pCyc, enDNV, enMGM, enA
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(tpA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(tpB))
-                config.set(processID + "HL_" + WONID, "SEOLSpace", str(tpK))
-                config.set(processID + "HL_" + WONID, "SEOPSpace", str(tpP))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(tpK)) # End of Layer sample space
+                config.set(processID + "HL_" + WONID, "SEOPSpace", str(tpP)) # End of Pipe Sample space
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(tpC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(tpD))
                 config.set(processID + "HL_" + WONID, "EnableMGM", str(tpE))
@@ -1863,7 +1863,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, pCyc, enDNV, enMGM, enA
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(tgA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(tgB))
-                config.set(processID + "HL_" + WONID, "SEOLSpace", str(tgK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(tgK))    # End of Layer sample space
                 config.set(processID + "HL_" + WONID, "SEOPSpace", str(tgP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(tgC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(tgD))
@@ -1880,7 +1880,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, pCyc, enDNV, enMGM, enA
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(laA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(laB))
-                config.set(processID + "HL_" + WONID, "SEOLSpace", str(laK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(laK))    # End of Layer sample space
                 config.set(processID + "HL_" + WONID, "SEOPSpace", str(laP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(laC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(laD))
@@ -1897,7 +1897,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, pCyc, enDNV, enMGM, enA
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(rfA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(rfB))
-                config.set(processID + "HL_" + WONID, "SEOLSpace", str(rfK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(rfK))    # End of Layer sample space
                 config.set(processID + "HL_" + WONID, "SEOPSpace", str(rfP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(rfC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(rfD))
@@ -1915,7 +1915,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, pCyc, enDNV, enMGM, enA
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(lpA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(lpB))
-                config.set(processID + "HL_" + WONID, "SEOLSpace", str(lpK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(lpK))    # End of Layer sample space
                 config.set(processID + "HL_" + WONID, "SEOPSpace", str(lpP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(lpC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(lpD))
@@ -1933,7 +1933,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, pCyc, enDNV, enMGM, enA
                 config.add_section(processID +"HL_" + WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(ttA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(ttB))
-                config.set(processID + "HL_" + WONID, "SEOLSpace", str(ttK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(ttK))    # End of Layer sample space
                 config.set(processID + "HL_" + WONID, "SEOPSpace", str(ttP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(ttC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(ttD))
@@ -1954,7 +1954,7 @@ def encryptMetricsQP(WON, processID, sSize, gType, sCyc, pCyc, enDNV, enMGM, enA
                 config.add_section(processID +"HL_"+WONID)
                 config.set(processID + "HL_" + WONID, "SmpleSize", str(stA))
                 config.set(processID + "HL_" + WONID, "GroupType", str(stB))
-                config.set(processID + "HL_" + WONID, "SEOLSpace", str(stK))
+                config.set(processID + "HL_" + WONID, "SEOLSpace", str(stK))    # End of Layer sample space
                 config.set(processID + "HL_" + WONID, "SEOPSpace", str(stP))
                 config.set(processID + "HL_" + WONID, "EnableDNV", str(stC))
                 config.set(processID + "HL_" + WONID, "EnableAUT", str(stD))
@@ -1995,8 +1995,8 @@ def decryptpProcessLim(WONID, processID):
         if processID == 'RF':
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
-            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
+            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')     # End of Pipe sample space
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
             gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
@@ -2010,7 +2010,7 @@ def decryptpProcessLim(WONID, processID):
         elif processID == 'LP':
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
             gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
@@ -2025,7 +2025,7 @@ def decryptpProcessLim(WONID, processID):
         elif processID == 'TG':
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random') # End of Layer sample space
             gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
@@ -2040,7 +2040,7 @@ def decryptpProcessLim(WONID, processID):
         elif processID == 'TP':     # Tape Placementr Error(Keyance)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
             gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
@@ -2055,7 +2055,7 @@ def decryptpProcessLim(WONID, processID):
         elif processID == 'LA':
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
             gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
@@ -2070,7 +2070,7 @@ def decryptpProcessLim(WONID, processID):
         elif processID == 'TT':
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
             gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
@@ -2085,7 +2085,7 @@ def decryptpProcessLim(WONID, processID):
         elif processID == 'ST':
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
             gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
             gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
             gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')

@@ -187,7 +187,7 @@ def decryptMetricsGeneral(WONID):
             TT = onetimepad.decrypt(limpParams["Tape_Temp"], 'random')
             ST = onetimepad.decrypt(limpParams["Subs_temp"], 'random')
             TG = onetimepad.decrypt(limpParams["Tape_void"], 'random')
-            SP = onetimepad.decrypt(limpParams["Temp_Ramp"], 'random')
+            SP = onetimepad.decrypt(limpParams["Temp_Ramp"], 'random')  # Spooling
 
         except KeyError:
             print('Configuration File or Key is missing. Loading default values...')
