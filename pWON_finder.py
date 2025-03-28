@@ -31,93 +31,101 @@ inUseAlready = False                # import realTPostProdUpdate as pq | ALLOW U
 UsePLC_DBS = True
 
 
+def connSQL():
+    import CommsSql as mCon
+    agent = 0
+    if agent == 0:
+        conn = mCon.DAQ_connect(1, agent)  # 1 = connection is active to be .closed()
+    else:
+        conn = 'none'
+        # errorNoconnect()
+    return conn
+
 
 def errorSearchWON():
     messagebox.showerror('Local GUI', 'Invalid Work Order Number. Try again!')
     return
 
 
-def searchSqlRecs(conn_t, DATEentry, WONentry):                   # Post Production data search
-    # print('\nConn:', conn_t)
+def searchSqlData(DATEentry, WONentry):                   # Post Production data search
+    # ----------------------#
+    # Load SQL server library
+    import CommsSql as sql_con
+
     StaSearchD = DATEentry                                      # Date Lower Boundary or WON #
     EndSearchD = int(DATEentry) + 1                             # Date Upper Boundary or 0
     EndSearchD = str(EndSearchD)
 
     # Test connection readiness and clear any flags ups.....
-    if conn_t != 'failed':
-        mPTablesID = conn_t.cursor()
-        mProcessID = conn_t.cursor()
+    sqlTableid = sql_con.DAQ_connect()  # Execute connection
+    conn_sq = sqlTableid.cursor()       # Convert to cursor
 
-        # ----------------------------------- If Search was by Date String ----------------------[]
-        if StaSearchD != '0' and WONentry == '0':               # If Date search
-            print('\nWON: Date Search.')
+    # ----------------------------------- If Search was by Date String ----------------------[]
+    if StaSearchD != '0' and WONentry == '0':               # If Date search
+        print('\nWON: Date Search.')
 
-            # Find out how many tables meet this condition -----[A]
-            pTables = mPTablesID.execute('SELECT COUNT(create_date) AS ValidTotal from sys.tables where '
-                                         'create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND ' + "'" + EndSearchD + "'").fetchone()
-            time.sleep(10)                                      # allow SQL server response delay
-            nTables = pTables[0]                                # pick values from sql column
-            total_T = int(nTables)
+        # Find out how many tables meet this condition -----[A]
+        pTables = conn_sq.execute('SELECT COUNT(create_date) AS ValidTotal from sys.tables where '
+                                     'create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND ' + "'" + EndSearchD + "'").fetchone()
+        time.sleep(10)                                      # allow SQL server response delay
+        nTables = pTables[0]                                # pick values from sql column
+        total_T = int(nTables)
 
-            if not total_T % 2 == 0:                            # Test value and add 1 if value is odd
-                nTables = pTables[0] + 1
-            print('\nFound:', nTables, 'valid records..')
+        if not total_T % 2 == 0:                            # Test value and add 1 if value is odd
+            nTables = pTables[0] + 1
+        print('\nFound:', nTables, 'valid records..')
 
-            if nTables > 1:                                     # Production file exist with OEE data
-                # List tables that meet this condition ---------[# schema_name	table_name	create_date]
-                mTables = mProcessID.execute(
-                    'SELECT schema_name(schema_id) as schema_name, name as table_name, create_date from '
-                    'sys.tables where create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND '
-                    + "'" + EndSearchD + "'" + 'order by table_name asc').fetchmany(nTables)
+        if nTables > 1:                                     # Production file exist with OEE data
+            # List tables that meet this condition ---------[# schema_name	table_name	create_date]
+            mTables = conn_sq.execute(
+                'SELECT schema_name(schema_id) as schema_name, name as table_name, create_date from '
+                'sys.tables where create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND '
+                + "'" + EndSearchD + "'" + 'order by table_name asc').fetchmany(nTables)
 
-                # get the Work Order Name and keep for index-tracking ----
-                newWON = mTables[1][1]                          # First_row, second column (Table_name)
-                newWON = newWON.split('_')
-                processWON.append(newWON[1])
-                newWON = processWON[0]
-                # OEEdataID = mTables[0][1]                     # Pick first table on the first row
-                OEEdataID = mP.get_encodedFiles(StaSearchD)     # Computed OEE_ID for specific date
+            # get the Work Order Name and keep for index-tracking ----
+            newWON = mTables[1][1]                          # First_row, second column (Table_name)
+            newWON = newWON.split('_')
+            processWON.append(newWON[1])
+            newWON = processWON[0]
+            # OEEdataID = mTables[0][1]                     # Pick first table on the first row
+            OEEdataID = mP.get_encodedFiles(StaSearchD)     # Computed OEE_ID for specific date
 
-            else:
-                errorSearchWON()                                # return error to the user.
-                OEEdataID = 0
-                newWON = 0
+        else:
+            errorSearchWON()                                # return error to the user.
+            OEEdataID = 0
+            newWON = 0
 
-            # ------------------------------------- If Search was by Work Order Number -----------------------[]
-        elif WONentry != 0 and StaSearchD == '0':                        # WON is searched by WO# -------[]
-            print('WON: Work Order Number Search... True')
+        # ------------------------------------- If Search was by Work Order Number -----------------------[]
+    elif WONentry != 0 and StaSearchD == '0':                        # WON is searched by WO# -------[]
+        print('WON: Work Order Number Search... True')
 
-            pTables = mPTablesID.execute('Select count(*) AS ValidTotal from Information_schema.Tables where '
-                                         'TABLE_NAME like ' + "'" '%' + str(WONentry) + '%' "'").fetchone()
-            time.sleep(4)                                       # allow SQL server response delay
-            nTables = pTables[0]                                # Pick total from sql column, add OEE table
-            print('\nFound:', nTables, 'valid records..')
+        pTables = conn_sq.execute('Select count(*) AS ValidTotal from Information_schema.Tables where '
+                                     'TABLE_NAME like ' + "'" '%' + str(WONentry) + '%' "'").fetchone()
+        time.sleep(4)                                       # allow SQL server response delay
+        nTables = pTables[0]                                # Pick total from sql column, add OEE table
+        print('\nFound:', nTables, 'valid records..')
 
-            if nTables >= 1:                                    # Production file exist with OEE data
-                # List out all valid tables, figure out OEE from the creation date --------------------------[]
-                mTables = mProcessID.execute(
-                    'SELECT type_desc AS schema_name, name as table_name, create_date from '
-                    'sys.tables where name LIKE ' + "'" '%' + str(WONentry) + '%' "'" + 'order by name asc').fetchmany(
-                    nTables)
-                checkOEE_date = mTables[1][2]
-                newWON = WONentry
-                OEEdataID = searchOEERecs(conn_t, checkOEE_date)         # get OEE file name
+        if nTables >= 1:                                    # Production file exist with OEE data
+            # List out all valid tables, figure out OEE from the creation date --------------------------[]
+            mTables = conn_sq.execute(
+                'SELECT type_desc AS schema_name, name as table_name, create_date from '
+                'sys.tables where name LIKE ' + "'" '%' + str(WONentry) + '%' "'" + 'order by name asc').fetchmany(
+                nTables)
+            checkOEE_date = mTables[1][2]
+            newWON = WONentry
+            OEEdataID = searchOEERecs(conn_sq, checkOEE_date)         # get OEE file name
 
-            else:
-                print('Invalid Work Order Number..')
-                errorSearchWON()
-                OEEdataID = 0
-                newWON = 0
         else:
             print('Invalid Work Order Number..')
             errorSearchWON()
-            OEEdataID = mP.seek_OEE_data()                             # Default to current date's OEE
+            OEEdataID = 0
             newWON = 0
     else:
-        # print('SQL Query failed. Please, check Server connection.')
-        conn = 0
-        OEEdataID = 0
+        print('Invalid Work Order Number..')
+        errorSearchWON()
+        OEEdataID = mP.seek_OEE_data()                             # Default to current date's OEE
         newWON = 0
+        conn = 0
 
     return OEEdataID, newWON
 

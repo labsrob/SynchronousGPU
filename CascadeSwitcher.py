@@ -106,11 +106,10 @@ print('\nDecrypted Prod Parameters:', mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart,
 if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA) and not int(TP) and not int(RF):
     pRecipe = 'DNV'
     import qParamsHL_DNV as dnv
-elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
+else:
     pRecipe = 'MGM'
     import qParamsHL_MGM as mgm
-else:
-    pRecipe = 'USR'
+
 # ----------------------------------------------[]
 
 

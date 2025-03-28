@@ -53,7 +53,7 @@ def autoConn():
 # --------------------------------------------------------
 
 # Connection to MS-SQL Server (MARS enabled connection) ------------[+ In-Memory OLTP]
-def DAQ_connect(state, agent):
+def DAQ_connect():
     """
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
@@ -61,8 +61,6 @@ def DAQ_connect(state, agent):
 
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    connect = state
-    print('\nValues -', 'State:', state, 'Agent:', agent)
     # ---------------------------------------------------------#
 
     if conn == None:

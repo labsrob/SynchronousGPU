@@ -479,12 +479,22 @@ def menuExit():
 
 # ------------------------------------------------------------------------------------[ MAIN PROGRAM ]
 
-def tabbed_cascadeMode():  # Limited Tab default screen with multiple independent screens
-    global p1, p2, p3, p4, p5, p6, p7
+def tabbed_cascadeMode(pMode):  # Limited Tab default screen with multiple independent screens
+    global p1, p2, p3, p4, p5, p6, p7, hostConn
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
     """
+    if pMode == 1:
+        import CommsPlc as hp
+        hostConn = hp.connectM2M()
+    elif pMode == 2:
+        print('Connecting to SQL Server...')
+        pass
+    else:
+        print('Standby/Maintenance Mode')
+        pass
+
     s = ttk.Style()
     s.theme_use('default')  # Options: ('clam', 'alt', 'default', 'classic')
     s.configure('TNotebook.Tab', background="green3", foreground="black")
@@ -529,11 +539,22 @@ def tabbed_cascadeMode():  # Limited Tab default screen with multiple independen
     root.mainloop()
 
 
-def tabbed_canvas():   # Tabbed Common Classes -------------------[TABBED ]
+def tabbed_canvas(pMode):   # Tabbed Common Classes -------------------[TABBED ]
+    global hostConn
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
     """
+    if pMode == 1:
+        import CommsPlc as hp
+        hostConn = hp.connectM2M()
+    elif pMode == 2:
+        print('Connecting to SQL Server...')
+        pass
+    else:
+        print('Standby/Maintenance Mode')
+        pass
+
     s = ttk.Style()
     s.theme_use('default')
     s.configure('TNotebook.Tab', background="green3", foreground="black")
@@ -2617,12 +2638,14 @@ class common_gapCount(ttk.Frame):
 # ------------------------- Additional Tabb for Monitoring Parameters -------------[Monitoring Tabs]
 
 class MonitorTabb(ttk.Frame):
+
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=20)
         self.createWidgets()
 
     def createWidgets(self):
+        smp_Sz, smp_St = 30, 1      # Assumes the default statistical sampling rate
 
         # Load Quality Historical Values -----------[]
         label = ttk.Label(self, text='[' + rType + ' Mode]', font=LARGE_FONT)
@@ -2830,7 +2853,7 @@ class MonitorTabb(ttk.Frame):
 
             # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
 
-        def synchronousP(smp_Sz, smp_St, fetchT):
+        def synchronousP(fetchT):
             fetch_no = str(fetchT)      # entry value in string sql syntax
 
             # Obtain SQL Data Host Server ---------------------------[GEN, RP, LP, LA]
@@ -2917,42 +2940,34 @@ class MonitorTabb(ttk.Frame):
 
             # declare asynchronous variables ------------------[]
             if monitorP == 'DNV':
-                dtRP, dtWS, dtCT, dtOT = synchronousP(smp_Sz, stp_Sz, db_freq)                  # data loading functions
+                dGEN, dRP = synchronousP(db_freq)               # data loading functions
             else:
-                dtLP, dtCT, dtRP, dtLA, dtOT, dtWS = synchronousP(smp_Sz, stp_Sz, db_freq)      # data loading functions
+                dGEN, dRP, dLP, dLA = synchronousP(db_freq)      # data loading functions
 
-            import varSQL_DFpm as pm                    # Contruct new data frame columns                                                # load SQL named columns
+            import varSQL_PM as pm                            # Construct new data frame columns
 
             viz_cycle = 150
             if monitorP == 'DNV':
-                g1 = qpm.validCols(T1)                   # Roller Pressure
-                d1 = pd.DataFrame(dtRP, columns=g1)
-                g2 = qpm.validCols(T2)                   # Tape Winding Speed
-                d2 = pd.DataFrame(dtWS, columns=g2)
-                g3 = qpm.validCols(T3)                   # Cell Tension and Oven Temp
-                d3 = pd.DataFrame(dtCT, columns=g3)
-                g4 = qpm.validCols(T4)  # Cell Tension and Oven Temp
-                d4 = pd.DataFrame(dtOT, columns=g4)
+                g1 = qpm.validCols(T1)                          # General Table
+                d1 = pd.DataFrame(dGEN, columns=g1)
+                g2 = qpm.validCols(T2)                          # Roller Pressure Table
+                d2 = pd.DataFrame(dRP, columns=g2)
+
+                # Concatenate all columns -----------[]
+                df1 = pd.concat([d1, d2], axis=1)
+
+            elif monitorP == 'MGM':
+                g1 = qpm.validCols(T1)                          # General Table
+                d1 = pd.DataFrame(dGEN, columns=g1)
+                g2 = qpm.validCols(T2)                          # Tape Winding Speed
+                d2 = pd.DataFrame(dRP, columns=g2)
+                g3 = qpm.validCols(T3)                          # Roller Pressure
+                d3 = pd.DataFrame(dLP, columns=g3)
+                g4 = qpm.validCols(T4)                          # Laser Angle
+                d4 = pd.DataFrame(dLA, columns=g4)
 
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2, d3, d4], axis=1)
-
-            elif monitorP == 'MGM':
-                g1 = qpm.validCols(T5)                   # Laser Power
-                d1 = pd.DataFrame(dtLP, columns=g1)
-                g2 = qpm.validCols(T3)                   # Cell Tension
-                d2 = pd.DataFrame(dtCT, columns=g2)
-                g3 = qpm.validCols(T1)                   # Roller Pressure
-                d3 = pd.DataFrame(dtRP, columns=g3)
-                g4 = qpm.validCols(T6)                   # Laser Angle
-                d4 = pd.DataFrame(dtLA, columns=g4)
-                g5 = qpm.validCols(T4)                  # Oven Temperature
-                d5 = pd.DataFrame(dtOT, columns=g5)
-                g6 = qpm.validCols(T2)                   # Tape Winding Speed
-                d6 = pd.DataFrame(dtWS, columns=g6)
-
-                # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2, d3, d4, d5, d6], axis=1)
             else:
                 df1 = 0
                 pass                                            # Reserve for process scaling -- RBL.
@@ -3024,243 +3039,106 @@ class MonitorTabb(ttk.Frame):
             im64.set_xdata(np.arange(db_freq))
             im65.set_xdata(np.arange(db_freq))
             im66.set_xdata(np.arange(db_freq))
-            im67.set_xdata(np.arange(db_freq))
-            im68.set_xdata(np.arange(db_freq))
-            im69.set_xdata(np.arange(db_freq))
-            im70.set_xdata(np.arange(db_freq))
-            im71.set_xdata(np.arange(db_freq))
-            im72.set_xdata(np.arange(db_freq))
-            im73.set_xdata(np.arange(db_freq))
-            im74.set_xdata(np.arange(db_freq))
-            im75.set_xdata(np.arange(db_freq))
-            im76.set_xdata(np.arange(db_freq))
-            im77.set_xdata(np.arange(db_freq))
 
             if monitorP == 'DNV':
                 # X Plot Y-Axis data points for XBar ----------[Roller Pressure x16, A1]
-                im10.set_ydata((PM[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H1
-                im11.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H2
-                im12.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H3
-                im13.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H4
-                im14.set_ydata((PM[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R2H1
-                im15.set_ydata((PM[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R2H2
-                im16.set_ydata((PM[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R2H3
-                im17.set_ydata((PM[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R2H4
-                # No computation for PPk / Cpk
-                im18.set_ydata((PM[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im19.set_ydata((PM[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im20.set_ydata((PM[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im21.set_ydata((PM[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                # No computation for PPk / Cpk
-                im22.set_ydata((PM[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im23.set_ydata((PM[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im24.set_ydata((PM[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im25.set_ydata((PM[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im10.set_ydata((PM[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H1
+                im11.set_ydata((PM[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H2
+                im12.set_ydata((PM[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H3
+                im13.set_ydata((PM[16]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R1H4
+                im14.set_ydata((PM[17]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R2H1
+                im15.set_ydata((PM[18]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R2H2
+                im16.set_ydata((PM[19]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R2H3
+                im17.set_ydata((PM[20]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # R2H4
+                im18.set_ydata((PM[21]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im19.set_ydata((PM[22]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im20.set_ydata((PM[23]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im21.set_ydata((PM[24]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im22.set_ydata((PM[25]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im23.set_ydata((PM[26]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im24.set_ydata((PM[27]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im25.set_ydata((PM[28]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
                 # ------------------------------------- Tape Winding Speed x16, A2
-                im26.set_ydata((PM[16]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im27.set_ydata((PM[17]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im28.set_ydata((PM[18]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im29.set_ydata((PM[19]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                # No computation for PPk / Cpk
-                im30.set_ydata((PM[20]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im31.set_ydata((PM[21]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im32.set_ydata((PM[22]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im33.set_ydata((PM[23]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                # No computation for PPk / Cpk
-                im34.set_ydata((PM[24]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im35.set_ydata((PM[25]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im36.set_ydata((PM[26]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im37.set_ydata((PM[27]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                # No computation for PPk / Cpk
-                im38.set_ydata((PM[28]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im39.set_ydata((PM[29]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im40.set_ydata((PM[30]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im41.set_ydata((PM[31]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                # -------------------------------------for Cell Tension x2, A3
-                im42.set_ydata((PM[32]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im43.set_ydata((PM[33]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                # -------------------------------------for Oven Temperature x2 A4
-                im44.set_ydata((PM[34]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im45.set_ydata((PM[35]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im26.set_ydata((PM[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im27.set_ydata((PM[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im28.set_ydata((PM[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im29.set_ydata((PM[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                # --------------------------------------Active Cell Tension x1
+                im30.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                # ----------------------------------------Oven Temperature x4 (RTD & IR Temp)
+                im31.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im32.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im33.set_ydata((PM[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im34.set_ydata((PM[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
 
             elif monitorP == 'MGM':
                 # -------------------------------------------------------------------------------[Laser Power]
-                im10.set_ydata((PM[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im11.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im12.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im13.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im14.set_ydata((PM[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im15.set_ydata((PM[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im16.set_ydata((PM[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im17.set_ydata((PM[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im18.set_ydata((PM[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im19.set_ydata((PM[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im20.set_ydata((PM[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im21.set_ydata((PM[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im22.set_ydata((PM[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im23.set_ydata((PM[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im24.set_ydata((PM[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im25.set_ydata((PM[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im10.set_ydata((PM[30]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im11.set_ydata((PM[31]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im12.set_ydata((PM[32]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im13.set_ydata((PM[33]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im14.set_ydata((PM[34]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im15.set_ydata((PM[35]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im16.set_ydata((PM[36]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im17.set_ydata((PM[37]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im18.set_ydata((PM[38]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im19.set_ydata((PM[39]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im20.set_ydata((PM[40]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im21.set_ydata((PM[41]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im22.set_ydata((PM[42]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im23.set_ydata((PM[43]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im24.set_ydata((PM[44]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im25.set_ydata((PM[45]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
                 # -----------------------------------------------------[Cell Tension]
-                im26.set_ydata((PM[16]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im27.set_ydata((PM[17]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im26.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])   # Segment 1
                 # --------------------------------------------------[Roller Pressure]
-                im28.set_ydata((PM[18]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im29.set_ydata((PM[19]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im30.set_ydata((PM[20]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im31.set_ydata((PM[21]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im32.set_ydata((PM[22]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im33.set_ydata((PM[23]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im34.set_ydata((PM[24]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im35.set_ydata((PM[25]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im36.set_ydata((PM[26]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im37.set_ydata((PM[27]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im38.set_ydata((PM[28]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im39.set_ydata((PM[29]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im40.set_ydata((PM[30]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im41.set_ydata((PM[31]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im42.set_ydata((PM[33]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im43.set_ydata((PM[34]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im27.set_ydata((PM[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im28.set_ydata((PM[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im29.set_ydata((PM[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im30.set_ydata((PM[16]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im31.set_ydata((PM[17]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im32.set_ydata((PM[18]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im33.set_ydata((PM[19]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im34.set_ydata((PM[20]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im35.set_ydata((PM[21]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im36.set_ydata((PM[22]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im37.set_ydata((PM[23]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im38.set_ydata((PM[24]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im39.set_ydata((PM[25]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im40.set_ydata((PM[26]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im41.set_ydata((PM[27]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im42.set_ydata((PM[28]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
                 # -------------------------------------------------------[Laser Angle]
-                im44.set_ydata((PM[36]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im45.set_ydata((PM[37]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im46.set_ydata((PM[46]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im47.set_ydata((PM[47]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im48.set_ydata((PM[48]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im49.set_ydata((PM[49]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im50.set_ydata((PM[50]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im51.set_ydata((PM[51]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im52.set_ydata((PM[52]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im53.set_ydata((PM[53]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im54.set_ydata((PM[54]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im55.set_ydata((PM[55]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im56.set_ydata((PM[56]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im57.set_ydata((PM[57]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im58.set_ydata((PM[58]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im59.set_ydata((PM[59]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im43.set_ydata((PM[47]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im44.set_ydata((PM[48]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im45.set_ydata((PM[49]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im46.set_ydata((PM[50]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im47.set_ydata((PM[51]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im48.set_ydata((PM[52]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im49.set_ydata((PM[53]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im50.set_ydata((PM[54]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im51.set_ydata((PM[55]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im52.set_ydata((PM[56]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im53.set_ydata((PM[57]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im54.set_ydata((PM[58]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
+                im55.set_ydata((PM[59]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im56.set_ydata((PM[60]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im57.set_ydata((PM[61]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im58.set_ydata((PM[62]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
                 # -------------------------------------------------[Oven Temperature]
-                im60.set_ydata((PM[60]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im61.set_ydata((PM[61]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im59.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im60.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im61.set_ydata((PM[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im62.set_ydata((PM[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
                 # ----------------------------------------------[Winding Speed x16]
-                im62.set_ydata((PM[62]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im63.set_ydata((PM[63]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im64.set_ydata((PM[64]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im65.set_ydata((PM[65]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im66.set_ydata((PM[66]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im67.set_ydata((PM[67]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im68.set_ydata((PM[68]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im69.set_ydata((PM[69]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im70.set_ydata((PM[70]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im71.set_ydata((PM[71]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im72.set_ydata((PM[72]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im73.set_ydata((PM[73]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                im74.set_ydata((PM[74]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                im75.set_ydata((PM[75]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                im76.set_ydata((PM[76]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                im77.set_ydata((PM[77]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im63.set_ydata((PM[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                im64.set_ydata((PM[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
+                im65.set_ydata((PM[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
+                im66.set_ydata((PM[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
 
             else:
                 # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
-                if int(OT) and int(CT):
-                    im10.set_ydata((PM[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im11.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im12.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im13.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                elif int(LP) and int(LA):
-                    im10.set_ydata((PM[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im11.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im12.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im13.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im14.set_ydata((PM[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im15.set_ydata((PM[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im16.set_ydata((PM[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im17.set_ydata((PM[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im18.set_ydata((PM[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im19.set_ydata((PM[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im20.set_ydata((PM[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im21.set_ydata((PM[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im22.set_ydata((PM[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im23.set_ydata((PM[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im24.set_ydata((PM[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im25.set_ydata((PM[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # ------------------------------------- for Laser Angle
-                    im26.set_ydata((PM[16]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im27.set_ydata((PM[17]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im28.set_ydata((PM[18]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im29.set_ydata((PM[19]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im30.set_ydata((PM[20]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im31.set_ydata((PM[21]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im32.set_ydata((PM[22]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im33.set_ydata((PM[23]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im34.set_ydata((PM[24]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im35.set_ydata((PM[25]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im36.set_ydata((PM[26]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im37.set_ydata((PM[27]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im38.set_ydata((PM[28]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im39.set_ydata((PM[29]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im40.set_ydata((PM[30]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im41.set_ydata((PM[31]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                elif int(RP) and int(WS):
-                    im10.set_ydata((PM[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im11.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im12.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im13.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im14.set_ydata((PM[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im15.set_ydata((PM[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im16.set_ydata((PM[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im17.set_ydata((PM[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im18.set_ydata((PM[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im19.set_ydata((PM[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im20.set_ydata((PM[10]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im21.set_ydata((PM[11]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im22.set_ydata((PM[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im23.set_ydata((PM[13]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im24.set_ydata((PM[14]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im25.set_ydata((PM[15]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # ------------------------------------- for Laser Angle
-                    im26.set_ydata((PM[16]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im27.set_ydata((PM[17]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im28.set_ydata((PM[18]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im29.set_ydata((PM[19]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im30.set_ydata((PM[20]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im31.set_ydata((PM[21]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im32.set_ydata((PM[22]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im33.set_ydata((PM[23]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im34.set_ydata((PM[24]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im35.set_ydata((PM[25]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im36.set_ydata((PM[26]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im37.set_ydata((PM[27]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im38.set_ydata((PM[28]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im39.set_ydata((PM[29]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im40.set_ydata((PM[30]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im41.set_ydata((PM[31]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-
-                elif int(ST) and int(TG):
-                    # -------------------------------------for Roller Pressure
-                    im10.set_ydata((PM[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im11.set_ydata((PM[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im12.set_ydata((PM[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im13.set_ydata((PM[3]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im14.set_ydata((PM[4]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im15.set_ydata((PM[5]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
-                    im16.set_ydata((PM[6]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 3
-                    im17.set_ydata((PM[7]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 4
-                    # No computation for PPk / Cpk
-                    im18.set_ydata((PM[8]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-                    im19.set_ydata((PM[9]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+                print('No data to plot...')
 
             # --------------------
             xline, sline = 10, 2.2
@@ -3425,7 +3303,6 @@ class laserPowerTabb(ttk.Frame):
         window_Xmin, window_Xmax = 0, (int(lpSize) + 3)             # windows view = visible data points
 
         # ----------------------------------------------------------#
-        # Real-Time Parameter according to updated requirements ----# 27/Feb/2025
         T1 = processWON[0] + '_LP'  # Laser Power
         # ----------------------------------------------------------#
 
@@ -9668,49 +9545,57 @@ def userMenu():     # listener, myplash
         global stpd, processWON, processID, OEEdataID, hostConn
 
         if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
-            import CommsSql as hs
+            print('\nSelection RetroPlay Condition met....')
 
             # import signal
             # os.kill(sid, signal.SIGTERM)
-            if (analysis.entrycget(0, 'state') == 'normal'
-                    and analysis.entrycget(1, 'state') == 'normal'
-                    and analysis.entrycget(3, 'state') == 'normal'):
-                analysis.entryconfig(0, state='disabled')                             # turn command off
 
-                # ----- Calling essential functions -----------[1]
-                DATEentry, WONentry = retroUserSearchReq()                                  # Popup dialogue
+            if (process.entrycget(0, 'state') == 'disabled'
+                    and process.entrycget(1, 'state') == 'normal'
+                    and process.entrycget(3, 'state') == 'normal'):
+
+                # ----- Calling essential functions -----------[]
+                process.entryconfig(0, state='disabled')                     # turn command off
+                analysis.entryconfig(0, state='normal')
+                analysis.entryconfig(1, state='normal')
+                analysis.entryconfig(3, state='normal')
+
+                # ------- Indicate Record Date or WON ---------[]
+                DATEentry, WONentry = searchBox()                                  # Popup dialogue
 
                 # ---------------------------------------------[2]
                 print('Attempting connection with SQL Server...')
-                hostConn = hs.DAQ_connect(0, 1)                                 # Connect to SQL Host
+                qType = 2
+                runType.append(qType)
 
-                if hostConn:
-                    # -----------------------------------------[3]
-                    OEEdataID, processID = sqld.searchSqlRecs(hostConn, DATEentry, WONentry)    # Query SQL record
-                    # processID = processID +'RF'
-                    qType = 2
-                    runType.append(qType)
-                else:
-                    print('Connection to SQL Server failed. Please, check Server connection.')
+                # Connect to SQL Server -----------------------[]
+                OEEdataID, processID = sqld.searchSqlData(DATEentry, WONentry)     # Query SQL record
+                print('\nSelecting Cascade View....')
+                tabbed_cascadeMode(qType)
 
-            elif (analysis.entrycget(3, 'state') == 'disabled'
-                  and analysis.entrycget(0, 'state') == 'normal'):
-                analysis.entryconfig(3, state='normal')
-                analysis.entryconfig(0, state='disabled')
+            elif (process.entrycget(1, 'state') == 'disabled'
+                  and process.entrycget(0, 'state') == 'normal'
+                  and process.entrycget(3, 'state') == 'normal'):
 
                 # ----- Calling essential functions ----------#
-                DATEentry, WONentry = retroUserSearchReq()                                 # Search for Production data
-                hostConn = hs.DAQ_connect(0, 1)                                # Connect to SQL Host
-                print('Connecting to SQL Server...')
+                process.entryconfig(1, state='disabled')
+                analysis.entryconfig(0, state='normal')
+                analysis.entryconfig(1, state='normal')
+                analysis.entryconfig(3, state='normal')
 
-                if hostConn:
-                    # connect SQL Server and obtain Process ID ----#
-                    OEEdataID, processID = sqld.searchSqlRecs(hostConn, DATEentry, WONentry)    # Query SQL record
-                    # ---------------------------------------------[]
-                    qType = 2
-                    runType.append(qType)
-                else:
-                    print('Connection to SQL Server failed. Please, check Server connection.')
+                # ------- Indicate Record Date or WON ---------[]
+                DATEentry, WONentry = searchBox()                                   # Search for Production data
+
+                # ---------------------------------------------[2]
+                print('Attempting connection with SQL Server...')
+                qType = 2
+                runType.append(qType)
+
+                # connect SQL Server and obtain Process ID ----#
+                OEEdataID, processID = sqld.searchSqlData(DATEentry, WONentry)    # Query SQL record
+                # ---------------------------------------------[]
+                print('\nSelecting Tabbed View....')
+                tabbed_canvas(qType)
 
             else:
                 runtimeChange()
@@ -9721,40 +9606,53 @@ def userMenu():     # listener, myplash
         else:
             print('Invalid selection. Please, enable a visualisation mode')
 
-        # return # stpd, WON, processID, OEEdataID, qType, hostConn
+        return
+
 
     def realTimePlay():
-        import CommsPlc as hp
+        if analysis.entrycget(0, 'state') == 'disabled' or analysis.entrycget(1, 'state') == 'disabled':
 
-        if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
-            global hostConn
-
+            print('\nSelection A Condition met....')
             # import dataRepository as sqld
-            if (analysis.entrycget(0, 'state') == 'normal'
+
+            # Test condition for CASCADE VIEW -----------------#
+            if (analysis.entrycget(0, 'state') == 'disabled'
                     and analysis.entrycget(1, 'state') == 'normal'
                     and analysis.entrycget(3, 'state') == 'normal'):
-                analysis.entryconfig(1, state='disabled')
-                # ----- Calling essential functions -----------[]
-                qType = 1
-                runType.append(qType)
-                # ---------------------------------------------[]
-                hostConn = hp.connectM2M()
 
-            elif (analysis.entrycget(3, 'state') == 'disabled'
-                  and analysis.entrycget(1, 'state') == 'normal'):
-                analysis.entryconfig(3, state='normal')
-                analysis.entryconfig(1, state='disabled')
-                # ----- Calling essential functions -----------
+                # ----- Calling essential functions -----------[]
+                analysis.entryconfig(0, state='disabled')
+                process.entryconfig(0, state='normal')
+                process.entryconfig(1, state='normal')
+                process.entryconfig(3, state='normal')
+
                 qType = 1
                 runType.append(qType)
-                hostConn = hp.connectM2M()
+                print('\nSelecting Cascade View....')
+                tabbed_cascadeMode(qType)                    # Call objective function
+
+            # Test condition for TABBED VIEW -----------------#
+            elif (analysis.entrycget(1, 'state') == 'disabled'
+                  and analysis.entrycget(0, 'state') == 'normal'
+                  and analysis.entrycget(3, 'state') == 'normal'):
+
+                # ----- Calling essential functions ----------#
+                analysis.entryconfig(1, state='disabled')
+                process.entryconfig(0, state='normal')
+                process.entryconfig(1, state='normal')
+                process.entryconfig(3, state='normal')
+
+                qType = 1
+                runType.append(qType)
+                print('\nSelecting Tabbed View....')
+                tabbed_canvas(qType)                         # Call tabbed canvas functions
 
             else:
                 runtimeChange()
                 qType = 0
                 runType.append(qType)
         else:
-            print('Invalid selection. Please, enable a visualisation mode')
+            print('Invalid selection. Please, enable visualisation mode')
 
         return
 
@@ -9799,7 +9697,7 @@ def userMenu():     # listener, myplash
             errorNoServer()
         return plcTbls, sqlTbls
 
-    def retroUserSearchReq():       # Search for production data either by date or work order number
+    def searchBox():       # Indicate DATE/WON Search for production data
         pop = Toplevel(root)
         pop.wm_attributes('-topmost', True)
 
@@ -9885,6 +9783,7 @@ def userMenu():     # listener, myplash
                 process.entryconfig(0, state='normal')              # revert to original state
 
             HeadA, HeadB, closeV = 1, 0, 0
+            retroPlay()                                                  # Call objective function
 
         elif process.entrycget(3, 'state') == 'disabled':    # If Closed Display state is disabled
             process.entryconfig(0, state='disabled')                # select and disable Cascade View command
@@ -9893,6 +9792,7 @@ def userMenu():     # listener, myplash
 
             # --- start parallel thread ----------------------------------#
             # cascadeViews()                                              # Critical Production Params
+            retroPlay()                                                   # Call objective function
             tabbed_cascadeMode()                                          # Default limited tabbed common screen + Casc
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
@@ -9906,6 +9806,7 @@ def userMenu():     # listener, myplash
 
             # --- start parallel thread --------------------------------#
             # cascadeViews()                                            # Critical Production Params
+            retroPlay()                                                 # Call objective function
             tabbed_cascadeMode()                                        # Provide limited Tabb and multiple screen
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
@@ -9943,12 +9844,14 @@ def userMenu():     # listener, myplash
                 process.entryconfig(1, state='normal')              # revert to original state
 
             HeadA, HeadB, closeV = 0, 1, 0                                # call embedded functions
+            retroPlay()                                                   # Call objective function
 
         elif process.entrycget(3, 'state') == 'disabled':
             process.entryconfig(1, state='disabled')
             process.entryconfig(0, state='normal')
             process.entryconfig(3, state='normal')
 
+            retroPlay()                                                     # Call objective function
             tabbed_canvas()                                                 # Tabbed Visualisation
             exit_bit.append(0)
 
@@ -9961,6 +9864,7 @@ def userMenu():     # listener, myplash
                 process.entryconfig(0, state='normal')
                 process.entryconfig(3, state='normal')
 
+                retroPlay()                     # Call objective function
                 tabbed_canvas()                 # Tabbed Visualisation
                 exit_bit.append(0)
                 HeadA, HeadB, closeV = 0, 1, 0
@@ -9969,6 +9873,135 @@ def userMenu():     # listener, myplash
             process.entryconfig(1, state='normal')
             HeadA, HeadB, closeV = 0, 0, 1
             errorChoice()                                   # raise user exception
+            print('Invalid! View selection before process parameter..')
+
+        return HeadA, HeadB, closeV
+
+
+# --------------------------------------------------------------------------------#
+    def viewTypeC():
+        global HeadA, rType  # declare as global variables
+
+        # Define run Type -------------[]
+        if runType == 1:
+            rType = 'Synchro'
+        elif runType == 2:
+            rType = 'PostPro'
+        else:
+            rType = 'Standby'
+        # -----------------------------[]
+        if analysis.entrycget(1, 'state') == 'disabled':  # If Tabbed View was in disabled state
+            # if Tabbed view is active
+            analysis.entryconfig(0, state='disabled')   # select cascade View becomes an option
+            analysis.entryconfig(1, state='normal')     # set Tabb View to normal
+            analysis.entryconfig(3, state='normal')     # set Close Display to normal
+
+            if messagebox.askokcancel("Warning!!!", "Current Visualisation will be lost!"):
+                tabb_clearOut()                             # Clear out existing Tabbed View
+                tabbed_cascadeMode()                        # Default limited tabbed common screen
+                print('\nStarting new GPU thread...')
+                exit_bit.append(1)
+
+            else:
+                analysis.entryconfig(1, state='disabled')   # revert to original state
+                analysis.entryconfig(0, state='normal')     # revert to original state
+
+            HeadA, HeadB, closeV = 1, 0, 0
+            # realTimePlay()                                        # Call objective function
+
+        elif analysis.entrycget(3, 'state') == 'disabled':  # If Closed Display state is disabled
+            analysis.entryconfig(0, state='disabled')  # select and disable Cascade View command
+            analysis.entryconfig(1, state='normal')  # set tabb view command to normal
+            analysis.entryconfig(3, state='normal')  # set close display to normal
+
+            # --- start parallel thread ----------------------------------#
+            # cascadeViews()                                              # Critical Production Params
+            # realTimePlay()                                                # Call objective function
+            # tabbed_cascadeMode()  # Default limited tabbed common screen + Casc
+            exit_bit.append(1)
+            HeadA, HeadB, closeV = 1, 0, 0
+
+        # ---------------- Fresh selection ------------------------------#
+        elif (analysis.entrycget(0, 'state') == 'normal'
+              and analysis.entrycget(1, 'state') == 'normal'
+              and analysis.entrycget(3, 'state') == 'normal'):
+            analysis.entryconfig(0, state='disabled')   # Disable selected command
+            analysis.entryconfig(1, state='normal')     # Keep command Enabled
+            analysis.entryconfig(3, state='normal')     # Keep command enabled
+            # Prevent Post Production analysis Menu object
+            process.entryconfig(0, state='normal')
+            process.entryconfig(1, state='normal')
+            process.entryconfig(3, state='normal')
+
+            # --- start parallel thread --------------------------------#
+            # cascadeViews()                                            # Critical Production Params
+            print('\nFresh Condition met....')
+            realTimePlay()                                              # Call objective function
+            # tabbed_cascadeMode()  # Provide limited Tabb and multiple screen
+            exit_bit.append(1)
+            HeadA, HeadB, closeV = 1, 0, 0
+
+        else:
+            analysis.entryconfig(0, state='normal')
+            HeadA, HeadB, closeV = 0, 0, 1
+            errorChoice()  # pop up error
+            print('Invalid! View selection before process parameter..')
+
+        return HeadA, HeadB, closeV
+
+    def viewTypeD():  # Tabbed View (This is configured for remote users)
+        global HeadA, HeadB, closeV, rType
+        # Define run Type ---------------------[TODO]
+        if runType == 1:
+            rType = 'Synchro'
+        elif runType == 2:
+            rType = 'PostPro'
+        else:
+            rType = 'Standby'
+        # -------------------------------------[]
+        # enforce category selection integrity ---------------------#
+        if analysis.entrycget(0, 'state') == 'disabled':
+            analysis.entryconfig(1, state='disabled')
+            analysis.entryconfig(0, state='normal')
+            analysis.entryconfig(3, state='normal')
+
+            if messagebox.askokcancel("Warning!!!", "Current Visualisation will be lost!"):
+                casc_clearOut()  # clear out visualisation frame
+                tabbed_canvas()  # Call Canvas binding function
+                exit_bit.append(0)  # Keep a byte into empty list
+            else:
+                analysis.entryconfig(0, state='disabled')  # revert to original state
+                analysis.entryconfig(1, state='normal')  # revert to original state
+
+            HeadA, HeadB, closeV = 0, 1, 0          # call embedded functions
+            realTimePlay()                          # Call objective function
+
+        elif analysis.entrycget(3, 'state') == 'disabled':
+            analysis.entryconfig(1, state='disabled')
+            analysis.entryconfig(0, state='normal')
+            analysis.entryconfig(3, state='normal')
+
+            realTimePlay()                          # Call objective function
+            # tabbed_canvas()                         # Tabbed Visualisation
+            exit_bit.append(0)
+            HeadA, HeadB, closeV = 0, 1, 0  # call embedded functions
+
+        elif (analysis.entrycget(0, 'state') == 'normal'
+              and analysis.entrycget(1, 'state') == 'normal'
+              and analysis.entrycget(3, 'state') == 'normal'):
+            analysis.entryconfig(1, state='disabled')
+            analysis.entryconfig(0, state='normal')
+            analysis.entryconfig(3, state='normal')
+
+            realTimePlay()                          # Call objective function
+            tabbed_canvas()                         # Tabbed Visualisation
+            exit_bit.append(0)
+            HeadA, HeadB, closeV = 0, 1, 0
+
+        else:
+            analysis.entryconfig(1, state='normal')
+            HeadA, HeadB, closeV = 0, 0, 1
+            errorChoice()  # raise user exception
             print('Invalid! View selection before process parameter..')
 
         return HeadA, HeadB, closeV
@@ -10082,9 +10115,11 @@ def userMenu():     # listener, myplash
     menubar = Menu(root)
     filemenu = Menu(menubar, tearoff=0)
     sub_menu = tk.Menu(menubar, tearoff=0)
+
     filemenu.add_cascade(label="Server Credentials", menu=sub_menu)
     sub_menu.add_command(label="SQL Connectivity", command=serverSQLConfig, accelerator="Ctrl+S")
     sub_menu.add_command(label="PLC Connectivity", command=serverPLCConfig, accelerator="Ctrl+P")
+
     filemenu.add_command(label="Statistical Limits", command=newMetricsConfig, accelerator="Ctrl+L")
 
     filemenu.add_separator()
@@ -10097,21 +10132,25 @@ def userMenu():     # listener, myplash
     filemenu.add_command(label="Exit", command=menuExit)
     menubar.add_cascade(label="System Setup", menu=filemenu)
 
-    # Process Menu ----------------------------------------[]
-    process = Menu(menubar, tearoff=0)
-    process.add_command(label="Cascade Views", command=viewTypeA)
-    process.add_command(label="Tabbed Views", command=viewTypeB)
-    process.add_separator()
-    process.add_command(label="Close Display", command=closeViews)
-    menubar.add_cascade(label="Visualisation", menu=process)
-
     # Analysis Menu -----------------------------------------[]
     analysis = Menu(menubar, tearoff=0)
-    analysis.add_command(label="Post Production", command=retroPlay)
-    analysis.add_command(label="Synchronous SPC", command=realTimePlay)
+
+    analysis.add_command(label="Set Cascade View", command=viewTypeC)
+    analysis.add_command(label="Set Tabbed View", command=viewTypeD)
+
     analysis.add_separator()
     analysis.add_command(label="Stop SPC Process", command=stopSPCrun)
-    menubar.add_cascade(label="Runtime Mode", menu=analysis)
+    menubar.add_cascade(label="Synchronous Mode", menu=analysis)
+
+    # Process Menu ----------------------------------------[]
+    process = Menu(menubar, tearoff=0)
+
+    process.add_command(label="Use Cascade View", command=viewTypeA)
+    process.add_command(label="Use Tabbed View", command=viewTypeB)
+
+    process.add_separator()
+    process.add_command(label="Close Display", command=closeViews)
+    menubar.add_cascade(label="PostProd Analysis", menu=process)
 
     # Help Menu ------------------------------------------------[]
     helpmenu = Menu(menubar, tearoff=0)
