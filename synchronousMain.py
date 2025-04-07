@@ -8307,9 +8307,6 @@ def userMenu():     # listener, myplash
         else:
             pTG.set(0)
 
-    def eolpConfigs():
-        pass
-
 
     def dnvConfigs():
         global modal, pRP, pTT, pST, pWS, pTG
@@ -8509,6 +8506,35 @@ def userMenu():     # listener, myplash
 
         return dnv, mgm, aut
 
+    def watchDG():
+        global runMode, HeadA, HeadB, closeV
+        if pWDG.get():
+            runMode = 1         # set auto synchronous mode
+
+            process.entryconfig(0, state='disabled')
+            process.entryconfig(1, state='disabled')
+            process.entryconfig(3, state='disabled')
+            # -------------------------------------------
+            analysis.entryconfig(0, state='disabled')
+            analysis.entryconfig(1, state='disabled')
+            analysis.entryconfig(3, state='disabled')
+            pWDG.set(runMode)
+            HeadA, HeadB, closeV = 0, 1, 0  # call embedded functions
+            import autoSCADA
+
+        else:
+            runMode = 0         # clear auto synchronous mode
+            process.entryconfig(0, state='normal')
+            process.entryconfig(1, state='normal')
+            process.entryconfig(3, state='normal')
+            # -------------------------------------------
+            analysis.entryconfig(0, state='normal')
+            analysis.entryconfig(1, state='normal')
+            analysis.entryconfig(3, state='normal')
+            pWDG.set(runMode)
+
+        return runMode, HeadA, HeadB, closeV
+
     def preventClose():
         print('Variable State:', pLmtA.get())
         pass
@@ -8516,7 +8542,7 @@ def userMenu():     # listener, myplash
     def newMetricsConfig():  # This is a DNV Metric Configuration Lookup Table ------[]
 
         global pLmtA, sSta, sEnd, eStat, gSize1, gSize2, xUCLLP, xLCLLP, xUCLLA, xLCLLA, xUCLHT, xLCLHT, xUCLDL, \
-            xLCLDL, xUCLDD, xLCLDD, xUCLOT, xLCLOT, hLmtA, shewhart, pLmtB, dnvMinMax, mgmMinMax, othMinMax, \
+            xLCLDL, xUCLDD, xLCLDD, xUCLOT, xLCLOT, hLmtA, shewhart, pLmtB, dnvMinMax, mgmMinMax, othMinMax, pWDG, \
             s_butt, sSta, sEnd, e5, e6, dnv_butt, mgm_butt, button2, pop, mOT, mCT, mRP, mLA, mST, mTG, mWS, mLP
 
         pop = Toplevel(root)
@@ -8540,9 +8566,11 @@ def userMenu():     # listener, myplash
         pLmtA, pLmtB, pLmtC, pLmtD, pLmtE, pLmtF, mWS, mLP = (IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop),
                                                               IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop))
         hLmtA, hLmtB, shewhart, Sample = IntVar(pop), IntVar(pop), IntVar(pop), StringVar(pop)
+
         dnvMinMax, mgmMinMax, othMinMax, mOT, mCT, mRP, mLA, mST, mTG = (IntVar(pop), IntVar(pop), IntVar(pop),
                                                                          IntVar(pop), IntVar(pop), IntVar(pop),
                                                                          IntVar(pop), IntVar(pop), IntVar(pop))
+        pWDG = IntVar(pop)
 
         # global pop, screen_h, screen_w, x_c, y_c
         # center object on the screen---
@@ -8620,8 +8648,10 @@ def userMenu():     # listener, myplash
                           height=3, font=("bold", 12), command=dnvConfigs, state=cState)
         dnv_butt.place(x=240, y=3 + y_start + y_incmt * 4)  # 350 | 8
         # --------------------------------------------------------------------------------------------#
-        EoLP_butt = Button(pop, text=" EoL/EoP Sampling ", width=15, command=eolpConfigs, state='normal')
-        EoLP_butt.place(x=240, y=3 + y_start + y_incmt * 6.6)
+        # EoLP_butt = Button(pop, text=" EoL/EoP Sampling ", width=15, command=eolpConfigs, state='normal')
+        # EoLP_butt.place(x=240, y=3 + y_start + y_incmt * 6.6)
+        p4 = Checkbutton(pop, text="AutoSynchronous", font=("bold", 10), variable=pWDG, command=watchDG)
+        p4.place(x=240, y=3 + y_start + y_incmt * 6.6)  # 393 |10
         # --------------------------------------------------------------------------------------------#
         mgm_butt = Button(pop, text="MGM Key Parameters", wraplength=90, justify=CENTER, width=12,
                               height=3, font=("bold", 12), command=mgmConfigs, state=cState)
@@ -8796,107 +8826,107 @@ def userMenu():     # listener, myplash
         # pop.grab_release()
         return
 
-    # Define function for user selection on hitorical model and schewhart model --------------------[]
-    def en_button():                    # Do a toggle from Shewhart Model to enforce single choice --[]
-        if optm1.get():
-            hLmt.set(0)
-            optm2.set(0)
-        else:
-            # hLmt.set(1)
-            optm1.set(0)
-
-    def en_limits():                    # Do a toggle from Shewhart Model to enforce single choice --[]
-        if optm2.get():
-            hLmt.set(1)
-            optm1.set(0)
-        else:
-            optm1.set(0)
-            optm2.set(0)
+    # # Define function for user selection on hitorical model and schewhart model --------------------[]
+    # def en_button():                    # Do a toggle from Shewhart Model to enforce single choice --[]
+    #     if optm1.get():
+    #         hLmt.set(0)
+    #         optm2.set(0)
+    #     else:
+    #         # hLmt.set(1)
+    #         optm1.set(0)
+    #
+    # def en_limits():                    # Do a toggle from Shewhart Model to enforce single choice --[]
+    #     if optm2.get():
+    #         hLmt.set(1)
+    #         optm1.set(0)
+    #     else:
+    #         optm1.set(0)
+    #         optm2.set(0)
 
     # Define function for user selection on Parameter Monitoring -----------------------------------[]
-    def monitorA():
-        swA()                           # Call label switch func
-        if lPwr.get():                  # Allow complementary Parameter (LA)
-            lPwr.set(1)
-            hoTens.set(0)
-            dcLoad.set(0)
-            dDispl.set(0)
-        else:
-            lPwr.set(0)
-
-    def monitorB():
-        swB()                           # Call label switch func
-        if lAng.get():                  # Allow complementary Parameter (LP)
-            lAng.set(1)                 # comment out to allow one selection at a time
-            hoTens.set(0)
-            dcLoad.set(0)
-            dDispl.set(0)
-        else:
-            lAng.set(0)
-
-    # ------------- Additional functional module for distribution selection ------------------------
-    def monitorC():
-        swA()
-        if hoTens.get():
-            lPwr.set(0)
-            lAng.set(0)
-            if dcLoad.get() == 0 and dDispl.get() != 0:
-                hoTens.set(1)
-            elif dcLoad.get() != 0 and dDispl.get() == 0:
-                hoTens.set(1)
-            elif dcLoad.get() != 0 and dDispl.get() != 0:
-                errorConfig()
-                hoTens.set(0)
-        else:
-            hoTens.set(0)
-        return
-
-    def monitorD():
-        swB()
-        if dcLoad.get():
-            lPwr.set(0)
-            lAng.set(0)
-            if hoTens.get() == 0 and dDispl.get() != 0:
-                dcLoad.set(1)
-            elif hoTens.get() != 0 and dDispl.get() == 0:
-                dcLoad.set(1)
-            elif hoTens.get() != 0 and dDispl.get() != 0:
-                errorConfig()
-                dcLoad.set(0)
-        else:
-            dcLoad.set(0)
-        return
-
-    def monitorE():     # Dancer Displacement ----
-        swB()
-        if dDispl.get():
-            lPwr.set(0)
-            lAng.set(0)
-            if dcLoad.get() == 0 and hoTens.get() != 0:
-                dDispl.set(1)
-            elif dcLoad.get() != 0 and hoTens.get() == 0:
-                dDispl.set(1)
-            elif dcLoad.get() != 0 and hoTens.get() != 0:
-                errorConfig()
-                dDispl.set(0)
-        else:
-            dDispl.set(0)
-        return
-
-    # ----------------------------------------------------------------
-    def enableStats():
-        if eStat.get():
-            if lPwr.get() != 0 and lAng.get() != 0:
-                eStat.set(1)
-            elif hoTens.get() != 0 and dcLoad.get() != 0 or dDispl.get() != 0:
-                eStat.set(1)
-            else:
-                print('Select Two Parameter for Statistical consideration..')
-                errorConfig()
-                eStat.set(0)
-        else:
-            eStat.set(0)
-        return
+    # def monitorA():
+    #     swA()                           # Call label switch func
+    #     if lPwr.get():                  # Allow complementary Parameter (LA)
+    #         lPwr.set(1)
+    #         hoTens.set(0)
+    #         dcLoad.set(0)
+    #         dDispl.set(0)
+    #     else:
+    #         lPwr.set(0)
+    #
+    # def monitorB():
+    #     swB()                           # Call label switch func
+    #     if lAng.get():                  # Allow complementary Parameter (LP)
+    #         lAng.set(1)                 # comment out to allow one selection at a time
+    #         hoTens.set(0)
+    #         dcLoad.set(0)
+    #         dDispl.set(0)
+    #     else:
+    #         lAng.set(0)
+    #
+    # # ------------- Additional functional module for distribution selection ------------------------
+    # def monitorC():
+    #     swA()
+    #     if hoTens.get():
+    #         lPwr.set(0)
+    #         lAng.set(0)
+    #         if dcLoad.get() == 0 and dDispl.get() != 0:
+    #             hoTens.set(1)
+    #         elif dcLoad.get() != 0 and dDispl.get() == 0:
+    #             hoTens.set(1)
+    #         elif dcLoad.get() != 0 and dDispl.get() != 0:
+    #             errorConfig()
+    #             hoTens.set(0)
+    #     else:
+    #         hoTens.set(0)
+    #     return
+    #
+    # def monitorD():
+    #     swB()
+    #     if dcLoad.get():
+    #         lPwr.set(0)
+    #         lAng.set(0)
+    #         if hoTens.get() == 0 and dDispl.get() != 0:
+    #             dcLoad.set(1)
+    #         elif hoTens.get() != 0 and dDispl.get() == 0:
+    #             dcLoad.set(1)
+    #         elif hoTens.get() != 0 and dDispl.get() != 0:
+    #             errorConfig()
+    #             dcLoad.set(0)
+    #     else:
+    #         dcLoad.set(0)
+    #     return
+    #
+    # def monitorE():     # Dancer Displacement ----
+    #     swB()
+    #     if dDispl.get():
+    #         lPwr.set(0)
+    #         lAng.set(0)
+    #         if dcLoad.get() == 0 and hoTens.get() != 0:
+    #             dDispl.set(1)
+    #         elif dcLoad.get() != 0 and hoTens.get() == 0:
+    #             dDispl.set(1)
+    #         elif dcLoad.get() != 0 and hoTens.get() != 0:
+    #             errorConfig()
+    #             dDispl.set(0)
+    #     else:
+    #         dDispl.set(0)
+    #     return
+    #
+    # # ----------------------------------------------------------------
+    # def enableStats():
+    #     if eStat.get():
+    #         if lPwr.get() != 0 and lAng.get() != 0:
+    #             eStat.set(1)
+    #         elif hoTens.get() != 0 and dcLoad.get() != 0 or dDispl.get() != 0:
+    #             eStat.set(1)
+    #         else:
+    #             print('Select Two Parameter for Statistical consideration..')
+    #             errorConfig()
+    #             eStat.set(0)
+    #     else:
+    #         eStat.set(0)
+    #     return
     #
     # def metricsConfig():
     #     global pop, metRO, xUCLa, xLCLa, xUCLb, xLCLb, xUCLc, xLCLc, sSta, sEnd, lPwr, lAng, eStat, optm1, optm2, e8,\
@@ -9970,19 +10000,19 @@ def userMenu():     # listener, myplash
                 tabbed_canvas()  # Call Canvas binding function
                 exit_bit.append(0)  # Keep a byte into empty list
             else:
-                analysis.entryconfig(0, state='disabled')  # revert to original state
-                analysis.entryconfig(1, state='normal')  # revert to original state
+                analysis.entryconfig(0, state='disabled')     # revert to original state
+                analysis.entryconfig(1, state='normal')       # revert to original state
 
-            HeadA, HeadB, closeV = 0, 1, 0          # call embedded functions
-            realTimePlay()                          # Call objective function
+            HeadA, HeadB, closeV = 0, 1, 0                          # call embedded functions
+            realTimePlay()                                          # Call objective function
 
         elif analysis.entrycget(3, 'state') == 'disabled':
             analysis.entryconfig(1, state='disabled')
             analysis.entryconfig(0, state='normal')
             analysis.entryconfig(3, state='normal')
 
-            realTimePlay()                          # Call objective function
-            # tabbed_canvas()                         # Tabbed Visualisation
+            realTimePlay()                                          # Call objective function
+            # tabbed_canvas()                                       # Tabbed Visualisation
             exit_bit.append(0)
             HeadA, HeadB, closeV = 0, 1, 0  # call embedded functions
 
@@ -10140,7 +10170,7 @@ def userMenu():     # listener, myplash
 
     analysis.add_separator()
     analysis.add_command(label="Stop SPC Process", command=stopSPCrun)
-    menubar.add_cascade(label="Synchronous Mode", menu=analysis)
+    menubar.add_cascade(label="Synchronous Live Mode", menu=analysis)
 
     # Process Menu ----------------------------------------[]
     process = Menu(menubar, tearoff=0)

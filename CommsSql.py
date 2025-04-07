@@ -90,7 +90,7 @@ def DAQ_connect():
         #         successNote()                       # popup message
     else:                                           # when connection = 1 and requires disconnect
         try:
-            connect.close()
+            conn.close()
             errorNote()
             print('\nActive connection will be closed...')
 

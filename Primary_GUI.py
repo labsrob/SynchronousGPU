@@ -10,8 +10,8 @@
 import numpy as np
 import pandas as pd
 import spcWatchDog as wd
-import selPlcColumnsTFM as vq
-import selSqlColumnsTFM as qq
+# import selPlcColumnsTFM as vq
+# import selSqlColumnsTFM as qq
 import time
 import os
 import sys
@@ -34,7 +34,7 @@ from pydub import AudioSegment
 from matplotlib.animation import FuncAnimation
 # ---------------------------------
 import pParamsHL as mp
-import qParamsHL as mq
+# import qParamsHL as mq
 
 import pWON_finder as sqld
 
@@ -54,8 +54,8 @@ except Exception:
 
 # ----------------------- Audible alert --------------------------------------------------[]
 impath ='C:\\Users\\Labs\\PycharmProjects\\SynchronousSPC\\Media\\'
-nudge = AudioSegment.from_wav(impath+'tada.wav')
-error = AudioSegment.from_wav(impath+'error.wav')
+# nudge = AudioSegment.from_wav(impath+'tada.wav')
+# error = AudioSegment.from_wav(impath+'error.wav')
 
 # Define statistical operations ----------------------------------------------------------[]
 WeldQualityProcess = True
