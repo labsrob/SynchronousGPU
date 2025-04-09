@@ -38,8 +38,9 @@ import time
 import os
 import sys
 import math
-from datetime import datetime
+from datetime import datetime, date
 from time import gmtime, strftime
+from pynput.keyboard import Key, Listener
 import signal
 import tkinter as tk
 from tkinter import *
@@ -113,14 +114,17 @@ B3 = [0.284, 0.428, 0.510, 0.5452, 0.565, 0.6044]       # 10, 15, 20, 23, 25, 30
 B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
 # ----------------------------------------------[]
 
+today = date.today()
+pWON = today.strftime("%Y%m%d")
+
 plcConnex = []
 UsePLC_DBS = True                                       # specify SQl Query or PLC DB Query is in use
-processWON = ["20240507", "20240508"]                   # Dynamically obtain WON from Host PLC
+processWON = [pWON, "20240507", "20240508"]             # Dynamically obtain WON from sysDate or Host PLC
+# print('Computed Work Order #:', pWON)
 
 # ------------- Dummy values -------------------[]
 pPos = '6.2345'
 layer = '03'
-# WON = "20240507"
 sel_SS = "30"
 sel_gT = "S-Domino"
 eSMC = 'Tape laying process in progress...'
@@ -133,10 +137,17 @@ rtValues = []
 pRecipe = ""
 
 # Call function and load WON specification -----[]
-mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP = dd.decryptMetricsGeneral(processWON[0])
+cDM, cSS, cGS, mLA, mLP, mCT, mOT, mRP, mWS, sStart, sStops, LP, LA, TP, RF, TT, ST, TG = dd.decryptMetricsGeneral(processWON[0])
 print('\nDecrypted MGM Parameters:', mLA, mLP, LP, LA, TP, RF, TT, ST, TG)
-print('Decrypted DNV Parameters:', mCT, mOT, mRP, mWS, TT, ST, TG, SP)
-
+print('Decrypted DNV Parameters:', mCT, mOT, mRP, mWS, TT, ST, TG)
+print('Work Order Number #:', processWON[0], 'Default Mode:', cDM)
+print('Monitors:', cDM, cSS, cGS, mLA, mLP, mCT, mOT, mRP, mWS, '\n')
+if cGS == 'SS-Domino':
+    cGS = 1
+elif cGS == 'GS-Discrete':
+    cGS = 2
+else:
+    cGS = 0
 # ----------------------------------------------[A]
 if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA):
     pRecipe = 'DNV'
@@ -149,9 +160,10 @@ elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int
     print('processing MGM parameters...\n')
 
 else:
-    pRecipe = 'USR'
-    print('Bespoke User Selection is NOT allowed on this version...')
-    exit()
+    pRecipe = 'New Process'
+    import qParamsHL_DNV as dnv
+    print('processing DNV parameters...\n')
+    # exit()
 # ----------------------------------------------[]
 
 def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, SetPt, Value, Stdev, Tvalu, usrID):
@@ -5851,7 +5863,7 @@ class substTempTabb(ttk.Frame):
         a3.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a3.transAxes)
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousST(smp_Sz, smp_St, fetchT):
+        def synchronousST(fetchT):
             fetch_no = str(fetchT)                          # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
@@ -5946,7 +5958,7 @@ class substTempTabb(ttk.Frame):
             timei = time.time()  # start timing the entire loop
 
             # Call data loader Method---------------------------#
-            stData = synchronousST(smp_Sz, stp_Sz, db_freq)     # data loading functions
+            stData = synchronousST(db_freq)     # data loading functions
             # --------------------------------------------------#
             if UsePLC_DBS == 1:
                 import VarPLCst as st
@@ -7745,59 +7757,66 @@ def userMenu():     # listener, myplash
 
     def save_pMetrics():                    # Save historical Limits for Production Parameters
         print("\nSaving Production Constants..")
-        grayOut = [button2, e7, e8, m1, m2, m3, m4, m5, m6, m7, m8]     # set value entry field to read only
+        grayOut = [button2, e7, e8, m1, m2, m3, m4, m5, m6]             # set value entry field to read only
         e5.config(state='readonly')                                     # applicable to combo drop down
         e6.config(state='readonly')                                     # combo box property
+
         for fld in grayOut:
-            fld.config(state="disabled")                        # for text fields
-        if hLmtA.get() == 1:                                    # check condition of edit button
-            hLmtA.set(0)                                        # uncheck the button
-        s_butt.config(state="disabled")                         # disable Save button
+            fld.config(state="disabled")                                # for text fields
+        if hLmtA.get() == 1:                                            # check condition of edit button
+            hLmtA.set(0)                                                # uncheck the button
+        s_butt.config(state="disabled")                                 # disable Save button
 
         print('\nStacked Values:', rtValues)
         print('Array Length', len(rtValues))
 
         # print('Switch Values', rtValues[-1])
-        if len(rtValues) > 1:                                   # Compute the length for dynamic arrays
-            x = len(rtValues) - 1                               # Use the last index
-
-            # Encrypt configuration on production params -------#
-            mp.saveMetricspP(processWON[0], sel_SS, sel_gT, sSta, sEnd, rtValues[x][0], rtValues[x][1], rtValues[x][2],
-                             rtValues[x][3], rtValues[x][4], rtValues[x][5], rtValues[x][6], rtValues[x][7])
+        if len(rtValues) > 1:                                           # Compute the length for dynamic arrays
+            x = len(rtValues) - 1                                       # Use the last index
+            print('\nTest Vars:', m1, m2, m3, m4, m5, m6)
+            # Encrypt configuration on production params ---------------#
+            dd.saveMetricspP(processWON[0],  rMode, sel_SS, sel_gT, LA, LP, CT, OT, RP, WS, sSta, sEnd, rtValues[x][0], rtValues[x][1], rtValues[x][2],
+                             rtValues[x][3], rtValues[x][4], rtValues[x][5], rtValues[x][6])
         else:
-            mp.saveMetricspP(processWON[0], sel_SS, sel_gT, sSta, sEnd, OT, CT, RP, LA, WS, TG, ST, LP)
+            print('\nTest Vars:', m1, m2, m3, m4, m5, m6)
+            dd.saveMetricspP(processWON[0], rMode, sel_SS, sel_gT, LA, LP, CT, OT, RP, WS, sSta, sEnd, xlp, xla, xtp, xrf, xtt, xst, xtg)
+
         return
 
 
     def clearMetrics():
         # clear the content of chart parameter using change settings button ---
-        global e5, e6, e7, e8, m1, m2, m3, m4, m5, m6, m7, m8, metRO
+        global e5, e6, e7, e8, m1, m2, m3, m4, m5, m6, metRO, clearM
 
         # pop = Toplevel(root)
         # pop.wm_attributes('-topmost', True)
+        clearM = 1
+        if clearM:
+            sSta.set('07:00:00')
+            sEnd.set('17:00:00')
+            e5 = Entry(pop, width=8, state='normal', textvariable=sSta)
+            e5.place(x=290, y=10)  # Shift starts
+            e6 = Entry(pop, width=8, state='normal', textvariable=sEnd)
+            e6.place(x=290, y=40)  # Shift ends
 
-        sSta.set('07:00:00')
-        sEnd.set('17:00:00')
-        e5 = Entry(pop, width=8, state='normal', textvariable=sSta)
-        e5.place(x=290, y=10)  # Shift starts
-        e6 = Entry(pop, width=8, state='normal', textvariable=sEnd)
-        e6.place(x=290, y=40)  # Shift ends
+            e7 = ttk.Combobox(pop, width=10, values=[" Select", "10", "15", "20", "23", "25", "30"], state="normal")
+            e7.bind("<<ComboboxSelected>>", display_sel)
+            e7.place(x=100, y=10)
 
-        e7 = ttk.Combobox(pop, width=10, values=[" Select", "10", "15", "20", "23", "25", "30"], state="normal")
-        e7.bind("<<ComboboxSelected>>", display_sel)
-        e7.place(x=100, y=10)
+            e8 = ttk.Combobox(pop, width=10, values=["SS-Domino", "GS-Discrete"], state="normal")
+            e8.bind("<<ComboboxSelected>>", display_selection)
+            e8.place(x=100, y=40)
 
-        e8 = ttk.Combobox(pop, width=10, values=["SS-Domino", "GS-Discrete"], state="normal")
-        e8.bind("<<ComboboxSelected>>", display_selection)
-        e8.place(x=100, y=40)
+            s_butt.config(state="normal")  # enable edit button (Sve Details) on entry
+            # mp.ppHLderivation(pop, gSize1, gSize2, xUCLLP, xLCLLP, xUCLLA, xLCLLA)
 
-        s_butt.config(state="normal")  # enable edit button (Sve Details) on entry
-        # mp.ppHLderivation(pop, gSize1, gSize2, xUCLLP, xLCLLP, xUCLLA, xLCLLA)
+            metRO = True
+        else:
+            clearM = 0
+            metRO = False
+        print('SQL Field State:', metRO, clearM)  # metric fields set to read only
 
-        metRO = True
-        print('SQL Field State:', metRO)  # metric fields set to read only
-
-        return metRO
+        return
     # ------------------------------
 
     def display_selection(event):
@@ -7847,9 +7866,9 @@ def userMenu():     # listener, myplash
 
 
     def dMinMaxPlot():
-        global pStat, dMax, mMax, oMax, OT, CT, RP, LA, WS, TG, ST, LP, m1, m2, m3, m4, m5, m6, m7, m8
+        global pStat, dMax, mMax, oMax, OT, CT, RP, WS, LP, LA, m1, m2, m3, m4, m5, m6, xlp, xla, xtp, xrf, xtt, xst, xtg
         if dnvMinMax.get():
-            print('\nMin/Max Monitoring for DNV Production Parameters..')
+            print('\nMonitoring Parameters for DNV Production..')
             dMax = 1
             mMax = 0
             oMax = 0
@@ -7864,8 +7883,6 @@ def userMenu():     # listener, myplash
             mRP.set(1)      # Roller Pressure
             mWS.set(1)      # Tape Winding Speed
             # --------
-            mST.set(0)      # Substrate emp
-            mTG.set(0)      # Tape Gap pol
             mLA.set(0)      # Laser Angle
             mLP.set(0)      # Laser Power
             # ----------------------------------------------------
@@ -7874,31 +7891,25 @@ def userMenu():     # listener, myplash
                 m1 = Checkbutton(pop, text="Oven Temperature", font=("bold", 10), variable=mOT, state="disabled")
                 m1.place(x=10, y=y_start)
 
-                m2 = Checkbutton(pop, text="Cell Tension", font=("bold", 10), variable=mCT, state="disabled")
+                m2 = Checkbutton(pop, text="Active Cell Tension", font=("bold", 10), variable=mCT, state="disabled")
                 m2.place(x=150, y=y_start)
 
-                m3 = Checkbutton(pop, text="Roller Pressure", font=("bold", 10), variable=mRP, state="disabled")
-                m3.place(x=270, y=y_start)
-                # mRP.set(1)
+                m3 = Checkbutton(pop, text="Tape Winding Spd", font=("bold", 10), variable=mWS, state="disabled")
+                m3.place(x=10, y=y_start + y_incmt * 1)
 
-                m4 = Checkbutton(pop, text="Gap Polarisation", font=("bold", 10), variable=mTG, state="disabled")
-                m4.place(x=270, y=y_start + y_incmt * 1)
-                # mLA.set(1)
+                m4 = Checkbutton(pop, text="Reinforced Pressure", font=("bold", 10), variable=mRP, state="disabled")
+                m4.place(x=150, y=y_start + y_incmt * 1)
 
-                m5 = Checkbutton(pop, text="Spooling Tension", font=("bold", 10), variable=mST, state="disabled")
-                m5.place(x=10, y=y_start + y_incmt * 1)
-
-                m6 = Checkbutton(pop, text="Winding Speed", font=("bold", 10), variable=mWS, state="disabled")
-                m6.place(x=150, y=y_start + y_incmt * 1)
                 # -------------------------------------------- Not included in DNV/MGM requirements
-                m7 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="disabled")
-                m7.place(x=400, y=y_start)
+                m5 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="disabled")
+                m5.place(x=305, y=y_start)
 
-                m8 = Checkbutton(pop, text="Laser Angle", font=("bold", 10), variable=mLA, state="disabled")
-                m8.place(x=400, y=y_start + y_incmt * 1)
+                m6 = Checkbutton(pop, text="Laser Angle", font=("bold", 10), variable=mLA, state="disabled")
+                m6.place(x=305, y=y_start + y_incmt * 1)
                 # -----------------------------------
-                OT, CT, RP, LA, WS, TG, ST, LP = 1, 1, 1, 0, 1, 0, 0, 0
-            # -----------End of Parameters ----
+            OT, CT, WS, RP, LP, LA = 1, 1, 1, 1, 0, 0
+            xlp, xla, xtp, xrf, xtt, xst, xtg = 0, 0, 0, 0, 1, 1, 1
+        # -----------End of Parameters ---------------
         else:
             dMax = 0
             mMax = 0        # Defaulted to Commercial Production
@@ -7911,14 +7922,16 @@ def userMenu():     # listener, myplash
             mCT.set(0)
             mRP.set(0)
             mWS.set(0)
-            OT, CT, RP, LA, WS, TG, ST, LP = 0, 0, 0, 0, 0, 0, 0, 0
-        print('Min/Max Monitoring:', dMax, 'Plot Stats:', pStat)
-        return OT, CT, RP, LA, WS, TG, ST, LP
+            OT, CT, WS, RP, LP, LA = 0, 0, 0, 0, 0, 0
+            xlp, xla, xtp, xrf, xtt, xst, xtg = 0, 0, 0, 0, 0, 0, 0
+
+        print('Monitoring DNV Params:', OT, CT, WS, RP, LP, LA, 'Plot Stats:', pStat)
+        return OT, CT, WS, RP, LP, LA
 
     def mMinMaxPlot():
-        global pStat, dMax, mMax, oMax, OT, CT, RP, LA, WS, TG, ST, LP, m1, m2, m3, m4, m5, m6, m7, m8
+        global pStat, dMax, mMax, oMax, OT, CT, WS, RP, LP, LA, xlp, xla, xtp, xrf, xtt, xst, xtg, m1, m2, m3, m4, m5, m6
         if mgmMinMax.get():
-            print('\nMin/Max Monitoring for MGM Production Parameters..')
+            print('\nMonitoring Parameters for Commercial Production..')
             dMax = 0
             mMax = 1
             oMax = 0
@@ -7926,46 +7939,42 @@ def userMenu():     # listener, myplash
             dnvMinMax.set(dMax)
             mgmMinMax.set(mMax)
             othMinMax.set(oMax)
-            # Set Production Parameter Variables
-            mLA.set(1)
-            mLP.set(1)
-            mCT.set(1)
-            mOT.set(1)
-            mRP.set(1)
-            mWS.set(1)
-            # ---------
-            mTG.set(0)
-            mST.set(0)
+            # Set default Monitoring params for MGM
+            mOT.set(1)  # Oven Temperature
+            mCT.set(1)  # Cell Tension
+            mRP.set(1)  # Roller Pressure
+            mWS.set(1)  # Tape Winding Speed
+            # --------
+            mLA.set(1)  # Laser Angle
+            mLP.set(1)  # Laser Power
             # ----------------------------------------------------[]
-
             if metRO:
                 # repopulate with default values -----------#
                 m1 = Checkbutton(pop, text="Oven Temperature", font=("bold", 10), variable=mOT, state="disabled")
                 m1.place(x=10, y=y_start)
+                mOT.set(1)
 
-                m2 = Checkbutton(pop, text="Cell Tension", font=("bold", 10), variable=mCT, state="disabled")
-                m2.place(x=150, y=y_start)
+                m2 = Checkbutton(pop, text="Active Cell Tension", font=("bold", 10), variable=mCT, state="disabled")
+                m2.place(x=150, y=y_start)  # x=160
+                mCT.set(1)
 
-                m3 = Checkbutton(pop, text="Roller Pressure", font=("bold", 10), variable=mRP, state="disabled")
-                m3.place(x=270, y=y_start)
+                m3 = Checkbutton(pop, text="Tape Winding Spd", font=("bold", 10), variable=mWS, state="disabled")
+                m3.place(x=10, y=y_start + y_incmt * 1)
+                mWS.set(1)
 
-                m4 = Checkbutton(pop, text="Gap Polarisation", font=("bold", 10), variable=mTG, state="disabled")
-                m4.place(x=270, y=y_start + y_incmt * 1)
-
-                m5 = Checkbutton(pop, text="Spooling Tension", font=("bold", 10), variable=mST, state="disabled")
-                m5.place(x=10, y=y_start + y_incmt * 1)
-
-                m6 = Checkbutton(pop, text="Winding Speed", font=("bold", 10), variable=mWS, state="disabled")
-                m6.place(x=150, y=y_start + y_incmt * 1)
+                m4 = Checkbutton(pop, text="Reinforced Pressure", font=("bold", 10), variable=mRP, state="disabled")
+                m4.place(x=150, y=y_start + y_incmt * 1)
+                mRP.set(1)
                 # -------------------------------------------- Not included in DNV/MGM requirements
-                m7 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="disabled")
-                m7.place(x=400, y=y_start)
+                m5 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="disabled")
+                m5.place(x=305, y=y_start)
 
-                m8 = Checkbutton(pop, text="Laser Angle", font=("bold", 10), variable=mLA, state="disabled")
-                m8.place(x=400, y=y_start + y_incmt * 1)
-            # -----------------------------------
-            OT, CT, RP, LA, WS, TG, ST, LP = 0, 0, 0, 1, 0, 1, 0, 1
-            # -----------End of Parameters ----
+                m6 = Checkbutton(pop, text="Laser Angle", font=("bold", 10), variable=mLA, state="disabled")
+                m6.place(x=305, y=y_start + y_incmt * 1)
+            # --------Summary of Monitors -----------
+            OT, CT, WS, RP, LP, LA = 1, 1, 1, 1, 1, 1
+            xlp, xla, xtp, xrf, xtt, xst, xtg = 1, 1, 1, 1, 1, 1, 1
+            # -----------End of Parameters ----------
         else:
             dMax = 0
             mMax = 0                # Defaulted to Commercial Production
@@ -7981,175 +7990,11 @@ def userMenu():     # listener, myplash
             mRP.set(0)
             mWS.set(0)
             # ---------
-            mTG.set(0)
-            mST.set(0)
+            OT, CT, WS, RP, LP, LA = 0, 0, 0, 0, 0, 0
+            xlp, xla, xtp, xrf, xtt, xst, xtg = 0, 0, 0, 0, 0, 0, 0
 
-            OT, CT, RP, LA, WS, TG, ST, LP = 0, 0, 0, 0, 0, 0, 0, 0
-        print('Monitoring Params:', OT, CT, RP, LA, WS, TG, ST, LP, 'Plot Stats:', pStat)
-        return OT, CT, RP, LA, WS, TG, ST, LP
-
-
-    def oMinMaxPlot():
-        global pStat, dMax, mMax, oMax, m1, m2, m3, m4, m5, m6, m7, m8, OT, CT, RP, LA, WS, TG, ST, LP
-        # ------------------------------------------------------------
-        if othMinMax.get():
-            print('\nMin/Max Monitoring for NEW Production Parameters..')
-            dMax = 0
-            mMax = 0
-            oMax = 1
-            pStat = 1
-            dnvMinMax.set(dMax)
-            mgmMinMax.set(mMax)
-            othMinMax.set(oMax)
-            # Reset variables for Production Parameters
-            mLP.set(0)
-            mLA.set(0)
-            mTG.set(0)
-            mST.set(0)
-            # -------
-            mWS.set(0)
-            mRP.set(0)
-            mOT.set(0)
-            mCT.set(0)
-
-            def testA():
-                if mOT.get():  # Oven Temperature
-                    mOT.set(1)
-                    OT = 1
-                else:
-                    mOT.set(0)
-                    OT = 0
-                print('\nOven Temperature Status:', OT)
-
-                if mCT.get():  # Cell Tension
-                    mCT.set(1)
-                    CT = 1
-                else:
-                    mCT.set(0)
-                    CT = 0
-                print('Cell Tension Status:', CT)
-
-                # ---------------------------------
-                if mRP.get():  # Roller pressure
-                    mRP.set(1)
-                    RP = 1
-                else:
-                    mRP.set(0)
-                    RP = 0
-                print('Roller Pressure:', RP)
-
-                if mLA.get():  # Laser Angle
-                    mLA.set(1)
-                    LA = 1
-                else:
-                    mLA.set(0)
-                    LA = 0
-                print('Laser Angles:', LA)
-
-                if mST.get():  # Spooling Tension
-                    mST.set(1)
-                    ST = 1
-                else:
-                    mST.set(0)
-                    ST = 0
-                print('Spooling Tension:', ST)
-
-                if mTG.get():  #
-                    mTG.set(1)
-                    TG = 1
-                else:
-                    mTG.set(0)
-                    TG = 0
-                print('Tape Gap Polarisation:', TG)
-
-                if mWS.get():  # Winding Speed
-                    mWS.set(0)
-                    WS = 0
-                else:
-                    mWS.set(0)
-                    WS = 0
-                print('Winding Speed:', WS)
-
-                if mLP.get():  # Laser Power
-                    mLP.set(1)
-                    LP = 1
-                else:
-                    mLP.set(0)
-                    LP = 0
-                print('Laser Power:', LP)
-
-                print('\nMonitoring Stored Values:', OT, CT, RP, LA, WS, TG, ST, LP)
-
-                # --------- Use dynamic array to store user selection ------------
-                storedV = [OT, CT, RP, LA, WS, TG, ST, LP]
-                rtValues.append(storedV)
-
-                return OT, CT, RP, LA, WS, TG, ST, LP
-
-            if metRO:
-                # repopulate with default values -----------#
-                m1 = Checkbutton(pop, text="Oven Temperature", font=("bold", 10), variable=mOT, state="normal", command=testA)
-                m1.place(x=10, y=y_start)
-
-                m2 = Checkbutton(pop, text="Cell Tension", font=("bold", 10), variable=mCT, state="normal", command=testA)
-                m2.place(x=150, y=y_start)
-
-                m3 = Checkbutton(pop, text="Roller Pressure", font=("bold", 10), variable=mRP, state="normal", command=testA)
-                m3.place(x=270, y=y_start)
-
-                m4 = Checkbutton(pop, text="Gap Polarisation", font=("bold", 10), variable=mTG, state="normal", command=testA)
-                m4.place(x=270, y=y_start + y_incmt * 1)
-
-                m5 = Checkbutton(pop, text="Spooling Tension", font=("bold", 10), variable=mST, state="normal", command=testA)
-                m5.place(x=10, y=y_start + y_incmt * 1)
-
-                m6 = Checkbutton(pop, text="Winding Speed", font=("bold", 10), variable=mWS, state="normal", command=testA)
-                m6.place(x=150, y=y_start + y_incmt * 1)
-                # -------------------------------------------- Not included in DNV/MGM requirements
-                m7 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="normal", command=testA)
-                m7.place(x=400, y=y_start)
-
-                m8 = Checkbutton(pop, text="Laser Angle", font=("bold", 10), variable=mLA, state="normal", command=testA)
-                m8.place(x=400, y=y_start + y_incmt * 1)
-            # -----------------------------------
-            else:
-                dMax = 0
-                mMax = 0        # Defaulted to Commercial Production
-                oMax = 0
-                pStat = 0
-                dnvMinMax.set(dMax)
-                mgmMinMax.set(mMax)
-                othMinMax.set(oMax)
-                OT, CT, RP, LA, WS, TG, ST, LP = 0, 0, 0, 0, 0, 0, 0, 0
-                # ----------------------------------------------------
-                if metRO:
-                    # repopulate with default values -----------#
-                    m1 = Checkbutton(pop, text="Oven Temperature", font=("bold", 10), variable=mOT, state="disabled")
-                    m1.place(x=10, y=y_start)
-
-                    m2 = Checkbutton(pop, text="Cell Tension", font=("bold", 10), variable=mCT, state="disabled")
-                    m2.place(x=150, y=y_start)
-
-                    m3 = Checkbutton(pop, text="Roller Pressure", font=("bold", 10), variable=mRP, state="disabled")
-                    m3.place(x=270, y=y_start)
-
-                    m4 = Checkbutton(pop, text="Gap Polarisation", font=("bold", 10), variable=mTG, state="disabled")
-                    m4.place(x=270, y=y_start + y_incmt * 1)
-
-                    m5 = Checkbutton(pop, text="Spooling Tension", font=("bold", 10), variable=mST, state="disabled")
-                    m5.place(x=10, y=y_start + y_incmt * 1)
-
-                    m6 = Checkbutton(pop, text="Winding Speed", font=("bold", 10), variable=mWS, state="disabled")
-                    m6.place(x=160, y=y_start + y_incmt * 1)
-
-                    m7 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="disabled")
-                    m7.place(x=400, y=y_start)
-
-                    m8 = Checkbutton(pop, text="Laser Angle", font=("bold", 10), variable=mLA, state="disabled")
-                    m8.place(x=400, y=y_start + y_incmt * 1)
-                    # -----------------------------------
-                print('\nMonitoring Stored...', OT, CT, RP, LA, WS, TG, ST, LP)
-        # return OT, CT, RP, LA, WS, TG, ST, LP
+        print('Monitoring MGM Params:', OT, CT, WS, RP, LP, LA, 'Plot Stats:', pStat)
+        return OT, CT, WS, RP, LP, LA
 
 
     def runChecksPQ():
@@ -8507,23 +8352,21 @@ def userMenu():     # listener, myplash
         return dnv, mgm, aut
 
     def watchDG():
-        global runMode, HeadA, HeadB, closeV
+        global rMode, HeadA, HeadB, closeV
         if pWDG.get():
-            runMode = 1         # set auto synchronous mode
-
+            rMode = 1                   # set auto synchronous mode
             process.entryconfig(0, state='disabled')
             process.entryconfig(1, state='disabled')
             process.entryconfig(3, state='disabled')
             # -------------------------------------------
-            analysis.entryconfig(0, state='disabled')
+            analysis.entryconfig(0, state='normal')
             analysis.entryconfig(1, state='disabled')
             analysis.entryconfig(3, state='disabled')
-            pWDG.set(runMode)
+            pWDG.set(rMode)
             HeadA, HeadB, closeV = 0, 1, 0  # call embedded functions
-            import autoSCADA
 
         else:
-            runMode = 0         # clear auto synchronous mode
+            rMode = 0                       # clear auto synchronous mode
             process.entryconfig(0, state='normal')
             process.entryconfig(1, state='normal')
             process.entryconfig(3, state='normal')
@@ -8531,9 +8374,10 @@ def userMenu():     # listener, myplash
             analysis.entryconfig(0, state='normal')
             analysis.entryconfig(1, state='normal')
             analysis.entryconfig(3, state='normal')
-            pWDG.set(runMode)
+            pWDG.set(rMode)
+            HeadA, HeadB, closeV = 0, 1, 0  # call embedded functions
 
-        return runMode, HeadA, HeadB, closeV
+        return # rMode, HeadA, HeadB, closeV
 
     def preventClose():
         print('Variable State:', pLmtA.get())
@@ -8543,14 +8387,15 @@ def userMenu():     # listener, myplash
 
         global pLmtA, sSta, sEnd, eStat, gSize1, gSize2, xUCLLP, xLCLLP, xUCLLA, xLCLLA, xUCLHT, xLCLHT, xUCLDL, \
             xLCLDL, xUCLDD, xLCLDD, xUCLOT, xLCLOT, hLmtA, shewhart, pLmtB, dnvMinMax, mgmMinMax, othMinMax, pWDG, \
-            s_butt, sSta, sEnd, e5, e6, dnv_butt, mgm_butt, button2, pop, mOT, mCT, mRP, mLA, mST, mTG, mWS, mLP
+            s_butt, sSta, sEnd, e5, e6, dnv_butt, mgm_butt, button2, pop, mLA, mLP, mCT, mOT, mRP, mWS, m1, m2, m3, \
+            m4, m5, m6, pWDG
+
 
         pop = Toplevel(root)
         pop.wm_attributes('-topmost', True)
 
         # Define volatile runtime variables -------------------[]
         metRO = False
-
         # Define and initialise essential popup variables -----------------------------------------
         xUCLLP, xLCLLP, sUCLLP, sLCLLP = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
         xUCLLA, xLCLLA, sUCLLA, sLCLLA = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
@@ -8563,11 +8408,12 @@ def userMenu():     # listener, myplash
         sSta, sEnd, gSize1, gSize2 = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
         lPwr, lAng, eStat, optm1, optm2 = IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop)
 
-        pLmtA, pLmtB, pLmtC, pLmtD, pLmtE, pLmtF, mWS, mLP = (IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop),
-                                                              IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop))
+        pLmtA, pLmtB, pLmtC, pLmtD, pLmtE, pLmtF = (IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop),
+                                                    IntVar(pop), IntVar(pop))
+
         hLmtA, hLmtB, shewhart, Sample = IntVar(pop), IntVar(pop), IntVar(pop), StringVar(pop)
 
-        dnvMinMax, mgmMinMax, othMinMax, mOT, mCT, mRP, mLA, mST, mTG = (IntVar(pop), IntVar(pop), IntVar(pop),
+        dnvMinMax, mgmMinMax, othMinMax, mLA, mLP, mCT, mOT, mRP, mWS = (IntVar(pop), IntVar(pop), IntVar(pop),
                                                                          IntVar(pop), IntVar(pop), IntVar(pop),
                                                                          IntVar(pop), IntVar(pop), IntVar(pop))
         pWDG = IntVar(pop)
@@ -8595,42 +8441,40 @@ def userMenu():     # listener, myplash
         Label(pop, text='[Configure Monitoring Parameters]  -  ', font=("bold", 10)).place(x=10, y=80)
 
         p4 = Checkbutton(pop, text="DNV Pipe", font=("bold", 10), variable=dnvMinMax, command=dMinMaxPlot)
-        p4.place(x=230, y=y_start - y_incmt * 1)  # 6
+        p4.place(x=230, y=y_start - y_incmt * 1)    # 6
 
         p5 = Checkbutton(pop, text="MGM Pipe", font=("bold", 10), variable=mgmMinMax, command=mMinMaxPlot)
-        p5.place(x=325, y=y_start - y_incmt * 1)  # 6
+        p5.place(x=325, y=y_start - y_incmt * 1)    # 6
 
-        p6 = Checkbutton(pop, text="Bespoke", font=("bold", 10), variable=othMinMax, command=oMinMaxPlot)
-        p6.place(x=425, y=y_start - y_incmt * 1)  # 6
-
+        p6 = Checkbutton(pop, text="AutoMode", font=("bold", 10), variable=pWDG, command=watchDG)
+        p6.place(x=415, y=124)                      # 6
+        if int(cDM):
+            pWDG.set(1)
+        else:
+            pWDG.set(0)
         # -------------------------------------------------------------------------[]
         m1 = Checkbutton(pop, text="Oven Temperature", font=("bold", 10), variable=mOT, state="disabled")
         m1.place(x=10, y=y_start)
         mOT.set(1)
 
-        m2 = Checkbutton(pop, text="Cell Tension", font=("bold", 10), variable=mCT, state="disabled")
+        m2 = Checkbutton(pop, text="Active Cell Tension", font=("bold", 10), variable=mCT, state="disabled")
         m2.place(x=150, y=y_start)  #x=160
         mCT.set(1)
 
-        m3 = Checkbutton(pop, text="Roller Pressure", font=("bold", 10), variable=mRP, state="disabled")
-        m3.place(x=270, y=y_start)
-        mRP.set(1)
-
-        m4 = Checkbutton(pop, text="Gap Polarisation", font=("bold", 10), variable=mTG, state="disabled")
-        m4.place(x=270, y=y_start + y_incmt * 1)
-
-        m5 = Checkbutton(pop, text="Spooling Tension", font=("bold", 10), variable=mST, state="disabled")
-        m5.place(x=10, y=y_start + y_incmt * 1)
-
-        m6 = Checkbutton(pop, text="Winding Speed", font=("bold", 10), variable=mWS, state="disabled")
-        m6.place(x=150, y=y_start + y_incmt * 1)
+        m3 = Checkbutton(pop, text="Tape Winding Spd", font=("bold", 10), variable=mWS, state="disabled")
+        m3.place(x=10, y=y_start + y_incmt * 1)
         mWS.set(1)
-        # -------------------------------------------- Not included in DNV/MGM requirements
-        m7 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="disabled")
-        m7.place(x=400, y=y_start)
 
-        m8 = Checkbutton(pop, text="Laser Angle", font=("bold", 10), variable=mLA, state="disabled")
-        m8.place(x=400, y=y_start + y_incmt * 1)
+        m4 = Checkbutton(pop, text="Reinforced Pressure", font=("bold", 10), variable=mRP, state="disabled")
+        m4.place(x=150, y=y_start + y_incmt * 1)
+        mRP.set(1)
+        # -------------------------------------------- Not included in DNV/MGM requirements
+        m5 = Checkbutton(pop, text="Laser Power", font=("bold", 10), variable=mLP, state="disabled")
+        m5.place(x=305, y=y_start)
+
+        m6 = Checkbutton(pop, text="Laser Angle", font=("bold", 10), variable=mLA, state="disabled")
+        m6.place(x=305, y=y_start + y_incmt * 1)
+
         # ---------------------------------------------------------------------#
         # load variables directly from ini files --[TODO]
         sbutton = 'disabled'  # disable Save button on entry state
@@ -8650,8 +8494,8 @@ def userMenu():     # listener, myplash
         # --------------------------------------------------------------------------------------------#
         # EoLP_butt = Button(pop, text=" EoL/EoP Sampling ", width=15, command=eolpConfigs, state='normal')
         # EoLP_butt.place(x=240, y=3 + y_start + y_incmt * 6.6)
-        p4 = Checkbutton(pop, text="AutoSynchronous", font=("bold", 10), variable=pWDG, command=watchDG)
-        p4.place(x=240, y=3 + y_start + y_incmt * 6.6)  # 393 |10
+        # p4 = Checkbutton(pop, text="AutoSynchronous", font=("bold", 10), variable=pWDG, command=watchDG)
+        # p4.place(x=240, y=3 + y_start + y_incmt * 6.6)  # 393 |10
         # --------------------------------------------------------------------------------------------#
         mgm_butt = Button(pop, text="MGM Key Parameters", wraplength=90, justify=CENTER, width=12,
                               height=3, font=("bold", 12), command=mgmConfigs, state=cState)
@@ -8661,7 +8505,7 @@ def userMenu():     # listener, myplash
         p1 = Checkbutton(pop, text="DNV Quality Limits", font=("bold", 10), variable=pLmtA, command=enDNV)
         p1.place(x=10, y=3 + y_start + y_incmt * 4)         # 353
 
-        p2 = Checkbutton(pop, text="Shewhart's Limits", font=("bold", 10), variable=shewhart, command=enAUTO)
+        p2 = Checkbutton(pop, text="Automatic Limits", font=("bold", 10), variable=shewhart, command=enAUTO)
         p2.place(x=10, y=y_start + y_incmt * 5)             # 373 | 9
         shewhart.set(1)
 
@@ -9907,7 +9751,18 @@ def userMenu():     # listener, myplash
 
         return HeadA, HeadB, closeV
 
-
+# -----------------------------------------[ For Spalsh Control]
+    def abortKey(key):
+        # you can terminate the program with 'End' button ----
+        if key == Key.end:
+            print('\nTotal Number of Core-CPU#:', os.cpu_count())
+            print('Killing Parent PID:', os.getppid())
+            print('Killing Child PID:', os.getpid())
+            print('SPC terminated by Local User...')
+            # mySplash.withdraw()
+            # lt.timer.cancel()
+            os._exit(0)
+            return True
 # --------------------------------------------------------------------------------#
     def viewTypeC():
         global HeadA, rType  # declare as global variables
@@ -9955,19 +9810,28 @@ def userMenu():     # listener, myplash
         elif (analysis.entrycget(0, 'state') == 'normal'
               and analysis.entrycget(1, 'state') == 'normal'
               and analysis.entrycget(3, 'state') == 'normal'):
-            analysis.entryconfig(0, state='disabled')   # Disable selected command
-            analysis.entryconfig(1, state='normal')     # Keep command Enabled
-            analysis.entryconfig(3, state='normal')     # Keep command enabled
+            analysis.entryconfig(0, state='disabled')               # Disable selected command
+            analysis.entryconfig(1, state='normal')                 # Keep command Enabled
+            analysis.entryconfig(3, state='normal')                 # Keep command enabled
             # Prevent Post Production analysis Menu object
             process.entryconfig(0, state='normal')
             process.entryconfig(1, state='normal')
             process.entryconfig(3, state='normal')
 
-            # --- start parallel thread --------------------------------#
-            # cascadeViews()                                            # Critical Production Params
+            # --- start parallel thread ---------------------------------#
+            # cascadeViews()                                             # Critical Production Params
             print('\nFresh Condition met....')
-            realTimePlay()                                              # Call objective function
-            # tabbed_cascadeMode()  # Provide limited Tabb and multiple screen
+            # import magmaSPC as lt
+            # -----------------------------------
+            # listener = Listener(on_press=abortKey, suppress=False)
+            # root.wm_attributes("-topmost", True)                       # set splash screen on top
+            # root.after(3, lambda: lt.autoSplash(listener, root))
+            # ----------------------------------
+            import autoSPCGUI as lt
+            lt.splashT(root)
+            # realTimePlay()                                             # Call objective function
+            # ----------------------------------
+            # tabbed_cascadeMode()                                       # Provide limited Tabb and multiple screen
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
@@ -9981,14 +9845,14 @@ def userMenu():     # listener, myplash
 
     def viewTypeD():  # Tabbed View (This is configured for remote users)
         global HeadA, HeadB, closeV, rType
-        # Define run Type ---------------------[TODO]
+        # Define run Type -----------------------------------------[]
         if runType == 1:
             rType = 'Synchro'
         elif runType == 2:
             rType = 'PostPro'
         else:
             rType = 'Standby'
-        # -------------------------------------[]
+        # ---------------------------------------------------------[]
         # enforce category selection integrity ---------------------#
         if analysis.entrycget(0, 'state') == 'disabled':
             analysis.entryconfig(1, state='disabled')
@@ -9996,9 +9860,9 @@ def userMenu():     # listener, myplash
             analysis.entryconfig(3, state='normal')
 
             if messagebox.askokcancel("Warning!!!", "Current Visualisation will be lost!"):
-                casc_clearOut()  # clear out visualisation frame
-                tabbed_canvas()  # Call Canvas binding function
-                exit_bit.append(0)  # Keep a byte into empty list
+                casc_clearOut()                                     # clear out visualisation frame
+                tabbed_canvas()                                     # Call Canvas binding function
+                exit_bit.append(0)                                  # Keep a byte into empty list
             else:
                 analysis.entryconfig(0, state='disabled')     # revert to original state
                 analysis.entryconfig(1, state='normal')       # revert to original state
@@ -10142,6 +10006,12 @@ def userMenu():     # listener, myplash
         return HeadA, HeadB, closeV
 
     # Menu Bar --------------------------------------------------------------------------------[]
+    if int(cDM):
+        inautoMode = 'disabled' # disable Synchronous and PostProd Menu if in AutoMode
+    else:
+        inautoMode = 'normal'   # enable Synchronous and PostProd Menu if in AutoMode
+
+    # ---------------------------------------------------------------[Menu GUI Canvas Begins Here]
     menubar = Menu(root)
     filemenu = Menu(menubar, tearoff=0)
     sub_menu = tk.Menu(menubar, tearoff=0)
@@ -10166,7 +10036,7 @@ def userMenu():     # listener, myplash
     analysis = Menu(menubar, tearoff=0)
 
     analysis.add_command(label="Set Cascade View", command=viewTypeC)
-    analysis.add_command(label="Set Tabbed View", command=viewTypeD)
+    analysis.add_command(label="Set Tabbed View", state=inautoMode, command=viewTypeD)
 
     analysis.add_separator()
     analysis.add_command(label="Stop SPC Process", command=stopSPCrun)
@@ -10175,8 +10045,8 @@ def userMenu():     # listener, myplash
     # Process Menu ----------------------------------------[]
     process = Menu(menubar, tearoff=0)
 
-    process.add_command(label="Use Cascade View", command=viewTypeA)
-    process.add_command(label="Use Tabbed View", command=viewTypeB)
+    process.add_command(label="Use Cascade View", state=inautoMode, command=viewTypeA)
+    process.add_command(label="Use Tabbed View", state=inautoMode, command=viewTypeB)
 
     process.add_separator()
     process.add_command(label="Close Display", command=closeViews)

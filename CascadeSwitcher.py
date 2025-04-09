@@ -12,7 +12,7 @@ from multiprocessing import Process
 from time import gmtime, strftime
 from tkinter import *
 from tkinter import ttk
-
+from datetime import datetime, date
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -63,10 +63,8 @@ countG = '08'
 countH = '09'
 # --------------------------------------- Common to all Process Procedures -------------------------[]
 cpTapeW, cpLayerNo, runType = [], [], []
-UsePLC_DBS = True
 hostConn = 0
 runStatus = 0
-
 # --------------
 gap_vol = 0
 ramp_vol = 0
@@ -80,8 +78,14 @@ A3 = [0.975, 0.789, 0.680, 0.6327, 0.606, 0.5525]       # 10, 15, 20, 23, 25, 30
 B3 = [0.284, 0.428, 0.510, 0.5452, 0.565, 0.6044]       # 10, 15, 20, 23, 25, 30  sample sizes respectively
 B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
 
+
+today = date.today()
+pWON = today.strftime("%Y%m%d")
+
+plcConnex = []
 UsePLC_DBS = True                                       # specify SQl Query or PLC DB Query is in use
-processWON = []
+processWON = [pWON, "20240507", "20240508"]             # Dynamically obtain WON from sysDate or Host PLC
+# print('Computed Work Order #:', pWON)
 
 # ------------- Dummy values ----------------------[]
 pPos = '6.2345'
@@ -99,8 +103,17 @@ rtValues = []
 pRecipe = ""
 
 # Call function and load WON specification -----[]
-mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP = dd.decryptMetricsGeneral(WON)
-print('\nDecrypted Prod Parameters:', mLA, mLP, mCT, mOT, mRP, mWS, mSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP)
+cDM, cSS, cGS, mLA, mLP, mCT, mOT, mRP, mWS, sStart, sStops, LP, LA, TP, RF, TT, ST, TG = dd.decryptMetricsGeneral(processWON[0])
+print('\nDecrypted MGM Parameters:', mLA, mLP, LP, LA, TP, RF, TT, ST, TG)
+print('Decrypted DNV Parameters:', mCT, mOT, mRP, mWS, TT, ST, TG)
+print('Work Order Number #:', processWON[0], 'Default Mode:', cDM)
+print('Monitors:', cDM, cSS, cGS, mLA, mLP, mCT, mOT, mRP, mWS, '\n')
+if cGS == 'SS-Domino':
+    cGS = 1
+elif cGS == 'GS-Discrete':
+    cGS = 2
+else:
+    cGS = 0
 
 # ----------------------------------------------[A]
 if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA) and not int(TP) and not int(RF):

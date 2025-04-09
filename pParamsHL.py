@@ -63,16 +63,17 @@ def checkhistDev(xUCL, MeanP, sampSiz):
 
     return UCL, LCL, stdDev
 
-
-def saveMetricspP(WorkOrderID, sLA, sLP, sCT, sOT, sRP, sWS, sSP, shiftS, shiftE, LP, LA, TP, RF, TT, ST, TG, SP):
+# processWON[0], rMode, sel_SS, sel_gT, LA, LP, CT, OT, RP, WS, sSta, sEnd, xlp, xla, xtp, xrf, xtt, xst, xtg
+def saveMetricspP(WorkOrderID, rMode, sel_SS, sel_gT, sLA, sLP, sCT, sOT, sRP, sWS, shiftS, shiftE, LP, LA, TP, RF, TT, ST, TG):
     shfS = shiftS.get()
     shfE = shiftE.get()
+    print('Details of Monitors to save:', sLA, sLP, sCT, sOT, sRP, sWS)
     print('Details of metrics to save:', WorkOrderID, shfS, shfE)
 
     # ----------------------------------------------------------------[]
     try:
         print("Attempting to encrypt config values...")
-        encryptMetricspP(WorkOrderID, sLA, sLP, sCT, sOT, sRP, sWS, sSP, shfS, shfE, LP, LA, TP, RF, TT, ST, TG, SP)
+        encryptMetricspP(WorkOrderID, rMode, sel_SS, sel_gT, sLA, sLP, sCT, sOT, sRP, sWS, shfS, shfE, LP, LA, TP, RF, TT, ST, TG)
 
     except ValueError:
         errorNote()     # response to save button when entry field is empty
@@ -82,21 +83,24 @@ def saveMetricspP(WorkOrderID, sLA, sLP, sCT, sOT, sRP, sWS, sSP, shiftS, shiftE
 # --------------------------------------------------------------------[]
 
 
-def encryptMetricspP(WON, eLA, eLP, eCT, eOT, eRP, eWS, eSP, shiftS, shiftE, LP, LA, TP, RF, TT, ST, TG, SP):
+def encryptMetricspP(WON, eDM, eSS, SgT, eLA, eLP, eCT, eOT, eRP, eWS, shiftS, shiftE, LP, LA, TP, RF, TT, ST, TG):
     WONID = WON
     # objective of cryptography is to provide basic security concepts in data exchange & integrity
     print('\nWriting encryption into archive...')
 
     # Check variables----- []
     print('Saving the Lists:', WONID, "\n", shiftS, "\n", shiftE)
+    ab1 = onetimepad.encrypt(str(eDM), 'random')    # Default Run Mode
+    ab2 = onetimepad.encrypt(str(eSS), 'random')    # monitor LP
+    ab3 = onetimepad.encrypt(str(SgT), 'random')    # monitor CT
     # ------------- Encrypt each line of information -----[]
-    af1 = onetimepad.encrypt(str(eLA), 'random')
-    af2 = onetimepad.encrypt(str(eLP), 'random')
-    af3 = onetimepad.encrypt(str(eCT), 'random')
-    af4 = onetimepad.encrypt(str(eOT), 'random')
-    af5 = onetimepad.encrypt(str(eRP), 'random')
-    af6 = onetimepad.encrypt(str(eWS), 'random')
-    af7 = onetimepad.encrypt(str(eSP), 'random')
+
+    af1 = onetimepad.encrypt(str(eLA), 'random')    # monitor LA
+    af2 = onetimepad.encrypt(str(eLP), 'random')    # monitor LP
+    af3 = onetimepad.encrypt(str(eCT), 'random')    # monitor CT
+    af4 = onetimepad.encrypt(str(eOT), 'random')    # monitor OT
+    af5 = onetimepad.encrypt(str(eRP), 'random')    # monitor RP
+    af6 = onetimepad.encrypt(str(eWS), 'random')    # monitor WS
 
     cf3 = onetimepad.encrypt(str(shiftS), 'random')
     cf4 = onetimepad.encrypt(str(shiftE), 'random')
@@ -108,24 +112,26 @@ def encryptMetricspP(WON, eLA, eLP, eCT, eOT, eRP, eWS, eSP, shiftS, shiftE, LP,
     cf9 = onetimepad.encrypt(str(TT), 'random')
     cfA = onetimepad.encrypt(str(ST), 'random')
     cfB = onetimepad.encrypt(str(TG), 'random')
-    cfC = onetimepad.encrypt(str(SP), 'random')
 
     # Open text file and save historical details -----------#
     with open("histProdParams.INI", 'a') as configfile:            # append mode.
         # Prevent duplicated instance ------ [TODO]
-        # Prevent duplicated keys -----------[TODO]
+        if not config.has_section("CommonStatistic_" + WONID):
+            config.add_section("CommonStatistic_" + WONID)
+            # Plot type Min/Max or Control Charts ----------#
+            config.set("CommonStatistic_" + WONID, "DefaultMOD", str(ab1))
+            config.set("CommonStatistic_" + WONID, "SampleSize", str(ab2))
+            config.set("CommonStatistic_" + WONID, "SubgSample", str(ab3))
 
         if not config.has_section("WorkOrderNumber_" + WONID):
             config.add_section("WorkOrderNumber_" + WONID)
-
-            # Plot type Min/Max or Control Charts -------
+            # Plot type Min/Max or Control Charts ------------#
             config.set("WorkOrderNumber_" + WONID, "monitor_LA", str(af1))
             config.set("WorkOrderNumber_" + WONID, "monitor_LP", str(af2))
             config.set("WorkOrderNumber_" + WONID, "monitor_CT", str(af3))
             config.set("WorkOrderNumber_" + WONID, "monitor_OT", str(af4))
             config.set("WorkOrderNumber_" + WONID, "monitor_RP", str(af5))
             config.set("WorkOrderNumber_" + WONID, "monitor_WS", str(af6))
-            config.set("WorkOrderNumber_" + WONID, "monitor_SP", str(af7))
 
         if not config.has_section("ShiftPattern_" + WONID):
             config.add_section("ShiftPattern_" + WONID)
@@ -133,19 +139,18 @@ def encryptMetricspP(WON, eLA, eLP, eCT, eOT, eRP, eWS, eSP, shiftS, shiftE, LP,
             config.set("ShiftPattern_" + WONID, "shiftBegn", str(cf3))
             config.set("ShiftPattern_" + WONID, "ShiftEnds", str(cf4))
 
-        if not config.has_section("ProdParameters_" + WONID):
-            config.add_section("ProdParameters_" + WONID)
+        if not config.has_section("ActiveParams_" + WONID):
+            config.add_section("ActiveParams_" + WONID)
             # Plot type Min/Max or Control Charts -------
-            config.set("ProdParameters_" + WONID, "Laser_pwr", str(cf5))
-            config.set("ProdParameters_" + WONID, "Laser_ang", str(cf6))
-            config.set("ProdParameters_" + WONID, "Tape_plac", str(cf7))
-            config.set("ProdParameters_" + WONID, "Roller_fc", str(cf8))
+            config.set("ActiveParams_" + WONID, "Laser_pwr", str(cf5))
+            config.set("ActiveParams_" + WONID, "Laser_ang", str(cf6))
+            config.set("ActiveParams_" + WONID, "Tape_plac", str(cf7))
+            config.set("ActiveParams_" + WONID, "Roller_fc", str(cf8))
             # ------ ------------------------------------
-            config.set("ProdParameters_" + WONID, "Tape_Temp", str(cf9))
-            config.set("ProdParameters_" + WONID, "Subs_temp", str(cfA))
-            config.set("ProdParameters_" + WONID, "Tape_void", str(cfB))
-            config.set("ProdParameters_" + WONID, "Temp_Ramp", str(cfC))
-            config.set("ProdParameters_" + WONID, "[" + dt_string + "]", str("-" * 172) + "EndOfConfig.")
+            config.set("ActiveParams_" + WONID, "Tape_Temp", str(cf9))
+            config.set("ActiveParams_" + WONID, "Subs_temp", str(cfA))
+            config.set("ActiveParams_" + WONID, "Tape_void", str(cfB))
+            config.set("ActiveParams_" + WONID, "[" + dt_string + "]", str("-" * 172) + "EndOfConfig.")
         else:
             pass
 
@@ -154,6 +159,7 @@ def encryptMetricspP(WON, eLA, eLP, eCT, eOT, eRP, eWS, eSP, shiftS, shiftE, LP,
 
 def decryptMetricsGeneral(WONID):
     import os.path
+
     # initialise object instance ------------------[]
     processFile = os.path.exists("histProdParams.INI")
 
@@ -163,10 +169,14 @@ def decryptMetricsGeneral(WONID):
 
         try:
             # Load the content ------------------------------------------------[]
+            comnSample = config_object["CommonStatistic_" + WONID]
             limpSample = config_object["WorkOrderNumber_" + WONID]
             limpShifts = config_object["ShiftPattern_" + WONID]
             limpParams = config_object["ActiveParams_" + WONID]
 
+            cDM = onetimepad.decrypt(comnSample["DefaultMOD"], 'random')
+            cSS = onetimepad.decrypt(comnSample["SampleSize"], 'random')
+            cGS = onetimepad.decrypt(comnSample["SubgSample"], 'random')
             # ---------------------------------------------------------------#
             dLA = onetimepad.decrypt(limpSample["monitor_LA"], 'random')
             dLP = onetimepad.decrypt(limpSample["monitor_LP"], 'random')
@@ -174,7 +184,6 @@ def decryptMetricsGeneral(WONID):
             dOT = onetimepad.decrypt(limpSample["monitor_OT"], 'random')
             dRP = onetimepad.decrypt(limpSample["monitor_RP"], 'random')
             dWS = onetimepad.decrypt(limpSample["monitor_WS"], 'random')
-            dSP = onetimepad.decrypt(limpSample["monitor_SP"], 'random')
 
             # --------- Fetch date under each Key ---------------------------#
             sStart = onetimepad.decrypt(limpShifts["ShiftBegn"], 'random')
@@ -187,19 +196,20 @@ def decryptMetricsGeneral(WONID):
             TT = onetimepad.decrypt(limpParams["Tape_Temp"], 'random')
             ST = onetimepad.decrypt(limpParams["Subs_temp"], 'random')
             TG = onetimepad.decrypt(limpParams["Tape_void"], 'random')
-            SP = onetimepad.decrypt(limpParams["Temp_Ramp"], 'random')  # Spooling
 
         except KeyError:
-            print('Configuration File or Key is missing. Loading default values...')
+            print('Process config record not found. Loading default values for WON#' + WONID)
+            cDM = 0
+            cSS = 0
+            cGS = 0
             dLA = 0
             dLP = 0
             dCT = 0
             dOT = 0
             dRP = 0
             dWS = 0
-            dSP = 0
-            sStart = 0
-            sStops = 0
+            sStart = '07:00:00'
+            sStops = '17:00:00'
             LP = 0
             LA = 0
             TP = 0
@@ -207,30 +217,29 @@ def decryptMetricsGeneral(WONID):
             TT = 0
             ST = 0
             TG = 0
-            SP = 0
 
     else:
-        print('Config File exist', processFile)
-        print('Configuration file does not exist, loading default variables...')
-        LmType = 0  # used automatic limits is historical values are missing
+        print('Configuration file does not exist, loading dummy variables...')
+        cDM = 0
+        cSS = 30
+        cGS = 2
+        # -----
         dLA = 0
         dLP = 0
         dCT = 0
         dOT = 0
         dRP = 0
         dWS = 0
-        dSP = 0
-        sStart = 0
-        sStops = 0
+        sStart = '07:00:00'
+        sStops = '17:00:00'
         LP = 0
         LA = 0
         TP = 0
         RF = 0
-        TT = 0
-        ST = 0
-        TG = 0
-        SP = 0
+        TT = 1
+        ST = 1
+        TG = 1
 
     # print('Fetch Data:','\n', dCT, '\n', dOT, '\n', sStart, '\n', sStops, '\n',  RF, '\n', TT)
 
-    return dLA, dLP, dCT, dOT, dRP, dWS, dSP, sStart, sStops, LP, LA, TP, RF, TT, ST, TG, SP
+    return cDM, cSS, cGS, dLA, dLP, dCT, dOT, dRP, dWS, sStart, sStops, LP, LA, TP, RF, TT, ST, TG

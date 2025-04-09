@@ -220,18 +220,31 @@ def autoSplash(istener, splash):
 
             retry = 0
             while not connectPLC and retry < 10:       # create a persistent loop
-                print('\nConnection failed at first instance, retrying...')
-                init_str.set(f"{error_handlers[1]}{'.' * n}".ljust(27))
                 try:
+                    print('\nConnection failed at first instance, retrying...')
+                    init_str.set(f"{error_handlers[1]}{'.' * n}".ljust(27))
+
                     print('Second try...')
                     connectPLC = sn7.connectM2M()                        # Connect to Snap7 Server
                     print('\nCONN2:', connectPLC)
+
                     # recall M2M connection again ----------- 2nd time
                     if connectPLC:
                         print('\nSending M2M acknowledgement... (2)')
                         sendM2M_ACK()
+                        init_str.set("Sending M2M acknowledgement... (2)".ljust(27))
+                        sleep(.5)
+                        mySplash.update_idletasks()
                     else:
                         print('\nM2M acknowledgement failed...')
+                        init_str.set("M2M acknowledgement failed...".ljust(27))
+                        sleep(.5)
+                        mySplash.update_idletasks()
+                    # -----------------------------------------------#
+
+                    init_str.set("PLC Connection is sorted".ljust(27))
+                    sleep(.5)
+                    mySplash.update_idletasks()
 
                 except Exception as err:
                     print(f"Exception Error: '{err}'")
@@ -318,7 +331,9 @@ def localSplash(istener, splash):
     print('\nChecking Viz-Screen Resolution...')
     checkRes()
 
-    # -----------------------------------------
+    # Initiate a new thread / process -------[C]
+    import spcWatchDog as wd
+    # ----------------------------------------[]
 
     if not splashInUse:
         listener = istener
@@ -340,12 +355,13 @@ def localSplash(istener, splash):
         print(w, h, x_c, y_c)
         mySplash.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
 
-        img = ImageTk.PhotoImage(Image.open("200x120.png"))
+        path = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\Media\\Images\\'
+        img = ImageTk.PhotoImage(Image.open(path + "200x120.png"))
         s_label = Label(mySplash, image=img, text="Welcome to Magma SPC", font=18)
 
-        Label(mySplash, text="Synchronous Multivariate SPC", width=28, justify=CENTER, font=12).place(x=70, y=125)
-        Label(mySplash, text="Advanced Statistical Processing & Visualization System", justify=CENTER).place(x=78, y=150)
-        Label(mySplash, text="Integrated into SCADA's (CF/PEEK) Manufacturing Process", justify=CENTER).place(x=70, y=168)
+        Label(mySplash, text="Synchronous Multivariate SPC", width=28, justify=CENTER, font=12).place(x=80, y=125)
+        Label(mySplash, text="Advanced Statistical Processing & Visualization System", justify=CENTER).place(x=65, y=150)
+        Label(mySplash, text="Integrated into SCADA's (CF/PEEK) Manufacturing Process", justify=CENTER).place(x=55, y=168)
         Label(mySplash, text=user_url).place(x=120, y=186)
         Label(mySplash, textvariable=init_str, width=30, justify=CENTER).place(x=100, y=215)  #
         s_label.pack()
@@ -367,16 +383,96 @@ def localSplash(istener, splash):
         for n in range(r):
             sleep(.2)
             init_str.set(f"Almost Done.{'.' * n}".ljust(27))
+
+            sleep(.5)
+            init_str.set(f"Connecting to PLC...{'.' * n}".ljust(27))
             mySplash.update_idletasks()
 
         for n in range(r):
+            # ---------------------------------------------------------------#
+            print('\nConnecting to PLC subsystem....')
+            sleep(.2)
+            init_str.set(f"Establishing connectivity.{'.' * n}".ljust(27))
+            connectPLC = sn7.connectM2M()  # Connect to Snap7 Server
+
+            # recall M2M connection again ----------- TODO 1st time try
+            if connectPLC:
+                init_str.set(f"Sending M2M acknowledgement....{'.' * n}".ljust(27))
+                sendM2M_ACK()
+            else:
+                init_str.set(f"M2M acknowledgement failed.....{'.' * n}".ljust(27))
+            mySplash.update_idletasks()
+            # ------------------------------------------------------------[]
+
+            retry = 0
+            while not connectPLC and retry < 10:  # create a persistent loop
+                try:
+                    print('\nConnection failed at first instance, retrying...')
+                    init_str.set(f"{error_handlers[1]}{'.' * n}".ljust(27))
+                    sleep(.5)
+                    connectPLC = sn7.connectM2M()  # Connect to Snap7 Server
+                    mySplash.update_idletasks()
+
+                    # recall M2M connection again ----------- 2nd time
+                    if connectPLC:
+                        init_str.set(f"Sending M2M acknowledgement... (2)".ljust(27))
+                        sleep(.5)
+                        sendM2M_ACK()
+                        mySplash.update_idletasks()
+                    else:
+                        init_str.set(f"M2M acknowledgement failed...".ljust(27))
+                        sleep(.5)
+                        mySplash.update_idletasks()
+                    # -----------------------------------------------#
+
+                    init_str.set("PLC Connection is sorted !".ljust(27))
+                    sleep(.5)
+                    mySplash.update_idletasks()
+
+                except Exception as err:
+                    print(f"Exception Error: '{err}'")
+                    errorLog(error_handlers[0])                     # retrying connection
+                    init_str.set(f"{error_handlers[1]}{'.' * n}".ljust(27))
+                    sleep(.5)
+                    mySplash.update_idletasks()
+
+                else:  # Connection failed, show status
+                    if connectPLC:
+                        # recall M2M connection again ----------- 3rd time
+                        print('Successful connection established...')
+                        init_str.set(f"{error_handlers[2]}{'.' * n}".ljust(27))
+                        print('\nSending M2M acknowledgement... (3)')
+                        sendM2M_ACK()
+                        sleep(.5)  # rest a while
+                        mySplash.update_idletasks()
+                    else:
+                        # sn7.plc.destroy()                     # reset command
+                        sn7.connectPLC = False
+                        init_str.set(f"{error_handlers[1]}{'.' * n}".ljust(27))
+                        print('Issues with M2M Connection, may shut down..')
+                        sleep(.5)  # rest a while
+                        mySplash.update_idletasks()
+                retry += 1
+                print('Counting', retry)
+
+        for n in range(r):
+
             sleep(.5)
             init_str.set("Almost Done..........".ljust(27))
+
             sleep(.5)
             init_str.set("Initialization Sorted...".ljust(27))
 
             # Allow SPC loading user values from SCADA once for every pipe laying process ----
             mySplash.update_idletasks()
 
-        Label(mySplash, text="Watchdog disabled, local call...", justify=LEFT).place(x=140, y=215)
+        Label(mySplash, text="Watchdog activated, auto call...", justify=LEFT).place(x=120, y=215)
         mySplash.after(60000, lambda: move_window(False))
+
+        # Initiate a new thread / process -------------------------------[C]
+        npid = wd.watchDog(listener, splash)                # carry 2 variables along
+        p = Process(target=npid)
+        p.start()
+        p.join()
+
+        return splashInUse

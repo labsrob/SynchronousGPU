@@ -31,7 +31,7 @@ def respiteAct(key):
 
     # you can terminate the program with 'End' button ----
     if key == Key.end:
-        print('Emergency Abort: User\'s termination attempt...')
+        print('\nTotal Number of Core-CPU#:', os.cpu_count())
         print('Killing Parent PID:', os.getppid())
         print('Killing Child PID:', os.getpid())
         print('SPC terminated by Local User...')
@@ -40,6 +40,8 @@ def respiteAct(key):
         os._exit(0)
         return True
 
+
+# def scadaStart():
 
 if __name__ == '__main__':
     listener = Listener(on_press=respiteAct, suppress=False)  # .start()
@@ -57,7 +59,7 @@ if __name__ == '__main__':
     print('-' * 25)
 
     # Start screen splash --------------------------------[P]
-    mySplash.after(1, lambda: lt.autoSplash(listener, mySplash))
+    mySplash.after(10, lambda: lt.autoSplash(listener, mySplash))
     print('Listener Thread:', get_ident())  # get_native_id()
 
     if listener.is_alive():
@@ -66,3 +68,4 @@ if __name__ == '__main__':
     mySplash.protocol('WM_DELETE_WINDOW', lambda: quit())
 
     listener.join()
+# scadaStart()
