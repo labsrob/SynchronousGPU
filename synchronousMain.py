@@ -491,21 +491,18 @@ def menuExit():
 
 # ------------------------------------------------------------------------------------[ MAIN PROGRAM ]
 
-def tabbed_cascadeMode(pMode):  # Limited Tab default screen with multiple independent screens
+def tabbed_cascadeMode(pMode):
     global p1, p2, p3, p4, p5, p6, p7, hostConn
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
     """
     if pMode == 1:
-        import CommsPlc as hp
-        hostConn = hp.connectM2M()
+        print('Connecting to PLC Host...')
     elif pMode == 2:
         print('Connecting to SQL Server...')
-        pass
     else:
-        print('Standby/Maintenance Mode')
-        pass
+        print('Standby/Maintenance Mode...')
 
     s = ttk.Style()
     s.theme_use('default')  # Options: ('clam', 'alt', 'default', 'classic')
@@ -558,14 +555,12 @@ def tabbed_canvas(pMode):   # Tabbed Common Classes -------------------[TABBED ]
     :return:
     """
     if pMode == 1:
-        import CommsPlc as hp
-        hostConn = hp.connectM2M()
+        print('Connecting to PLC Host...')
     elif pMode == 2:
         print('Connecting to SQL Server...')
-        pass
     else:
         print('Standby/Maintenance Mode')
-        pass
+
 
     s = ttk.Style()
     s.theme_use('default')
@@ -9782,27 +9777,40 @@ def userMenu():     # listener, myplash
             analysis.entryconfig(3, state='normal')     # set Close Display to normal
 
             if messagebox.askokcancel("Warning!!!", "Current Visualisation will be lost!"):
-                tabb_clearOut()                             # Clear out existing Tabbed View
-                tabbed_cascadeMode()                        # Default limited tabbed common screen
+                tabb_clearOut()                                             # Clear out existing Tabbed View
+
+                # --- start parallel thread --------------------------------#
+                import autoSPCGUI as lt
+                conPLC = lt.splashT(root)
+                # call realtime method -----------[]
+                if conPLC:
+                    realTimePlay()                                          # Call objective function (tabbed_cascade)
+                else:
+                    print('Failed connection...')
+                # ----------------------------------------------------------[]
                 print('\nStarting new GPU thread...')
                 exit_bit.append(1)
 
             else:
                 analysis.entryconfig(1, state='disabled')   # revert to original state
                 analysis.entryconfig(0, state='normal')     # revert to original state
-
             HeadA, HeadB, closeV = 1, 0, 0
-            # realTimePlay()                                        # Call objective function
 
-        elif analysis.entrycget(3, 'state') == 'disabled':  # If Closed Display state is disabled
-            analysis.entryconfig(0, state='disabled')  # select and disable Cascade View command
-            analysis.entryconfig(1, state='normal')  # set tabb view command to normal
-            analysis.entryconfig(3, state='normal')  # set close display to normal
+        elif analysis.entrycget(3, 'state') == 'disabled':    # If Closed Display state is disabled
+            analysis.entryconfig(0, state='disabled')               # select and disable Cascade View command
+            analysis.entryconfig(1, state='normal')                 # set tabb view command to normal
+            analysis.entryconfig(3, state='normal')                 # set close display to normal
 
-            # --- start parallel thread ----------------------------------#
-            # cascadeViews()                                              # Critical Production Params
-            # realTimePlay()                                                # Call objective function
-            # tabbed_cascadeMode()  # Default limited tabbed common screen + Casc
+            # --- start parallel thread ---------------------------------#
+            # cascadeViews()                                             # Critical Production Params
+            import autoSPCGUI as lt
+            conPLC = lt.splashT(root)
+            # call realtime method -----------[]
+            if conPLC:
+                realTimePlay()                                           # Call objective function (tabbed_cascade)
+            else:
+                print('Failed connection...')
+            # ----------------------------------------------------------[]
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
@@ -9819,26 +9827,21 @@ def userMenu():     # listener, myplash
             process.entryconfig(3, state='normal')
 
             # --- start parallel thread ---------------------------------#
-            # cascadeViews()                                             # Critical Production Params
-            print('\nFresh Condition met....')
-            # import magmaSPC as lt
-            # -----------------------------------
-            # listener = Listener(on_press=abortKey, suppress=False)
-            # root.wm_attributes("-topmost", True)                       # set splash screen on top
-            # root.after(3, lambda: lt.autoSplash(listener, root))
-            # ----------------------------------
             import autoSPCGUI as lt
-            lt.splashT(root)
-            # realTimePlay()                                             # Call objective function
-            # ----------------------------------
-            # tabbed_cascadeMode()                                       # Provide limited Tabb and multiple screen
+            conPLC = lt.splashT(root)
+            # call realtime method -----------[]
+            if conPLC:
+                realTimePlay()                                           # Call objective function (tabbed_cascade)
+            else:
+                print('Failed connection...')
+            # ----------------------------------------------------------[]
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
         else:
             analysis.entryconfig(0, state='normal')
             HeadA, HeadB, closeV = 0, 0, 1
-            errorChoice()  # pop up error
+            errorChoice()                                               # pop up error
             print('Invalid! View selection before process parameter..')
 
         return HeadA, HeadB, closeV
@@ -9861,7 +9864,16 @@ def userMenu():     # listener, myplash
 
             if messagebox.askokcancel("Warning!!!", "Current Visualisation will be lost!"):
                 casc_clearOut()                                     # clear out visualisation frame
-                tabbed_canvas()                                     # Call Canvas binding function
+                # tabbed_canvas()                                   # Call Canvas binding function
+                # --- start parallel thread ------------------------#
+                import autoSPCGUI as lt
+                conPLC = lt.splashT(root)
+                # call realtime method -----------[]
+                if conPLC:
+                    realTimePlay()  # Call objective function (tabbed_cascade)
+                else:
+                    print('Failed connection...')
+                # --------------------------------------------------[]
                 exit_bit.append(0)                                  # Keep a byte into empty list
             else:
                 analysis.entryconfig(0, state='disabled')     # revert to original state
@@ -9875,8 +9887,15 @@ def userMenu():     # listener, myplash
             analysis.entryconfig(0, state='normal')
             analysis.entryconfig(3, state='normal')
 
-            realTimePlay()                                          # Call objective function
-            # tabbed_canvas()                                       # Tabbed Visualisation
+            # --- start parallel thread ---------------------------------#
+            import autoSPCGUI as lt
+            conPLC = lt.splashT(root)
+            # call realtime method -----------[]
+            if conPLC:
+                realTimePlay()  # Call objective function (tabbed_cascade)
+            else:
+                print('Failed connection...')
+            # ----------------------------------------------------------[]
             exit_bit.append(0)
             HeadA, HeadB, closeV = 0, 1, 0  # call embedded functions
 
@@ -9887,8 +9906,15 @@ def userMenu():     # listener, myplash
             analysis.entryconfig(0, state='normal')
             analysis.entryconfig(3, state='normal')
 
-            realTimePlay()                          # Call objective function
-            tabbed_canvas()                         # Tabbed Visualisation
+            # --- start parallel thread ---------------------------------#
+            import autoSPCGUI as lt
+            conPLC = lt.splashT(root)
+            # call realtime method -----------[]
+            if conPLC:
+                realTimePlay()  # Call objective function (tabbed_cascade)
+            else:
+                print('Failed connection...')
+            # ----------------------------------------------------------[]
             exit_bit.append(0)
             HeadA, HeadB, closeV = 0, 1, 0
 

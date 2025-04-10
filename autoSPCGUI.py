@@ -38,12 +38,15 @@ def showMenu(key):
 
 
 def splashT(root=None):
-    listener = Listener(on_press=showMenu, suppress=False)      # as listener:
+    # if __name__ == '__main__':
+    listener = Listener(on_press=showMenu, suppress=False)      # as listener:     # childP = Toplevel(root)
     listener.start()
 
-    # mySplash = root
-    mySplash = Tk()
-    mySplash.wm_attributes('-topmost', True)                    # -alpha, -disabled, -fullscreen, -toolwindow, -topmost
+    if root==None:
+        cSplash = Tk()
+    else:
+        cSplash = Toplevel(root)
+    cSplash.wm_attributes('-topmost', True)   # -topmost, -alpha, -disabled, -fullscreen, -toolwindow, -topmost
 
     print('\nNumber of Core-CPU#:', os.cpu_count())
     print('='*24)
@@ -54,15 +57,14 @@ def splashT(root=None):
     print('-' * 25)
 
     # Use Main (primary) Process ID ------------------------[P1]
-    mySplash.after(1, lambda: lt.localSplash(listener, mySplash))
+    conPLC = cSplash.after(10, lambda: lt.localSplash(listener, cSplash))
     print('Listener Thread:', get_ident())                      # get_native_id()
 
     if listener.is_alive():
         print('Listener is active')
-    mySplash.mainloop()
-    mySplash.protocol('WM_DELETE_WINDOW', lambda: quit())
+    cSplash.mainloop()
+    cSplash.protocol('WM_DELETE_WINDOW', lambda: quit())
 
     listener.join()                                             # block until block terminates
 
-splashT()
-
+    return conPLC

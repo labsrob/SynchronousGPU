@@ -15,8 +15,15 @@ Consists of:
 
 """
 from tkinter import *
+import tkinter as tk
 from random import randint
+
 from PIL import ImageTk, Image              # Python Imaging Library
+# import ImageTk, Image
+from matplotlib.image import imread
+import matplotlib.pyplot as plt
+
+import numpy as np
 from multiprocessing import Process
 from threading import *
 import keyboard
@@ -132,15 +139,19 @@ def move_window(token=None):
 def sendM2M_ACK():
     # Send acknowledgement by raising M2MConACK on SCADA Process and activate watchdog ---[]
     try:
+
         # Check if the Bit is @Low then raise High --------------------------[A]
         m2mgood = sn7.readBool(db_number, start_offset[0], bit_offset[0])
+
         if not m2mgood:
+
             print('\nM2M connection acknowledged by SCADA...')
             sn7.writeBool(db_number, start_offset[0], bit_offset[0], 1)
             m2mgood = True
 
             # Initiate a new thread / process -------------------------------[B]
             print('Obtaining and writing SPC metrics to .INI..')
+
             call_once = sn7.spcMetricsModule()      # prevent multiple call for this procedure class
             call_once.saveMetric()                  # download metrics from scada & write values into .INI
 
@@ -189,7 +200,9 @@ def autoSplash(istener, splash):
     print(w, h, x_c, y_c)
     mySplash.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
 
-    img = ImageTk.PhotoImage(Image.open("200x120.png"))
+    # img = ImageTk.PhotoImage(Image.open("200x120.png"))
+    path = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\Media\\Images\\'
+    img = ImageTk.PhotoImage(Image.open(path + "200x120.png"))
     s_label = Label(mySplash, image=img, text="Welcome to Magma SPC", font=18)
     # x=35, y=122
     Label(mySplash, text="Synchronous Multivariate SPC", width=28, justify=CENTER, font=12).place(x=70, y=125)
@@ -332,7 +345,7 @@ def localSplash(istener, splash):
     checkRes()
 
     # Initiate a new thread / process -------[C]
-    import spcWatchDog as wd
+    # import spcWatchDog as wd
     # ----------------------------------------[]
 
     if not splashInUse:
@@ -341,7 +354,8 @@ def localSplash(istener, splash):
         mySplash = splash                           # rename to allow usage in global.ini
         mySplash.overrideredirect(True)             # disable top bar
 
-        # splash_root.geometry("450x250")           # defined above but can be altered to suit
+        # mySplash.geometry("450x250", bg='#f48024')           # defined above but can be altered to suit
+
         init_str = StringVar()
         init_str.set('Initializing variables...')
 
@@ -352,18 +366,27 @@ def localSplash(istener, splash):
         # -------------------------------------------
         x_c = int((screen_w / 2) - (w / 2))
         y_c = int((screen_h / 2) - (h / 2))
+
         print(w, h, x_c, y_c)
         mySplash.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
 
         path = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\Media\\Images\\'
         img = ImageTk.PhotoImage(Image.open(path + "200x120.png"))
-        s_label = Label(mySplash, image=img, text="Welcome to Magma SPC", font=18)
 
-        Label(mySplash, text="Synchronous Multivariate SPC", width=28, justify=CENTER, font=12).place(x=80, y=125)
-        Label(mySplash, text="Advanced Statistical Processing & Visualization System", justify=CENTER).place(x=65, y=150)
-        Label(mySplash, text="Integrated into SCADA's (CF/PEEK) Manufacturing Process", justify=CENTER).place(x=55, y=168)
-        Label(mySplash, text=user_url).place(x=120, y=186)
-        Label(mySplash, textvariable=init_str, width=30, justify=CENTER).place(x=100, y=215)  #
+        # Best practices ----------------------------------
+        # im = Image.open(path + "200x120.png")           # image reference
+        # img = tk.PhotoImage(file=im)
+
+        # -------------------------------------------------
+        pStatus = '#f48024'                                # '#f48024', '#66f424', '#249df4'
+        mySplash.configure(bg=pStatus)                      # Change to default color
+
+        s_label = Label(master=mySplash, image=img, text="Welcome to Magma SPC", font=18, bg=pStatus)
+        Label(mySplash, text="Synchronous Multivariate SPC", width=28, justify=CENTER, font=12, bg=pStatus).place(x=80, y=125)
+        Label(mySplash, text="Advanced Statistical Processing & Visualization System", justify=CENTER, bg=pStatus).place(x=65, y=150)
+        Label(mySplash, text="Integrated into SCADA's (CF/PEEK) Manufacturing Process", justify=CENTER, bg=pStatus).place(x=55, y=168)
+        Label(mySplash, text=user_url, bg=pStatus).place(x=120, y=186)
+        Label(mySplash, textvariable=init_str, width=30, justify=CENTER, bg=pStatus).place(x=100, y=215)  #
         s_label.pack()
 
         r = 10
@@ -399,8 +422,10 @@ def localSplash(istener, splash):
             if connectPLC:
                 init_str.set(f"Sending M2M acknowledgement....{'.' * n}".ljust(27))
                 sendM2M_ACK()
+                conPLC = True
             else:
                 init_str.set(f"M2M acknowledgement failed.....{'.' * n}".ljust(27))
+                conPLC = False
             mySplash.update_idletasks()
             # ------------------------------------------------------------[]
 
@@ -418,15 +443,18 @@ def localSplash(istener, splash):
                         init_str.set(f"Sending M2M acknowledgement... (2)".ljust(27))
                         sleep(.5)
                         sendM2M_ACK()
+                        conPLC = True
                         mySplash.update_idletasks()
                     else:
                         init_str.set(f"M2M acknowledgement failed...".ljust(27))
                         sleep(.5)
+                        conPLC = False
                         mySplash.update_idletasks()
                     # -----------------------------------------------#
 
                     init_str.set("PLC Connection is sorted !".ljust(27))
                     sleep(.5)
+                    conPLC = True
                     mySplash.update_idletasks()
 
                 except Exception as err:
@@ -444,6 +472,7 @@ def localSplash(istener, splash):
                         print('\nSending M2M acknowledgement... (3)')
                         sendM2M_ACK()
                         sleep(.5)  # rest a while
+                        conPLC = True
                         mySplash.update_idletasks()
                     else:
                         # sn7.plc.destroy()                     # reset command
@@ -451,17 +480,18 @@ def localSplash(istener, splash):
                         init_str.set(f"{error_handlers[1]}{'.' * n}".ljust(27))
                         print('Issues with M2M Connection, may shut down..')
                         sleep(.5)  # rest a while
+                        conPLC = False
                         mySplash.update_idletasks()
                 retry += 1
                 print('Counting', retry)
 
         for n in range(r):
-
             sleep(.5)
             init_str.set("Almost Done..........".ljust(27))
 
             sleep(.5)
             init_str.set("Initialization Sorted...".ljust(27))
+            conPLC = True
 
             # Allow SPC loading user values from SCADA once for every pipe laying process ----
             mySplash.update_idletasks()
@@ -470,9 +500,9 @@ def localSplash(istener, splash):
         mySplash.after(60000, lambda: move_window(False))
 
         # Initiate a new thread / process -------------------------------[C]
-        npid = wd.watchDog(listener, splash)                # carry 2 variables along
-        p = Process(target=npid)
-        p.start()
-        p.join()
+        # npid = wd.watchDog(listener, splash)                # carry 2 variables along
+        # p = Process(target=npid)
+        # p.start()
+        # # p.join()
 
-        return splashInUse
+        return conPLC

@@ -112,7 +112,7 @@ def connectM2M():
 		# if not plc.get_connected() or plc.get_cpu_state() == 'S7CpuStatusUnknown':
 		try:
 			# ------------------------------------------------------------------------------
-			print('Testing the M2M connection...')
+			print('Testing PLC connection...')
 			plc.connect(TCP01_IP, RACK, SLOT)  	# Details of TCP/IP Connection (from HW settings)
 			# set connectPLC bit to high/low for future uses----
 

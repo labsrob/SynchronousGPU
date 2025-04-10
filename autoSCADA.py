@@ -59,7 +59,7 @@ if __name__ == '__main__':
     print('-' * 25)
 
     # Start screen splash --------------------------------[P]
-    mySplash.after(10, lambda: lt.autoSplash(listener, mySplash))
+    mySplash.after(3, lambda: lt.autoSplash(listener, mySplash))
     print('Listener Thread:', get_ident())  # get_native_id()
 
     if listener.is_alive():
