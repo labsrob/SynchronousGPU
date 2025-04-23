@@ -80,8 +80,9 @@ pExLayer = 100
 pLength = 10000
 # --------------
 optm = True
-
+inUseAlready = []
 # --------------
+
 import subprocess
 try:
     subprocess.check_output('nvidia-smi')
@@ -3191,22 +3192,22 @@ class laserPowerTabb(ttk.Frame):
         """Create the widgets for the GUI"""
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
-            lpSize, lpgType, eolSample, eopSample, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = dnv.decryptpProcessLim(
-                processWON[0], 'LP')
+            import qParamsHL_DNV as dnv
+            lpS, lTy, olS, opS, pHL, pAL, pFO, pP1, pP2, pP3, pP4, pP5 = dnv.decryptpProcessLim(processWON[0], 'LP')
         else:
-            lpSize, lpgType, eolSample, eopSample, lpHL, lpAL, lpFO, lpParam1, lpParam2, lpParam3, lpParam4, lpParam5 = mgm.decryptpProcessLim(
-                processWON[0], 'LP')
+            import qParamsHL_MGM as mgm
+            lpS, lTy, olS, opS, pHL, pAL, pFO, pP1, pP2, pP3, pP4, pP5 = mgm.decryptpProcessLim(processWON[0], 'LP')
         # Break down each element to useful list ---------------[Tape Temperature]
 
-        if lpHL and lpParam1 and lpParam2 and lpParam3 and lpParam4 and lpParam5:  #
-            lpPerf = '$Pp_{k' + str(lpSize) + '}$'  # Using estimated or historical Mean
+        if pHL and pP1 and pP2 and pP3 and pP4 and pP5:  #
+            lpPerf = '$Pp_{k' + str(lpS) + '}$'  # Using estimated or historical Mean
             lplabel = 'Pp'
             # -------------------------------
-            One = lpParam1.split(',')                   # split into list elements
-            Two = lpParam2.split(',')
-            Thr = lpParam3.split(',')
-            For = lpParam4.split(',')
-            Fiv = lpParam5.split(',')
+            One = pP1.split(',')                   # split into list elements
+            Two = pP2.split(',')
+            Thr = pP3.split(',')
+            For = pP4.split(',')
+            Fiv = pP5.split(',')
             # -------------------------------
             dTape1 = One[1].strip("' ")                 # defined Tape Width
             dTape2 = Two[1].strip("' ")                 # defined Tape Width
@@ -3286,7 +3287,7 @@ class laserPowerTabb(ttk.Frame):
             sLCLlp = 0
             lpUSL = 0
             lpLSL = 0
-            lpPerf = '$Cp_{k' + str(lpSize) + '}$'  # Using Automatic group Mean
+            lpPerf = '$Cp_{k' + str(lpS) + '}$'  # Using Automatic group Mean
             lplabel = 'Cp'
 
         # ------------------------------------[End of Tape Temperature Abstraction]
@@ -3307,7 +3308,7 @@ class laserPowerTabb(ttk.Frame):
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minLP, YScale_maxLP = lpLSL - 8.5, lpUSL + 8.5       # Roller Force
         sBar_minLP, sBar_maxLP = sLCLlp - 80, sUCLlp + 80           # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (int(lpSize) + 3)             # windows view = visible data points
+        window_Xmin, window_Xmax = 0, (int(lpS) + 3)                # windows view = visible data points
 
         # ----------------------------------------------------------#
         T1 = processWON[0] + '_LP'  # Laser Power
@@ -3503,7 +3504,7 @@ class laserPowerTabb(ttk.Frame):
             timei = time.time()                                 # start timing the entire loop
 
             # Bistream Data Pooling Method ---------------------#
-            lpData = synchronousLP(lpSize, lpgType, db_freq)    # data loading functions
+            lpData = synchronousLP(db_freq)                     # data loading functions
             # --------------------------------------------------#
 
             if UsePLC_DBS == 1:
@@ -3563,54 +3564,54 @@ class laserPowerTabb(ttk.Frame):
             im41.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((LP[0]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((LP[1]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((LP[2]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((LP[3]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
+            im11.set_ydata((LP[1]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
+            im12.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
+            im13.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
-            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(lpHL, lpSize, 'LP')
+            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(lpHL, lpS, 'LP')
             # ---------------------------------------#
-            im14.set_ydata((LP[4]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((LP[5]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((LP[6]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((LP[7]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
+            im15.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
+            im16.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
+            im17.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
-            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(lpHL, lpSize, 'LP')
+            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(lpHL, lpS, 'LP')
             # ---------------------------------------#
-            im18.set_ydata((LP[8]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((LP[9]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((LP[10]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((LP[11]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
+            im19.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
+            im20.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
+            im21.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
-            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(lpHL, lpSize, 'LP')
+            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(lpHL, lpS, 'LP')
             # ---------------------------------------#
-            im22.set_ydata((LP[12]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((LP[13]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((LP[14]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((LP[15]).rolling(window=lpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
+            im23.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
+            im24.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
+            im25.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
-            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(lpHL, lpSize, 'LP')
+            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(lpHL, lpS, 'LP')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((LP[0]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((LP[1]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((LP[2]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((LP[3]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im27.set_ydata((LP[1]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im28.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im29.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
 
-            im30.set_ydata((LP[4]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((LP[5]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((LP[6]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((LP[7]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im31.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im32.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im33.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
 
-            im34.set_ydata((LP[8]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((LP[9]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((LP[10]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((LP[11]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im35.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im36.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im37.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
 
-            im38.set_ydata((LP[12]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((LP[13]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((LP[14]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((LP[15]).rolling(window=lpSize, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im39.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im40.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im41.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
 
             # Compute entire Process Capability -----------#
             if not lpHL:
@@ -4151,7 +4152,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
 
 # ---------------------------------------------------------------------------------------------[Tape Placement P3]
 
-class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA param - Substrate Temperature --[]
+class tapePlacementTabb(ttk.Frame):
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -8385,11 +8386,14 @@ def userMenu():     # listener, myplash
             s_butt, sSta, sEnd, e5, e6, dnv_butt, mgm_butt, button2, pop, mLA, mLP, mCT, mOT, mRP, mWS, m1, m2, m3, \
             m4, m5, m6, pWDG
 
-
         pop = Toplevel(root)
         pop.wm_attributes('-topmost', True)
 
-        # Define volatile runtime variables -------------------[]
+        # center root window ------------------------[]
+        pop.tk.eval(f'tk::PlaceWindow {pop._w} center')
+        # pop.withdraw()
+
+        # Define volatile runtime variables ---------[]
         metRO = False
         # Define and initialise essential popup variables -----------------------------------------
         xUCLLP, xLCLLP, sUCLLP, sLCLLP = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
@@ -9415,7 +9419,6 @@ def userMenu():     # listener, myplash
 
         if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
             print('\nSelection RetroPlay Condition met....')
-
             # import signal
             # os.kill(sid, signal.SIGTERM)
 
@@ -9429,42 +9432,47 @@ def userMenu():     # listener, myplash
                 analysis.entryconfig(1, state='normal')
                 analysis.entryconfig(3, state='normal')
 
-                # ------- Indicate Record Date or WON ---------[]
-                DATEentry, WONentry = searchBox()                                  # Popup dialogue
-
+                # ------- Indicate Record Date or WON ---------[TODO...]
+                sDate1, sDate2, uWON = searchBox()                                  # Popup dialogue
+                print('\nDate String - Between:', sDate1, 'and:', sDate2, 'WON-String', uWON)
                 # ---------------------------------------------[2]
-                print('Attempting connection with SQL Server...')
-                qType = 2
-                runType.append(qType)
-
-                # Connect to SQL Server -----------------------[]
-                OEEdataID, processID = sqld.searchSqlData(DATEentry, WONentry)     # Query SQL record
-                print('\nSelecting Cascade View....')
-                tabbed_cascadeMode(qType)
+                if sDate1 == 0 and sDate2 == 0 and uWON == 0:
+                    print('Cancelled button pressed...')
+                    process.entryconfig(0, state='normal')
+                else:
+                    print('Attempting connection with SQL Server...')
+                    qType = 2
+                    runType.append(qType)
+                    # Connect to SQL Server -----------------------[]
+                    OEEdataID, processID = sqld.searchSqlData(sDate1, sDate2, uWON)     # Query SQL record
+                    print('\nSelecting Cascade View....')
+                    tabbed_cascadeMode(qType)   # Cascade
 
             elif (process.entrycget(1, 'state') == 'disabled'
                   and process.entrycget(0, 'state') == 'normal'
                   and process.entrycget(3, 'state') == 'normal'):
 
-                # ----- Calling essential functions ----------#
+                # ----- Calling essential functions ---------#
                 process.entryconfig(1, state='disabled')
                 analysis.entryconfig(0, state='normal')
                 analysis.entryconfig(1, state='normal')
                 analysis.entryconfig(3, state='normal')
 
                 # ------- Indicate Record Date or WON ---------[]
-                DATEentry, WONentry = searchBox()                                   # Search for Production data
-
-                # ---------------------------------------------[2]
-                print('Attempting connection with SQL Server...')
-                qType = 2
-                runType.append(qType)
-
-                # connect SQL Server and obtain Process ID ----#
-                OEEdataID, processID = sqld.searchSqlData(DATEentry, WONentry)    # Query SQL record
-                # ---------------------------------------------[]
-                print('\nSelecting Tabbed View....')
-                tabbed_canvas(qType)
+                sDate1, sDate2, uWON = searchBox()                                   # Search for Production data
+                print('\nDate String - Between:', sDate1, 'and:', sDate2, 'WON-String', uWON)
+                if sDate1 == 0 and sDate2 == 0 and uWON == 0:
+                    print('Cancelled button pressed...')
+                    process.entryconfig(1, state='normal')
+                else:
+                    print('Attempting connection with SQL Server...')
+                    qType = 2
+                    runType.append(qType)
+                    # connect SQL Server and obtain Process ID ----#
+                    OEEdataID, processID = sqld.searchSqlData(sDate1, sDate2, uWON)    # Query SQL record
+                    # ---------------------------------------------[]
+                    print('\nSelecting Tabbed View....')
+                    tabbed_canvas(qType)        # Tabbed
 
             else:
                 runtimeChange()
@@ -9573,55 +9581,107 @@ def userMenu():     # listener, myplash
         # center root window --------------
         pop.tk.eval(f'tk::PlaceWindow {pop._w} center')
         pop.withdraw()
-        stad = askstring(title="Date", prompt="Work Order Number (WON):", initialvalue="20240507", parent=root)
+        uWON = askstring(title="Date", prompt="Work Order Number (WON):", initialvalue="20240507", parent=root)
 
         # -----------------------############---------------------------[]
         # Test for null entry -------------
-        if stad is None or stad == '':
-            return
+        if uWON is None or uWON == '':
+            fmDATE, toDATE, uWON = '0', '0', '0'  # Date was not used
+            print('Search was cancelled, or Null values...')
 
-        elif stad.isnumeric():  # Checks if characters in the entry are numeric.
-            print('\nProduction Record Search by Work Order Number...')
-            ret = 1
-            stad = str(stad)
-            WONentry = stad                          # Obtain Work Order Number
-            DATEentry = '0'                          # Date was not used
-            lst_idx = 0
+        # elif isinstance(uWON, str):                # Search data rec by date
+        elif '\\' in uWON or '-' in uWON:
 
-        else:  # calculate the next boundary date
-            print('\nProduction Record Search by Production Date...')
-            rangeD = stad.split('-', 2)
-            print(rangeD)
-            # treat calendar special casess ------------------------[]
-            if rangeD[1] == '02' and rangeD[2] == '28':  # february
-                # print('AM HERE 1')
-                stpdA = int(rangeD[1]) + 1
-                stpdB = '01'
+            # calculate the next boundary date
+            print('\nSearch by Production Date...')
+            if '-' in uWON:
+                print('Dash found...')
+                rangeD = uWON.split('-', 2)
+                print('DT1:', rangeD)
+            else:
+                print('Slash found...')
+                rangeD = uWON.split('\\', 2)
+                print('DT2', rangeD)
 
-            elif rangeD[2] == '31':  # Jan, March, May, July, August, October, December
-                # print('AM HERE 2')
-                if (rangeD[1] == '01' or rangeD[1] == '03' or rangeD[1] == '05' or rangeD[1] == '07'
+            # treat calendar special cassess ------------------------[]
+            if rangeD[1] == '02' and rangeD[2] <= '28':  # Find February Month
+
+                nextDate = int(rangeD[2]) + 1       # New date interval
+
+                if nextDate > 28:                   # end search interval (i.e 28 + 1 = 29; this would mean 1/03/xx)
+                    stpdA = int(rangeD[1]) + 1      # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 28           # keep current date
+                else:
+                    stpdA = int(rangeD[1])          # keep the current Month
+                    stpdB = int(rangeD[2]) + 1      # Advance current date by 1
+
+            # elif rangeD[1] == '01' and rangeD[2] <= '31':   # Jan, March, May, July, August, October, December
+            elif (rangeD[1] == '01' or rangeD[1] == '03' or rangeD[1] == '05' or rangeD[1] == '07'
                         or rangeD[1] == '08' or rangeD[1] == '10' or rangeD[1] == '12'):
-                    stpdA = int(rangeD[1]) + 1
-                    stpdB = '01'
 
-            elif rangeD[2] == '30':  # April June, September, November
-                # print('AM HERE 3')
-                if rangeD[1] == '04' or rangeD[1] == '06' or rangeD[1] == '09' or rangeD[1] == '11':
-                    stpdA = int(rangeD[1]) + 1
-                    stpdB = '01'
+                nextDate = int(rangeD[2]) + 1               # New date interval
+                if nextDate > 31 and rangeD[1] == '01':     # end search interval
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 31                   # keep current date
+                elif nextDate > 31 and rangeD[1] == '03':
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 31                   # keep current date
+                elif nextDate > 31 and rangeD[1] == '05':
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 31                   # keep current date
+                elif nextDate > 31 and rangeD[1] == '07':
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 31                   # keep current date
+                elif nextDate > 31 and rangeD[1] == '08':
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 31                   # keep current date
+                elif nextDate > 31 and rangeD[1] == '10':
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 31                   # keep current date
+                elif nextDate > 31 and rangeD[1] == '12':
+                    stpdA = '01'                            # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 31                   # keep current date
+                else:
+                    stpdA = int(rangeD[1])                  # keep the current Month
+                    stpdB = int(rangeD[2]) + 1              # Advance current date by 1
 
+            elif rangeD[1] == '04' or rangeD[1] == '06' or rangeD[1] == '09' or rangeD[1] == '11': #rangeD[2] == '30':                         # April, June, September, November
+                nextDate = int(rangeD[2]) + 1               # New date interval
+                if nextDate > 30 and rangeD[1] == '04':     # Month and date search interval
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 30                   # keep current date
+                elif nextDate > 30 and rangeD[1] == '06':   # Month and date search interval
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 30                   # keep current date
+                elif nextDate > 30 and rangeD[1] == '09':   # Month and date search interval
+                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
+                    stpdB = nextDate - 30                   # keep current date
+                elif nextDate > 30 and rangeD[1] == '11':
+                    stpdA = int(rangeD[1]) + 1
+                    stpdB = nextDate - 30
+                else:
+                    stpdA = int(rangeD[1])                  # keep the current Month
+                    stpdB = int(rangeD[2]) + 1              # Advance current date by 1
             else:
                 # print('AM HERE 4')
                 stpdA = rangeD[1]
-                stpdB = int(rangeD[2]) + 1
-            DATEentry = rangeD[0] + '-' + str(stpdA) + '-' + str(stpdB)  # Date was used in search query
+                stpdB = int(rangeD[2])
 
-            # Convert to Work Order Number---
-            WON = stad.split('-')
-            WONentry = WON[0] + WON[1] + WON[2]
+            # Convert to Work Order Number--- YYYY-MM-DD -----------
+            fmDATE = rangeD[0] + '-' + str(stpdA - 1) + '-' + str(stpdB - 1)    # Date was used in search query
+            toDATE = rangeD[0] + '-' + str(stpdA) + '-' + str(stpdB)            # Date was used in search query
 
-        return DATEentry, WONentry
+            uWON = rangeD[0] + rangeD[1] + rangeD[2]
+            print('WON:', uWON)
+
+        else: #if uWON.isnumeric():  # Checks if characters in the entry are numeric.
+            print('\nSearch by Work Order Number...')
+            ret = 1
+            stad = str(uWON)
+            fmDATE, toDATE, uWON = '0', '0', stad        # Date was not used
+            print('WON:', uWON)
+
+        return fmDATE, toDATE, uWON
 
     # -------------------------------- APP MENU PROCEDURE START ------------------------------------------------[]
     def viewTypeA():    # enforce selection integrity ------------------[Cascade Tabb View]
@@ -9662,7 +9722,7 @@ def userMenu():     # listener, myplash
             # --- start parallel thread ----------------------------------#
             # cascadeViews()                                              # Critical Production Params
             retroPlay()                                                   # Call objective function
-            tabbed_cascadeMode()                                          # Default limited tabbed common screen + Casc
+            # tabbed_cascadeMode()                                        # Default limited tabbed common screen + Casc
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
@@ -9676,7 +9736,7 @@ def userMenu():     # listener, myplash
             # --- start parallel thread --------------------------------#
             # cascadeViews()                                            # Critical Production Params
             retroPlay()                                                 # Call objective function
-            tabbed_cascadeMode()                                        # Provide limited Tabb and multiple screen
+            # tabbed_cascadeMode()                                      # Provide limited Tabb and multiple screen
             exit_bit.append(1)
             HeadA, HeadB, closeV = 1, 0, 0
 
@@ -9721,7 +9781,7 @@ def userMenu():     # listener, myplash
             process.entryconfig(3, state='normal')
 
             retroPlay()                                                     # Call objective function
-            tabbed_canvas()                                                 # Tabbed Visualisation
+            # tabbed_canvas()                                               # Tabbed Visualisation
             exit_bit.append(0)
 
             HeadA, HeadB, closeV = 0, 1, 0                                  # call embedded functions
@@ -9734,7 +9794,7 @@ def userMenu():     # listener, myplash
                 process.entryconfig(3, state='normal')
 
                 retroPlay()                     # Call objective function
-                tabbed_canvas()                 # Tabbed Visualisation
+                # tabbed_canvas()               # Tabbed Visualisation
                 exit_bit.append(0)
                 HeadA, HeadB, closeV = 0, 1, 0
 
@@ -9805,8 +9865,10 @@ def userMenu():     # listener, myplash
             # cascadeViews()                                             # Critical Production Params
             import autoSPCGUI as lt
             conPLC = lt.splashT(root)
+
             # call realtime method -----------[]
             if conPLC:
+                inUseAlready.append(True)
                 realTimePlay()                                           # Call objective function (tabbed_cascade)
             else:
                 print('Failed connection...')
@@ -9831,6 +9893,7 @@ def userMenu():     # listener, myplash
             conPLC = lt.splashT(root)
             # call realtime method -----------[]
             if conPLC:
+                inUseAlready.append(True)
                 realTimePlay()                                           # Call objective function (tabbed_cascade)
             else:
                 print('Failed connection...')
@@ -9870,6 +9933,7 @@ def userMenu():     # listener, myplash
                 conPLC = lt.splashT(root)
                 # call realtime method -----------[]
                 if conPLC:
+                    inUseAlready.append(True)
                     realTimePlay()  # Call objective function (tabbed_cascade)
                 else:
                     print('Failed connection...')
@@ -9892,6 +9956,7 @@ def userMenu():     # listener, myplash
             conPLC = lt.splashT(root)
             # call realtime method -----------[]
             if conPLC:
+                inUseAlready.append(True)
                 realTimePlay()  # Call objective function (tabbed_cascade)
             else:
                 print('Failed connection...')
@@ -9911,6 +9976,7 @@ def userMenu():     # listener, myplash
             conPLC = lt.splashT(root)
             # call realtime method -----------[]
             if conPLC:
+                inUseAlready.append(True)
                 realTimePlay()  # Call objective function (tabbed_cascade)
             else:
                 print('Failed connection...')

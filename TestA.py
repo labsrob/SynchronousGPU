@@ -600,19 +600,44 @@ x = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type"
 # x = {"name": "John", "age": 30, "married": True, "divorced": False, "children": ("Ann","Billy"), "pets": None, "cars": [{"model": "BMW 230", "mpg": 27.5}, {"model": "Ford Edge", "mpg": 24.1}]}
 
 # convert into JSON ------------------------
-y = json.dumps(x)
-print('Data1', y)
+# y = json.dumps(x)
+# print('Data1', y)
+#
+# # Convert JSON to single quote string ------
+# z = json.loads(y)
+# print('Data2:', z)
+#
+# print('\nData3', z["features"])
+# print('\nData4', z["features"][0]['geometry'])
+# print('\nData5', z["features"][0]['properties'])  # -- embedded values in this Key
+#
+#
+# print('\n')
+#
+# for key in z:
+#    print("Key ID: %s , value: %s:" % (key, y[key]))
 
-# Convert JSON to single quote string ------
-z = json.loads(y)
-print('Data2:', z)
+# -----------------------------------------------------------------
+import tkinter as tk
+from tkinter import simpledialog
 
-print('\nData3', z["features"])
-print('\nData4', z["features"][0]['geometry'])
-print('\nData5', z["features"][0]['properties'])  # -- embedded values in this Key
+# Create the main Tkinter window
+root = tk.Tk()
+root.title("Customizing tkSimpleDialog.askstring")
+root.geometry("720x250")
 
+# Function to show the customized string input dialog
+def get_custom_string_input():
+   result = simpledialog.askstring("Custom Input", "Enter your name:", initialvalue="XlsPoint")
+   print('\nUser Req', result)
+   if result:
+      print("Entered name:", result)
+   else:
+      print('Empty values...')
 
-print('\n')
+# Create a button to call the get_custom_string_input function
+button = tk.Button(root, text="Get Custom String Input", command=get_custom_string_input)
+button.pack(pady=20)
 
-for key in z:
-   print("Key ID: %s , value: %s:" % (key, y[key]))
+# Start the Tkinter event loop
+root.mainloop()

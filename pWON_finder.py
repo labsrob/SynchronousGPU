@@ -47,21 +47,20 @@ def errorSearchWON():
     return
 
 
-def searchSqlData(DATEentry, WONentry):                   # Post Production data search
+def searchSqlData(sD1, sD2, uWON):                   # Post Production data search
     # ----------------------#
     # Load SQL server library
     import CommsSql as sql_con
 
-    StaSearchD = DATEentry                                      # Date Lower Boundary or WON #
-    EndSearchD = int(DATEentry) + 1                             # Date Upper Boundary or 0
-    EndSearchD = str(EndSearchD)
+    StaSearchD = str(sD1)                             # Date Lower Boundary or WON #
+    EndSearchD = str(sD2)
 
     # Test connection readiness and clear any flags ups.....
     sqlTableid = sql_con.DAQ_connect()  # Execute connection
     conn_sq = sqlTableid.cursor()       # Convert to cursor
 
     # ----------------------------------- If Search was by Date String ----------------------[]
-    if StaSearchD != '0' and WONentry == '0':               # If Date search
+    if StaSearchD != '0' and uWON == '0':               # If Date search
         print('\nWON: Date Search.')
 
         # Find out how many tables meet this condition -----[A]
@@ -96,11 +95,11 @@ def searchSqlData(DATEentry, WONentry):                   # Post Production data
             newWON = 0
 
         # ------------------------------------- If Search was by Work Order Number -----------------------[]
-    elif WONentry != 0 and StaSearchD == '0':                        # WON is searched by WO# -------[]
+    elif uWON != 0 and StaSearchD == '0':                        # WON is searched by WO# -------[]
         print('WON: Work Order Number Search... True')
 
         pTables = conn_sq.execute('Select count(*) AS ValidTotal from Information_schema.Tables where '
-                                     'TABLE_NAME like ' + "'" '%' + str(WONentry) + '%' "'").fetchone()
+                                     'TABLE_NAME like ' + "'" '%' + str(uWON) + '%' "'").fetchone()
         time.sleep(4)                                       # allow SQL server response delay
         nTables = pTables[0]                                # Pick total from sql column, add OEE table
         print('\nFound:', nTables, 'valid records..')
@@ -109,10 +108,10 @@ def searchSqlData(DATEentry, WONentry):                   # Post Production data
             # List out all valid tables, figure out OEE from the creation date --------------------------[]
             mTables = conn_sq.execute(
                 'SELECT type_desc AS schema_name, name as table_name, create_date from '
-                'sys.tables where name LIKE ' + "'" '%' + str(WONentry) + '%' "'" + 'order by name asc').fetchmany(
+                'sys.tables where name LIKE ' + "'" '%' + str(uWON) + '%' "'" + 'order by name asc').fetchmany(
                 nTables)
             checkOEE_date = mTables[1][2]
-            newWON = WONentry
+            newWON = uWON
             OEEdataID = searchOEERecs(conn_sq, checkOEE_date)         # get OEE file name
 
         else:
