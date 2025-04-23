@@ -9,6 +9,7 @@
 import numpy as np
 import pandas as pd
 import spcWatchDog as wd
+import ctypes
 
 # ----- PLC/SQL Query ---#
 import selDataColsGEN as gv     # General Table
@@ -471,22 +472,42 @@ def callback():
     return
 
 
-def menuExit():
-    print('\nExiting Local GUI, bye for now...')
-    print('Exit Bit:', len(exit_bit))
-    if not exit_bit:        # Check exit_bit for unitary value
-        root.quit()         # Exit Apps if exit_bit is empty
-        os._exit(0)         # Close out all process
+def check_pid(pid):
+    PROCESS_QUERY_INFROMATION = 0x1000
+    processHandle = ctypes.windll.kernel32.OpenProcess(PROCESS_QUERY_INFROMATION, 0, pid)
+    if processHandle == 0:
+        return False
     else:
-        if len(exit_bit) >= 1:
-            # Evaluate exit_bit as true (if cascade was called atr any point in time)
-            proc_list = [p1.pid, p2.pid, p3.pid, p4.pid]
-            for p in proc_list:
-                try:
-                    os.kill(p, signal.SIGTERM)
-                    print('Process:', p, ' terminated by the User')
-                except Exception:
-                    print(f'Process {p} failed to terminate!')
+        ctypes.windll.kernel32.CloseHandle(processHandle)
+    return True
+
+def menuExit():
+    # print('ExitBit H/L:', exit_bit)
+    inUse = os.getpid()
+
+    if not exit_bit:                                # Check exit_bit for unitary value
+        print('\nExiting Local GUI, bye for now...')
+        root.quit()                                 # Exit Apps if exit_bit is empty
+        os._exit(0)                                 # Close out all process
+
+    elif len(exit_bit) >= 4:
+        print('\nExiting Local GUI, bye for now...')
+
+        # Evaluate active process before exiting -------#
+        proc_list = [p1.pid, p2.pid, p3.pid, p4.pid]  # Evaluate exit_bit as true if all active
+        for p in proc_list:
+            try:
+                os.kill(p, signal.SIGTERM)
+                print('Process:', p, ' terminated by the User')
+            except Exception:
+                print(f'Process {p} failed to terminate, attempting force termination!')
+
+    elif len(exit_bit) < 4 and inUse:
+        print('Exiting...')
+        root.quit()
+        os._exit(0)
+
+    else:
         root.quit()
         os._exit(0)
 
@@ -9434,10 +9455,10 @@ def userMenu():     # listener, myplash
 
                 # ------- Indicate Record Date or WON ---------[TODO...]
                 sDate1, sDate2, uWON = searchBox()                                  # Popup dialogue
-                print('\nDate String - Between:', sDate1, 'and:', sDate2, 'WON-String', uWON)
+                print('\nDate String - Between:', sDate1, 'and:', sDate2, 'WON_#:', uWON)
                 # ---------------------------------------------[2]
-                if sDate1 == 0 and sDate2 == 0 and uWON == 0:
-                    print('Cancelled button pressed...')
+                if sDate1 == '?' and sDate2 == '?' and uWON == '?':
+                    print('Search Aborted!')
                     process.entryconfig(0, state='normal')
                 else:
                     print('Attempting connection with SQL Server...')
@@ -9445,8 +9466,12 @@ def userMenu():     # listener, myplash
                     runType.append(qType)
                     # Connect to SQL Server -----------------------[]
                     OEEdataID, processID = sqld.searchSqlData(sDate1, sDate2, uWON)     # Query SQL record
-                    print('\nSelecting Cascade View....')
-                    tabbed_cascadeMode(qType)   # Cascade
+                    if processID > 1:
+                        print('\nSelecting Cascade View....')
+                        tabbed_cascadeMode(qType)   # Cascade
+                    else:
+                        process.entryconfig(0, state='normal')
+                        print('Invalid post processing data or Production record not found..')
 
             elif (process.entrycget(1, 'state') == 'disabled'
                   and process.entrycget(0, 'state') == 'normal'
@@ -9460,9 +9485,10 @@ def userMenu():     # listener, myplash
 
                 # ------- Indicate Record Date or WON ---------[]
                 sDate1, sDate2, uWON = searchBox()                                   # Search for Production data
-                print('\nDate String - Between:', sDate1, 'and:', sDate2, 'WON-String', uWON)
-                if sDate1 == 0 and sDate2 == 0 and uWON == 0:
-                    print('Cancelled button pressed...')
+                print('\nDate String - Between:', sDate1, 'and:', sDate2, 'WON_#:', uWON)
+
+                if sDate1 == '?' and sDate2 == '?' and uWON == '?':
+                    print('Search Aborted!')
                     process.entryconfig(1, state='normal')
                 else:
                     print('Attempting connection with SQL Server...')
@@ -9471,8 +9497,12 @@ def userMenu():     # listener, myplash
                     # connect SQL Server and obtain Process ID ----#
                     OEEdataID, processID = sqld.searchSqlData(sDate1, sDate2, uWON)    # Query SQL record
                     # ---------------------------------------------[]
-                    print('\nSelecting Tabbed View....')
-                    tabbed_canvas(qType)        # Tabbed
+                    if processID > 1:
+                        print('\nSelecting Tabbed View....')
+                        tabbed_canvas(qType)        # Tabbed
+                    else:
+                        process.entryconfig(1, state='normal')
+                        print('Invalid post processing data or Production record not found..')
 
             else:
                 runtimeChange()
@@ -9584,10 +9614,12 @@ def userMenu():     # listener, myplash
         uWON = askstring(title="Date", prompt="Work Order Number (WON):", initialvalue="20240507", parent=root)
 
         # -----------------------############---------------------------[]
+        validWON = 8
+
         # Test for null entry -------------
         if uWON is None or uWON == '':
-            fmDATE, toDATE, uWON = '0', '0', '0'  # Date was not used
-            print('Search was cancelled, or Null values...')
+            fmDATE, toDATE, uWON = '?', '?', '?'  # Date was not used
+            print('Search was aborted by User action')
 
         # elif isinstance(uWON, str):                # Search data rec by date
         elif '\\' in uWON or '-' in uWON:
@@ -9674,12 +9706,15 @@ def userMenu():     # listener, myplash
             uWON = rangeD[0] + rangeD[1] + rangeD[2]
             print('WON:', uWON)
 
-        else: #if uWON.isnumeric():  # Checks if characters in the entry are numeric.
+        elif validWON == len(uWON):
             print('\nSearch by Work Order Number...')
             ret = 1
             stad = str(uWON)
             fmDATE, toDATE, uWON = '0', '0', stad        # Date was not used
             print('WON:', uWON)
+        else:
+            print('Search was aborted by Operator...')
+            return
 
         return fmDATE, toDATE, uWON
 

@@ -66,8 +66,9 @@ def searchSqlData(sD1, sD2, uWON):                   # Post Production data sear
         # Find out how many tables meet this condition -----[A]
         pTables = conn_sq.execute('SELECT COUNT(create_date) AS ValidTotal from sys.tables where '
                                      'create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND ' + "'" + EndSearchD + "'").fetchone()
+
         time.sleep(10)                                      # allow SQL server response delay
-        nTables = pTables[0]                                # pick values from sql column
+        nTables = pTables[2]                                # pick values from sql column
         total_T = int(nTables)
 
         if not total_T % 2 == 0:                            # Test value and add 1 if value is odd
@@ -85,18 +86,19 @@ def searchSqlData(sD1, sD2, uWON):                   # Post Production data sear
             newWON = mTables[1][1]                          # First_row, second column (Table_name)
             newWON = newWON.split('_')
             processWON.append(newWON[1])
-            newWON = processWON[0]
+            newREC = processWON[0]
             # OEEdataID = mTables[0][1]                     # Pick first table on the first row
             OEEdataID = mP.get_encodedFiles(StaSearchD)     # Computed OEE_ID for specific date
 
         else:
             errorSearchWON()                                # return error to the user.
+            newREC = 0
             OEEdataID = 0
-            newWON = 0
+            print('No matching records found !')
 
         # ------------------------------------- If Search was by Work Order Number -----------------------[]
     elif uWON != 0 and StaSearchD == '0':                        # WON is searched by WO# -------[]
-        print('WON: Work Order Number Search... True')
+        print('WON: Work Order Number Search...')
 
         pTables = conn_sq.execute('Select count(*) AS ValidTotal from Information_schema.Tables where '
                                      'TABLE_NAME like ' + "'" '%' + str(uWON) + '%' "'").fetchone()
@@ -111,22 +113,22 @@ def searchSqlData(sD1, sD2, uWON):                   # Post Production data sear
                 'sys.tables where name LIKE ' + "'" '%' + str(uWON) + '%' "'" + 'order by name asc').fetchmany(
                 nTables)
             checkOEE_date = mTables[1][2]
-            newWON = uWON
+            newREC = nTables
             OEEdataID = searchOEERecs(conn_sq, checkOEE_date)         # get OEE file name
 
         else:
             print('Invalid Work Order Number..')
             errorSearchWON()
+            newREC = 0
             OEEdataID = 0
-            newWON = 0
+
     else:
         print('Invalid Work Order Number..')
         errorSearchWON()
+        newREC = 0
         OEEdataID = mP.seek_OEE_data()                             # Default to current date's OEE
-        newWON = 0
-        conn = 0
 
-    return OEEdataID, newWON
+    return OEEdataID, newREC
 
 
 def searchOEERecs(conn, MatchOEE):
