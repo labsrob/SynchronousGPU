@@ -11,7 +11,7 @@ Puthor: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlEOLRP = [df1['tStamp'], df1['LyID'], df1['R1SP'],  df1['R1NV'], df1['R2SP'],
-             df1['R2NV'], df1['R3SP'], df1['R3NV'], df1['R4SP'], df1['R4NV'] ]
+    sqlEOLRP = [df1['tStmb'], df1['LyIDb'], df1['R1SPb'],  df1['R1NVb'], df1['R2SPb'],
+             df1['R2NVb'], df1['R3SPb'], df1['R3NVb'], df1['R4SPb'], df1['R4NVb'] ]
 
     return sqlEOLRP

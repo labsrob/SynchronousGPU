@@ -12,7 +12,7 @@ idx = count()
 now = datetime.now()
 
 dataList0 = []
-dTT, dST, dTG, dRM, dLP, dLA, dTP, dRF = [], [], [], [], [], [], [], []
+rTT, rST, rTG, rWS, rWA, rLP, rLA = [], [], [], [], [], [], []
 
 st_id  = 0                                               # SQL start index unless otherwise tracker!
 eol_sr = 0.5
@@ -25,24 +25,24 @@ def dnv_sqlexec(daq1, daq2, daq3, daq4, T1, T2, T3, T4, layerNo):
 
     # Procedure -----------------------------------------------------------------------------------------------[X]
     # -- Find out total number of column record per Ring -----[]
-    ttRa = daq1.execute(
+    Ra = daq1.execute(
         'Select count([R1H1TT]) AS ValidTotal from ' + "'" '%' + str(T1) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
-    stRb = daq1.execute(
-        'Select count([R1H1ST]) AS ValidTotal from ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+    Rb = daq1.execute(
+        'Select count([R1H1RP]) AS ValidTotal from ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
-    tgRc = daq1.execute(
-        'Select count([GaugeA1]) AS ValidTotal from ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+    Rc = daq1.execute(
+        'Select count([R1H1TP]) AS ValidTotal from ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
-    rmRd = daq1.execute(
-        'Select count([R4H1RM]) AS ValidTotal from ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+    Rd = daq1.execute(
+        'Select count([R1H1WS]) AS ValidTotal from ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
 
     # --- Compute sampling regime based on data volume -------[]
-    sp1 = ttRa * eol_sr
-    sp2 = stRb * eol_sr
-    sp3 = tgRc % 60            # Modulo evaluation for Tape Gap
-    sp4 = rmRd * eol_sr
+    sp1 = Ra * eol_sr
+    sp2 = Rb * eol_sr
+    sp3 = Rc % 60            # Modulo evaluation for Tape Placement
+    sp4 = Rd * eol_sr
     # ------------------ Load randomised samples --------------------------------------------------------------[A]
     dataTT = daq1.execute(
         'Select TOP ' + "'" '%' + str(sp1) + '%' "'" '* FROM ' + "'" '%' + str(T1) + '%' "'" ' where [cLayer] = '
@@ -55,7 +55,7 @@ def dnv_sqlexec(daq1, daq2, daq3, daq4, T1, T2, T3, T4, layerNo):
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dTT.append(result)
+            rTT.append(result)
         # print("Step List1:", len(dL1), dL1)       FIXME:
 
     else:
@@ -77,7 +77,7 @@ def dnv_sqlexec(daq1, daq2, daq3, daq4, T1, T2, T3, T4, layerNo):
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dST.append(result)
+            rST.append(result)
 
     else:
         print('Process EOF reached...')
@@ -98,27 +98,27 @@ def dnv_sqlexec(daq1, daq2, daq3, daq4, T1, T2, T3, T4, layerNo):
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dTG.append(result)
+            rTG.append(result)
 
     else:
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    daq1.close()
+    daq3.close()
 
     # Ramp Profile ------------------------------------------------------------------------------------------[D]
-    dataRM = daq4.execute(
+    dataWS = daq4.execute(
         'Select TOP ' + "'" '%' + str(sp4) + '%' "'" '* FROM ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = '
         + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-    if len(dataRM) != 0:
-        for result in dataRM:
+    if len(dataWS) != 0:
+        for result in dataWS:
             result = list(result)
             if UseRowIndex:
                 dataList0.append(next(idx))
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dRM.append(result)
+            rWS.append(result)
 
         # print("Step List1:", len(dL1), dL1)       FIXME:
 
@@ -127,13 +127,13 @@ def dnv_sqlexec(daq1, daq2, daq3, daq4, T1, T2, T3, T4, layerNo):
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq3.close()
+    daq4.close()
 
-    return dTT, dST, dTG, dRM, ttRa, stRb, tgRc, rmRd
+    return rTT, rST, rTG, rWS, Ra, Rb, Rc, Rd
 # -------------------------------------------------------------------------------------------------------[XXXXXXX]
 
 
-def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, T5, T6, T7, T8, layerNo):
+def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, T1, T2, T3, T4, T5, T6, layerNo):
     """
     NOTE:
     """
@@ -147,33 +147,26 @@ def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
         'Select count([R1H1ST]) AS ValidTotal from ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
     Rc = daq3.execute(
-        'Select count([GaugeA1]) AS ValidTotal from ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+        'Select count([R1H1TG]) AS ValidTotal from ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
     Rd = daq4.execute(
-        'Select count([R4H1RM]) AS ValidTotal from ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+        'Select count([R4H1WA]) AS ValidTotal from ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
     Re = daq5.execute(
         'Select count([R4H1LP]) AS ValidTotal from ' + "'" '%' + str(T5) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
+
     Rf = daq6.execute(
         'Select count([R4H1LA]) AS ValidTotal from ' + "'" '%' + str(T6) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
-    Rg = daq7.execute(
-        'Select count([R4H1TP]) AS ValidTotal from ' + "'" '%' + str(T7) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    Rh = daq8.execute(
-        'Select count([R4H1RF]) AS ValidTotal from ' + "'" '%' + str(T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
 
     # --- Compute sampling regime based on data volume -------[]
-    sp1 = Ra * eol_sr
-    sp2 = Rb * eol_sr
-    sp3 = Rc % 60             # Modulo evaluation for Tape Gap
-    sp4 = Rd * eol_sr
-    sp5 = Re * eol_sr
-    sp6 = Rf * eol_sr
-    sp7 = Rg * eol_sr
-    sp8 = Rh * eol_sr
+    sp1 = Ra * eol_sr       # TT
+    sp2 = Rb * eol_sr       # ST
+    sp3 = Rc % 60           # TG
+    sp4 = Rd * eol_sr       # WA
+    sp5 = Re * eol_sr       # LP
+    sp6 = Rf * eol_sr       # LA
 
     # ------------------ Load randomised samples ----------------------------------------------------------[A]
     dataTT = daq1.execute(
@@ -188,7 +181,7 @@ def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dTT.append(result)
+            rTT.append(result)
         # print("Step List1:", len(dL1), dL1)       FIXME:
 
     else:
@@ -212,7 +205,7 @@ def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dST.append(result)
+            rST.append(result)
 
     else:
         print('Process EOF reached...')
@@ -234,7 +227,7 @@ def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dTG.append(result)
+            rTG.append(result)
         # print("Step List1:", len(dL1), dL1)       FIXME:
 
     else:
@@ -245,19 +238,19 @@ def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
     daq3.close()
 
     # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataRM = daq4.execute(
+    dataWS = daq4.execute(
         'Select TOP ' + "'" '%' + str(sp4) + '%' "'" '* FROM ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = '
         + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
     # ------------------------------------------------------------------------------------------------------[]
-    if len(dataRM) != 0:
-        for result in dataRM:
+    if len(dataWS) != 0:
+        for result in dataWS:
             result = list(result)
             if UseRowIndex:
                 dataList0.append(next(idx))
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dRM.append(result)
+            rWS.append(result)
         # print("Step List1:", len(dL1), dL1)       FIXME:
 
     else:
@@ -280,7 +273,7 @@ def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dLP.append(result)
+            rLP.append(result)
 
     else:
         print('Process EOF reached...')
@@ -302,7 +295,7 @@ def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dLA.append(result)
+            rLA.append(result)
 
     else:
         print('Process EOF reached...')
@@ -311,47 +304,4 @@ def mgm_sqlexec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
 
     daq6.close()
 
-    # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataTP = daq7.execute(
-        'Select TOP ' + "'" '%' + str(sp7) + '%' "'" '* FROM ' + "'" '%' + str(T7) + '%' "'" ' where [cLayer] = '
-        + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-    # ------------------------------------------------------------------------------------------------------[]
-    if len(dataTP) != 0:
-        for result in dataTP:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dTP.append(result)
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
-    daq7.close()
-
-    # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataRF = daq6.execute(
-        'Select TOP ' + "'" '%' + str(sp8) + '%' "'" '* FROM ' + "'" '%' + str(T8) + '%' "'" ' where [cLayer] = '
-        + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
-    # ------------------------------------------------------------------------------------------------------[]
-    if len(dataRF) != 0:
-        for result in dataRF:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dRF.append(result)
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
-    daq4.close()
-
-    return dTT, dST, dTG, dRM, dLP, dLA, dTP, dRF, Ra, Rb, Rc, Rd, Re, Rf, Rg, Rh
+    return rTT, rST, rTG, rWS, rLP, rLA, Ra, Rb, Rc, Rd, Re, Rf

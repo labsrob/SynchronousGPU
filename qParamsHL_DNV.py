@@ -1209,7 +1209,7 @@ def decryptpProcessLim(WONID, processID):
     try:
         limX = config_object[processID + "HL_" + WONID]
 
-        if processID == 'TG':  # Tape Gag (Polarisation)
+        if processID == 'TG':  # Tape Gap (Polarisation)
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
             gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
@@ -1254,8 +1254,23 @@ def decryptpProcessLim(WONID, processID):
             tapeD = onetimepad.decrypt(limX['size18'+processID+'d4'], 'random')
             tapeE = onetimepad.decrypt(limX['size18'+processID+'d5'], 'random')
 
+        elif processID == 'WS':  # Substrate Temperature
+            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
+            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')
+            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
+            # ----------------------------------------------------------
+            tapeA = onetimepad.decrypt(limX['size20' + processID + 'd1'], 'random')
+            tapeB = onetimepad.decrypt(limX['size20' + processID + 'd2'], 'random')
+            tapeC = onetimepad.decrypt(limX['size20' + processID + 'd3'], 'random')
+            tapeD = onetimepad.decrypt(limX['size18' + processID + 'd4'], 'random')
+            tapeE = onetimepad.decrypt(limX['size18' + processID + 'd5'], 'random')
+
         else:
-            pass
+            print('Error! Invalid Process Choice..')
 
     except KeyError:
         print('Configuration file is missing. Loading default values...')

@@ -10,10 +10,10 @@ Check SQL data columns ...
 
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'EOLTT':
+    if pParam == 'TT':
         columns = [ # Tape Temperature --------------[]
-                   'tStamp', 'LyID', 'R1SP', 'R1NV', 'R2SP',
-                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
+                   'tStmp', 'LyIDa', 'R1SPa', 'R1NVa', 'R2SPa',
+                   'R2NVa', 'R3SPa', 'R3NVa', 'R4SPa',  'R4NVa']
 
 
     else:

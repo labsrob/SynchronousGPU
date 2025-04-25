@@ -25,9 +25,18 @@ import selDataColsTP as qtp     # Tape Placement error
 import selDataColsTT as qtt     # Tape Temperature
 import selDataColsVC as qvc     # void (gap) count
 import selDataColsVM as qvm     # Void mapping
-import selDataColsEoLRP as lrp  # End of Layer Roller Pressure
-import selDataColsEoLTP as ltp  # End of Layer Tape Placement
-import selDataColsEoLRP as ltt  # End of Layer Tape Temperature
+# ------------ EoL Report ------#
+# import selDataColsEoLTS as xts
+# ------------------------------#
+import selDataColsEoLTT as ott  # EoL Tape Temperature (Control Temperature)
+import selDataColsEoLST as ost  # EoL Substrate Temperature (on DNV)
+import selDataColsEoLTG as otg  # EoL Tape Gape (on DNV)
+import selDataColsEoLWS as ows  # EoL Winding Speed (on DNV)
+# ------------------------------#
+import selDataColsEoLLP as olp  # EoL Laser Power (on DNV)
+import selDataColsEoLLA as ola  # EoL Laser Angle (on DNV)
+import selDataColsEoLWA as owa  # EoL Winding Angle (on MGM)
+
 # ----- DNV/MGM Params ---#
 import selDataColsProcMonitor as qpm     # Production Monitors
 import selDataColsWA as qwa     # winding angle
@@ -850,21 +859,21 @@ class collectiveEoL(ttk.Frame):
     def createWidgets(self):
         # Load settings -------
         WON = processWON[0]
-        # Load metrics from config -----------------------------------[]
+        # Load metrics from config -----------------------------------[TG, TT, ST]
         if pRecipe == 'DNV':
             import qParamsHL_DNV as dnv
-            ttSize, ttgType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'TT')
-            stSize, stgType, stSEoL, stSEoP, stHL, stAL, stFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'ST')
-            tgSize, tggType, tgSEoL, tgSEoP, tgHL, tgAL, tgFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'TG')
+            ttSize, ttType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'TT')
+            stSize, stType, stSEoL, stSEoP, stHL, stAL, stFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'ST')
+            tgSize, tgType, tgSEoL, tgSEoP, tgHL, tgAL, tgFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'TG')
+            wsSize, wsType, wsSEoL, wsSEoP, wsHL, wsAL, wsFO, A, B, C, D, E = dnv.decryptpProcessLim(WON, 'WS')
         else:
             import qParamsHL_MGM as mgm
             lpSize, lpType, lpSEoL, lpSEoP, lpHL, lpAL, lpFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'LP')
             laSize, laType, laSEoL, laSEoP, laHL, laAL, laFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'LA')
-            tpSize, tpType, tpSEoL, tpSEoP, tpHL, tpAL, tpFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'TP')
-            rfSize, rfType, rfSEoL, rfSEoP, rfHL, rfAL, rfFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'RF')
             ttSize, ttType, ttSEoL, ttSEoP, ttHL, ttAL, ttFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'TT')
             stSize, stType, stSEoL, stSEoP, stHL, stAL, stFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'ST')
             tgSize, tgType, tgSEoL, tgSEoP, tgHL, tgAL, tgFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'TG')
+            waSize, waType, waSEoL, waSEoP, waHL, waAL, waFO, A, B, C, D, E = mgm.decryptpProcessLim(WON, 'WA')
 
         # ----------------------
         label = ttk.Label(self, text='[End of Layer Summary - ' + rType + ' Mode]', font=LARGE_FONT)
@@ -899,23 +908,21 @@ class collectiveEoL(ttk.Frame):
         # Load SQL Query Table ---------------------------------#
         if pRecipe == 'DNV':
             EoLRep = 'DNV'
-
+            # ---------- Based on Group's URS ------------------#
             T1 = WON + '_TT'    # Identify Table
             T2 = WON + '_ST'    # Identify Table
-            T3 = WON +'_TG'     # Table Identity
-            T4 = WON + '_RM'    # Identify Table
+            T3 = WON + '_TG'    # Table Identity
+            T4 = WON + '_WS'    # Identify Table
 
         elif pRecipe == 'MGM':
             EoLRep = 'MGM'
-
-            T1 = WON + '_TT'  # Identify Table
-            T2 = WON + '_ST'  # Identify Table
-            T3 = WON + '_TG'  # Table Identity
-            T4 = WON + '_RM'  # Identify Table
-            T5 = WON + '_LP'  # Identify Table
-            T6 = WON + '_LA'  # Identify Table
-            T7 = WON + '_TP'  # Identify Table
-            T8 = WON + '_RF'  # Identify Table
+            # --------- Based on Group's URS ------------------#
+            T1 = WON + '_LP'  # Identify Table
+            T2 = WON + '_LA'  # Identify Table
+            T3 = WON + '_TT'  # Table Identity
+            T4 = WON + '_ST'  # Identify Table
+            T5 = WON + '_TG'  # Identify Table
+            T6 = WON + '_WA'  # Identify Table
 
         else:
             pass
@@ -1027,7 +1034,7 @@ class collectiveEoL(ttk.Frame):
             im71, = a6.plot([], [], 'o-', label='Substrate Temp')
             im72, = a6.plot([], [], 'o-', label='Substrate Temp')
             im73, = a6.plot([], [], 'o-', label='Substrate Temp')
-            # ---------------------------------------------------------[3-7]
+            # --------------------------------------------------[Tape Gap x8]
             im74, = a3.plot([], [], 'o-', label='Tape Gap - (A1)')
             im75, = a3.plot([], [], 'o-', label='Tape Gap - (A2)')
             im76, = a3.plot([], [], 'o-', label='Tape Gap - (A3)')
@@ -1036,7 +1043,6 @@ class collectiveEoL(ttk.Frame):
             im79, = a3.plot([], [], 'o-', label='Tape Gap - (B2)')
             im80, = a3.plot([], [], 'o-', label='Tape Gap - (B3)')
             im81, = a3.plot([], [], 'o-', label='Tape Gap - (B4)')
-            # -----------------------------------------------------
             im82, = a7.plot([], [], 'o-', label='Tape Gap')
             im83, = a7.plot([], [], 'o-', label='Tape Gap')
             im84, = a7.plot([], [], 'o-', label='Tape Gap')
@@ -1046,14 +1052,14 @@ class collectiveEoL(ttk.Frame):
             im88, = a7.plot([], [], 'o-', label='Tape Gap')
             im89, = a7.plot([], [], 'o-', label='Tape Gap')
             # -------------------------------------------------------[Ramp Data]
-            im90, = a3.plot([], [], 'o-', label='Ramp Mappings - (R1)')     # Ring 1 value count per layer
-            im91, = a3.plot([], [], 'o-', label='Ramp Mappings - (R2)')     # Ring 2 value count per layer
-            im92, = a3.plot([], [], 'o-', label='Ramp Mappings - (R3)')     # Ring 3 value count per layer
-            im93, = a3.plot([], [], 'o-', label='Ramp Mappings - (R4)')     # Ring 4 value count per layer
-            # im94, = a7.plot([], [], 'o-', label='Tape Gap')
-            # im95, = a7.plot([], [], 'o-', label='Tape Gap')
-            # im96, = a7.plot([], [], 'o-', label='Tape Gap')
-            # im97, = a7.plot([], [], 'o-', label='Tape Gap')
+            im90, = a3.plot([], [], 'o-', label='Winding Speed - (R1)')     # Ring 1 value
+            im91, = a3.plot([], [], 'o-', label='Winding Speed - (R2)')     # Ring 2 value
+            im92, = a3.plot([], [], 'o-', label='Winding Speed - (R3)')     # Ring 3 value
+            im93, = a3.plot([], [], 'o-', label='Winding Speed - (R4)')     # Ring 4 value
+            # im94, = a7.plot([], [], 'o-', label='Winding Speed')
+            # im95, = a7.plot([], [], 'o-', label='Winding Speed')
+            # im96, = a7.plot([], [], 'o-', label='Winding Speed')
+            # im97, = a7.plot([], [], 'o-', label='Winding Speed')
         else:
             EoLRep = 'MGM'
             # ----------------------------------------[Tape Temperature x16]
@@ -1141,10 +1147,10 @@ class collectiveEoL(ttk.Frame):
             im88, = a7.plot([], [], 'o-', label='Tape Gap')
             im89, = a7.plot([], [], 'o-', label='Tape Gap')
             # -------------------------------------------------------[Ramp Data T4]
-            im90, = a3.plot([], [], 'o-', label='Ramp Mappings - (R1)')  # Ring 1 value count per layer
-            im91, = a3.plot([], [], 'o-', label='Ramp Mappings - (R2)')  # Ring 2 value count per layer
-            im92, = a3.plot([], [], 'o-', label='Ramp Mappings - (R3)')  # Ring 3 value count per layer
-            im93, = a3.plot([], [], 'o-', label='Ramp Mappings - (R4)')  # Ring 4 value count per layer
+            im90, = a3.plot([], [], 'o-', label='Winding Angle - (R1)')  # Ring 1 value count per layer
+            im91, = a3.plot([], [], 'o-', label='Winding Angle - (R2)')  # Ring 2 value count per layer
+            im92, = a3.plot([], [], 'o-', label='Winding Angle - (R3)')  # Ring 3 value count per layer
+            im93, = a3.plot([], [], 'o-', label='Winding Angle - (R4)')  # Ring 4 value count per layer
 
             # ---------------------------------------------------[Laser Power T5 x16]
             im94, = a2.plot([], [], 'o-', label='Laser Power - (R1H1)')
@@ -1213,85 +1219,17 @@ class collectiveEoL(ttk.Frame):
             im155, = a6.plot([], [], 'o-', label='Laser Angle')
             im156, = a6.plot([], [], 'o-', label='Laser Angle')
             im157, = a6.plot([], [], 'o-', label='Laser Angle')
-            # ---------------------------------------------[Tape Placement - x8]
-            im158, = a2.plot([], [], 'o-', label='Tape Placement - (R1H1)')
-            im159, = a2.plot([], [], 'o-', label='Tape Placement - (R1H2)')
-            im160, = a2.plot([], [], 'o-', label='Tape Placement - (R1H3)')
-            im161, = a2.plot([], [], 'o-', label='Tape Placement - (R1H4)')
-            im162, = a2.plot([], [], 'o-', label='Tape Placement - (R2H1)')
-            im163, = a2.plot([], [], 'o-', label='Tape Placement - (R2H2)')
-            im164, = a2.plot([], [], 'o-', label='Tape Placement - (R213)')
-            im165, = a2.plot([], [], 'o-', label='Tape Placement - (R2H4)')
-            im166, = a2.plot([], [], 'o-', label='Tape Placement - (R3H1)')
-            im167, = a2.plot([], [], 'o-', label='Tape Placement - (R3H2)')
-            im168, = a2.plot([], [], 'o-', label='Tape Placement - (R3H3)')
-            im169, = a2.plot([], [], 'o-', label='Tape Placement - (R3H4)')
-            im170, = a2.plot([], [], 'o-', label='Tape Placement - (R4H1)')
-            im171, = a2.plot([], [], 'o-', label='Tape Placement - (R4H2)')
-            im172, = a2.plot([], [], 'o-', label='Tape Placement - (R413)')
-            im173, = a2.plot([], [], 'o-', label='Tape Placement - (R4H4)')
-            # ---------
-            im174, = a6.plot([], [], 'o-', label='Tape Placement')
-            im175, = a6.plot([], [], 'o-', label='Tape Placement')
-            im176, = a6.plot([], [], 'o-', label='Tape Placement')
-            im177, = a6.plot([], [], 'o-', label='Tape Placement')
-            im178, = a6.plot([], [], 'o-', label='Tape Placement')
-            im179, = a6.plot([], [], 'o-', label='Tape Placement')
-            im180, = a6.plot([], [], 'o-', label='Tape Placement')
-            im181, = a6.plot([], [], 'o-', label='Tape Placement')
-            im182, = a6.plot([], [], 'o-', label='Tape Placement')
-            im183, = a6.plot([], [], 'o-', label='Tape Placement')
-            im184, = a6.plot([], [], 'o-', label='Tape Placement')
-            im185, = a6.plot([], [], 'o-', label='Tape Placement')
-            im186, = a6.plot([], [], 'o-', label='Tape Placement')
-            im187, = a6.plot([], [], 'o-', label='Tape Placement')
-            im188, = a6.plot([], [], 'o-', label='Tape Placement')
-            im189, = a6.plot([], [], 'o-', label='Tape Placement')
-            # --------------------------------------------------[Roller Force T8]
-            im190, = a2.plot([], [], 'o-', label='Roller Force - (R1H1)')
-            im191, = a2.plot([], [], 'o-', label='Roller Force - (R1H2)')
-            im192, = a2.plot([], [], 'o-', label='Roller Force - (R1H3)')
-            im193, = a2.plot([], [], 'o-', label='Roller Force - (R1H4)')
-            im194, = a2.plot([], [], 'o-', label='Roller Force - (R2H1)')
-            im195, = a2.plot([], [], 'o-', label='Roller Force - (R2H2)')
-            im196, = a2.plot([], [], 'o-', label='Roller Force - (R2H3)')
-            im197, = a2.plot([], [], 'o-', label='Roller Force - (R2H4)')
-            im198, = a2.plot([], [], 'o-', label='Roller Force - (R3H1)')
-            im199, = a2.plot([], [], 'o-', label='Roller Force - (R3H2)')
-            im200, = a2.plot([], [], 'o-', label='Roller Force - (R3H3)')
-            im201, = a2.plot([], [], 'o-', label='Roller Force - (R3H4)')
-            im202, = a2.plot([], [], 'o-', label='Roller Force - (R4H1)')
-            im203, = a2.plot([], [], 'o-', label='Roller Force - (R4H2)')
-            im204, = a2.plot([], [], 'o-', label='Roller Force - (R4H3)')
-            im205, = a2.plot([], [], 'o-', label='Roller Force - (R4H4)')
 
-            im206, = a6.plot([], [], 'o-', label='Roller Force')
-            im207, = a6.plot([], [], 'o-', label='Roller Force')
-            im208, = a6.plot([], [], 'o-', label='Roller Force')
-            im209, = a6.plot([], [], 'o-', label='Roller Force')
-            im210, = a6.plot([], [], 'o-', label='Roller Force')
-            im211, = a6.plot([], [], 'o-', label='Roller Force')
-            im212, = a6.plot([], [], 'o-', label='Roller Force')
-            im213, = a6.plot([], [], 'o-', label='Roller Force')
-            im214, = a6.plot([], [], 'o-', label='Roller Force')
-            im215, = a6.plot([], [], 'o-', label='Roller Force')
-            im216, = a6.plot([], [], 'o-', label='Roller Force')
-            im217, = a6.plot([], [], 'o-', label='Roller Force')
-            im218, = a6.plot([], [], 'o-', label='Roller Force')
-            im219, = a6.plot([], [], 'o-', label='Roller Force')
-            im220, = a6.plot([], [], 'o-', label='Roller Force')
-            im221, = a6.plot([], [], 'o-', label='Roller Force')
             # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 
         def synchronousEoL(layerNo):
 
             # Initialise SQL Data connection per listed Table --------------------[]
             if EoLRep == 'DNV':
-                eol1, eol2, eol3, eol4 = conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor()
+                l1, l2, l3, l4 = conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor()
             elif EoLRep == 'MGM':
-                eol1, eol2, eol3, eol4, eol5, eol6, eol7, eol8 = (conn.cursor(), conn.cursor(), conn.cursor(),
-                                                                  conn.cursor(), conn.cursor(), conn.cursor(),
-                                                                  conn.cursor(), conn.cursor())
+                l1, l2, l3, l4, l5, l6 = (conn.cursor(), conn.cursor(), conn.cursor(),
+                                      conn.cursor(), conn.cursor(), conn.cursor())
             else:
                 pass  # reserved for bespoke configuration
 
@@ -1312,19 +1250,17 @@ class collectiveEoL(ttk.Frame):
 
                 # ------ Process data fetch sequences --------------------------#
                 if EoLRep == 'DNV':
-                    rpTT, rpST, rpTG, rpRM, ttRa, stRb, tgRc, rmRd = sel.dnv_sqlexec(eol1, eol2, eol3, eol4, T1, T2, T3, T4,  layerNo)
+                    rpTT, rpST, rpTG, rpWS, Ra, Rb, Rc, Rd = sel.dnv_sqlexec(l1, l2, l3, l4, T1, T2, T3, T4,  layerNo)
                 else:
-                    rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF = sel.mgm_sqlexec(eol1, eol2, eol3, eol4, eol5, eol6,
-                                                                                     eol7, eol8, T1, T2, T3, T4, T5, T6,
-                                                                                     T7, T8, layerNo)
+                    rpTT, rpST, rpTG, rpWA, rpLP, rpLA, Ra, Rb, Rc, Rd, Re, Rf = sel.mgm_sqlexec(l1, l2, l3, l4, l5, l6, T1, T2, T3, T4, T5, T6, layerNo)
 
-                if rpTT > 0 and rpST > 0 and rpTG > 0 and rpRM > 0:
+                if rpTT > 0 and rpST > 0 and rpTG > 0 and rpWS > 0:
                     break
 
             if EoLRep == 'DNV':
-                 return rpTT, rpST, rpTG, rpRM
+                 return rpTT, rpST, rpTG, rpWS
             else:
-                return rpTT, rpST, rpTG, rpRM, rpLP, rpLA, rpTP, rpRF
+                return rpTT, rpST, rpTG, rpWA, rpLP, rpLA
 
         # ================== End of synchronous Method ==========================
         def asynchronousEoL(layerNo):
@@ -1333,58 +1269,59 @@ class collectiveEoL(ttk.Frame):
 
             # Obtain fetch SQl data from respective Tables -----#
             if EoLRep == 'DNV':
-                rdTT, rdST, rdTG, rdRM, Ra, Rb, Rc, Rd = synchronousEoL(layerNo)
+                rpTT, rpST, rpTG, rpWS, Ra, Rb, Rc, Rd = synchronousEoL(layerNo)
                 dbA = range(0, Ra)
                 dbB = range(0, Rb)
                 dbC = range(0, Rc)
                 dbD = range(0, Rd)
             else:
-                rdTT, rdST, rdTG, rdRM, rdLP, rdLA, rdTP, rdRF, Ra, Rb, Rc, Rd, Re, Rf, Rg, Rh = synchronousEoL(layerNo)
+                rpTT, rpST, rpTG, rpWA, rpLP, rpLA, Ra, Rb, Rc, Rd, Re, Rf = synchronousEoL(layerNo)
                 dbA = range(0, Ra)
                 dbB = range(0, Rb)
                 dbC = range(0, Rc)
                 dbD = range(0, Rd)
                 dbE = range(0, Re)
                 dbF = range(0, Rf)
-                dbG = range(0, Rg)
-                dbH = range(0, Rh)
 
             # --------------------------------------------------#
 
-            import varSQL_DFeol as el                            # load SQL variables column names | rfVarSQL
+            import varSQL_EOLrpt as el                            # load SQL variables column names | rfVarSQL
 
             if EoLRep == 'DNV':
-                g1 = eol.validCols(T1)                           # Construct Table Column (Tape Temp)
-                d1 = pd.DataFrame(rdTT, columns=g1)
-                g2 = eol.validCols(T2)                           # Construct Table Column (Sub Temp)
-                d2 = pd.DataFrame(rdST, columns=g2)
-                g3 = eol.validCols(T3)                           # Construct Table Column (Tape Gap)
-                d3 = pd.DataFrame(rdTG, columns=g3)
-                g4 = eol.validCols(T4)                           # Construct Table Column (Tape Gap)
-                d4 = pd.DataFrame(rdRM, columns=g4)
+                g1 = ott.validCols(T1)                           # Construct Table Column (Tape Temp)
+                d1 = pd.DataFrame(rpTT, columns=g1)
+
+                g2 = ost.validCols(T2)                           # Construct Table Column (Sub Temp)
+                d2 = pd.DataFrame(rpST, columns=g2)
+
+                g3 = otg.validCols(T3)                           # Construct Table Column (Tape Gap)
+                d3 = pd.DataFrame(rpTG, columns=g3)
+
+                g4 = ows.validCols(T4)                           # Construct Table Column (Tape Gap)
+                d4 = pd.DataFrame(rpWS, columns=g4)
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2, d3, d4], axis=1)
 
             elif EoLRep == 'MGM':
-                g1 = eol.validCols(T1)                          # Construct Table Column (Tape Temp)
-                d1 = pd.DataFrame(rdTT, columns=g1)
-                g2 = eol.validCols(T2)                          # Construct Table Column (Sub Temp)
-                d2 = pd.DataFrame(rdST, columns=g2)
-                g3 = eol.validCols(T3)                          # Construct Table Column (Tape Gap)
-                d3 = pd.DataFrame(rdTG, columns=g3)
-                g4 = eol.validCols(T4)                          # Construct Table Column (Tape Gap)
-                d4 = pd.DataFrame(rdRM, columns=g4)
-                # ---------------------------------
-                g5 = qpm.validCols(T5)                          # Laser Power
-                d5 = pd.DataFrame(rdLP, columns=g5)
-                g6 = qpm.validCols(T6)                          # Laser Angle
-                d6 = pd.DataFrame(rdLA, columns=g6)
-                g7= qpm.validCols(T7)                           # Tape Placement
-                d7 = pd.DataFrame( rdTP, columns=g7)
-                g8 = qpm.validCols(T8)                          # Roller Force
-                d8 = pd.DataFrame( rdRF, columns=g8)
+                g1 = ott.validCols(T1)                          # Construct Table Column (Tape Temp)
+                d1 = pd.DataFrame(rpTT, columns=g1)
+
+                g2 = ost.validCols(T2)                          # Construct Table Column (Sub Temp)
+                d2 = pd.DataFrame(rpST, columns=g2)
+
+                g3 = otg.validCols(T3)                          # Construct Table Column (Tape Gap)
+                d3 = pd.DataFrame(rpTG, columns=g3)
+
+                g4 = owa.validCols(T4)                          # Construct Table Column (Tape Gap)
+                d4 = pd.DataFrame(rpWA, columns=g4)
+
+                g5 = olp.validCols(T5)                          # Construct Table Column (Tape Gap)
+                d5 = pd.DataFrame(rpLP, columns=g5)
+
+                g6 = ola.validCols(T6)                          # Construct Table Column (Tape Gap)
+                d6 = pd.DataFrame(rpLA, columns=g6)
                 # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2, d3, d4, d5, d6, d7, d8], axis=1)
+                df1 = pd.concat([d1, d2, d3, d4, d5, d6], axis=1)
             else:
                 df1 = 0
                 pass
@@ -1520,108 +1457,6 @@ class collectiveEoL(ttk.Frame):
             im123.set_xdata(range(0, Re))
             im124.set_xdata(range(0, Re))
             im125.set_xdata(range(0, Re))
-            # ------------------------------ X Plot LA
-            im126.set_xdata(range(0, Rf))
-            im127.set_xdata(range(0, Rf))
-            im128.set_xdata(range(0, Rf))
-            im129.set_xdata(range(0, Rf))
-            im130.set_xdata(range(0, Rf))
-            im131.set_xdata(range(0, Rf))
-            im132.set_xdata(range(0, Rf))
-            im133.set_xdata(range(0, Rf))
-            im134.set_xdata(range(0, Rf))
-            im135.set_xdata(range(0, Rf))
-            im136.set_xdata(range(0, Rf))
-            im137.set_xdata(range(0, Rf))
-            im138.set_xdata(range(0, Rf))
-            im139.set_xdata(range(0, Rf))
-            im140.set_xdata(range(0, Rf))
-            im141.set_xdata(range(0, Rf))
-            # ----------------------------- S Plot LA
-            im142.set_xdata(range(0, Rf))
-            im143.set_xdata(range(0, Rf))
-            im144.set_xdata(range(0, Rf))
-            im145.set_xdata(range(0, Rf))
-            im146.set_xdata(range(0, Rf))
-            im147.set_xdata(range(0, Rf))
-            im148.set_xdata(range(0, Rf))
-            im149.set_xdata(range(0, Rf))
-            im150.set_xdata(range(0, Rf))
-            im151.set_xdata(range(0, Rf))
-            im152.set_xdata(range(0, Rf))
-            im153.set_xdata(range(0, Rf))
-            im154.set_xdata(range(0, Rf))
-            im155.set_xdata(range(0, Rf))
-            im156.set_xdata(range(0, Rf))
-            im157.set_xdata(range(0, Rf))
-            # -------------------------------- X Plot TP
-            im158.set_xdata(range(0, Rg))
-            im159.set_xdata(range(0, Rg))
-            im160.set_xdata(range(0, Rg))
-            im161.set_xdata(range(0, Rg))
-            im162.set_xdata(range(0, Rg))
-            im163.set_xdata(range(0, Rg))
-            im164.set_xdata(range(0, Rg))
-            im165.set_xdata(range(0, Rg))
-            im166.set_xdata(range(0, Rg))
-            im167.set_xdata(range(0, Rg))
-            im168.set_xdata(range(0, Rg))
-            im169.set_xdata(range(0, Rg))
-            im170.set_xdata(range(0, Rg))
-            im171.set_xdata(range(0, Rg))
-            im172.set_xdata(range(0, Rg))
-            im173.set_xdata(range(0, Rg))
-            # ------------------------------- S Pot TP
-            im174.set_xdata(range(0, Rg))
-            im175.set_xdata(range(0, Rg))
-            im176.set_xdata(range(0, Rg))
-            im177.set_xdata(range(0, Rg))
-            im178.set_xdata(range(0, Rg))
-            im179.set_xdata(range(0, Rg))
-            im180.set_xdata(range(0, Rg))
-            im181.set_xdata(range(0, Rg))
-            im182.set_xdata(range(0, Rg))
-            im183.set_xdata(range(0, Rg))
-            im184.set_xdata(range(0, Rg))
-            im185.set_xdata(range(0, Rg))
-            im186.set_xdata(range(0, Rg))
-            im187.set_xdata(range(0, Rg))
-            im188.set_xdata(range(0, Rg))
-            im189.set_xdata(range(0, Rg))
-            # ---------------------------- X Plot RF
-            im190.set_xdata(range(0, Rh))
-            im191.set_xdata(range(0, Rh))
-            im192.set_xdata(range(0, Rh))
-            im193.set_xdata(range(0, Rh))
-            im194.set_xdata(range(0, Rh))
-            im195.set_xdata(range(0, Rh))
-            im196.set_xdata(range(0, Rh))
-            im197.set_xdata(range(0, Rh))
-            im198.set_xdata(range(0, Rh))
-            im199.set_xdata(range(0, Rh))
-            im200.set_xdata(range(0, Rh))
-            im201.set_xdata(range(0, Rh))
-            im202.set_xdata(range(0, Rh))
-            im203.set_xdata(range(0, Rh))
-            im204.set_xdata(range(0, Rh))
-            im205.set_xdata(range(0, Rh))
-            # --------------------------- S Plot RF
-            im206.set_xdata(range(0, Rh))
-            im207.set_xdata(range(0, Rh))
-            im208.set_xdata(range(0, Rh))
-            im209.set_xdata(range(0, Rh))
-            im210.set_xdata(range(0, Rh))
-            im211.set_xdata(range(0, Rh))
-            im212.set_xdata(range(0, Rh))
-            im213.set_xdata(range(0, Rh))
-            im214.set_xdata(range(0, Rh))
-            im215.set_xdata(range(0, Rh))
-            im216.set_xdata(range(0, Rh))
-            im217.set_xdata(range(0, Rh))
-            im218.set_xdata(range(0, Rh))
-            im219.set_xdata(range(0, Rh))
-            im220.set_xdata(range(0, Rh))
-            im221.set_xdata(range(0, Rh))
 
             if EoLRep == 'DNV':
                 # X Plot Y-Axis data points for XBar ---------------------------------------------[ Mean T1 ]
@@ -8444,7 +8279,7 @@ def userMenu():     # listener, myplash
         height = (95 + y_start + (y_incmt * 5))
         w, h = 520, height  # 450
 
-        pop.title('Setting Chart Parameters')
+        pop.title('Configure Samples & Parameters')
         screen_w = pop.winfo_screenwidth()
         screen_h = pop.winfo_screenheight()
         x_c = int((screen_w / 2) - (w / 2))
@@ -8504,7 +8339,7 @@ def userMenu():     # listener, myplash
         separatorU.place(relx=0.01, rely=0.53, relwidth=0.75, relheight=0.01)  # y=7.3
 
         # ---------------------------------------------------------------------#
-        Label(pop, text='[Configure Quality Parameters]', font=("bold", 10)).place(x=10,
+        Label(pop, text='[Configure Statistical Limits]', font=("bold", 10)).place(x=10,
                                                                              y=(y_start + 5) + (y_incmt * 3))  # 320 | 7
 
         # --------------------------------------------------------------------------------------------#
@@ -8522,14 +8357,14 @@ def userMenu():     # listener, myplash
         mgm_butt.place(x=380, y=3 + y_start + y_incmt * 4)  # 350 | 8
         # --------------------------------------------------------------------------------------------#
 
-        p1 = Checkbutton(pop, text="DNV Quality Limits", font=("bold", 10), variable=pLmtA, command=enDNV)
+        p1 = Checkbutton(pop, text="Set DNV Limits", font=("bold", 10), variable=pLmtA, command=enDNV)
         p1.place(x=10, y=3 + y_start + y_incmt * 4)         # 353
 
-        p2 = Checkbutton(pop, text="Automatic Limits", font=("bold", 10), variable=shewhart, command=enAUTO)
+        p2 = Checkbutton(pop, text="Use Auto Limits", font=("bold", 10), variable=shewhart, command=enAUTO)
         p2.place(x=10, y=y_start + y_incmt * 5)             # 373 | 9
         shewhart.set(1)
 
-        p3 = Checkbutton(pop, text="Commercial Limits", font=("bold", 10), variable=pLmtB, command=enMGM)
+        p3 = Checkbutton(pop, text="Set MGM Limits", font=("bold", 10), variable=pLmtB, command=enMGM)
         p3.place(x=10, y=y_start + y_incmt * 6)             # 393 |10
 
         def display_selection(event):
@@ -9611,7 +9446,7 @@ def userMenu():     # listener, myplash
         # center root window --------------
         pop.tk.eval(f'tk::PlaceWindow {pop._w} center')
         pop.withdraw()
-        uWON = askstring(title="Date", prompt="Work Order Number (WON):", initialvalue="20240507", parent=root)
+        uWON = askstring(title="Search Records", prompt="By WON / (YYYY-MM-DD)", initialvalue="20240507", parent=root)
 
         # -----------------------############---------------------------[]
         validWON = 8
@@ -9622,7 +9457,7 @@ def userMenu():     # listener, myplash
             print('Search was aborted by User action')
 
         # elif isinstance(uWON, str):                # Search data rec by date
-        elif '\\' in uWON or '-' in uWON:
+        elif '\\' in uWON or '-' in uWON or '/' in uWON:
 
             # calculate the next boundary date
             print('\nSearch by Production Date...')
@@ -9630,78 +9465,59 @@ def userMenu():     # listener, myplash
                 print('Dash found...')
                 rangeD = uWON.split('-', 2)
                 print('DT1:', rangeD)
-            else:
-                print('Slash found...')
+
+            elif '\\' in uWON:
+                print('Slash found...\\')
                 rangeD = uWON.split('\\', 2)
                 print('DT2', rangeD)
 
-            # treat calendar special cassess ------------------------[]
-            if rangeD[1] == '02' and rangeD[2] <= '28':  # Find February Month
+            else:
+                print('Slash found.../')
+                rangeD = uWON.split('/', 2)
+                print('DT2', rangeD)
 
-                nextDate = int(rangeD[2]) + 1       # New date interval
+            # ----------------------------------------------#
+            begMO = int(rangeD[1])
+            begDA = int(rangeD[2])                          # The current Month
+            nextMnth = int(rangeD[1]) + 1                   # New Month interval
+            nextDate = int(rangeD[2]) + 1                   # New date interval
 
-                if nextDate > 28:                   # end search interval (i.e 28 + 1 = 29; this would mean 1/03/xx)
-                    stpdA = int(rangeD[1]) + 1      # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 28           # keep current date
+            # treat calendar special cases ----------------[]
+            if rangeD[1] == '02':                           # Find February Month (28)
+                if nextDate > 28:                           # February
+                    endMO = nextMnth                        # Spilling into next Month
+                    endDA = nextDate - 28                   # keep current date
                 else:
-                    stpdA = int(rangeD[1])          # keep the current Month
-                    stpdB = int(rangeD[2]) + 1      # Advance current date by 1
+                    endMO = int(rangeD[1])                  # The current Day
+                    endDA = nextDate                        # Current date + 1
 
-            # elif rangeD[1] == '01' and rangeD[2] <= '31':   # Jan, March, May, July, August, October, December
+            # -----------------------------------   # Jan, March, May, July, August, October, December
             elif (rangeD[1] == '01' or rangeD[1] == '03' or rangeD[1] == '05' or rangeD[1] == '07'
                         or rangeD[1] == '08' or rangeD[1] == '10' or rangeD[1] == '12'):
-
-                nextDate = int(rangeD[2]) + 1               # New date interval
-                if nextDate > 31 and rangeD[1] == '01':     # end search interval
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 31                   # keep current date
-                elif nextDate > 31 and rangeD[1] == '03':
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 31                   # keep current date
-                elif nextDate > 31 and rangeD[1] == '05':
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 31                   # keep current date
-                elif nextDate > 31 and rangeD[1] == '07':
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 31                   # keep current date
-                elif nextDate > 31 and rangeD[1] == '08':
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 31                   # keep current date
-                elif nextDate > 31 and rangeD[1] == '10':
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 31                   # keep current date
-                elif nextDate > 31 and rangeD[1] == '12':
-                    stpdA = '01'                            # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 31                   # keep current date
+                # ------------------------------------------#
+                if nextDate > 31:                           # end search interval
+                   endMO = nextMnth                         # Spilling into next Month
+                   endDA = nextDate - 31                    # keep current date
                 else:
-                    stpdA = int(rangeD[1])                  # keep the current Month
-                    stpdB = int(rangeD[2]) + 1              # Advance current date by 1
+                    endMO = int(rangeD[1])                  # The current Day
+                    endDA = nextDate                        # Current date + 1
 
             elif rangeD[1] == '04' or rangeD[1] == '06' or rangeD[1] == '09' or rangeD[1] == '11': #rangeD[2] == '30':                         # April, June, September, November
-                nextDate = int(rangeD[2]) + 1               # New date interval
-                if nextDate > 30 and rangeD[1] == '04':     # Month and date search interval
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 30                   # keep current date
-                elif nextDate > 30 and rangeD[1] == '06':   # Month and date search interval
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 30                   # keep current date
-                elif nextDate > 30 and rangeD[1] == '09':   # Month and date search interval
-                    stpdA = int(rangeD[1]) + 1              # advance current Month by 1 (1st March)
-                    stpdB = nextDate - 30                   # keep current date
-                elif nextDate > 30 and rangeD[1] == '11':
-                    stpdA = int(rangeD[1]) + 1
-                    stpdB = nextDate - 30
+
+                if nextDate > 30:                           # Month and date search interval
+                    endMO = nextMnth                        # Spilling into next Month
+                    endDA = nextDate - 31                   # keep current date
                 else:
-                    stpdA = int(rangeD[1])                  # keep the current Month
-                    stpdB = int(rangeD[2]) + 1              # Advance current date by 1
+                    endMO = int(rangeD[1])                  # The current Day
+                    endDA = nextDate                        # Current date + 1
             else:
                 # print('AM HERE 4')
-                stpdA = rangeD[1]
-                stpdB = int(rangeD[2])
+                endMO = int(rangeD[1])                      # The current Day
+                endDA = nextDate                            # Current date + 1
 
             # Convert to Work Order Number--- YYYY-MM-DD -----------
-            fmDATE = rangeD[0] + '-' + str(stpdA - 1) + '-' + str(stpdB - 1)    # Date was used in search query
-            toDATE = rangeD[0] + '-' + str(stpdA) + '-' + str(stpdB)            # Date was used in search query
+            fmDATE = rangeD[0] + '-' + str(begMO) + '-' + str(begDA)    # Date was used in search query
+            toDATE = rangeD[0] + '-' + str(endMO) + '-' + str(endDA)    # Date was used in search query
 
             uWON = rangeD[0] + rangeD[1] + rangeD[2]
             print('WON:', uWON)
@@ -10147,7 +9963,7 @@ def userMenu():     # listener, myplash
     sub_menu.add_command(label="SQL Connectivity", command=serverSQLConfig, accelerator="Ctrl+S")
     sub_menu.add_command(label="PLC Connectivity", command=serverPLCConfig, accelerator="Ctrl+P")
 
-    filemenu.add_command(label="Statistical Limits", command=newMetricsConfig, accelerator="Ctrl+L")
+    filemenu.add_command(label="Statistical Process", command=newMetricsConfig, accelerator="Ctrl+L")
 
     filemenu.add_separator()
     filemenu.add_command(label="Disconnect SQL Data", command=sCloseConnSQL, accelerator="Alt+S")  # enabled on connection

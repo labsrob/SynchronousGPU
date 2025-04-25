@@ -1992,22 +1992,7 @@ def decryptpProcessLim(WONID, processID):
     try:
         limX = config_object[processID +"HL_" + WONID]
 
-        if processID == 'RF':
-            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
-            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
-            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')     # End of Pipe sample space
-            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
-            # ----------------------------------------------------------
-            tapeA = onetimepad.decrypt(limX['size20'+processID+'d1'], 'random')
-            tapeB = onetimepad.decrypt(limX['size18'+processID+'d2'], 'random')
-            tapeC = 0
-            tapeD = 0
-            tapeE = 0
-
-        elif processID == 'LP':
+        if processID == 'LP':
             gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
             gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
             gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
@@ -2018,36 +2003,6 @@ def decryptpProcessLim(WONID, processID):
             # ----------------------------------------------------------
             tapeA = onetimepad.decrypt(limX['size20'+processID+'d1'], 'random')
             tapeB = onetimepad.decrypt(limX['size18'+processID+'d2'], 'random')
-            tapeC = 0
-            tapeD = 0
-            tapeE = 0
-
-        elif processID == 'TG':
-            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
-            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random') # End of Layer sample space
-            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
-            # ----------------------------------------------------------
-            tapeA = onetimepad.decrypt(limX['Size'+processID+'d1'], 'random')
-            tapeB = 0
-            tapeC = 0
-            tapeD = 0
-            tapeE = 0
-
-        elif processID == 'TP':     # Tape Placementr Error(Keyance)
-            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
-            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
-            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
-            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
-            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
-            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
-            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
-            # ----------------------------------------------------------
-            tapeA = onetimepad.decrypt(limX['Size' + processID + 'd1'], 'random')
-            tapeB = 0
             tapeC = 0
             tapeD = 0
             tapeE = 0
@@ -2096,6 +2051,36 @@ def decryptpProcessLim(WONID, processID):
             tapeC = onetimepad.decrypt(limX['size20'+processID+'d3'], 'random')
             tapeD = onetimepad.decrypt(limX['size18'+processID+'d4'], 'random')
             tapeE = onetimepad.decrypt(limX['size18'+processID+'d5'], 'random')
+
+        elif processID == 'TG':
+            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
+            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random') # End of Layer sample space
+            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
+            # ----------------------------------------------------------
+            tapeA = onetimepad.decrypt(limX['Size'+processID+'d1'], 'random')
+            tapeB = 0
+            tapeC = 0
+            tapeD = 0
+            tapeE = 0
+
+        elif processID == 'WA':     # Tape Placementr Error(Keyance)
+            gen10 = onetimepad.decrypt(limX['SmpleSize'], 'random')
+            gen20 = onetimepad.decrypt(limX['GroupType'], 'random')
+            gen25 = onetimepad.decrypt(limX['SEOLSpace'], 'random')     # End of Layer sample space
+            gen26 = onetimepad.decrypt(limX['SEOPSpace'], 'random')
+            gen30 = onetimepad.decrypt(limX['EnableDNV'], 'random')
+            gen40 = onetimepad.decrypt(limX['EnableAUT'], 'random')
+            gen50 = onetimepad.decrypt(limX['EnableMGM'], 'random')
+            # ----------------------------------------------------------
+            tapeA = onetimepad.decrypt(limX['Size' + processID + 'd1'], 'random')
+            tapeB = 0
+            tapeC = 0
+            tapeD = 0
+            tapeE = 0
 
         else:
             pass
