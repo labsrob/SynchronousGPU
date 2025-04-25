@@ -1460,7 +1460,7 @@ class collectiveEoL(ttk.Frame):
 
             if EoLRep == 'DNV':
                 # X Plot Y-Axis data points for XBar ---------------------------------------------[ Mean T1 ]
-                im10.set_ydata((EL[0]).rolling(window=ttSize, step=ttgType).mean()[0:dbA])  # head 1
+                im10.set_ydata((EL[0]).rolling(window=ttSize, step=ttType).mean()[0:dbA])  # head 1
                 im11.set_ydata((EL[1]).rolling(window=ttSize, min_periods=1).mean()[0:dbA])  # head 2
                 im12.set_ydata((EL[2]).rolling(window=ttSize, min_periods=1).mean()[0:dbA])  # head 3
                 im13.set_ydata((EL[3]).rolling(window=ttSize, min_periods=1).mean()[0:dbA])  # head 4
