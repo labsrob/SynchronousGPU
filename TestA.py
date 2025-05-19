@@ -618,26 +618,159 @@ x = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type"
 #    print("Key ID: %s , value: %s:" % (key, y[key]))
 
 # -----------------------------------------------------------------
-import tkinter as tk
-from tkinter import simpledialog
+import torch
+import torchvision
+import subprocess
 
-# Create the main Tkinter window
-root = tk.Tk()
-root.title("Customizing tkSimpleDialog.askstring")
-root.geometry("720x250")
+print('Cuda Available:', torch.cuda.is_available())
 
-# Function to show the customized string input dialog
-def get_custom_string_input():
-   result = simpledialog.askstring("Custom Input", "Enter your name:", initialvalue="XlsPoint")
-   print('\nUser Req', result)
-   if result:
-      print("Entered name:", result)
-   else:
-      print('Empty values...')
+try:
+    subprocess.check_output('nvidia-smi')
+    print('Nvidia GPU detected!')
+except Exception:
+    print('No Nvidia GPU in system!')
 
-# Create a button to call the get_custom_string_input function
-button = tk.Button(root, text="Get Custom String Input", command=get_custom_string_input)
-button.pack(pady=20)
+# --------------------------------------------------
+import torch
+import GPUtil as gp
 
-# Start the Tkinter event loop
-root.mainloop()
+use_cuda = gp.getAvailable()
+print('\nCUDA Available', use_cuda)
+print(torch.version.cuda)
+
+if use_cuda:
+    print('__CUDNN VERSION:', torch.backends.cudnn.version())
+    print('__Number CUDA Devices:', torch.cuda.device_count())
+    print('__CUDA Device Name:', torch.cuda.get_device_name(0))
+    print('__CUDA Device Total Memory [GB]:',torch.cuda.get_device_properties(0).total_memory/1e9)
+else:
+    print('GPU Not detected...')
+    device = torch.device("cuda" if use_cuda else "cpu")
+    print("Device In Use: ", device)
+
+# Payload Tester ---------------------------#
+from numba import jit, cuda
+import numpy as np
+# to measure exec time
+from timeit import default_timer as timer
+
+# ----- Factorial TIme ------
+def heap_permutation(data, n):
+    if n == 1:
+        print(data)
+        return
+
+    for i in range(n):
+        heap_permutation(data, n - 1)
+        if n % 2 == 0:
+            data[i], data[n - 1] = data[n - 1], data[i]
+        else:
+            data[0], data[n - 1] = data[n - 1], data[0]
+
+
+def merge_sort(data):
+    if len(data) <= 1:
+        return
+
+    mid = len(data) // 2
+    left_data = data[:mid]
+    right_data = data[mid:]
+
+    merge_sort(left_data)
+    merge_sort(right_data)
+
+    left_index = 0
+    right_index = 0
+    data_index = 0
+
+    while left_index < len(left_data) and right_index < len(right_data):
+        if left_data[left_index] < right_data[right_index]:
+            data[data_index] = left_data[left_index]
+            left_index += 1
+        else:
+            data[data_index] = right_data[right_index]
+            right_index += 1
+        data_index += 1
+
+    if left_index < len(left_data):
+        del data[data_index:]
+        data += left_data[left_index:]
+    elif right_index < len(right_data):
+        del data[data_index:]
+        data += right_data[right_index:]
+
+def binary_search(data, value):
+    n = len(data)
+    left = 0
+    right = n - 1
+    while left <= right:
+        middle = (left + right) // 2
+        if value < data[middle]:
+            right = middle - 1
+        elif value > data[middle]:
+            left = middle + 1
+        else:
+            return middle
+    raise ValueError('Value is not in the list')
+
+def linear_search(data, value):
+    for index in range(len(data)):
+        if value == data[index]:
+            return index
+    raise ValueError('Value not found in the list')
+
+def bubble_sort(data):
+    swapped = True
+    while swapped:
+        swapped = False
+        for i in range(len(data)-1):
+            if data[i] > data[i+1]:
+                data[i], data[i+1] = data[i+1], data[i]
+                swapped = True
+
+
+# normal function to run on cpu
+def func(a):
+    for i in range(10000000):
+        a[i] += 1
+    # function optimized to run on gpu
+
+@jit(target_backend='cuda')
+def func2(a):
+    for i in range(10000000):
+        a[i] += 1
+
+
+if __name__ == "__main__":
+    data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    n = 10000000
+    a = np.ones(n, dtype=np.float64)
+
+    start = timer()
+    func(a)
+    print("with CPU:", timer() - start)
+
+    start = timer()
+    func2(a)
+    print("with GPU:", timer() - start)
+
+    start = timer()
+    binary_search(data, 8)
+    print("with GPU:", timer() - start)
+
+    # Merge Sort ------
+    data = [9, 1, 7, 6, 2, 8, 5, 3, 4, 0]
+    merge_sort(data)
+
+    # --Bubble Sort ------
+    bubble_sort(data)
+    print(data)
+
+    # -- Permutation Data
+    data = [1, 2, 3]
+    heap_permutation(data, len(data))
+# -----------------
+
+# import pycuda.driver as cuda
+# import pycuda.autoinit
+# from pycuda.compiler import SourceModule

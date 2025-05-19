@@ -38,9 +38,9 @@ import selDataColsEoLLA as ola  # EoL Laser Angle (on DNV)
 import selDataColsEoLWA as owa  # EoL Winding Angle (on MGM)
 
 # ----- DNV/MGM Params ---#
-import selDataColsProcMonitor as qpm     # Production Monitors
-import selDataColsWA as qwa     # winding angle
-# import selDataColsOE as qoe     # OEE TechnipFMC
+import selDataColsProcMonitor as qpm        # Production Monitors
+import selDataColsWA as qwa                 # winding angle
+# import selDataColsOE as qoe               # OEE TechnipFMC
 # -------------------------#
 import pdfkit
 from fpdf import FPDF
@@ -9506,7 +9506,7 @@ def userMenu():     # listener, myplash
 
                 if nextDate > 30:                           # Month and date search interval
                     endMO = nextMnth                        # Spilling into next Month
-                    endDA = nextDate - 31                   # keep current date
+                    endDA = nextDate - 30                   # keep current date
                 else:
                     endMO = int(rangeD[1])                  # The current Day
                     endDA = nextDate                        # Current date + 1
