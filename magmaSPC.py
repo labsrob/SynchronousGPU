@@ -201,7 +201,7 @@ def autoSplash(istener, splash):
     mySplash.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
 
     # img = ImageTk.PhotoImage(Image.open("200x120.png"))
-    path = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\Media\\Images\\'
+    path = 'C:\\SynchronousGPU\\Media\\Images\\'
     img = ImageTk.PhotoImage(Image.open(path + "200x120.png"))
     s_label = Label(mySplash, image=img, text="Welcome to Magma SPC", font=18)
     # x=35, y=122
@@ -370,7 +370,7 @@ def localSplash(istener, splash):
         print(w, h, x_c, y_c)
         mySplash.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
 
-        path = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\Media\\Images\\'
+        path = 'C:\\SynchronousGPU\\Media\\Images\\'
         img = ImageTk.PhotoImage(Image.open(path + "200x120.png"))
 
         # Best practices ----------------------------------

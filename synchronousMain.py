@@ -38,9 +38,9 @@ import selDataColsEoLLA as ola  # EoL Laser Angle (on DNV)
 import selDataColsEoLWA as owa  # EoL Winding Angle (on MGM)
 
 # ----- DNV/MGM Params ---#
-import selDataColsProcMonitor as qpm     # Production Monitors
-import selDataColsWA as qwa     # winding angle
-# import selDataColsOE as qoe     # OEE TechnipFMC
+import selDataColsProcMonitor as qpm        # Production Monitors
+import selDataColsWA as qwa                 # winding angle
+# import selDataColsOE as qoe               # OEE TechnipFMC
 # -------------------------#
 import pdfkit
 from fpdf import FPDF
@@ -101,13 +101,12 @@ except Exception:
     print('No Nvidia GPU in system!')
 
 # ----------------------- Audible alert --------------------------------------------------[]
-impath ='C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\Media\\'
+impath ='C:\\SynchronousGPU\\Media\\'
 nudge = AudioSegment.from_wav(impath+'tada.wav')
 error = AudioSegment.from_wav(impath+'error.wav')
 
 # -------------------------------------------------------------------------------------------#
-path = ('C:\\Users\\DevEnv\\OneDrive - Magma Global LTD\\Documents\\Development DOCUMENTS\\'
-                'Technical Reqs Docs\\Tape Gap Measurements\\testFile.csv')
+path = ('C:\\TapeGapDocs\\testFile.csv')
 csv_file = (path)
 df = pd.read_csv(csv_file)
 
@@ -9506,7 +9505,7 @@ def userMenu():     # listener, myplash
 
                 if nextDate > 30:                           # Month and date search interval
                     endMO = nextMnth                        # Spilling into next Month
-                    endDA = nextDate - 31                   # keep current date
+                    endDA = nextDate - 30                   # keep current date
                 else:
                     endMO = int(rangeD[1])                  # The current Day
                     endDA = nextDate                        # Current date + 1
