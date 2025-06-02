@@ -7574,24 +7574,30 @@ def userMenu():     # listener, myplash
 
     def clearFields():  # for SQL server credentials -------
         # clear the content of text entry box
-        if sub_menu.entrycget(0, 'state') =='normal':
+        if sub_menu.entrycget(0, 'state') == 'disabled' and sub_menu.entrycget(1, 'state') == 'normal':
             seripSql.set('')
+            sqlid.set('')
+            uname.set('')
+            autho.set('')
             Entry(pop, state='normal', textvariable=seripSql).place(x=86, y=60)
+            Entry(pop, state='normal', textvariable=sqlid).place(x=86, y=100)
+            Entry(pop, state='normal', textvariable=uname).place(x=330, y=60)
+            Entry(pop, state='normal', textvariable=autho, show="*").place(x=330, y=100)
+
+        elif sub_menu.entrycget(1, 'state') == 'disabled' and sub_menu.entrycget(0, 'state') == 'normal':
+            hostIPv4.set('')
+            hostName.set('')
+            deviceNm.set('')
+            authopwd.set('')
+            Entry(pop, state='normal', width=15, textvariable=hostIPv4).place(x=105, y=60)
+            Entry(pop, state='normal', width=15, textvariable=hostName).place(x=105, y=100)
+            Entry(pop, state='normal', width=15, textvariable=deviceNm).place(x=330, y=60)
+            Entry(pop, state='normal', width=15, textvariable=authopwd, show="*").place(x=330, y=100)
         else:
-            seripPlc.set('')
-            Entry(pop, state='normal', textvariable=seripPlc).place(x=86, y=60)
-        sqlid.set('')
-        uname.set('')
-        autho.set('')
-
-        # set initial variables or last known variables
-        # Entry(pop, state='normal', textvariable=seripSql).place(x=86, y=60)
-        Entry(pop, state='normal', textvariable=sqlid).place(x=86, y=100)
-        Entry(pop, state='normal', textvariable=uname).place(x=330, y=60)
-        Entry(pop, state='normal', textvariable=autho, show="*").place(x=330, y=100)
-
+            pass
         sqlRO = True
         print('Read Only Field State:', sqlRO)
+
         return sqlRO
 
     # function to allow historical limits entry--------------------------------------------------------------[]
@@ -8503,7 +8509,7 @@ def userMenu():     # listener, myplash
         if sub_menu.entrycget(0, 'state') == 'normal':
             ct1 = seripSql.get()
         else:
-            ct1 = seripPlc.get()
+            ct1 = seripSql.get()
         ct2 = sqlid.get()
         ct3 = uname.get()
         ct4 = autho.get()
@@ -8524,488 +8530,33 @@ def userMenu():     # listener, myplash
         # pop.grab_release()
         return
 
-    # # Define function for user selection on hitorical model and schewhart model --------------------[]
-    # def en_button():                    # Do a toggle from Shewhart Model to enforce single choice --[]
-    #     if optm1.get():
-    #         hLmt.set(0)
-    #         optm2.set(0)
-    #     else:
-    #         # hLmt.set(1)
-    #         optm1.set(0)
-    #
-    # def en_limits():                    # Do a toggle from Shewhart Model to enforce single choice --[]
-    #     if optm2.get():
-    #         hLmt.set(1)
-    #         optm1.set(0)
-    #     else:
-    #         optm1.set(0)
-    #         optm2.set(0)
+    def savePLCconfig():
+        import loadOPCconfig as to
+        if sub_menu.entrycget(0, 'state') == 'normal':
+            ct1 = hostName.get()
+        else:
+            ct1 = hostName.get()
+        ct2 = hostIPv4.get()
+        ct3 = deviceNm.get()
+        ct4 = authopwd.get()
+        print('Variables:', ct1, ct2, ct3, ct4)
+        if ct1 == "" or ct2 == "" or ct3 == "" or ct4 == "":
+            errorNote()  # response to save button when entry field is empty
+            print('Empty field...')
 
-    # Define function for user selection on Parameter Monitoring -----------------------------------[]
-    # def monitorA():
-    #     swA()                           # Call label switch func
-    #     if lPwr.get():                  # Allow complementary Parameter (LA)
-    #         lPwr.set(1)
-    #         hoTens.set(0)
-    #         dcLoad.set(0)
-    #         dDispl.set(0)
-    #     else:
-    #         lPwr.set(0)
-    #
-    # def monitorB():
-    #     swB()                           # Call label switch func
-    #     if lAng.get():                  # Allow complementary Parameter (LP)
-    #         lAng.set(1)                 # comment out to allow one selection at a time
-    #         hoTens.set(0)
-    #         dcLoad.set(0)
-    #         dDispl.set(0)
-    #     else:
-    #         lAng.set(0)
-    #
-    # # ------------- Additional functional module for distribution selection ------------------------
-    # def monitorC():
-    #     swA()
-    #     if hoTens.get():
-    #         lPwr.set(0)
-    #         lAng.set(0)
-    #         if dcLoad.get() == 0 and dDispl.get() != 0:
-    #             hoTens.set(1)
-    #         elif dcLoad.get() != 0 and dDispl.get() == 0:
-    #             hoTens.set(1)
-    #         elif dcLoad.get() != 0 and dDispl.get() != 0:
-    #             errorConfig()
-    #             hoTens.set(0)
-    #     else:
-    #         hoTens.set(0)
-    #     return
-    #
-    # def monitorD():
-    #     swB()
-    #     if dcLoad.get():
-    #         lPwr.set(0)
-    #         lAng.set(0)
-    #         if hoTens.get() == 0 and dDispl.get() != 0:
-    #             dcLoad.set(1)
-    #         elif hoTens.get() != 0 and dDispl.get() == 0:
-    #             dcLoad.set(1)
-    #         elif hoTens.get() != 0 and dDispl.get() != 0:
-    #             errorConfig()
-    #             dcLoad.set(0)
-    #     else:
-    #         dcLoad.set(0)
-    #     return
-    #
-    # def monitorE():     # Dancer Displacement ----
-    #     swB()
-    #     if dDispl.get():
-    #         lPwr.set(0)
-    #         lAng.set(0)
-    #         if dcLoad.get() == 0 and hoTens.get() != 0:
-    #             dDispl.set(1)
-    #         elif dcLoad.get() != 0 and hoTens.get() == 0:
-    #             dDispl.set(1)
-    #         elif dcLoad.get() != 0 and hoTens.get() != 0:
-    #             errorConfig()
-    #             dDispl.set(0)
-    #     else:
-    #         dDispl.set(0)
-    #     return
-    #
-    # # ----------------------------------------------------------------
-    # def enableStats():
-    #     if eStat.get():
-    #         if lPwr.get() != 0 and lAng.get() != 0:
-    #             eStat.set(1)
-    #         elif hoTens.get() != 0 and dcLoad.get() != 0 or dDispl.get() != 0:
-    #             eStat.set(1)
-    #         else:
-    #             print('Select Two Parameter for Statistical consideration..')
-    #             errorConfig()
-    #             eStat.set(0)
-    #     else:
-    #         eStat.set(0)
-    #     return
-    #
-    # def metricsConfig():
-    #     global pop, metRO, xUCLa, xLCLa, xUCLb, xLCLb, xUCLc, xLCLc, sSta, sEnd, lPwr, lAng, eStat, optm1, optm2, e8,\
-    #         xUCLd, xLCLd, XBarMa, SBarMa, XBarMb, SBarMb, XBarMc, SBarMc, XBarMd, SBarMd, hLmt, gSize1, gSize2, e7,\
-    #         xUCLf, xLCLf, xUCLg, xLCLg, BarMf, SBarMf, BarMg, SBarMg, hoTens, dcLoad, dDispl, swA, swB, seRF, sdRF, \
-    #         seTT, sdTT, seST, sdST, seTG, sdTG, seLP, sdLP, seLA, sdLA
-    #
-    #     # newLabel = '??'
-    #     # modal = Toplevel(pop)
-    #     pop = Toplevel(root)
-    #     pop.wm_attributes('-topmost', True)
-    #
-    #     # Define and initialise essential popup variables -----------------------------------------
-    #     xUCLa, xLCLa, sUCLa, sLCLa = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #     xUCLb, xLCLb, sUCLb, sLCLb = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #     xUCLc, xLCLc, sUCLc, sLCLc = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #     xUCLd, xLCLd, sUCLd, sLCLd = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #     # -----------------------------------------------
-    #     xUCLf, xLCLf, sUCLf, sLCLf = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #     xUCLg, xLCLg, sUCLg, sLCLg = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #
-    #     # --------------- Additional Prod Parameters ----
-    #     seRF, sdRF, seTT, sdTT = IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop)
-    #     seST, sdST, seTG, sdTG = IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop)
-    #     seLP, sdLP, seLA, sdLA = IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop)
-    #     hoTens, dcLoad, dDispl = IntVar(pop), IntVar(pop), IntVar(pop)
-    #
-    #     sSta, sEnd, gSize1, gSize2 = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #     lPwr, lAng, eStat, optm1, optm2 = IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop), IntVar(pop)
-    #
-    #     XBarMa, SBarMa, hLmt, Sample = StringVar(pop), StringVar(pop), IntVar(pop), StringVar(pop)
-    #     XBarMb, SBarMb, XBarMc, SBarMc = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #     XBarMd, SBarMd = StringVar(pop), StringVar(pop)
-    #     XBarMf, SBarMf, XBarMg, SBarMg = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
-    #     print('State:', sqlRO)
-    #
-    #     # global pop, screen_h, screen_w, x_c, y_c
-    #     # center object on the screen---
-    #     pop.resizable(False, False)
-    #     w, h = 660, 420
-    #     pop.title('Setting Chart Parameters')
-    #     screen_w = pop.winfo_screenwidth()
-    #     screen_h = pop.winfo_screenheight()
-    #     x_c = int((screen_w / 2) - (w / 2))
-    #     y_c = int((screen_h / 2) - (h / 2))
-    #     pop.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
-    #
-    #     # creating labels and positioning them on the grid --------[]
-    #     Label(pop, text='Size').place(x=10, y=50)
-    #     Label(pop, text='Type').place(x=133, y=50)
-    #     Label(pop, text='Shift @').place(x=278, y=50)
-    #     Label(pop, text='Ends @').place(x=400, y=50)
-    #
-    #     # --------------------------------------------------------[]
-    #     separatorU = ttk.Separator(pop, orient='horizontal')
-    #     separatorU.place(relx=0.01, rely=0.230, relwidth=0.30, relheight=0.01)
-    #     separatorLR = ttk.Separator(pop, orient='horizontal')
-    #     separatorLR.place(relx=0.60, rely=0.230, relwidth=0.39, relheight=0.01)
-    #
-    #     Label(pop, text='Historical Limits [Quality Parameters]', font=("bold", 10)).place(x=160, y=80)
-    #     Label(pop, text='Distribution').place(x=550, y=80)
-    #     # Obtain historical limits of respective processes from User #
-    #
-    #     # ----------------------------------------[Roller Force]
-    #     Label(pop, text='UCL-RF').place(x=10, y=110)
-    #     Label(pop, text='LCL-RF').place(x=138, y=110)
-    #
-    #     Label(pop, text='X\u033FLine :').place(x=278, y=110)
-    #     Label(pop, text='S\u0305Line :').place(x=400, y=110)
-    #
-    #     # ----------------------------------------[Tape Temp]
-    #     Label(pop, text='UCL-TT').place(x=10, y=140)
-    #     Label(pop, text='LCL-TT').place(x=138, y=140)
-    #     Label(pop, text='X\u033FLine :').place(x=278, y=140)
-    #     Label(pop, text='S\u0305Line :').place(x=400, y=140)
-    #
-    #     # -----------------------------------------[Temp Delta]
-    #     Label(pop, text='UCL-DT').place(x=10, y=170)
-    #     Label(pop, text='LCL-DT').place(x=138, y=170)
-    #     Label(pop, text='X\u033FLine :').place(x=278, y=170)
-    #     Label(pop, text='S\u0305Line :').place(x=400, y=170)
-    #
-    #     # -----------------------------------------[Tape Gap]
-    #     Label(pop, text='UCL-TG').place(x=10, y=200)
-    #     Label(pop, text='LCL-TG').place(x=138, y=200)
-    #     Label(pop, text='X\u033FLine :').place(x=278, y=200)
-    #     Label(pop, text='S\u0305Line :').place(x=400, y=200)
-    #
-    #     # ------------------------------------[Multiple options: Laser Power (M)]
-    #     def swA():
-    #         global newLabelA
-    #         if lPwr.get():
-    #             newLabelA = 'LP'
-    #             print('Laser Power Selected..')
-    #         elif hoTens.get():
-    #             newLabelA = 'HT'
-    #             print('H/O Tension Selected..')
-    #         else:
-    #             newLabelA = '???'
-    #         Label(pop, text='UCL-' + newLabelA).place(x=10, y=290)
-    #         Label(pop, text='LCL-' + newLabelA).place(x=138, y=290)
-    #     Label(pop, text='UCL-???').place(x=10, y=290)        # GUI Illusion
-    #     Label(pop, text='LCL-???').place(x=138, y=290)       # GUI Illusion
-    #     Label(pop, text='X\u033FLine :').place(x=278, y=290)
-    #     Label(pop, text='S\u0305Line :').place(x=400, y=290)
-    #
-    #     # ------------------------------------[Laser Angle (M)]
-    #     def swB():
-    #         global newLabelB
-    #         if lAng.get():
-    #             newLabelB = 'LA'
-    #             print('Laser Angle Selected..')
-    #         elif dcLoad.get():
-    #             newLabelB = 'DL'
-    #             print('Dancer Load Selected..')
-    #         elif dDispl.get():
-    #             newLabelB = 'DD'
-    #             print('Dancer Displacement Selected..')
-    #         else:
-    #             newLabelB = '???'
-    #         Label(pop, text='UCL-' + newLabelB).place(x=10, y=320)
-    #         Label(pop, text='LCL-' + newLabelB).place(x=138, y=320)
-    #     Label(pop, text='UCL-???').place(x=10, y=320)        # GUI Illusion
-    #     Label(pop, text='LCL-???').place(x=138, y=320)       # GUI Illusion
-    #     Label(pop, text='X\u033FLine :').place(x=278, y=320)
-    #     Label(pop, text='S\u0305Line :').place(x=400, y=320)
-    #
-    #     # set initial variables or last known variables
-    #     # Set default values --------------------------
-    #     XBarMa.set('350.0')         # 352.1102
-    #     SBarMa.set('17.50')         # 22.4268
-    #     XBarMb.set('350.0')         # 352.1102
-    #     SBarMb.set('17.50')         # 22.4268
-    #     XBarMc.set('350.0')         # 352.1102
-    #     SBarMc.set('17.50')         # 22.4268
-    #     XBarMd.set('350.0')         # 352.1102
-    #     SBarMd.set('17.50')         # 22.4268
-    #     XBarMf.set('350.0')         # 352.1102
-    #     SBarMf.set('17.50')         # 22.4268
-    #     XBarMg.set('350.0')         # 352.1102
-    #     SBarMg.set('17.50')         # 22.4268
-    #
-    #     xUCLa.set('361.90')         # 364.6894
-    #     xLCLa.set('338.10')         # 343.0816
-    #     xUCLb.set('361.90')         # 364.6894
-    #     xLCLb.set('338.10')         # 343.0816
-    #     xUCLc.set('361.90')         # 364.6894
-    #     xLCLc.set('338.10')         # 343.0816
-    #     xUCLd.set('361.90')         # 364.6894
-    #     xLCLd.set('338.10')         # 343.0816
-    #     xUCLf.set('361.90')         # 364.6894
-    #     xLCLf.set('338.10')         # 343.0816
-    #     xUCLg.set('361.90')         # 364.6894
-    #     xLCLg.set('338.10')         # 343.0816
-    #
-    #     sUCLa.set('0')
-    #     sLCLa.set('0')
-    #     sUCLb.set('0')
-    #     sLCLb.set('0')
-    #     sUCLc.set('0')
-    #     sLCLc.set('0')
-    #     sUCLd.set('0')
-    #     sLCLd.set('0')
-    #     sUCLf.set('0')
-    #     sLCLf.set('0')
-    #     sUCLg.set('0')
-    #     sLCLg.set('0')
-    #
-    #     sSta.set('07:00:00')
-    #     sEnd.set('17:00:00')
-    #     gSize1.set('20')            # Group Size
-    #     gSize2.set('03')            # Group Type (1=Domino, 2=SemiDomino, 3=Discrete)
-    #     lPwr.set(0)
-    #     hLmt.set(0)
-    #     optm1.set(1)
-    #     optm2.set(0)
-    #
-    #     # Set default distribution for each listed Process ------[]
-    #     sdRF.set(1)                 # 343.0816
-    #     sdTT.set(1)
-    #     sdST.set(1)
-    #     sdTG.set(1)
-    #     sdLP.set(1)
-    #     sdLA.set(1)
-    #
-    #     # ------------------------------------------------------
-    #     separatorL = ttk.Separator(pop, orient='horizontal')
-    #     separatorL.place(relx=0.01, rely=0.590, relwidth=0.39, relheight=0.01)
-    #     separatorR = ttk.Separator(pop, orient='horizontal')
-    #     separatorR.place(relx=0.60, rely=0.590, relwidth=0.39, relheight=0.01)
-    #
-    #     Label(pop, text='Critical Production Parameters', font=("bold", 10)).place(x=240, y=230)
-    #     Checkbutton(pop, text="Laser Power", variable=lPwr, command=monitorA).place(x=25, y=255)
-    #     Checkbutton(pop, text="Laser Angle", variable=lAng, command=monitorB).place(x=125, y=255)
-    #     # ------------------------------------------------------
-    #     Checkbutton(pop, text="H/O Tension", variable=hoTens, command=monitorC).place(x=225, y=255)
-    #     Checkbutton(pop, text="Dancer Load", variable=dcLoad, command=monitorD).place(x=325, y=255)
-    #     Checkbutton(pop, text="Displacement", variable=dDispl, command=monitorE).place(x=425, y=255)
-    #     # ------------------------------------------------------
-    #     Checkbutton(pop, text="Enable Stats", variable=eStat, command=enableStats).place(x=525, y=255)
-    #
-    #     c1 = Checkbutton(pop, text="Enable Historical Limits", width=20, font=("bold", 12), variable=hLmt, command=klr)
-    #     c1.place(x=15, y=8)
-    #     # ------------------
-    #     c2 = Checkbutton(pop, text='Enable Automatic Limits', width=20, font=("bold", 12), variable=optm1, command=en_button)
-    #     c2.place(x=230, y=8)
-    #     # ------------------
-    #     c2 = Checkbutton(pop, text='Enable Failover', width=20, font=("bold", 12), variable=optm2, command=en_limits)
-    #     c2.place(x=430, y=8)
-    #
-    #     if not metRO:
-    #         # TODO --------------------------------------------------------[]
-    #
-    #         e7 = ttk.Combobox(pop, width=8, values=[" Select", "10", "15", "20", "23", "25", "30"], state="disabled")
-    #         e7.bind("<<ComboboxSelected>>", display_sel)
-    #         e7.current(0)  # set default choice
-    #         e7.place(x=40, y=50)
-    #
-    #         e8 = ttk.Combobox(pop, width=10, values=["SS-Domino", "GS-Discrete"], state="disabled")
-    #         e8.bind("<<ComboboxSelected>>", display_selection)
-    #         e8.current(0)  # set default choice to first index
-    #         e8.place(x=172, y=50)
-    #         # --------------------------------------------------- [Shift information]
-    #         e5 = Entry(pop, width=8, textvariable=sSta, state="readonly")
-    #         e5.place(x=325, y=50)
-    #         e6 = Entry(pop, width=8, textvariable=sEnd, state="readonly")
-    #         e6.place(x=450, y=50)
-    #         # Add isolation button
-    #         button2 = Button(pop, text="Amend Properties", command=clearMetrics, bg="red", fg="white")
-    #         button2.place(x=520, y=47)
-    #
-    #         # Declare variable arrays ----------------------------[Roller Force]
-    #         a1a = Entry(pop, width=8, textvariable=xUCLa, state="readonly")
-    #         a1a.place(x=65, y=110)
-    #         a2a = Entry(pop, width=8, textvariable=xLCLa, state="readonly")
-    #         a2a.place(x=190, y=110)
-    #
-    #         a3a = Entry(pop, width=8, textvariable=XBarMa, state="readonly")
-    #         a3a.place(x=325, y=110)
-    #         a4a = Entry(pop, width=8, textvariable=SBarMa, state="readonly")
-    #         a4a.place(x=447, y=110)
-    #         Checkbutton(pop, text="SE", variable=seRF, command=cseRF).place(x=550, y=110)  # cstat, UseSE
-    #         Checkbutton(pop, text="SD", variable=sdRF, command=csdRF).place(x=600, y=110)
-    #
-    #         # ------------- DNV Requirements ----------------[Tape Temperature]
-    #         b1b = Entry(pop, width=8, textvariable=xUCLb, state="readonly")
-    #         b1b.place(x=65, y=140)
-    #         b2b = Entry(pop, width=8, textvariable=xLCLb, state="readonly")
-    #         b2b.place(x=190, y=140)
-    #
-    #         b3b = Entry(pop, width=8, textvariable=XBarMb, state="readonly")
-    #         b3b.place(x=325, y=140)
-    #         b4b = Entry(pop, width=8, textvariable=SBarMb, state="readonly")
-    #         b4b.place(x=447, y=140)
-    #         Checkbutton(pop, text="SE", variable=seTT, command=cseTT).place(x=550, y=140)  # cstat, UseSE
-    #         Checkbutton(pop, text="SD", variable=sdTT, command=csdTT).place(x=600, y=140)
-    #
-    #         # ------------ DNV Requirements ---------------[Temperature Substrate]
-    #         c1b = Entry(pop, width=8, textvariable=xUCLc, state="readonly")
-    #         c1b.place(x=65, y=170)
-    #         c2b = Entry(pop, width=8, textvariable=xLCLc, state="readonly")
-    #         c2b.place(x=190, y=170)
-    #         c3b = Entry(pop, width=8, textvariable=XBarMc, state="readonly")
-    #         c3b.place(x=325, y=170)
-    #         c4b = Entry(pop, width=8, textvariable=SBarMc, state="readonly")
-    #         c4b.place(x=447, y=170)
-    #         Checkbutton(pop, text="SE", variable=seST, command=cseST).place(x=550, y=170)  # cstat, UseSE
-    #         Checkbutton(pop, text="SD", variable=sdST, command=csdST).place(x=600, y=170)
-    #
-    #         # -----------------------------------------[Tape Gap Measurement]
-    #         a1b = Entry(pop, width=8, textvariable=xUCLd, state="readonly")
-    #         a1b.place(x=65, y=200)
-    #         a2b = Entry(pop, width=8, textvariable=xLCLd, state="readonly")
-    #         a2b.place(x=190, y=200)
-    #         a3b = Entry(pop, width=8, textvariable=XBarMd, state="readonly")
-    #         a3b.place(x=325, y=200)
-    #         a4b = Entry(pop, width=8, textvariable=SBarMd, state="readonly")
-    #         a4b.place(x=447, y=200)
-    #         Checkbutton(pop, text="SE", variable=seTG, command=cseTG).place(x=550, y=200)  # cstat, UseSE
-    #         Checkbutton(pop, text="LN", variable=sdTG, command=csdTG).place(x=600, y=200)
-    #
-    #         # -----------------------------------------[Laser Power (Monitor)]
-    #         a1d = Entry(pop, width=8, textvariable=xUCLf, state="readonly")
-    #         a1d.place(x=65, y=290)
-    #         a2d = Entry(pop, width=8, textvariable=xLCLf, state="readonly")
-    #         a2d.place(x=190, y=290)
-    #         a3d = Entry(pop, width=8, textvariable=XBarMf, state="readonly")
-    #         a3d.place(x=325, y=290)
-    #         a4d = Entry(pop, width=8, textvariable=SBarMf, state="readonly")
-    #         a4d.place(x=447, y=290)
-    #         Checkbutton(pop, text="SE", variable=seLP, command=cseLP).place(x=550, y=290)  # cstat, UseSE
-    #         Checkbutton(pop, text="SD", variable=sdLP, command=csdLP).place(x=600, y=290)
-    #
-    #         # --------------------------------------[Laser Angle Measurement]
-    #         a1d = Entry(pop, width=8, textvariable=xUCLg, state="readonly")
-    #         a1d.place(x=65, y=320)
-    #         a2d = Entry(pop, width=8, textvariable=xLCLg, state="readonly")
-    #         a2d.place(x=190, y=320)
-    #         a3d = Entry(pop, width=8, textvariable=XBarMg, state="readonly")
-    #         a3d.place(x=325, y=320)
-    #         a4d = Entry(pop, width=8, textvariable=SBarMg, state="readonly")
-    #         a4d.place(x=447, y=320)
-    #         Checkbutton(pop, text="SE", variable=seLA, command=cseLA).place(x=550, y=320)  # cstat, UseSE
-    #         Checkbutton(pop, text="SD", variable=sdLA, command=csdLA).place(x=600, y=320)
-    #
-    #     else:
-    #         e7 = ttk.Combobox(pop, width=8, values=[" Select", "10", "15", "20", "23", "25", "25"], state="normal")
-    #         e7.bind("<<ComboboxSelected>>", display_sel)
-    #         e7.current(0)  # set default choice
-    #         e7.place(x=40, y=50)
-    #
-    #         e8 = ttk.Combobox(pop, width=10, values=["SS-Domino", "GS-Discrete"], state="normal")
-    #         e8.bind("<<ComboboxSelected>>", display_selection)
-    #         e8.current(0)  # set default choice to first index
-    #         e8.place(x=172, y=50)
-    #         # -------------------------------------------------[ Shift duration ]
-    #         e5 = Entry(pop, width=8, textvariable=sSta, state="normal")
-    #         e5.place(x=325, y=50)
-    #         e6 = Entry(pop, width=8, textvariable=sEnd, state="normal")
-    #         e6.place(x=450, y=50)
-    #
-    #         # Declare variable arrays -------------------------[Roller Force]
-    #         a1a = Entry(pop, width=8, textvariable=xUCLa, state="normal")
-    #         a1a.place(x=65, y=110)
-    #         a2a = Entry(pop, width=8, textvariable=xLCLa, state="normal")
-    #         a2a.place(x=190, y=110)
-    #         a3a = Entry(pop, width=8, textvariable=XBarMa, state="normal")
-    #         a3a.place(x=325, y=110)
-    #         a4a = Entry(pop, width=8, textvariable=SBarMa, state="normal")
-    #         a4a.place(x=447, y=110)
-    #
-    #         # ------------- DNV Requirements -------------[Tape Temperature]
-    #         b1b = Entry(pop, width=8, textvariable=xUCLb, state="normal")
-    #         b1b.place(x=65, y=140)
-    #         b2b = Entry(pop, width=8, textvariable=xLCLb, state="normal")
-    #         b2b.place(x=190, y=140)
-    #         b3b = Entry(pop, width=8, textvariable=XBarMb, state="normal")
-    #         b3b.place(x=325, y=140)
-    #         b4b = Entry(pop, width=8, textvariable=SBarMb, state="normal")
-    #         b4b.place(x=447, y=140)
-    #         # ------------ DNV Requirements -------------[Delta Temperature]
-    #         c1b = Entry(pop, width=8, textvariable=xUCLc, state="normal")
-    #         c1b.place(x=65, y=170)
-    #         c2b = Entry(pop, width=8, textvariable=xLCLc, state="normal")
-    #         c2b.place(x=190, y=170)
-    #         c3b = Entry(pop, width=8, textvariable=XBarMc, state="normal")
-    #         c3b.place(x=325, y=170)
-    #         c4b = Entry(pop, width=8, textvariable=SBarMc, state="normal")
-    #         c4b.place(x=447, y=170)
-    #         # ---------------------------------------[Tape Gap Measurements]
-    #         a1b = Entry(pop, width=8, textvariable=xUCLd, state="normal")
-    #         a1b.place(x=65, y=200)
-    #         a2b = Entry(pop, width=8, textvariable=xLCLd, state="normal")
-    #         a2b.place(x=190, y=200)
-    #         a3b = Entry(pop, width=8, textvariable=XBarMd, state="normal")
-    #         a3b.place(x=325, y=200)
-    #         a4b = Entry(pop, width=8, textvariable=SBarMd, state="normal")
-    #         a4b.place(x=447, y=200)
-    #
-    #         # ------------------------------------[Laser Power (Monitoring)]
-    #         a1d = Entry(pop, width=8, textvariable=xUCLf, state="normal")
-    #         a1d.place(x=65, y=290)
-    #         a2d = Entry(pop, width=8, textvariable=xLCLf, state="normal")
-    #         a2d.place(x=190, y=290)
-    #         a3d = Entry(pop, width=8, textvariable=XBarMf, state="normal")
-    #         a3d.place(x=325, y=290)
-    #         a4d = Entry(pop, width=8, textvariable=SBarMf, state="normal")
-    #         a4d.place(x=447, y=290)
-    #         # -----------------------------------[Laser Angle (Monitoring)]
-    #         a1d = Entry(pop, width=8, textvariable=xUCLg, state="normal")
-    #         a1d.place(x=65, y=320)
-    #         a2d = Entry(pop, width=8, textvariable=xLCLg, state="normal")
-    #         a2d.place(x=190, y=320)
-    #         a3d = Entry(pop, width=8, textvariable=XBarMg, state="normal")
-    #         a3d.place(x=325, y=320)
-    #         a4d = Entry(pop, width=8, textvariable=SBarMg, state="normal")
-    #         a4d.place(x=447, y=320)
-    #
-    #     # Add Button for making selection -------------------------------
-    #     button1 = Button(pop, text="Save All Settings", command=saveMetric, bg="green", fg="white")
-    #     button1.place(x=280, y=370)
+        else:
+            to.writePLCconfig(ct1, ct2, ct3, ct4)  # save into text file
+            successNote()
+        # Condition for saving entries ---------------[]
+        Entry(pop, state='disabled').place(x=86, y=60)
+        Entry(pop, state='disabled').place(x=86, y=100)
+        Entry(pop, state='disabled').place(x=330, y=60)
+        Entry(pop, state='disabled').place(x=330, y=100)
+        pop.destroy()
+        # pop.grab_release()
+        return
+
+
 
     def serverSQLConfig():
         global pop, sqlRO, seripSql, sqlid, uname, autho, e4
@@ -9030,6 +8581,7 @@ def userMenu():     # listener, myplash
         labl_0.place(x=130, y=10)
 
         # creating labels and positioning them on the grid --------[]
+        sub_menu.entryconfig(0, label='SQL Connectivity', state='disabled')  # disable submenu
         Label(pop, text='Server IP').place(x=10, y=60)
         Label(pop, text='Database').place(x=10, y=100)
         Label(pop, text="Access ID").place(x=250, y=60)
@@ -9069,16 +8621,16 @@ def userMenu():     # listener, myplash
 
     # ------------------------------------------------------------------
     def serverPLCConfig():
-        global pop, sqlRO, seripPlc, sqlid, uname, autho, e4
+        global pop, sqlRO, hostName, hostIPv4, deviceNm, authopwd, e4
         pop = Toplevel(root)
         pop.wm_attributes('-topmost', True)
 
         # Define and initialise essential popup variables -------------------------------------
-        seripPlc, sqlid, uname, autho = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
+        hostName, hostIPv4, deviceNm, authopwd = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
         print('State:', sqlRO)
 
         # center object on the screen---
-        w, h = 480, 210
+        w, h = 470, 210
         pop.resizable(False, False)
         pop.title('Modify PLC Connection')
         screen_w = pop.winfo_screenwidth()
@@ -9087,44 +8639,45 @@ def userMenu():     # listener, myplash
         y_c = int((screen_h / 2) - (h / 2))
         pop.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
 
-        labl_0 = Label(pop, text="PLC Credentials", width=20, font=("bold", 14))
+        labl_0 = Label(pop, text="OPC UA Credentials", width=20, font=("bold", 14))
         labl_0.place(x=130, y=10)
 
         # creating labels and positioning them on the grid --------[]
-        Label(pop, text='Host PLC').place(x=10, y=60)
-        Label(pop, text='Data Block').place(x=10, y=100)
-        Label(pop, text="Access ID").place(x=250, y=60)
-        Label(pop, text="Authorize").place(x=250, y=100)
+        sub_menu.entryconfig(1, label='PLC Connectivity', state='disabled') # disable submenu
+        Label(pop, text='Host PLC Name:').place(x=10, y=60)
+        Label(pop, text="Device Access:").place(x=238, y=60)
+        Label(pop, text='TCPV4 Address:').place(x=10, y=100)
+        Label(pop, text="AccessID Code:").place(x=238, y=100)
 
         # set initial variables or last known variables
-        seripPlc.set('Server ID')
-        sqlid.set('Volatile Repository')
-        uname.set('User Name')
-        autho.set('Authorization Code')
+        hostName.set('+C1 Main PLC')
+        hostIPv4.set('192.168.100.241')
+        deviceNm.set('TCP01_SPC')
+        authopwd.set('*********')
 
         # creating entries and positioning them on the grid -----
         if not sqlRO:
-            e1 = Entry(pop, textvariable=seripPlc, state='readonly')
-            e1.place(x=86, y=60)
-            e2 = Entry(pop, textvariable=sqlid, state='readonly')
-            e2.place(x=86, y=100)
-            e3 = Entry(pop, textvariable=uname, state='readonly')
+            e1 = Entry(pop, textvariable=hostName, width=15, state='readonly')
+            e1.place(x=105, y=60)
+            e2 = Entry(pop, textvariable=hostIPv4, width=15, state='readonly')
+            e2.place(x=105, y=100)
+            e3 = Entry(pop, textvariable=deviceNm, width=15, state='readonly')
             e3.place(x=330, y=60)
-            e4 = Entry(pop, textvariable=autho, state='readonly')   #, show="*")
+            e4 = Entry(pop, textvariable=authopwd, width=15, state='readonly')   #, show="*")
             e4.place(x=330, y=100)
         else:
-            e1 = Entry(pop, textvariable=seripPlc, state='normal')
-            e1.place(x=86, y=60)
-            e2 = Entry(pop, textvariable=sqlid, state='normal')
-            e2.place(x=86, y=100)
-            e3 = Entry(pop, textvariable=uname, state='normal')
+            e1 = Entry(pop, textvariable=hostName, width=15, state='normal')
+            e1.place(x=105, y=60)
+            e2 = Entry(pop, textvariable=hostIPv4, width=15, state='normal')
+            e2.place(x=105, y=100)
+            e3 = Entry(pop, textvariable=deviceNm, width=15, state='normal')
             e3.place(x=330, y=60)
-            e4 = Entry(pop, textvariable=autho, state='normal', show="*")
+            e4 = Entry(pop, textvariable=authopwd, width=15, state='normal', show="*")
             e4.place(x=330, y=100)
 
-        Button(pop, text="Change Details", bg="red", fg="white", command=clearFields).place(x=160, y=150)
-        Button(pop, text="Test Connection", command=testConnPLC).place(x=270, y=150)
-        Button(pop, text="Save Details", bg="green", fg="white", command=saveSQLconfig).place(x=380, y=150)
+        Button(pop, text="Modify OPC-UA", bg="red", fg="white", command=clearFields).place(x=245, y=140)
+        Button(pop, text="Test Connection",  bg="green", fg="white", command=testConnPLC).place(x=350, y=140)
+        Button(pop, text="Save OPC-UA Details & Exit", command=savePLCconfig).place(x=295, y=175)
 
         return
 
@@ -9192,8 +8745,9 @@ def userMenu():     # listener, myplash
 
     def testConnPLC():
         import Test_PING as sq
+
         agent = 0
-        server_IP = seripPlc.get()  # PLC Server IP
+        server_IP = hostIPv4.get()  # PLC Server IP
 
         try:
             # Test server connection over TCP/IP ---------------------[]
