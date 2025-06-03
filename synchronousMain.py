@@ -70,7 +70,7 @@ from matplotlib.animation import FuncAnimation
 from mpl_interactions import ioff, panhandler, zoom_factory
 # --------------------------
 import pParamsHL as dd
-import pWON_finder as sqld
+import pWON_finder as wo
 # -------------------------
 import qParametersDNV as hla
 import qParametersMGM as hlb
@@ -8411,12 +8411,7 @@ def userMenu():     # listener, myplash
             return
 
         # ------------------------------------[Multiple options: Laser Power (M)]
-        # set initial variables or last known variables
-        # Set default values for Production Params ----
         # TODO ---- command=saveMetricRP)
-
-        # Call function for configuration file ----[]
-        # sSize, gType, sStart, sStops, OT, CT, RP, LA, WS, TG, ST, LP = mp.decryptMetricspP(WON)
 
         # Set default values - Break down each element and show to users
         gSize1.set('30')
@@ -8531,7 +8526,8 @@ def userMenu():     # listener, myplash
         return
 
     def savePLCconfig():
-        import loadOPCconfig as to
+        import OPC_UA_settings as to
+
         if sub_menu.entrycget(0, 'state') == 'normal':
             ct1 = hostName.get()
         else:
@@ -8560,10 +8556,13 @@ def userMenu():     # listener, myplash
 
     def serverSQLConfig():
         global pop, sqlRO, seripSql, sqlid, uname, autho, e4
-        pop = Toplevel(root)
-        pop.wm_attributes('-topmost', True)
 
-        # Define and initialise essential popup variables -------------------------------------
+        import loadSQLConfig as ls
+        pop = Toplevel(root)
+        # pop.wm_attributes('-topmost', True)
+        pop.wm_attributes('-alpha', 0.9)
+
+        # Define and initialise essential popup variables -------------------------------------------
         seripSql, sqlid, uname, autho = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
         print('State:', sqlRO)
 
@@ -8588,10 +8587,19 @@ def userMenu():     # listener, myplash
         Label(pop, text="Authorize").place(x=250, y=100)
 
         # set initial variables or last known variables
-        seripSql.set('Server ID')
-        sqlid.set('dBase Repository')
-        uname.set('User Name')
-        autho.set('Authorization Code')
+        configFile = 'checksumError.ini'
+        if os.path.isfile('C:\\SynchronousGPU\\' + configFile):
+            IP, name, User, Pswd = ls.load_configSQL(configFile)
+            seripSql.set(IP)
+            sqlid.set(name)
+            uname.set(User)
+            autho.set(Pswd)
+            print('Using decrypted details...')
+        else:
+            seripSql.set('Server ID')
+            sqlid.set('dBase Repository')
+            uname.set('User Name')
+            autho.set('Authorization Code')
 
         # creating entries and positioning them on the grid -----
         if not sqlRO:
@@ -8601,7 +8609,7 @@ def userMenu():     # listener, myplash
             e2.place(x=86, y=100)
             e3 = Entry(pop, textvariable=uname, state='readonly')
             e3.place(x=330, y=60)
-            e4 = Entry(pop, textvariable=autho, state='readonly')   #, show="*")
+            e4 = Entry(pop, textvariable=autho, state='readonly', show="*")
             e4.place(x=330, y=100)
         else:
             e1 = Entry(pop, textvariable=seripSql, state='normal')
@@ -8622,8 +8630,12 @@ def userMenu():     # listener, myplash
     # ------------------------------------------------------------------
     def serverPLCConfig():
         global pop, sqlRO, hostName, hostIPv4, deviceNm, authopwd, e4
+
+        import OPC_UA_settings as ld
+
         pop = Toplevel(root)
-        pop.wm_attributes('-topmost', True)
+        # pop.wm_attributes('-topmost', True)
+        pop.wm_attributes('-alpha', 0.9)
 
         # Define and initialise essential popup variables -------------------------------------
         hostName, hostIPv4, deviceNm, authopwd = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
@@ -8650,10 +8662,19 @@ def userMenu():     # listener, myplash
         Label(pop, text="AccessID Code:").place(x=238, y=100)
 
         # set initial variables or last known variables
-        hostName.set('+C1 Main PLC')
-        hostIPv4.set('192.168.100.241')
-        deviceNm.set('TCP01_SPC')
-        authopwd.set('*********')
+        configFile = 'ISO62264_ISA95.ini'
+        if os.path.isfile('C:\\SynchronousGPU\\'+configFile):
+            IP, name, User, Pswd = ld.load_configPLC(configFile)
+            hostName.set(name)
+            hostIPv4.set(IP)
+            deviceNm.set(User)
+            authopwd.set(Pswd)
+            print('Using decrypted details:', name, IP, User, Pswd)
+        else:
+            hostName.set('DefaultHost')
+            hostIPv4.set('192.168.100.XXX')
+            deviceNm.set('TCP01_SPC')
+            authopwd.set('*********')
 
         # creating entries and positioning them on the grid -----
         if not sqlRO:
@@ -8831,6 +8852,7 @@ def userMenu():     # listener, myplash
             # import signal
             # os.kill(sid, signal.SIGTERM)
 
+            # Cascade View Date String Search ------------------------[]
             if (process.entrycget(0, 'state') == 'disabled'
                     and process.entrycget(1, 'state') == 'normal'
                     and process.entrycget(3, 'state') == 'normal'):
@@ -8843,7 +8865,7 @@ def userMenu():     # listener, myplash
 
                 # ------- Indicate Record Date or WON ---------[TODO...]
                 sDate1, sDate2, uWON = searchBox()                                  # Popup dialogue
-                print('\nDate String - Between:', sDate1, 'and:', sDate2, 'WON_#:', uWON)
+                print('\nCascade Date String - Between:', sDate1, 'and:', sDate2, 'WON_#:', uWON)
                 # ---------------------------------------------[2]
                 if sDate1 == '?' and sDate2 == '?' and uWON == '?':
                     print('Search Aborted!')
@@ -8853,7 +8875,7 @@ def userMenu():     # listener, myplash
                     qType = 2
                     runType.append(qType)
                     # Connect to SQL Server -----------------------[]
-                    OEEdataID, processID = sqld.searchSqlData(sDate1, sDate2, uWON)     # Query SQL record
+                    OEEdataID, processID = wo.srcTable(sDate1, sDate2, uWON)     # Query SQL record
                     if processID > 1:
                         print('\nSelecting Cascade View....')
                         tabbed_cascadeMode(qType)   # Cascade
@@ -8861,6 +8883,7 @@ def userMenu():     # listener, myplash
                         process.entryconfig(0, state='normal')
                         print('Invalid post processing data or Production record not found..')
 
+            # Tabbed View Date String Search -------------------------------[]
             elif (process.entrycget(1, 'state') == 'disabled'
                   and process.entrycget(0, 'state') == 'normal'
                   and process.entrycget(3, 'state') == 'normal'):
@@ -8873,7 +8896,7 @@ def userMenu():     # listener, myplash
 
                 # ------- Indicate Record Date or WON ---------[]
                 sDate1, sDate2, uWON = searchBox()                                   # Search for Production data
-                print('\nDate String - Between:', sDate1, 'and:', sDate2, 'WON_#:', uWON)
+                print('\nTabbed Date String - Between:', sDate1, '&', sDate2, ':WON_# -', uWON)
 
                 if sDate1 == '?' and sDate2 == '?' and uWON == '?':
                     print('Search Aborted!')
@@ -8883,7 +8906,9 @@ def userMenu():     # listener, myplash
                     qType = 2
                     runType.append(qType)
                     # connect SQL Server and obtain Process ID ----#
-                    OEEdataID, processID = sqld.searchSqlData(sDate1, sDate2, uWON)    # Query SQL record
+                    OEEdataID, processID = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
+                    print('\nSearch Return:', OEEdataID, processID)
+
                     # ---------------------------------------------[]
                     if processID > 1:
                         print('\nSelecting Tabbed View....')

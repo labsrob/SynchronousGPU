@@ -46,21 +46,29 @@ def errorSearchWON():
     messagebox.showerror('Local GUI', 'Invalid Work Order Number. Try again!')
     return
 
+def errornotFoundWON():
+    messagebox.showwarning('Local GUI', 'Specirfic WON# Not found. Try again!')
+    return
 
-def searchSqlData(sD1, sD2, uWON):                   # Post Production data search
+
+
+def srcTable(sD1, sD2, uWON):                   # Post Production data search
     # ----------------------#
     # Load SQL server library
     import CommsSql as sql_con
 
     StaSearchD = str(sD1)                             # Date Lower Boundary or WON #
     EndSearchD = str(sD2)
+    print('\nDate Range02:', sD1, 'and', sD2)
+    print('Date Range03:', StaSearchD, 'and', EndSearchD)
+    print('Date Range04:', StaSearchD, 'and', EndSearchD, 'WON#:', uWON)
 
     # Test connection readiness and clear any flags ups.....
     sqlTableid = sql_con.DAQ_connect()  # Execute connection
     conn_sq = sqlTableid.cursor()       # Convert to cursor
 
     # ----------------------------------- If Search was by Date String ----------------------[]
-    if StaSearchD != '0' and uWON == '0':               # If Date search
+    if StaSearchD != '0' and EndSearchD != '0':               # If Date search
         print('\nWON: Date Search.')
 
         # Find out how many tables meet this condition -----[A]
@@ -68,11 +76,16 @@ def searchSqlData(sD1, sD2, uWON):                   # Post Production data sear
                                      'create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND ' + "'" + EndSearchD + "'").fetchone()
 
         time.sleep(10)                                      # allow SQL server response delay
-        nTables = pTables[2]                                # pick values from sql column
-        total_T = int(nTables)
 
-        if not total_T % 2 == 0:                            # Test value and add 1 if value is odd
-            nTables = pTables[0] + 1
+        total_T = int(pTables[0])
+        # print('Record found4:', pTables[2])
+        if total_T != 0:
+            if not total_T % 2 == 0:                        # Test value and add 1 if value is odd
+                nTables = pTables[0] + 1
+            else:
+                nTables = pTables[0]
+        else:
+            nTables = total_T
         print('\nFound:', nTables, 'valid records..')
 
         if nTables > 1:                                     # Production file exist with OEE data
@@ -91,13 +104,13 @@ def searchSqlData(sD1, sD2, uWON):                   # Post Production data sear
             OEEdataID = mP.get_encodedFiles(StaSearchD)     # Computed OEE_ID for specific date
 
         else:
-            errorSearchWON()                                # return error to the user.
+            errornotFoundWON()                                # return error to the user.
             newREC = 0
             OEEdataID = 0
             print('No matching records found !')
 
         # ------------------------------------- If Search was by Work Order Number -----------------------[]
-    elif uWON != 0 and StaSearchD == '0':                        # WON is searched by WO# -------[]
+    elif uWON != 0 and StaSearchD == '0' and EndSearchD =='0':                        # WON is searched by WO# -------[]
         print('WON: Work Order Number Search...')
 
         pTables = conn_sq.execute('Select count(*) AS ValidTotal from Information_schema.Tables where '
@@ -117,8 +130,8 @@ def searchSqlData(sD1, sD2, uWON):                   # Post Production data sear
             OEEdataID = searchOEERecs(conn_sq, checkOEE_date)         # get OEE file name
 
         else:
-            print('Invalid Work Order Number..')
-            errorSearchWON()
+            print('Work Order Number not found !')
+            errornotFoundWON()
             newREC = 0
             OEEdataID = 0
 
