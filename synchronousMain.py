@@ -8902,15 +8902,15 @@ def userMenu():     # listener, myplash
                     print('Search Aborted!')
                     process.entryconfig(1, state='normal')
                 else:
-                    print('Attempting connection with SQL Server...')
+                    print('\nAttempting connection with SQL Server...')
                     qType = 2
                     runType.append(qType)
                     # connect SQL Server and obtain Process ID ----#
-                    OEEdataID, processID = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
-                    print('\nSearch Return:', OEEdataID, processID)
+                    oeeValid, organicID = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
+                    print('\nSearch Return:', oeeValid, organicID)
 
                     # ---------------------------------------------[]
-                    if processID > 1:
+                    if organicID == 'O':
                         print('\nSelecting Tabbed View....')
                         tabbed_canvas(qType)        # Tabbed
                     else:

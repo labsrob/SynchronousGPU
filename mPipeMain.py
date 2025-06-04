@@ -990,6 +990,7 @@ def mainRun(conn, ret, stad, stpd, Sqlfmt, HeadA, HeadB, viewTFM, oEE, rp, ts, t
                 newWON = mTables[1][1]
                 newWON = newWON.split('_')
                 processWON.append(newWON[1])
+
                 # Ensure compliance with 2 important header tables------------------------[]
                 if newWON[1] == 'OEE_'+mTables[0][1]:                           # search for OEE compliant data
                     matchedOEE = mTables[0][1]
