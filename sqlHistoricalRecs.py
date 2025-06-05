@@ -22,7 +22,7 @@ def seek_OEE_data():
 
     # Obtain OEE record in real-time ----------------------------
     mfilename = ('OEE_' + cDate)
-    print('ActiveOEE Table', mfilename)
+    print('\nActiveOEE Table', mfilename)
     return mfilename
 
 
@@ -30,16 +30,17 @@ def get_encodedFiles(StaSearchD=None):
 
     now = datetime.now()
     string = str.maketrans(" ", '-')                    # format date into ISO 8610
-    retroOEE = StaSearchD.replace('-', '')              # remove all hypernation
 
     if StaSearchD == None:
         cDate = strftime("%Y%m%d").translate(string)    # Obtain local date
     else:
-        cDate = strftime(retroOEE).translate(string)    # Obtain local date
+        retroOEE = StaSearchD.replace('-', '')          # remove all hypernation
+        cDate = strftime(retroOEE).translate(string)    # Obtain organic date
 
     vDate = strftime("%m%d").translate(string)          # Obtain local date
-    # print('Current Date:', cDate)
-    print('\nToday\'s Date:', strftime("%a, %d %b %Y", gmtime()))
+    print('\nCurrent Date:', vDate)
+    print('Today\'s Date:', strftime("%a, %d %b %Y", gmtime()))
+
     # Obtain OEE record in real-time ----------------------------
     mOEE = ('OEE_' + cDate)
     print('Searching for the Specific OEE Data:', mOEE)

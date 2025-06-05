@@ -8848,7 +8848,7 @@ def userMenu():     # listener, myplash
         global stpd, processWON, processID, OEEdataID, hostConn
 
         if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
-            print('\nSelection RetroPlay Condition met....')
+            print('\nSelection Condition met...')
             # import signal
             # os.kill(sid, signal.SIGTERM)
 
@@ -8896,7 +8896,7 @@ def userMenu():     # listener, myplash
 
                 # ------- Indicate Record Date or WON ---------[]
                 sDate1, sDate2, uWON = searchBox()                                   # Search for Production data
-                print('\nTabbed Date String - Between:', sDate1, '&', sDate2, ':WON_# -', uWON)
+                print('Tabbed Date String - Between:', sDate1, '&', sDate2, ':WON_# -', uWON)
 
                 if sDate1 == '?' and sDate2 == '?' and uWON == '?':
                     print('Search Aborted!')
@@ -8905,6 +8905,7 @@ def userMenu():     # listener, myplash
                     print('\nAttempting connection with SQL Server...')
                     qType = 2
                     runType.append(qType)
+
                     # connect SQL Server and obtain Process ID ----#
                     oeeValid, organicID = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
                     print('\nSearch Return:', oeeValid, organicID)
@@ -9038,21 +9039,21 @@ def userMenu():     # listener, myplash
         elif '\\' in uWON or '-' in uWON or '/' in uWON:
 
             # calculate the next boundary date
-            print('\nSearch by Production Date...')
+            print('SearchBox Production by date...')
             if '-' in uWON:
-                print('Dash found...')
+                # print('Dash found...')
                 rangeD = uWON.split('-', 2)
-                print('DT1:', rangeD)
+                # print('DT1:', rangeD)
 
             elif '\\' in uWON:
-                print('Slash found...\\')
+                # print('Slash found...\\')
                 rangeD = uWON.split('\\', 2)
-                print('DT2', rangeD)
+                # print('DT2', rangeD)
 
             else:
-                print('Slash found.../')
+                # print('Slash found.../')
                 rangeD = uWON.split('/', 2)
-                print('DT2', rangeD)
+                # print('DT3', rangeD)
 
             # ----------------------------------------------#
             begMO = int(rangeD[1])
@@ -9098,7 +9099,7 @@ def userMenu():     # listener, myplash
             toDATE = rangeD[0] + '-' + str(endMO) + '-' + str(endDA)    # Date was used in search query
 
             uWON = rangeD[0] + rangeD[1] + rangeD[2]
-            print('WON:', uWON)
+            # print('WON:', uWON)
 
         elif validWON == len(uWON):
             print('\nSearch by Work Order Number...')
