@@ -83,7 +83,7 @@ def srcforOEE(MatchOEE):
         gOEE = gOEE[2]                  # i.e <OEE_WON>
         if gOEE == 'OEE_' + MatchOEE:
             print('Matched OEE Data:', gOEE)
-            validOEE = 'O'              # Organic Table
+            validOEE = 'G'              # Organic Table
             oeeID = gOEE
         else:
             print('Complicated....:', gOEE)
@@ -134,8 +134,16 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         # -------------------------------------------------#
         if len(newWON[1]) < 2:
             xmonth = '0' + str(newWON[1])
+        else:
+            xmonth = str(newWON[1])
+
         if len(newWON[2]) < 2:
             xday = '0' + str(newWON[2])
+        else:
+            xday = str(newWON[2])
+
+        print('TPX1', xmonth, 'TPX2', xday)
+
         derivedWON = newWON[0] + xmonth + xday              # TP5: 2025 06 04
         derivedOEE = derivedWON
         # --------------------------------------------------#
@@ -151,6 +159,8 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
                                       'name LIKE ' + "'" '%' + str(derivedWON) + '%' "'" +
                                       'order by name asc').fetchmany(nTables)
             # get the Work Order Name and keep for index-tracking ----[]
+
+            ptype = 'DNV'
             # List all tables in DNV Configuration -------------------[]
             T1 = str(mTables[0][0])
             T2 = str(mTables[1][0])
@@ -171,7 +181,7 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             for (i, item) in enumerate(DNV_tables, start=1):
                 print(i, item)
 
-        elif nTables > 15 and nTables <=26:
+        elif nTables > 14 and nTables <= 26:
             # List tables that meet this condition ---------[# schema_name	table_name	create_date]
             # mTables = conn_sq.execute(
             #     'SELECT schema_name(schema_id) as schema_name, name as table_name, create_date from '
@@ -181,6 +191,8 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             mTables = conn_sq.execute('SELECT name as table_name, create_date from sys.tables where '
                                       'name LIKE ' + "'" '%' + str(derivedWON) + '%' "'" +
                                       'order by name asc').fetchmany(nTables)
+
+            ptype = 'MGM'
             # List all tables in DNV Configuration -------------------[]
             T1 = str(mTables[0][0])
             T2 = str(mTables[1][0])
@@ -214,9 +226,11 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
                 print(i, item)
 
         else:
-            print('Work Order Number not found !')
+            print('Invalid number of DNV/MGM Tables or WON not found!')
+            mTables = 0
+            ptype = 'UNK'
             errornotFoundWON()
-        # ----------------------------------------------#
+        # -----------------------------------------#
 
     # ------------------------------------- If Search was by Work Order Number -----------------------[]
     elif uWON != 0 and StaSearchD == '0' and EndSearchD =='0':                        # WON is searched by WO# -------[]
@@ -228,14 +242,14 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         nTables = pTables[0]                                # Pick total from sql column, add OEE table
         print('\nFound:', nTables, 'valid records..')
 
-        if nTables != 0 and nTables <= 15:                    # DNV Production file exist - OEE data
+        if nTables != 0 and nTables == 14:                    # DNV Production file exist - OEE data
             # List out all valid tables, figure out OEE from the creation date --------------------------[]
             mTables = conn_sq.execute(
                 'SELECT name as table_name, create_date from '
                 'sys.tables where name LIKE ' + "'" '%' + str(uWON) + '%' "'" + 'order by name asc').fetchmany(
                 nTables)
 
-            # print('\nAll DNV Tables:', mTables)
+            ptype = 'DNV'
             # List all tables in DNV Configuration -----------[]
             T1 = str(mTables[0][0])
             T2 = str(mTables[1][0])
@@ -256,15 +270,14 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             for (i, item) in enumerate(DNV_tables, start=1):
                 print(i, item)
 
-        elif nTables > 15 and nTables <=26:
-
+        elif nTables > 14 and nTables <= 26:
             # List out all valid tables, figure out OEE from the creation date ----------------[]
             mTables = conn_sq.execute(
                 'SELECT name as table_name, create_date from '
                 'sys.tables where name LIKE ' + "'" '%' + str(uWON) + '%' "'" + 'order by name asc').fetchmany(
                 nTables)
 
-            # print('\nAll DNV Tables:', mTables)
+            ptype = 'MGM'
             # List all tables in DNV Configuration -----------[]
             T1 = str(mTables[0][0])
             T2 = str(mTables[1][0])
@@ -298,23 +311,34 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
                 print(i, item)
 
         else:
-            print('Work Order Number not found !')
+            print('Invalid number of DNV/MGM Tables or WON not found!')
+            mTables = 0
+            ptype = 'UNK'
             errornotFoundWON()
-            # gOEE = mP.seek_OEE_data()               # Default to current date's OEE
-            # newREC = '0'
 
         # Verify OEE data against user specified WON ----[] # we require OEE data.
-        checkOEE = str(mTables[0][1])                       # pick date column data [2025-06-04 10:41:46.613]
-        date = datetime.strptime(checkOEE, "%Y-%m-%d  %H:%M:%S.%f")
-        checkOEE = str(date.year)
+        if not mTables:
+            checkOEE = mP.seek_OEE_data()
+            derivedOEE = checkOEE
+            prodT = ptype
+        else:
+            checkOEE = str(mTables[0][1])                       # pick date column data [2025-06-04 10:41:46.613]
+            date = datetime.strptime(checkOEE, "%Y-%m-%d  %H:%M:%S.%f")
+            checkOEE = str(date.year)
+            prodT = ptype
 
-        # Parse the date string -----------------------------#
-        if len(str(date.month)) < 2:
-            xmonth = '0' + str(date.month)
-        if len(str(date.day)) < 2:
-            xday = '0' + str(date.day)
-        # print('TP5:', checkOEE, xmonth, xday)               # TP5: 2025 06 04
-        derivedOEE = checkOEE + xmonth + xday                 # TP6: 20250604
+            # Parse the date string -----------------------------#
+            if len(str(date.month)) < 2:
+                xmonth = '0' + str(date.month)
+            else:
+                xmonth = str(date.month)
+
+            if len(str(date.day)) < 2:
+                xday = '0' + str(date.day)
+            else:
+                xday = str(date.day)
+            # print('TP5:', checkOEE, xmonth, xday)               # TP5: 2025 06 04
+            derivedOEE = checkOEE + xmonth + xday                 # TP6: 20250604
     # --------------------------------------------------------------------------------[]
     organicID, oeeID = srcforOEE(derivedOEE)  # search table record for matching OEEid
     print('Valid Code:', organicID)
@@ -323,11 +347,13 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
     if organicID == 'E':
         gOEE = mP.get_encodedFiles()
         newREC = organicID
+        pType = prodT
     else:
         gOEE = oeeID
         newREC = organicID                  # Valid  = 'O' for organic
-    print('TP7:', gOEE, newREC)
+        pType = 'UNK'
+    print('TP7:', gOEE, newREC, pType)
 
-    return gOEE, newREC
+    return gOEE, newREC, pType
 
 

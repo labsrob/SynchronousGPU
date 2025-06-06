@@ -553,8 +553,8 @@ def tabbed_cascadeMode(pMode):
     # ----------------------------------------------------------[]
 
     # Set up embedding notebook (tabs) ------------------------[B]
-    notebook = ttk.Notebook(root, width=2500, height=850)       # Declare Tab overall Screen size
-    notebook.grid(column=0, row=0, padx=10, pady=450)           # Tab's spatial position on the Parent
+    notebook = ttk.Notebook(root, width=2800, height=850)       # Declare Tab overall Screen size [2500]
+    notebook.grid(column=0, row=0, padx=10, pady=450)           # Tab's spatial position on the Parent [10]
     tab1 = ttk.Frame(notebook)
     tab2 = ttk.Frame(notebook)
     tab3 = ttk.Frame(notebook)
@@ -578,19 +578,22 @@ def tabbed_cascadeMode(pMode):
     root.mainloop()
 
 
-def tabbed_canvas(pMode):   # Tabbed Common Classes -------------------[TABBED ]
-    global hostConn
+def tabbed_canvas(vMode, pType):   # Tabbed Common Classes -------------------[TABBED ]
+    global hostConn, pRecipe
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
     """
-    if pMode == 1:
+    if vMode == 1:
         print('Connecting to PLC Host...')
-    elif pMode == 2:
+    elif vMode == 2:
         print('Connecting to SQL Server...')
     else:
         print('Standby/Maintenance Mode')
 
+    # Specify production type -------
+    pRecipe = pType
+    print('\nProcess:', pRecipe)
 
     s = ttk.Style()
     s.theme_use('default')
@@ -606,22 +609,29 @@ def tabbed_canvas(pMode):   # Tabbed Common Classes -------------------[TABBED ]
     # Load from CFG fine and parse the variables ------[x]
 
     # Set up embedding notebook (tabs) ----------------[B]
-    notebook = ttk.Notebook(root, width=2500, height=850)   # Declare Tab overall Screen size
+    notebook = ttk.Notebook(root, width=2800, height=850)   # Declare Tab overall Screen size
     notebook.grid(column=0, row=0, padx=10, pady=450)       # Tab's spatial position on the Parent
-    tab1 = ttk.Frame(notebook)
-    tab2 = ttk.Frame(notebook)
-    tab3 = ttk.Frame(notebook)
-    tab4 = ttk.Frame(notebook)
-    tab5 = ttk.Frame(notebook)
-    tab6 = ttk.Frame(notebook)
-    tab7 = ttk.Frame(notebook)
-    tab8 = ttk.Frame(notebook)
-    tab9 = ttk.Frame(notebook)
-    tab10 = ttk.Frame(notebook)
+    if pRecipe == 'DNV':
+        tab1 = ttk.Frame(notebook)
+        tab2 = ttk.Frame(notebook)
+        tab3 = ttk.Frame(notebook)
+        tab4 = ttk.Frame(notebook)
+        tab5 = ttk.Frame(notebook)
+        tab6 = ttk.Frame(notebook)
+    else:
+        tab1 = ttk.Frame(notebook)
+        tab2 = ttk.Frame(notebook)
+        tab3 = ttk.Frame(notebook)
+        tab4 = ttk.Frame(notebook)
+        tab5 = ttk.Frame(notebook)
+        tab6 = ttk.Frame(notebook)
+        tab7 = ttk.Frame(notebook)
+        tab8 = ttk.Frame(notebook)
+        tab9 = ttk.Frame(notebook)
+        tab10 = ttk.Frame(notebook)
 
     # ------------------------------------------ DNV Statistical Process Parameters -----[]
-    if int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA):
-        pRecipe = 'DNV'
+    if pRecipe == 'DNV': # and int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA):
         print('Loading DNV Algorithm...\n')
         notebook.add(tab1, text="Tape Temperature")         # Stats x16
         notebook.add(tab2, text="Substrate Temperature")    # Stats x16
@@ -632,8 +642,7 @@ def tabbed_canvas(pMode):   # Tabbed Common Classes -------------------[TABBED ]
         notebook.add(tab5, text="EoL Report System")        # Report
         notebook.add(tab6, text="EoP Report System")        # Report
 
-    elif int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
-        pRecipe = 'MGMR'
+    elif pRecipe == 'MGM': # and int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
         print('Loading Commercial Algorithm...\n')
         notebook.add(tab1, text="Laser Power")              # Stats
         notebook.add(tab2, text="Laser Angle")              # Stats
@@ -650,21 +659,8 @@ def tabbed_canvas(pMode):   # Tabbed Common Classes -------------------[TABBED ]
         notebook.add(tab10, text="EoP Report System")
 
     else:  # Bespoke selection only affects Runtime Monitoring Reports
-        pRecipe = 'USR'
+        pass
         print('Loading Bespoke User Selection Algorithm...')
-        notebook.add(tab1, text="Laser Power")           # Stats
-        notebook.add(tab2, text="Laser Angle")           # Stats
-        notebook.add(tab3, text="Roller Force")          # Stats
-        # -----------------------------------------------#
-        notebook.add(tab4, text="Tape Temperature")      # Stats
-        notebook.add(tab5, text="Subs Temperature")      # Stats
-        notebook.add(tab6, text="Tape Placement Error")  # Stats
-        notebook.add(tab7, text="Tape Gap Polarisation") # Stats x4 per Ring
-        # -----------------------------------------------#
-        notebook.add(tab8, text="[Runtime Monitoring]")  # User Bespoke selection - LP, LA, RP, WS, TG, RP
-        # -----------------------------------------------#
-        notebook.add(tab9, text="EoL Report System")
-        notebook.add(tab10, text="EoP Report System")
 
     notebook.grid()
 
@@ -720,36 +716,7 @@ def tabbed_canvas(pMode):   # Tabbed Common Classes -------------------[TABBED ]
         app10.grid(column=0, row=0, padx=10, pady=10)
         # ------------------------------------------[]
     else:       # USR Selection
-        app1 = laserPowerTabb(master=tab1)
-        app1.grid(column=0, row=0, padx=10, pady=10)
-
-        app2 = laserAngleTabb(master=tab2)
-        app2.grid(column=0, row=0, padx=10, pady=10)
-
-        app3 = rollerForceTabb(master=tab3)
-        app3.grid(column=0, row=0, padx=10, pady=10)
-
-        app4 = tapeTempTabb(master=tab4)
-        app4.grid(column=0, row=0, padx=10, pady=10)
-
-        app5 = substTempTabb(master=tab5)
-        app5.grid(column=0, row=0, padx=10, pady=10)
-
-        app6 = tapePlacementTabb(master=tab6)
-        app6.grid(column=0, row=0, padx=10, pady=10)  # Tape Placement Error
-
-        app7 = tapeGapPolTabb(master=tab7)
-        app7.grid(column=0, row=0, padx=10, pady=10)  # Tape Gap Polarisation
-        # --------------------------------------------[]
-        app8 = MonitorTabb(master=tab8)
-        app8.grid(column=0, row=0, padx=10, pady=10)
-        # --------------------------------------------[]
-        app9 = collectiveEoL(master=tab9)
-        app9.grid(column=0, row=0, padx=10, pady=10)
-
-        app10 = collectiveEoP(master=tab10)
-        app10.grid(column=0, row=0, padx=10, pady=10)
-        # ------------------------------------------[]
+        print('Details not found!')
 
     root.mainloop()
 
@@ -809,14 +776,14 @@ def plotView(titleMean):
 def readEoP(text_widget, rptID):        # End of Pipe Report
     # file_path = filedialog.askopenfilename(title='Select a Text File', filetypes=[('Text files&quot', '*.txt')])
 
-    file_path = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\FMEA_Log\\'+ rptID +'.txt'
-    rpfMissing = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\FMEA_Log\\RPT_NOTFOUND.txt'
+    file_path = 'C:\\SynchronousGPU\\FMEA_Log\\'+ rptID +'.txt'
+    rpfMissing = 'C:\\SynchronousGPU\\FMEA_Log\\RPT_NOTFOUND.txt'
     conc_RPT = ["RPT_LP_", "RPT_LA_", "RPT_TP_", "RPT_RF_", "RPT_TT_", "RPT_ST_", "RPT_TG_"]
     # -----------------------------------------------------------------
 
     if rptID == "RPT_AL_":
         counter = 1
-        file_path = 'C:\\Users\\DevEnv\\PycharmProjects\\SynchronousGPU\\FMEA_Log\\' + conc_RPT +'.txt'
+        file_path = 'C:\\SynchronousGPU\\FMEA_Log\\' + conc_RPT +'.txt'
         if os.path.isfile(file_path):
             with open(file_path, 'r') as file:
                 content = file.read()
@@ -2550,21 +2517,20 @@ class MonitorTabb(ttk.Frame):
         else:
             print('\n Users params condition met....')
             f.subplots_adjust(left=0.029, bottom=0.057, right=0.99, top=0.979, wspace=0.245, hspace=0.164)
-            # Bespoke user selection criteria -------------------------
-            print('\n Bespoke Selection Not allowed in this Version..')
+            print('Bespoke Selection Not allowed in this Version...')
             # ----------------------------------#
 
         # Declare Plots attributes -----------------[]
         plt.rcParams.update({'font.size': 7})        # Reduce font size to 7pt for all legends
         # Calibrate limits for X-moving Axis --------#
-        YScale_minMT, YScale_maxMT = 10 - 8.5, 10 + 8.5
+        YScale_minMT, YScale_maxMT = 10, 51
         window_Xmin, window_Xmax = 0, 35             # windows view = visible data points
         # -------------------------------------------#
 
         # Monitoring Parameters --------------------------------------------#
         # Element in the Monitoring Parameter plot
-        if int(mCT) and int(mOT) and int(mRP) and int(mWS):
-            monitorP = 'DNV'
+        if pRecipe == 'DNV': # int(mCT) and int(mOT) and int(mRP) and int(mWS):
+            # monitorP = 'DNV'
             a1.grid(color="0.5", linestyle='-', linewidth=0.5)
             a2.grid(color="0.5", linestyle='-', linewidth=0.5)
             a3.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2580,8 +2546,8 @@ class MonitorTabb(ttk.Frame):
             a3.set_ylabel("Cell Tension Force - N.m")       # Tension measured in Newton
             a4.set_ylabel("Oven Temperature - °C")          # Oven Temperature in Degrees Celsius
 
-        elif int(mLP) and int(mLA) and int(mCT) and int(mOT) and int(mRP):
-            monitorP = 'MGM'
+        elif pRecipe == 'MGM': # int(mLP) and int(mLA) and int(mCT) and int(mOT) and int(mRP):
+            # monitorP = 'MGM'
             a1.grid(color="0.5", linestyle='-', linewidth=0.5)
             a2.grid(color="0.5", linestyle='-', linewidth=0.5)
             a3.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2615,7 +2581,7 @@ class MonitorTabb(ttk.Frame):
         # ----------------------------------------------------------[]
 
         # Define Plot area and axes -
-        if monitorP == 'DNV':
+        if pRecipe == 'DNV':
             # -----------------------------------------------------[Roller Force]
             im10, = a1.plot([], [], 'o-', label='Roller Pressure - (R1H1)')
             im11, = a1.plot([], [], 'o-', label='Roller Pressure - (R1H2)')
@@ -2646,7 +2612,7 @@ class MonitorTabb(ttk.Frame):
             im33, = a4.plot([], [], 'o-', label='IR Oven Temperature (Lower Segment)')
             im34, = a4.plot([], [], 'o-', label='IR Oven Temperature (Upper Segment)')
 
-        elif monitorP == 'MGM':
+        elif pRecipe == 'MGM':
             # --------------------------------------------------[Laser Power]
             im10, = a1.plot([], [], 'o-', label='Laser Power - (R1H1)')
             im11, = a1.plot([], [], 'o-', label='Laser Power - (R1H2)')
@@ -2720,9 +2686,9 @@ class MonitorTabb(ttk.Frame):
             fetch_no = str(fetchT)      # entry value in string sql syntax
 
             # Obtain SQL Data Host Server ---------------------------[GEN, RP, LP, LA]
-            if monitorP == 'DNV':
+            if pRecipe == 'DNV':
                 conA, conB  = conn.cursor(), conn.cursor()  # Establish connection for SQL Table (GEN & RP)
-            elif monitorP == 'MGM':
+            elif pRecipe == 'MGM':
                 conA, conB, conC, conD = conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor()
 
             else:
@@ -2766,10 +2732,10 @@ class MonitorTabb(ttk.Frame):
 
                 else:
                     # Get list of relevant SQL Tables using conn() and execute real-time query --------------------[]
-                    if monitorP == 'DNV':
+                    if pRecipe == 'DNV':
                         dGEN, dRP = spm.dnv_sqlexec(smp_Sz, smp_St, conA, conB, T1, T2,  fetch_no)
 
-                    elif monitorP == 'MGM':
+                    elif pRecipe == 'MGM':
                         dGEN, dRP, dLP, dLA = spm.mgm_sqlexec(smp_Sz, smp_St, conA, conB, conC, conD, T1, T2, T3, T4, fetch_no)
                     else:
                         dGEN, dRP, dLP, dLA = 0, 0, 0, 0            # Assigned to Bespoke User Selection.
@@ -8874,11 +8840,14 @@ def userMenu():     # listener, myplash
                     print('Attempting connection with SQL Server...')
                     qType = 2
                     runType.append(qType)
+
                     # Connect to SQL Server -----------------------[]
-                    OEEdataID, processID = wo.srcTable(sDate1, sDate2, uWON)     # Query SQL record
-                    if processID > 1:
+                    oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)     # Query SQL record
+                    print('\nSearch Return:', oeeValid, organicID)
+                    # ---------------------------------------------[]
+                    if organicID != 'G':
                         print('\nSelecting Cascade View....')
-                        tabbed_cascadeMode(qType)   # Cascade
+                        tabbed_cascadeMode(qType, pType)   # Cascade
                     else:
                         process.entryconfig(0, state='normal')
                         print('Invalid post processing data or Production record not found..')
@@ -8907,13 +8876,13 @@ def userMenu():     # listener, myplash
                     runType.append(qType)
 
                     # connect SQL Server and obtain Process ID ----#
-                    oeeValid, organicID = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
+                    oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
                     print('\nSearch Return:', oeeValid, organicID)
 
                     # ---------------------------------------------[]
-                    if organicID == 'O':
+                    if organicID != 'G':
                         print('\nSelecting Tabbed View....')
-                        tabbed_canvas(qType)        # Tabbed
+                        tabbed_canvas(qType, pType)        # Tabbed
                     else:
                         process.entryconfig(1, state='normal')
                         print('Invalid post processing data or Production record not found..')

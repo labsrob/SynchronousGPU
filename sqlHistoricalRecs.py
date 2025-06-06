@@ -21,8 +21,9 @@ def seek_OEE_data():
     print('Current Date:', cDate)
 
     # Obtain OEE record in real-time ----------------------------
-    mfilename = ('OEE_' + cDate)
-    print('\nActiveOEE Table', mfilename)
+    # mfilename = ('OEE_' + cDate)
+    mfilename = (cDate)
+    print('\nNew OEE Table', 'OEE_'+mfilename)
     return mfilename
 
 
