@@ -32,6 +32,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib import colors
 from fontTools import ttLib
+import pyautogui
 
 # initializing variables with values
 fileName = 'SamplePDF.pdf'

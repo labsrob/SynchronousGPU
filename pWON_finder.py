@@ -352,6 +352,7 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         gOEE = oeeID
         newREC = organicID                  # Valid  = 'O' for organic
         pType = 'UNK'
+    # gOEE = OEE Table | newREC = if OEE is not multiple | pType = DNV/MGM
     print('TP7:', gOEE, newREC, pType)
 
     return gOEE, newREC, pType

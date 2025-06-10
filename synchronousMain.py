@@ -521,18 +521,22 @@ def menuExit():
 
 # ------------------------------------------------------------------------------------[ MAIN PROGRAM ]
 
-def tabbed_cascadeMode(pMode):
-    global p1, p2, p3, p4, p5, p6, p7, hostConn
+def tabbed_cascadeMode(cMode, pType):
+    global p1, p2, p3, p4, p5, p6, p7, hostConn, pRecipe
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
     """
-    if pMode == 1:
+    if cMode == 1:
         print('Connecting to PLC Host...')
-    elif pMode == 2:
+    elif cMode == 2:
         print('Connecting to SQL Server...')
     else:
         print('Standby/Maintenance Mode...')
+
+    # Specify production type -----------[DNV/MGM]
+    pRecipe = pType
+    print('\nProcess:', pRecipe)
 
     s = ttk.Style()
     s.theme_use('default')  # Options: ('clam', 'alt', 'default', 'classic')
@@ -549,11 +553,11 @@ def tabbed_cascadeMode(pMode):
 
     # Load class object from Cascade Switcher Method -----------[x]
     import CascadeSwitcher as cs
-    p1, p2, p3, p4, p5, p6, p7 = cs.myMain(rType, pRecipe)      # runtimeType, process RecipeType
+    p1, p2, p3, p4, p5, p6, p7 = cs.myMain(cMode, pRecipe)      # runtimeType, process RecipeType
     # ----------------------------------------------------------[]
 
     # Set up embedding notebook (tabs) ------------------------[B]
-    notebook = ttk.Notebook(root, width=2800, height=850)       # Declare Tab overall Screen size [2500]
+    notebook = ttk.Notebook(root, width=2710, height=850)       # Declare Tab overall Screen size [2500]
     notebook.grid(column=0, row=0, padx=10, pady=450)           # Tab's spatial position on the Parent [10]
     tab1 = ttk.Frame(notebook)
     tab2 = ttk.Frame(notebook)
@@ -578,20 +582,20 @@ def tabbed_cascadeMode(pMode):
     root.mainloop()
 
 
-def tabbed_canvas(vMode, pType):   # Tabbed Common Classes -------------------[TABBED ]
+def tabbed_canvas(cMode, pType):   # Tabbed Common Classes -------------------[TABBED ]
     global hostConn, pRecipe
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
     """
-    if vMode == 1:
+    if cMode == 1:
         print('Connecting to PLC Host...')
-    elif vMode == 2:
+    elif cMode == 2:
         print('Connecting to SQL Server...')
     else:
         print('Standby/Maintenance Mode')
 
-    # Specify production type -------
+    # Specify production type --------[]
     pRecipe = pType
     print('\nProcess:', pRecipe)
 
@@ -609,8 +613,8 @@ def tabbed_canvas(vMode, pType):   # Tabbed Common Classes -------------------[T
     # Load from CFG fine and parse the variables ------[x]
 
     # Set up embedding notebook (tabs) ----------------[B]
-    notebook = ttk.Notebook(root, width=2800, height=850)   # Declare Tab overall Screen size
-    notebook.grid(column=0, row=0, padx=10, pady=450)       # Tab's spatial position on the Parent
+    notebook = ttk.Notebook(root, width=2710, height=850)   # Declare Tab overall Screen size[2500, 2540,]
+    notebook.grid(column=0, row=0, padx=10, pady=450)       # Tab's spatial position on the Parent [450]
     if pRecipe == 'DNV':
         tab1 = ttk.Frame(notebook)
         tab2 = ttk.Frame(notebook)
@@ -723,7 +727,7 @@ def tabbed_canvas(vMode, pType):   # Tabbed Common Classes -------------------[T
 
 def plotView(titleMean):
     # Define Axes ----------------------------------#
-    fig = Figure(figsize=(25, 7), dpi=100)  # 12.5, 7
+    fig = Figure(figsize=(27, 7), dpi=100)  # 12.5, 7
     fig.subplots_adjust(left=0.04, bottom=0.033, right=0.988, top=0.957, hspace=0.14, wspace=0.033)
     # ---------------------------------[]
     a1 = fig.add_subplot(2, 3, (1, 2))  # X Bar Plot
@@ -852,7 +856,7 @@ class collectiveEoL(ttk.Frame):
         upload_report.place(x=2380, y=1)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)
         f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.936, wspace=0.1, hspace=0.17)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, 1)         # xbar plot
@@ -1797,7 +1801,7 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         label.place(x=400, y=10)
 
         # Define Axes ----------------------------------#
-        fig = Figure(figsize=(16, 7.22), dpi=100)        # 12.5, 7
+        fig = Figure(figsize=(18, 7.21), dpi=100)        # 12.5, 7.22
         fig.subplots_adjust(left=0.04, bottom=0.033, right=0.988, top=0.957, hspace=0.14, wspace=0.033)
         # ---------------------------------[]
         a1 = fig.add_subplot(2, 3, (1, 3))              # X Bar Plot
@@ -2108,12 +2112,12 @@ class common_rampCount(ttk.Frame):
 class common_climateProfile(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.place(x=910, y=20)
+        self.place(x=915, y=20)
         self.createWidgets()
 
     def createWidgets(self):
         # -----------------------------------
-        f = Figure(figsize=(7, 4), dpi=100)
+        f = Figure(figsize=(9, 4), dpi=100)
         f.subplots_adjust(left=0.076, bottom=0.098, right=0.91, top=0.99, wspace=0.202)
         a2 = f.add_subplot(1, 1, 1)
         a3 = a2.twinx()
@@ -2303,7 +2307,7 @@ class common_climateProfile(ttk.Frame):
 class common_gapCount(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.place(x=1600, y=20)
+        self.place(x=1820, y=20)    #[1600, 20]
         self.createWidgets()
 
     def createWidgets(self):
@@ -2475,13 +2479,12 @@ class MonitorTabb(ttk.Frame):
         self.createWidgets()
 
     def createWidgets(self):
-        smp_Sz, smp_St = 30, 1      # Assumes the default statistical sampling rate
+        smp_Sz, smp_St = 28, 1      # Assumes the default statistical sampling rate
 
         # Load Quality Historical Values -----------[]
         label = ttk.Label(self, text='[' + rType + ' Mode]', font=LARGE_FONT)
         label.pack(padx=10, pady=5)
-        # ------------------------------------------[TODO if pMinMax:]
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)
 
         if pRecipe == 'DNV':
             print('\n 4 params condition met....')
@@ -2498,7 +2501,6 @@ class MonitorTabb(ttk.Frame):
 
         elif pRecipe == 'MGM':
             print('\n6 Param condition met....')
-
             f.subplots_adjust(left=0.029, bottom=0.057, right=0.99, top=0.979, wspace=0.245, hspace=0.164)
             a1 = f.add_subplot(2, 6, (1, 2))        # Laser power
             a2 = f.add_subplot(2, 6, (3, 4))        # Cell Tension
@@ -2522,24 +2524,25 @@ class MonitorTabb(ttk.Frame):
 
         # Declare Plots attributes -----------------[]
         plt.rcParams.update({'font.size': 7})        # Reduce font size to 7pt for all legends
+
         # Calibrate limits for X-moving Axis --------#
-        YScale_minMT, YScale_maxMT = 10, 51
+        YScale_minMT, YScale_maxMT = 20, 400
         window_Xmin, window_Xmax = 0, 35             # windows view = visible data points
         # -------------------------------------------#
 
         # Monitoring Parameters --------------------------------------------#
-        # Element in the Monitoring Parameter plot
         if pRecipe == 'DNV': # int(mCT) and int(mOT) and int(mRP) and int(mWS):
-            # monitorP = 'DNV'
             a1.grid(color="0.5", linestyle='-', linewidth=0.5)
             a2.grid(color="0.5", linestyle='-', linewidth=0.5)
             a3.grid(color="0.5", linestyle='-', linewidth=0.5)
             a4.grid(color="0.5", linestyle='-', linewidth=0.5)
+
             # --------- Monitoring Legend Label -------------#
             a1.legend(loc='upper right', title='Roller Pressure - MPa')
             a2.legend(loc='upper right', title='Winding Speed - m/s')
             a3.legend(loc='upper right', title='Cell Tension - N.m')
             a4.legend(loc='upper right', title='Oven Temperature - °C')
+
             # Initialise runtime limits --------------------#
             a1.set_ylabel("Roller Pressure - MPa")          # Pressure measured in Pascal
             a2.set_ylabel("Tape Winding Speed - m/s")       # Angle measured in Degrees
@@ -3116,7 +3119,7 @@ class laserPowerTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)  #[25 on 1920 x 1200 resolution screen, 27 on 4096 x2160]
         f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
@@ -3602,7 +3605,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)
         f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
@@ -4030,7 +4033,7 @@ class tapePlacementTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Set subplot embedded properties ----------------------------------[]
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)
         f.subplots_adjust(left=0.029, bottom=0.05, right=0.99, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))
@@ -4516,7 +4519,7 @@ class rollerForceTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)
         f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
@@ -5011,7 +5014,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)
         f.subplots_adjust(left=0.029, bottom=0.05, right=0.983, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 6, (1, 3))                            # xbar plot
@@ -5569,7 +5572,7 @@ class substTempTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)
         f.subplots_adjust(left=0.029, bottom=0.05, right=0.99, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))
@@ -5994,7 +5997,7 @@ class tapeGapPolTabb(ttk.Frame):
         label.pack(padx=10, pady=5)     # 10 | 5
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(25, 8), dpi=100)                        # 25,  = 12 | 8
+        f = Figure(figsize=(27, 8), dpi=100)                        # 25,  = 12 | 8
         f.subplots_adjust(left=0.026, bottom=0.045, right=0.986, top=0.967, wspace=0.217, hspace=0.162)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 6, (1, 3))                            # xbar plot
@@ -6442,7 +6445,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         label.pack(padx=10, pady=5)
 
         # Set subplot embedded properties ----------------------------------[]
-        f = Figure(figsize=(25, 8), dpi=100)
+        f = Figure(figsize=(27, 8), dpi=100)
         f.subplots_adjust(left=0.029, bottom=0.05, right=0.99, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))        # xbar plot
@@ -8838,16 +8841,16 @@ def userMenu():     # listener, myplash
                     process.entryconfig(0, state='normal')
                 else:
                     print('Attempting connection with SQL Server...')
-                    qType = 2
-                    runType.append(qType)
+                    cMode = 2
+                    runType.append(cMode)
 
                     # Connect to SQL Server -----------------------[]
-                    oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)     # Query SQL record
+                    oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)     # Query record [pType=DnV/MGM]
                     print('\nSearch Return:', oeeValid, organicID)
                     # ---------------------------------------------[]
                     if organicID != 'G':
                         print('\nSelecting Cascade View....')
-                        tabbed_cascadeMode(qType, pType)   # Cascade
+                        tabbed_cascadeMode(cMode, pType)   # cMode = connection Mode (SQL=2 | PLC=1), pType=DNV/MGM
                     else:
                         process.entryconfig(0, state='normal')
                         print('Invalid post processing data or Production record not found..')
@@ -8872,8 +8875,8 @@ def userMenu():     # listener, myplash
                     process.entryconfig(1, state='normal')
                 else:
                     print('\nAttempting connection with SQL Server...')
-                    qType = 2
-                    runType.append(qType)
+                    cMode = 2
+                    runType.append(cMode)
 
                     # connect SQL Server and obtain Process ID ----#
                     oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
@@ -8882,15 +8885,15 @@ def userMenu():     # listener, myplash
                     # ---------------------------------------------[]
                     if organicID != 'G':
                         print('\nSelecting Tabbed View....')
-                        tabbed_canvas(qType, pType)        # Tabbed
+                        tabbed_canvas(cMode, pType)        # Tabbed View
                     else:
                         process.entryconfig(1, state='normal')
                         print('Invalid post processing data or Production record not found..')
 
             else:
                 runtimeChange()
-                qType = 0
-                runType.append(qType)
+                cMode = 0
+                runType.append(cMode)
                 print('Invalid SQL Query connection...')
 
         else:
@@ -8900,8 +8903,10 @@ def userMenu():     # listener, myplash
 
 
     def realTimePlay():
-        if analysis.entrycget(0, 'state') == 'disabled' or analysis.entrycget(1, 'state') == 'disabled':
+        # Declare global variable available to all processes
+        global stpd, processWON, processID, OEEdataID, hostConn
 
+        if analysis.entrycget(0, 'state') == 'disabled' or analysis.entrycget(1, 'state') == 'disabled':
             print('\nSelection A Condition met....')
             # import dataRepository as sqld
 
@@ -8916,10 +8921,10 @@ def userMenu():     # listener, myplash
                 process.entryconfig(1, state='normal')
                 process.entryconfig(3, state='normal')
 
-                qType = 1
-                runType.append(qType)
+                cMode = 1
+                runType.append(cMode)
                 print('\nSelecting Cascade View....')
-                tabbed_cascadeMode(qType)                    # Call objective function
+                tabbed_cascadeMode(cMode, pRecipe)                    # Call objective function
 
             # Test condition for TABBED VIEW -----------------#
             elif (analysis.entrycget(1, 'state') == 'disabled'
@@ -8932,15 +8937,15 @@ def userMenu():     # listener, myplash
                 process.entryconfig(1, state='normal')
                 process.entryconfig(3, state='normal')
 
-                qType = 1
-                runType.append(qType)
+                cMode = 1
+                runType.append(cMode)
                 print('\nSelecting Tabbed View....')
-                tabbed_canvas(qType)                         # Call tabbed canvas functions
+                tabbed_canvas(cMode, pRecipe)                         # Call tabbed canvas functions
 
             else:
                 runtimeChange()
-                qType = 0
-                runType.append(qType)
+                cMode = 0
+                runType.append(cMode)
         else:
             print('Invalid selection. Please, enable visualisation mode')
 
@@ -9085,6 +9090,29 @@ def userMenu():     # listener, myplash
     # -------------------------------- APP MENU PROCEDURE START ------------------------------------------------[]
     def viewTypeA():    # enforce selection integrity ------------------[Cascade Tabb View]
         global HeadA, rType                 # declare as global variables
+        # ------------------------------[ Check valid number of attached Monitors]
+        import screeninfo as m
+        myMon = m.get_monitors()                # Automatically detect attached monitors
+        print(len(myMon))
+        print('Attached Monitors', myMon)
+
+        if len(myMon) > 1 and len(myMon) < 5:
+            scr1 = myMon[0]
+            scr2 = myMon[1]
+            scr3 = myMon[2]
+            scr4 = myMon[3]
+        elif len(myMon) > 4 and len(myMon) < 9:
+            scr1 = myMon[0]
+            scr2 = myMon[1]
+            scr3 = myMon[2]
+            scr4 = myMon[3]
+            scr5 = myMon[4]
+            scr6 = myMon[5]
+            scr7 = myMon[6]
+            scr8 = myMon[7]
+        else:
+            print('\nSorry, function NOT available, attach 4 or 8 Monitors!')
+            viewTypeB()
 
         # Define run Type -------------[]
         if runType == 1:

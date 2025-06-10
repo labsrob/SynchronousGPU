@@ -100,7 +100,6 @@ y_incmt = 30
 rtValues = []
 
 # ---- Common to all Process Procedures ---[]
-pRecipe = ""
 
 # Call function and load WON specification -----[]
 cDM, cSS, cGS, mLA, mLP, mCT, mOT, mRP, mWS, sStart, sStops, LP, LA, TP, RF, TT, ST, TG = dd.decryptMetricsGeneral(processWON[0])
@@ -3323,18 +3322,25 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 
 # ---------------------- Port windows into parallel processing ----------[]
 
-def myMain(qType, ProcID):
-    global pType, pParam, smp_Sz, stp_Sz # , p1, p2, p3, p4, p5, p6, p7
-
-    pType = qType
+def myMain(cMode, ProcID):
+    global pParam, smp_Sz, stp_Sz # , p1, p2, p3, p4, p5, p6, p7
+    # ---------------------------
     pParam = ProcID
+
+    # -----------------------------[]
+    if cMode == 1:
+        pMode = 'Live Processing'
+    elif cMode == 2:
+        pMode = 'Post Processing'
+    else:
+        pMode = 'Standby/Maintenace'
 
     # print('\nP-Type..:', pType)
     if ProcID == 'DNV':
         # if GPU -------------------------------------------------#
-        p1 = Process(target=ttProcessParam, args=(countA, pType))          # name="CascadeTT")
-        p2 = Process(target=stProcessParam, args=(countB, pType))          # name="CascadeST")
-        p3 = Process(target=tgProcessParam, args=(countC, pType))          # name="CascadeTG")
+        p1 = Process(target=ttProcessParam, args=(countA, pMode))          # name="CascadeTT")
+        p2 = Process(target=stProcessParam, args=(countB, pMode))          # name="CascadeST")
+        p3 = Process(target=tgProcessParam, args=(countC, pMode))          # name="CascadeTG")
         p4 = 0
         p5 = 0
         p6 = 0
@@ -3346,13 +3352,13 @@ def myMain(qType, ProcID):
 
     elif ProcID == 'MGM':
         # if GPU -------------------------------------------------#
-        p1 = Process(target=lpProcessParam, args=(countA, pType))           # name="CascadeRF")
-        p2 = Process(target=laProcessParam, args=(countB, pType))           # name="CascadeTT")
-        p3 = Process(target=tpProcessParam, args=(countC, pType))           # name="CascadeST")
-        p4 = Process(target=rfProcessParam, args=(countD, pType))           # name="CascadeTS")
-        p5 = Process(target=ttProcessParam, args=(countE, pType))           # name="CascadeTG")
-        p6 = Process(target=stProcessParam, args=(countF, pType))           # name="CascadeTG")
-        p7 = Process(target=tgProcessParam, args=(countG, pType))           # name="CascadeTG")
+        p1 = Process(target=lpProcessParam, args=(countA, pMode))           # name="CascadeRF")
+        p2 = Process(target=laProcessParam, args=(countB, pMode))           # name="CascadeTT")
+        p3 = Process(target=tpProcessParam, args=(countC, pMode))           # name="CascadeST")
+        p4 = Process(target=rfProcessParam, args=(countD, pMode))           # name="CascadeTS")
+        p5 = Process(target=ttProcessParam, args=(countE, pMode))           # name="CascadeTG")
+        p6 = Process(target=stProcessParam, args=(countF, pMode))           # name="CascadeTG")
+        p7 = Process(target=tgProcessParam, args=(countG, pMode))           # name="CascadeTG")
 
         p1.start()                                                          # Quality parameter 1
         p2.start()                                                          # Quality parameter 2
