@@ -742,20 +742,20 @@ def func2(a):
         a[i] += 29
 
 
-if __name__ == "__main__":
-    data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    n = 10000000
-    a = np.ones(n, dtype=np.float64)
-
-    start = timer()
-    func(a)
-    print("\nUsing CPU:", timer() - start)
-
-    start = timer()
-    func2(a)
-    print("\nUsing GPU:", timer() - start)
-
-    from numba import jit, int32
+# if __name__ == "__main__":
+#     data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+#     n = 10000000
+#     a = np.ones(n, dtype=np.float64)
+#
+#     start = timer()
+#     func(a)
+#     print("\nUsing CPU:", timer() - start)
+#
+#     start = timer()
+#     func2(a)
+#     print("\nUsing GPU:", timer() - start)
+#
+#     from numba import jit, int32
 
 
 
@@ -795,3 +795,92 @@ if __name__ == "__main__":
 #     device = torch.device("cpu")
 #     device = 'CPU'
 # print("\nUsing", device, "device")
+
+import tkinter as tk
+from tkinter import ttk
+import time
+
+def start_progress():
+    progress.start()
+
+    # Simulate a task that takes time to complete
+    for i in range(101):
+      # Simulate some work
+        time.sleep(0.05)
+        progress['value'] = i
+        # Update the GUI
+        root.update_idletasks()
+    progress.stop()
+
+root = tk.Tk()
+root.title("Progressbar Example")
+
+# Create a progressbar widget
+progress = ttk.Progressbar(root, orient="horizontal", length=300, mode="determinate")
+progress.pack(pady=20)
+
+# Button to start progress
+start_button = tk.Button(root, text="Start Progress", command=start_progress)
+start_button.pack(pady=10)
+
+root.mainloop()
+
+# -----------------------------------------[]
+import ctypes
+user = ctypes.windll.user32
+
+class RECT(ctypes.Structure):
+  _fields_ = [
+    ('left', ctypes.c_long),
+    ('top', ctypes.c_long),
+    ('right', ctypes.c_long),
+    ('bottom', ctypes.c_long)
+    ]
+  def dump(self):
+    return [int(val) for val in (self.left, self.top, self.right, self.bottom)]
+
+class MONITORINFO(ctypes.Structure):
+  _fields_ = [
+    ('cbSize', ctypes.c_ulong),
+    ('rcMonitor', RECT),
+    ('rcWork', RECT),
+    ('dwFlags', ctypes.c_ulong)
+    ]
+
+def get_monitors():
+  retval = []
+  CBFUNC = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong, ctypes.POINTER(RECT), ctypes.c_double)
+  def cb(hMonitor, hdcMonitor, lprcMonitor, dwData):
+    r = lprcMonitor.contents
+    #print("cb: %s %s %s %s %s %s %s %s" % (hMonitor, type(hMonitor), hdcMonitor, type(hdcMonitor), lprcMonitor, type(lprcMonitor), dwData, type(dwData)))
+    data = [hMonitor]
+    data.append(r.dump())
+    retval.append(data)
+    return 1
+  cbfunc = CBFUNC(cb)
+  temp = user.EnumDisplayMonitors(0, 0, cbfunc, 0)
+  #print(temp)
+  return retval
+
+def monitor_areas():
+  retval = []
+  monitors = get_monitors()
+  for hMonitor, extents in monitors:
+    data = [hMonitor]
+    mi = MONITORINFO()
+    mi.cbSize = ctypes.sizeof(MONITORINFO)
+    mi.rcMonitor = RECT()
+    mi.rcWork = RECT()
+    res = user.GetMonitorInfoA(hMonitor, ctypes.byref(mi))
+    data = mi.rcMonitor.dump()
+#    data.append(mi.rcWork.dump())
+    retval.append(data)
+  return retval
+
+
+if __name__ == "__main__":
+  print(monitor_areas())
+
+
+# ------------------------------------------[]
+myList = Monitor(x=0, y=0, width=2560, height=1440, width_mm=597, height_mm=336, name='\\\\.\\DISPLAY1', is_primary=True)

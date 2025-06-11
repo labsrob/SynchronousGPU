@@ -25,6 +25,7 @@ import spcWatchDog as wd
 LARGE_FONT = ("Verdana", 12, 'bold')
 import matplotlib.patches as patches
 from mpl_interactions import zoom_factory
+import screeninfo as m
 
 import rtP_Evaluator as tq
 # -------PLC/SQL Query --------#
@@ -3323,9 +3324,63 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 # ---------------------- Port windows into parallel processing ----------[]
 
 def myMain(cMode, ProcID):
-    global pParam, smp_Sz, stp_Sz # , p1, p2, p3, p4, p5, p6, p7
+    global pParam, smp_Sz, stp_Sz, p1, p2, p3, p4, p5, p6, p7
     # ---------------------------
     pParam = ProcID
+
+    myMon = m.get_monitors()                    # Automatically detect attached monitors
+    if len(myMon) >= 4 and pRecipe == 'DNV':    # number of detected monitors
+        scr1 = str(myMon[0]).split(" ")         # compute screen coordinates for attached monitors
+        scr1 = scr1[0][10:11]
+        # -------------------
+        scr2 = str(myMon[1]).split(" ")
+        scr2 = scr2[0][10:14]
+        # -------------------
+        scr3 = str(myMon[2]).split(" ")
+        scr3 = scr3[0][10:14]
+        # -------------------
+        scr4 = str(myMon[3]).split(" ")
+        scr4 = scr4[0][10:14]
+        # -------------------
+        scr5 = 0
+        scr6 = 0
+        scr7 = 0
+        scr8 = 0
+    elif len(myMon) >= 8 and pRecipe == 'MGM':
+        scr1 = str(myMon[0]).split(" ")         # compute screen coordinates for attached monitors
+        scr1 = scr1[0][10:11]
+        # -------------------
+        scr2 = str(myMon[1]).split(" ")
+        scr2 = scr2[0][10:14]
+        # -------------------
+        scr3 = str(myMon[2]).split(" ")
+        scr3 = scr3[0][10:14]
+        # -------------------
+        scr4 = str(myMon[3]).split(" ")
+        scr4 = scr4[0][10:14]
+        # -------------------
+        scr5 = str(myMon[4]).split(" ")
+        scr5 = scr5[0][10:14]
+        # -------------------
+        scr6 = str(myMon[5]).split(" ")
+        scr6 = scr6[0][10:14]
+        # -------------------
+        scr7 = str(myMon[6]).split(" ")
+        scr7 = scr7[0][10:14]
+        # -------------------
+        scr8 = str(myMon[7]).split(" ")
+        scr8 = scr8[0][10:14]
+    else:
+        scr1 = 0
+        scr2 = 0
+        scr3 = 0
+        scr4 = 0
+        scr5 = 0
+        scr6 = 0
+        scr7 = 0
+        scr8 = 0
+        print('\nAttached Monitors', myMon)
+        print('Sorry, multiple screen function is NOT available, attach 4 or 8 Monitors!')
 
     # -----------------------------[]
     if cMode == 1:
@@ -3333,14 +3388,17 @@ def myMain(cMode, ProcID):
     elif cMode == 2:
         pMode = 'Post Processing'
     else:
-        pMode = 'Standby/Maintenace'
+        pMode = 'Standby/Maintenance'
 
     # print('\nP-Type..:', pType)
-    if ProcID == 'DNV':
+    if ProcID == 'DNV': # and len(myMon) >= 4:
         # if GPU -------------------------------------------------#
         p1 = Process(target=ttProcessParam, args=(countA, pMode))          # name="CascadeTT")
+        p1.moveTo(x=int(scr2), y=0)  # move visualisation to screen 2
         p2 = Process(target=stProcessParam, args=(countB, pMode))          # name="CascadeST")
+        p2.moveTo(x=int(scr3), y=0)  # move visualisation to screen 3
         p3 = Process(target=tgProcessParam, args=(countC, pMode))          # name="CascadeTG")
+        p3.moveTo(x=int(scr4), y=0)  # move visualisation to screen 3
         p4 = 0
         p5 = 0
         p6 = 0
@@ -3350,15 +3408,22 @@ def myMain(cMode, ProcID):
         p2.start()                                                          # Quality parameter 2
         p3.start()                                                          # Quality parameter 3
 
-    elif ProcID == 'MGM':
+    elif ProcID == 'MGM' and len(myMon) >= 8:
         # if GPU -------------------------------------------------#
         p1 = Process(target=lpProcessParam, args=(countA, pMode))           # name="CascadeRF")
+        p1.moveTo(x=int(scr2), y=0)  # move visualisation to screen 2
         p2 = Process(target=laProcessParam, args=(countB, pMode))           # name="CascadeTT")
+        p2.moveTo(x=int(scr3), y=0)  # move visualisation to screen 2
         p3 = Process(target=tpProcessParam, args=(countC, pMode))           # name="CascadeST")
+        p3.moveTo(x=int(scr4), y=0)  # move visualisation to screen 2
         p4 = Process(target=rfProcessParam, args=(countD, pMode))           # name="CascadeTS")
+        p4.moveTo(x=int(scr5), y=0)  # move visualisation to screen 2
         p5 = Process(target=ttProcessParam, args=(countE, pMode))           # name="CascadeTG")
+        p5.moveTo(x=int(scr6), y=0)  # move visualisation to screen 2
         p6 = Process(target=stProcessParam, args=(countF, pMode))           # name="CascadeTG")
+        p6.moveTo(x=int(scr7), y=0)  # move visualisation to screen 2
         p7 = Process(target=tgProcessParam, args=(countG, pMode))           # name="CascadeTG")
+        p7.moveTo(x=int(scr8), y=0)  # move visualisation to screen 2
 
         p1.start()                                                          # Quality parameter 1
         p2.start()                                                          # Quality parameter 2

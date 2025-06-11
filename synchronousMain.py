@@ -42,6 +42,9 @@ import selDataColsProcMonitor as qpm        # Production Monitors
 import selDataColsWA as qwa                 # winding angle
 # import selDataColsOE as qoe               # OEE TechnipFMC
 # -------------------------#
+import GPUtil as gp
+import screeninfo as m
+
 import pdfkit
 from fpdf import FPDF
 import time
@@ -99,6 +102,19 @@ try:
     print('Nvidia GPU detected!')
 except Exception:
     print('No Nvidia GPU in system!')
+
+# use_cuda = gp.getAvailable()
+# print('\nCUDA Version:', torch.version.cuda)
+#
+# if use_cuda:
+#     print('__CUDNN VERSION:', torch.backends.cudnn.version())
+#     print('__Number CUDA Devices:', torch.cuda.device_count())
+#     print('__CUDA Device Name:', torch.cuda.get_device_name(0))
+#     print('__CUDA Device Total Memory [GB]:',torch.cuda.get_device_properties(0).total_memory/1e9)
+# else:
+#     print('GPU Not detected...')
+#     device = torch.device("cuda" if use_cuda else "cpu")
+#     print("Device In Use: ", device)
 
 # ----------------------- Audible alert --------------------------------------------------[]
 impath ='C:\\SynchronousGPU\\Media\\'
@@ -536,7 +552,7 @@ def tabbed_cascadeMode(cMode, pType):
 
     # Specify production type -----------[DNV/MGM]
     pRecipe = pType
-    print('\nProcess:', pRecipe)
+    print('Loading ' + pRecipe + ' Production Data...\n')
 
     s = ttk.Style()
     s.theme_use('default')  # Options: ('clam', 'alt', 'default', 'classic')
@@ -597,7 +613,7 @@ def tabbed_canvas(cMode, pType):   # Tabbed Common Classes -------------------[T
 
     # Specify production type --------[]
     pRecipe = pType
-    print('\nProcess:', pRecipe)
+    print('Loading ' + pRecipe + ' Production Data...\n')
 
     s = ttk.Style()
     s.theme_use('default')
@@ -8521,8 +8537,6 @@ def userMenu():     # listener, myplash
         # pop.grab_release()
         return
 
-
-
     def serverSQLConfig():
         global pop, sqlRO, seripSql, sqlid, uname, autho, e4
 
@@ -8816,11 +8830,14 @@ def userMenu():     # listener, myplash
         # Declare global variable available to all processes
         global stpd, processWON, processID, OEEdataID, hostConn
 
+        # ------------------------------[ Check valid number of attached Monitors]
+        myMon = m.get_monitors()                    # Automatically detect attached monitors
+        # print('\nAttached Monitors:', len(myMon))
+
         if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
             print('\nSelection Condition met...')
             # import signal
             # os.kill(sid, signal.SIGTERM)
-
             # Cascade View Date String Search ------------------------[]
             if (process.entrycget(0, 'state') == 'disabled'
                     and process.entrycget(1, 'state') == 'normal'
@@ -8848,9 +8865,19 @@ def userMenu():     # listener, myplash
                     oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)     # Query record [pType=DnV/MGM]
                     print('\nSearch Return:', oeeValid, organicID)
                     # ---------------------------------------------[]
-                    if organicID != 'G':
+                    if organicID != 'G' and len(myMon) >= 4 and pRecipe == 'DNV':
                         print('\nSelecting Cascade View....')
-                        tabbed_cascadeMode(cMode, pType)   # cMode = connection Mode (SQL=2 | PLC=1), pType=DNV/MGM
+                        tabbed_cascadeMode(cMode, pType)                        # Cascade View
+
+                    elif organicID != 'G' and len(myMon) >= 8 and pRecipe == 'MGM':
+                        print('\nSelecting Cascade View....')
+                        tabbed_cascadeMode(cMode, pType)                        # Cascade View
+
+                    elif organicID != 'G' and len(myMon) >= 1 or len(myMon) <= 4:
+                        print('\nSorry, multiple Screen display is required for Cascade View!')
+                        print('Attached Monitor(s):', myMon)
+                        print('Switching back to Tabbed View...')
+                        tabbed_canvas(cMode, pType)                             # Tabbed View
                     else:
                         process.entryconfig(0, state='normal')
                         print('Invalid post processing data or Production record not found..')
@@ -8906,10 +8933,14 @@ def userMenu():     # listener, myplash
         # Declare global variable available to all processes
         global stpd, processWON, processID, OEEdataID, hostConn
 
+        # ------------------------------[ Check valid number of attached Monitors]
+        import screeninfo as m
+        myMon = m.get_monitors()            # Automatically detect attached monitors
+        # print('Attached Monitors:', len(myMon))
+
         if analysis.entrycget(0, 'state') == 'disabled' or analysis.entrycget(1, 'state') == 'disabled':
             print('\nSelection A Condition met....')
             # import dataRepository as sqld
-
             # Test condition for CASCADE VIEW -----------------#
             if (analysis.entrycget(0, 'state') == 'disabled'
                     and analysis.entrycget(1, 'state') == 'normal'
@@ -8924,7 +8955,22 @@ def userMenu():     # listener, myplash
                 cMode = 1
                 runType.append(cMode)
                 print('\nSelecting Cascade View....')
-                tabbed_cascadeMode(cMode, pRecipe)                    # Call objective function
+
+                if len(myMon) >= 4 and pRecipe == 'DNV':
+                    print('\nSelecting Cascade View....')
+                    tabbed_cascadeMode(cMode, pRecipe)                  # Cascade View
+
+                elif len(myMon) >= 8 and pRecipe == 'MGM':
+                    print('\nSelecting Cascade View....')
+                    tabbed_cascadeMode(cMode, pRecipe)                  # Cascade View
+
+                elif len(myMon) >= 1 or len(myMon) <= 4:
+                    print('\nSorry, multiple screen function is NOT available, attach 4 or 8 Monitors!')
+                    print('Attached Monitors', myMon)
+                    print('Selecting Tabbed View....')
+                    tabbed_canvas(cMode, pRecipe)                       # Tabbed View
+                else:
+                    print('Invalid post processing data or Production record not found..')
 
             # Test condition for TABBED VIEW -----------------#
             elif (analysis.entrycget(1, 'state') == 'disabled'
@@ -9090,29 +9136,6 @@ def userMenu():     # listener, myplash
     # -------------------------------- APP MENU PROCEDURE START ------------------------------------------------[]
     def viewTypeA():    # enforce selection integrity ------------------[Cascade Tabb View]
         global HeadA, rType                 # declare as global variables
-        # ------------------------------[ Check valid number of attached Monitors]
-        import screeninfo as m
-        myMon = m.get_monitors()                # Automatically detect attached monitors
-        print(len(myMon))
-        print('Attached Monitors', myMon)
-
-        if len(myMon) > 1 and len(myMon) < 5:
-            scr1 = myMon[0]
-            scr2 = myMon[1]
-            scr3 = myMon[2]
-            scr4 = myMon[3]
-        elif len(myMon) > 4 and len(myMon) < 9:
-            scr1 = myMon[0]
-            scr2 = myMon[1]
-            scr3 = myMon[2]
-            scr4 = myMon[3]
-            scr5 = myMon[4]
-            scr6 = myMon[5]
-            scr7 = myMon[6]
-            scr8 = myMon[7]
-        else:
-            print('\nSorry, function NOT available, attach 4 or 8 Monitors!')
-            viewTypeB()
 
         # Define run Type -------------[]
         if runType == 1:
