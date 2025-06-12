@@ -9,14 +9,9 @@ Roller Pressure measured in Pascal (Pa)
 
 def validCols(pParam, WON):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'RP1_'+ WON[0]:
-        columns = ['tStamp', 'cLayer', 'R1H1RP', 'R1H2RP', 'R1H3RP',
-                   'R1H4RP', 'R2H1RP', 'R2H2RP', 'R2H3RP', 'R2H4RP']
-
-    elif pParam == 'RP2_'+ WON[0]:
-        columns = ['tStamp', 'cLayer','R3H1RP', 'R3H2RP', 'R3H3RP',
-                   'R3H4RP', 'R4H1RP', 'R4H2RP', ' R4H3RP', 'R4H4RP']
-
+    if pParam == 'GEN_'+ WON[0]:
+        columns = ['tStamp', 'cTensX', 'oTempA', 'oTempB',
+                   'iTempA', 'iTempB', 'wSpeedA', 'wSpeedB', 'wSpeedC', 'wSpeedD', 'PipeDi', 'cLayer']
     else:
         print('Invalid Columns or Query error...')
 

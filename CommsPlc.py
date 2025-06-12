@@ -775,46 +775,48 @@ def getData_rf():
 	return y_rp
 
 
-# --------------------- TODO ---------------------------------------------------[set memory offset in PLC]
-def getData_tt():
-	# Tape Speed --------R1
-	TS1 = readInteger(db_number, start_offset[64], bit_offset[0])  # Sql Table 1 Ring-1 - 902.0
-	y_ts.append(TS1)
-	TS2 = readInteger(db_number, start_offset[65], bit_offset[0])  # Sql Table 2 Ring-1 - 904.0
-	y_ts.append(TS2)
-	TS3 = readInteger(db_number, start_offset[66], bit_offset[0])  # Sql Table 3 Ring-2 - 906.0
-	y_ts.append(TS3)
-	TS4 = readInteger(db_number, start_offset[67], bit_offset[0])  # Sql Table 4 Ring-2 - 908.0
-	y_ts.append(TS4)
-	# Tape Speed --------R2
-	TS1 = readInteger(db_number, start_offset[64], bit_offset[0])  # Sql Table 1 Ring-1 - 902.0
-	y_ts.append(TS1)
-	TS2 = readInteger(db_number, start_offset[65], bit_offset[0])  # Sql Table 2 Ring-1 - 904.0
-	y_ts.append(TS2)
-	TS3 = readInteger(db_number, start_offset[66], bit_offset[0])  # Sql Table 3 Ring-2 - 906.0
-	y_ts.append(TS3)
-	TS4 = readInteger(db_number, start_offset[67], bit_offset[0])  # Sql Table 4 Ring-2 - 908.0
-	y_ts.append(TS4)
-	# Tape Speed --------R3
-	TS1 = readInteger(db_number, start_offset[64], bit_offset[0])  # Sql Table 1 Ring-1 - 902.0
-	y_ts.append(TS1)
-	TS2 = readInteger(db_number, start_offset[65], bit_offset[0])  # Sql Table 2 Ring-1 - 904.0
-	y_ts.append(TS2)
-	TS3 = readInteger(db_number, start_offset[66], bit_offset[0])  # Sql Table 3 Ring-2 - 906.0
-	y_ts.append(TS3)
-	TS4 = readInteger(db_number, start_offset[67], bit_offset[0])  # Sql Table 4 Ring-2 - 908.0
-	y_ts.append(TS4)
-	# Tape Speed --------R4
-	TS1 = readInteger(db_number, start_offset[64], bit_offset[0])  # Sql Table 1 Ring-1 - 902.0
-	y_ts.append(TS1)
-	TS2 = readInteger(db_number, start_offset[65], bit_offset[0])  # Sql Table 2 Ring-1 - 904.0
-	y_ts.append(TS2)
-	TS3 = readInteger(db_number, start_offset[66], bit_offset[0])  # Sql Table 3 Ring-2 - 906.0
-	y_ts.append(TS3)
-	TS4 = readInteger(db_number, start_offset[67], bit_offset[0])  # Sql Table 4 Ring-2 - 908.0
-	y_ts.append(TS4)
+# --------------------- TODO ---------------------------------------------------[Tape Temperature db]
+def getData_tt(db_number):
+	# Tape Temp --------R1
+	TS0 = readInteger(db_number, start_offset[0], bit_offset[0])  # cLayer
+	y_tt.append(TS0)
+	TS1 = readInteger(db_number, start_offset[2], bit_offset[0])  # R1H1
+	y_tt.append(TS1)
+	TS2 = readInteger(db_number, start_offset[4], bit_offset[0])  # R1H2
+	y_tt.append(TS2)
+	TS3 = readInteger(db_number, start_offset[6], bit_offset[0])  # R1H3
+	y_tt.append(TS3)
+	TS4 = readInteger(db_number, start_offset[8], bit_offset[0])  # R1H4
+	y_tt.append(TS4)
+	# Tape Temp --------R2
+	TS1 = readInteger(db_number, start_offset[10], bit_offset[0])  # R2H1
+	y_tt.append(TS1)
+	TS2 = readInteger(db_number, start_offset[12], bit_offset[0])  # R2H2
+	y_tt.append(TS2)
+	TS3 = readInteger(db_number, start_offset[14], bit_offset[0])  # R2H3
+	y_tt.append(TS3)
+	TS4 = readInteger(db_number, start_offset[16], bit_offset[0])  # R2H4
+	y_tt.append(TS4)
+	# Tape Temp --------R3
+	TS1 = readInteger(db_number, start_offset[18], bit_offset[0])  # R3H1
+	y_tt.append(TS1)
+	TS2 = readInteger(db_number, start_offset[20], bit_offset[0])  # R3H2
+	y_tt.append(TS2)
+	TS3 = readInteger(db_number, start_offset[22], bit_offset[0])  # R3H3
+	y_tt.append(TS3)
+	TS4 = readInteger(db_number, start_offset[24], bit_offset[0])  # R3H4
+	y_tt.append(TS4)
+	# Tape Temp --------R4
+	TS1 = readInteger(db_number, start_offset[26], bit_offset[0])  # R4H1
+	y_tt.append(TS1)
+	TS2 = readInteger(db_number, start_offset[28], bit_offset[0])  # R4H2
+	y_tt.append(TS2)
+	TS3 = readInteger(db_number, start_offset[30], bit_offset[0])  # R4H3
+	y_tt.append(TS3)
+	TS4 = readInteger(db_number, start_offset[32], bit_offset[0])  # R4H4
+	y_tt.append(TS4)
 
-	return y_ts
+	return y_tt
 
 
 # --------------------- TODO ---------------------------------------------------[set memory offset in PLC]
@@ -956,19 +958,19 @@ def paramDataRequest(pREQ, nGZ, grp_step, fetch_no):
 			y_common.append(TLayer)
 
 			if pREQ == 'RF':
-				y_rf = getData_rf()
+				y_rf = getData_rf(db_number)
 				y_common.append(y_rf)
 			elif pREQ == 'TT':
-				y_tt = getData_tt()
+				y_tt = getData_tt(db_number)
 				y_common.append(y_tt)
 			elif pREQ == 'ST':
-				y_st = getData_st()
+				y_st = getData_st(db_number)
 				y_common.append(y_st)
 			elif pREQ == 'TG':
-				y_tg = getData_tg()
+				y_tg = getData_tg(db_number)
 				y_common.append(y_tg)
 			elif pREQ == 'LP':
-				y_lp = getData_lp()
+				y_lp = getData_lp(db_number)
 				y_common.append(y_lp)
 			else:
 				print('Invalid request!')

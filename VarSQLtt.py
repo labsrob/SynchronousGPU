@@ -11,15 +11,11 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlTT = [df1['cLayer'], df1['R1H1TT'], df1['R1H2TT'],
-             df1['R1H3TT'], df1['R1H4TT'],
-             df1['R2H1TT'], df1['R2H2TT'],
-             df1['R2H3TT'], df1['R2H4TT'],
-             df1['R3H1TT'], df1['R3H2TT'],
-             df1['R3H3TT'], df1['R3H4TT'],
-             df1['R4H1TT'], df1['R4H2TT'],
-             df1['R4H3TT'], df1['R4H4TT']]
-
+    sqlTT = [df1['tStamp'], df1['cLayer'], df1['R1H1TT'], df1['R1H2TT'],
+             df1['R1H3TT'], df1['R1H4TT'], df1['R2H1TT'], df1['R2H2TT'],
+             df1['R2H3TT'], df1['R2H4TT'], df1['tStamp'], df1['cLayer'],
+             df1['R3H1TT'], df1['R3H2TT'], df1['R3H3TT'], df1['R3H4TT'],
+             df1['R4H1TT'], df1['R4H2TT'], df1['R4H3TT'], df1['R4H4TT']]
 
     return sqlTT
 

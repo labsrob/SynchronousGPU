@@ -16,7 +16,7 @@ Idx, dL = [], []
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def sqlexec(nGZ, grp_step, daq, rT1, fetch_no):
+def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
     """
     NOTE:
     """

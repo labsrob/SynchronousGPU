@@ -538,11 +538,13 @@ def menuExit():
 # ------------------------------------------------------------------------------------[ MAIN PROGRAM ]
 
 def tabbed_cascadeMode(cMode, pType):
-    global p1, p2, p3, p4, p5, p6, p7, hostConn, pRecipe
+    global p1, p2, p3, p4, p5, p6, p7, hostConn, pRecipe, pMode
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
     """
+    pMode = cMode               # Copy variable to new var
+
     if cMode == 1:
         print('Connecting to PLC Host...')
     elif cMode == 2:
@@ -5049,9 +5051,16 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         window_XminRM, window_XmaxRM = 0, pLength                   # Get details from SCADA PIpe Recipe TODO[1]
 
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-        T1 = processWON[0] + '_TT'        # Tape Temperature
-        T2 = processWON[0] + '_RM'        # Ramp Profile Mapping
-        # ----------------------------------------------------------#
+        if pMode == 1:
+            # PLC Data - for Live Production Analysis
+            T1 = 'SSPC_TT' + processWON[0]          # Tape Temperature
+            T2 = 'SSPC_RM' + processWON[0]          # Ramp Profile Mapping
+        else:
+            # SQL Data - for Post Production Analysis
+            T1 = 'TT1_' + processWON[0]             # Tape Temperature
+            T2 = 'TT2_' + processWON[0]
+            T3 = 'RM_' + processWON[0]
+            # ----------------------------------------------------------#
 
         # Initialise runtime limits --------------------------------#
         a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
