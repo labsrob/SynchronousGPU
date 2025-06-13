@@ -5051,7 +5051,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         window_XminRM, window_XmaxRM = 0, pLength                   # Get details from SCADA PIpe Recipe TODO[1]
 
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-        if pMode == 1:
+        if rType == 1:
             # PLC Data - for Live Production Analysis
             T1 = 'SSPC_TT' + processWON[0]          # Tape Temperature
             T2 = 'SSPC_RM' + processWON[0]          # Ramp Profile Mapping
