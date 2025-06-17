@@ -77,6 +77,7 @@ import pWON_finder as wo
 # -------------------------
 import qParametersDNV as hla
 import qParametersMGM as hlb
+import Screen_Calibration as cal
 # ------------------------------------------------------------------------[]
 tabConfig = []
 cpTapeW, cpLayerNo, runType = [], [], []
@@ -103,30 +104,42 @@ try:
 except Exception:
     print('No Nvidia GPU in system!')
 
-# use_cuda = gp.getAvailable()
-# print('\nCUDA Version:', torch.version.cuda)
-#
-# if use_cuda:
-#     print('__CUDNN VERSION:', torch.backends.cudnn.version())
-#     print('__Number CUDA Devices:', torch.cuda.device_count())
-#     print('__CUDA Device Name:', torch.cuda.get_device_name(0))
-#     print('__CUDA Device Total Memory [GB]:',torch.cuda.get_device_properties(0).total_memory/1e9)
-# else:
-#     print('GPU Not detected...')
-#     device = torch.device("cuda" if use_cuda else "cpu")
-#     print("Device In Use: ", device)
+# -----[Detect attached Screen, Extract details to Set GUI Canvas ------[]
+aSCR, scrW1, scrW2, scrW3, scrW4, scrW5, scrW6, scrW7, scrW8 = cal.getSCRdetails()
 
-# ----------------------- Audible alert --------------------------------------------------[]
+if scrW1 == 2560:   # Digital monitor
+    scrW = 2535     # Set GUI Canvas size
+    scrX = 8.5      # Set GUI Figure size
+    pEvX = 860      # Environmental Values
+    pTgX = 1700     # TapeGap Count
+    pMtX = 25.5     # Canvas for Monitoring Tab
+
+elif scrW1 == 3840: # Digital Screen/TV
+    scrW = 3810     # Set GUI Canvas size
+    scrX = 9        # Set GUI Figure size
+    pEvX = 860      # Environmental Values
+    pTgX = 1700     # TapeGap Count
+    pMtX = 27       # Canvas for Monitoring Tab
+
+else:               # Digital Screen # 4864
+    print('Chosen.....')
+    scrW = 2535     # Set GUI Canvas size
+    scrX = 8.5      # Set GUI Figure size
+    pEvX = 860      # Environmental Values
+    pTgX = 1700     # TapeGap Count
+    pMtX = 25.5     # Canvas for monitoring Tab
+# -----------------------------------------------------------------------[]
+# ----------------------- Audible alert ---------------------------------[]
 impath ='C:\\SynchronousGPU\\Media\\'
 nudge = AudioSegment.from_wav(impath+'tada.wav')
 error = AudioSegment.from_wav(impath+'error.wav')
 
-# -------------------------------------------------------------------------------------------#
+# -----------------------------------------------------#
 path = ('C:\\TapeGapDocs\\testFile.csv')
 csv_file = (path)
 df = pd.read_csv(csv_file)
 
-# Define statistical operations ----------------------------------------------------------[]
+# Define statistical operations -----------------------[]
 WeldQualityProcess = True
 paused = False
 
@@ -575,7 +588,7 @@ def tabbed_cascadeMode(cMode, pType):
     # ----------------------------------------------------------[]
 
     # Set up embedding notebook (tabs) ------------------------[B]
-    notebook = ttk.Notebook(root, width=2710, height=850)       # Declare Tab overall Screen size [2500]
+    notebook = ttk.Notebook(root, width=scrW, height=850)       # Declare Tab overall Screen size [2500]
     notebook.grid(column=0, row=0, padx=10, pady=450)           # Tab's spatial position on the Parent [10]
     tab1 = ttk.Frame(notebook)
     tab2 = ttk.Frame(notebook)
@@ -631,8 +644,8 @@ def tabbed_canvas(cMode, pType):   # Tabbed Common Classes -------------------[T
     # Load from CFG fine and parse the variables ------[x]
 
     # Set up embedding notebook (tabs) ----------------[B]
-    notebook = ttk.Notebook(root, width=2710, height=850)   # Declare Tab overall Screen size[2500, 2540,]
-    notebook.grid(column=0, row=0, padx=10, pady=450)       # Tab's spatial position on the Parent [450]
+    notebook = ttk.Notebook(root, width=scrW, height=850)      # Declare Tab overall Screen size[2500, 2540,]
+    notebook.grid(column=0, row=0, padx=10, pady=450)           # Tab's spatial position on the Parent [450]
     if pRecipe == 'DNV':
         tab1 = ttk.Frame(notebook)
         tab2 = ttk.Frame(notebook)
@@ -874,8 +887,8 @@ class collectiveEoL(ttk.Frame):
         upload_report.place(x=2380, y=1)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(27, 8), dpi=100)
-        f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.936, wspace=0.1, hspace=0.17)
+        f = Figure(figsize=(pMtX, 8), dpi=100)
+        f.subplots_adjust(left=0.022, bottom=0.05, right=0.983, top=0.936, wspace=0.1, hspace=0.17)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, 1)         # xbar plot
         a2 = f.add_subplot(2, 4, 2)         # s bar plot
@@ -1819,8 +1832,8 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         label.place(x=400, y=10)
 
         # Define Axes ----------------------------------#
-        fig = Figure(figsize=(18, 7.21), dpi=100)        # 12.5, 7.22
-        fig.subplots_adjust(left=0.04, bottom=0.033, right=0.988, top=0.957, hspace=0.14, wspace=0.033)
+        fig = Figure(figsize=(pMtX - 9.5, 7.21), dpi=100)        # 12.5, 7.22, 18
+        fig.subplots_adjust(left=0.04, bottom=0.033, right=0.983, top=0.957, hspace=0.14, wspace=0.033)
         # ---------------------------------[]
         a1 = fig.add_subplot(2, 3, (1, 3))              # X Bar Plot
         a2 = fig.add_subplot(2, 3, (4, 6))              # S Bar Plot
@@ -1957,7 +1970,7 @@ class common_rampCount(ttk.Frame):
 
     def createWidgets(self):
         # -----------------------------------
-        f = Figure(figsize=(9, 4), dpi=100)
+        f = Figure(figsize=(scrX, 4), dpi=100)
         f.subplots_adjust(left=0.083, bottom=0.11, right=0.976, top=0.99, wspace=0.202)
         a1 = f.add_subplot(1, 1, 1)
 
@@ -2130,12 +2143,12 @@ class common_rampCount(ttk.Frame):
 class common_climateProfile(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.place(x=915, y=20)
+        self.place(x=pEvX, y=20)     # 915
         self.createWidgets()
 
     def createWidgets(self):
         # -----------------------------------
-        f = Figure(figsize=(9, 4), dpi=100)
+        f = Figure(figsize=(scrX, 4), dpi=100)
         f.subplots_adjust(left=0.076, bottom=0.098, right=0.91, top=0.99, wspace=0.202)
         a2 = f.add_subplot(1, 1, 1)
         a3 = a2.twinx()
@@ -2325,12 +2338,12 @@ class common_climateProfile(ttk.Frame):
 class common_gapCount(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.place(x=1820, y=20)    #[1600, 20]
+        self.place(x=pTgX, y=20)    #[1600, 1820]
         self.createWidgets()
 
     def createWidgets(self):
         # -----------------------------------
-        f = Figure(figsize=(9, 4), dpi=100)   #w.h
+        f = Figure(figsize=(scrX, 4), dpi=100)   #w.h
         f.subplots_adjust(left=0.076, bottom=0.1, right=0.971, top=0.99, wspace=0.202)
         a3 = f.add_subplot(1, 1, 1)
 
@@ -2502,11 +2515,11 @@ class MonitorTabb(ttk.Frame):
         # Load Quality Historical Values -----------[]
         label = ttk.Label(self, text='[' + rType + ' Mode]', font=LARGE_FONT)
         label.pack(padx=10, pady=5)
-        f = Figure(figsize=(27, 8), dpi=100)
+        f = Figure(figsize=(pMtX, 8), dpi=100)    # 27
 
         if pRecipe == 'DNV':
             print('\n 4 params condition met....')
-            f.subplots_adjust(left=0.029, bottom=0.057, right=0.99, top=0.979, wspace=0.167, hspace=0.164)
+            f.subplots_adjust(left=0.029, bottom=0.057, right=0.983, top=0.979, wspace=0.167, hspace=0.164)
             a1 = f.add_subplot(2, 4, (1, 2))        # Roller Pressure
             a2 = f.add_subplot(2, 4, (3, 4))        # Winding Speed
             a3 = f.add_subplot(2, 4, (5, 6))        # Cell Tension
@@ -3137,7 +3150,7 @@ class laserPowerTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(27, 8), dpi=100)  #[25 on 1920 x 1200 resolution screen, 27 on 4096 x2160]
+        f = Figure(figsize=(pMtX, 8), dpi=100)  #[25 on 1920 x 1200 resolution screen, 27 on 4096 x2160]
         f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
@@ -3623,7 +3636,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(27, 8), dpi=100)
+        f = Figure(figsize=(pMtX, 8), dpi=100)
         f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
@@ -4051,7 +4064,7 @@ class tapePlacementTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Set subplot embedded properties ----------------------------------[]
-        f = Figure(figsize=(27, 8), dpi=100)
+        f = Figure(figsize=(pMtX, 8), dpi=100)
         f.subplots_adjust(left=0.029, bottom=0.05, right=0.99, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))
@@ -4537,7 +4550,7 @@ class rollerForceTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(27, 8), dpi=100)
+        f = Figure(figsize=(pMtX, 8), dpi=100)
         f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
@@ -5032,7 +5045,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(27, 8), dpi=100)
+        f = Figure(figsize=(pMtX, 8), dpi=100)    # 27
         f.subplots_adjust(left=0.029, bottom=0.05, right=0.983, top=0.967, wspace=0.18, hspace=0.174)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 6, (1, 3))                            # xbar plot
@@ -5597,8 +5610,8 @@ class substTempTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(27, 8), dpi=100)
-        f.subplots_adjust(left=0.029, bottom=0.05, right=0.99, top=0.955, wspace=0.117, hspace=0.157)
+        f = Figure(figsize=(pMtX, 8), dpi=100)    # 27
+        f.subplots_adjust(left=0.029, bottom=0.05, right=0.983, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))
         a2 = f.add_subplot(2, 4, (5, 7))
@@ -5956,9 +5969,9 @@ class substTempTabb(ttk.Frame):
         canvas = FigureCanvasTkAgg(f, self)
         canvas.get_tk_widget().pack(expand=False)
         # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(expand=True)
+        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar.update()
+        canvas._tkcanvas.pack(expand=True)
 
 
 # ---------------------------------------------------------------------------------------------[Tape Gap P7]
@@ -6022,8 +6035,8 @@ class tapeGapPolTabb(ttk.Frame):
         label.pack(padx=10, pady=5)     # 10 | 5
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(27, 8), dpi=100)                        # 25,  = 12 | 8
-        f.subplots_adjust(left=0.026, bottom=0.045, right=0.986, top=0.967, wspace=0.217, hspace=0.162)
+        f = Figure(figsize=(pMtX, 8), dpi=100)                        # 25, 27 = 12 | 8
+        f.subplots_adjust(left=0.026, bottom=0.045, right=0.983, top=0.967, wspace=0.217, hspace=0.162)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 6, (1, 3))                            # xbar plot
         a3 = f.add_subplot(2, 6, (7, 9))                            # s bar plot
@@ -6470,8 +6483,8 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         label.pack(padx=10, pady=5)
 
         # Set subplot embedded properties ----------------------------------[]
-        f = Figure(figsize=(27, 8), dpi=100)
-        f.subplots_adjust(left=0.029, bottom=0.05, right=0.99, top=0.955, wspace=0.117, hspace=0.157)
+        f = Figure(figsize=(pMtX, 8), dpi=100)      # 25, 27
+        f.subplots_adjust(left=0.029, bottom=0.05, right=0.983, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
         a1 = f.add_subplot(2, 4, (1, 3))        # xbar plot
         a2 = f.add_subplot(2, 4, (5, 7))        # s bar plot
@@ -8840,7 +8853,7 @@ def userMenu():     # listener, myplash
         global stpd, processWON, processID, OEEdataID, hostConn
 
         # ------------------------------[ Check valid number of attached Monitors]
-        myMon = m.get_monitors()                    # Automatically detect attached monitors
+        # myMon = m.get_monitors()                    # Automatically detect attached monitors
         # print('\nAttached Monitors:', len(myMon))
 
         if process.entrycget(0, 'state') == 'disabled' or process.entrycget(1, 'state') == 'disabled':
@@ -8874,17 +8887,17 @@ def userMenu():     # listener, myplash
                     oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)     # Query record [pType=DnV/MGM]
                     print('\nSearch Return:', oeeValid, organicID)
                     # ---------------------------------------------[]
-                    if organicID != 'G' and len(myMon) >= 4 and pRecipe == 'DNV':
+                    if organicID != 'G' and aSCR >= 4 and pRecipe == 'DNV':
                         print('\nSelecting Cascade View....')
                         tabbed_cascadeMode(cMode, pType)                        # Cascade View
 
-                    elif organicID != 'G' and len(myMon) >= 8 and pRecipe == 'MGM':
+                    elif organicID != 'G' and aSCR >= 8 and pRecipe == 'MGM':
                         print('\nSelecting Cascade View....')
                         tabbed_cascadeMode(cMode, pType)                        # Cascade View
 
-                    elif organicID != 'G' and len(myMon) >= 1 or len(myMon) <= 4:
+                    elif organicID != 'G' and aSCR >= 1 or aSCR <= 4:
                         print('\nSorry, multiple Screen display is required for Cascade View!')
-                        print('Attached Monitor(s):', myMon)
+                        print('Attached Monitor(s):', aSCR)
                         print('Switching back to Tabbed View...')
                         tabbed_canvas(cMode, pType)                             # Tabbed View
                     else:
@@ -8944,7 +8957,7 @@ def userMenu():     # listener, myplash
 
         # ------------------------------[ Check valid number of attached Monitors]
         import screeninfo as m
-        myMon = m.get_monitors()            # Automatically detect attached monitors
+        # myMon = m.get_monitors()            # Automatically detect attached monitors
         # print('Attached Monitors:', len(myMon))
 
         if analysis.entrycget(0, 'state') == 'disabled' or analysis.entrycget(1, 'state') == 'disabled':
@@ -8965,17 +8978,17 @@ def userMenu():     # listener, myplash
                 runType.append(cMode)
                 print('\nSelecting Cascade View....')
 
-                if len(myMon) >= 4 and pRecipe == 'DNV':
+                if aSCR >= 4 and pRecipe == 'DNV':
                     print('\nSelecting Cascade View....')
                     tabbed_cascadeMode(cMode, pRecipe)                  # Cascade View
 
-                elif len(myMon) >= 8 and pRecipe == 'MGM':
+                elif aSCR >= 8 and pRecipe == 'MGM':
                     print('\nSelecting Cascade View....')
                     tabbed_cascadeMode(cMode, pRecipe)                  # Cascade View
 
-                elif len(myMon) >= 1 or len(myMon) <= 4:
+                elif aSCR >= 1 or aSCR <= 4:
                     print('\nSorry, multiple screen function is NOT available, attach 4 or 8 Monitors!')
-                    print('Attached Monitors', myMon)
+                    print('Attached Monitors', aSCR)
                     print('Selecting Tabbed View....')
                     tabbed_canvas(cMode, pRecipe)                       # Tabbed View
                 else:

@@ -878,9 +878,16 @@ def monitor_areas():
   return retval
 
 
-if __name__ == "__main__":
-  print(monitor_areas())
+# if __name__ == "__main__":
+#   print(monitor_areas())
 
 
 # ------------------------------------------[]
-myList = Monitor(x=0, y=0, width=2560, height=1440, width_mm=597, height_mm=336, name='\\\\.\\DISPLAY1', is_primary=True)
+myMon = get_monitors()
+scr1 = str(myMon[0]).split(" ")         # compute screen coordinates for attached monitors
+print('T1', myMon)
+print('T2', scr1[0])
+print('T3', scr1[1])
+print('T4', scr1[2])
+print('T5', scr1[3])
+print('T6', scr1[4])
