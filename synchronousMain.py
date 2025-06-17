@@ -331,9 +331,9 @@ def get_data():
     sptDat, valuDat, stdDat, tolDat = [], [], [], []
 
     # connect to SQL tabel EoL, perform minimal statistic and print report
-    T1 = processWON + '_EoL_RP'  # Identify Table
-    T2 = processWON + '_EoL_TP'  # Identify Table
-    T3 = processWON + '_EoL_TT'  # Identify Table  TODO --- sort out the connection !
+    T1 = 'EoL_RP' + processWON          # Identify Table
+    T2 = 'EoL_TP' + processWON          # Identify Table
+    T3 = 'EoL_TT' + processWON          # Identify Table  TODO --- sort out the connection !
 
     # Define dataframe columns ---------------------------------------------------------[]
     colu = ['tStamp', 'Pipe', 'pID', 'cID', 'yID', 'rR1', 'rR2', 'rR3', 'rR4', 'pSP', 'pRV', 'pDV', 'pTo', 'oID']
@@ -406,7 +406,7 @@ def diff_idx_Tracker(layer, idx1, idx2, idx3, idx4, idx5, idx6, pPos):    # Reco
     else:                                                       # if it's an existing report
         f = open('.\\RT_Index_Log\\' + PidxLog + ".txt", "a")   # Just open the file for a write operations
     # initialise a tab delimited data and insert corresponding values in string format ------------------------[]
-    f.write(event+'\t'+str(layer)+'\t'+str(idx1)+'\t'+str(idx2)+'\t'+str(idx3)+'\t'+str(idx4)+ '\t'+str(idx5)+'\t'+str(idx6)+'\t'+str(idx7)+'\t'+str(idx8)+ '\t'+str(pPos)+'\n')
+    f.write(event+'\t'+str(layer)+'\t'+str(idx1)+'\t'+str(idx2)+'\t'+str(idx3)+'\t'+str(idx4)+ '\t'+str(idx5)+'\t'+str(idx6)+'\t'+str(pPos)+'\n')
     f.close()
 
 
@@ -584,7 +584,7 @@ def tabbed_cascadeMode(cMode, pType):
 
     # Load class object from Cascade Switcher Method -----------[x]
     import CascadeSwitcher as cs
-    p1, p2, p3, p4, p5, p6, p7 = cs.myMain(cMode, pRecipe)      # runtimeType, process RecipeType
+    p1, p2, p3, p4, p5, p6, p7, p8 = cs.myMain(cMode, pRecipe)      # runtimeType, process RecipeType
     # ----------------------------------------------------------[]
 
     # Set up embedding notebook (tabs) ------------------------[B]

@@ -40,6 +40,7 @@ import selDataColsTT as qtt     # Tape Temperature
 import selDataColsVM as qvm     # Void mapping
 # -----------------------------#
 import pParamsHL as dd
+import Screen_Calibration as cal
 
 import subprocess
 try:
@@ -193,7 +194,7 @@ def rfProcessParam(vCounter, pType):
     fig = Figure(figsize=(25, 13), dpi=100)
 
     # fig = Figure(figsize=(self.winfo_screenwidth(), self.winfo_screenheight()), dpi=100)
-    fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+    fig.subplots_adjust(left=0.03, bottom=0.02, right=0.983, top=0.976, hspace=0.14, wspace=0.195)
     # -------------------------------------------------------[]
     a1 = fig.add_subplot(2, 3, (1, 2))                       # Roller Force X Bar plot
     a2 = fig.add_subplot(2, 3, (4, 5))                       # Roller angle S Bar plot
@@ -208,7 +209,8 @@ def rfProcessParam(vCounter, pType):
 
     # ----------------------------------------------------------#
     # Real-Time Parameter according to updated requirements ----# 28/Feb/2025
-    T1 = WON + '_RF'  # Laser Power
+    T1 = 'RF1_'+ WON    # Roller Force Table 1
+    T2 = 'RF2_'+ WON    # Roller Force Table 2
     # ----------------------------------------------------------#
 
     # Declare Plots attributes --------------------------------#
@@ -676,7 +678,7 @@ def ttProcessParam(vCounter, pType):
     # Define Axes ---------------------#
     fig = Figure(figsize=(25, 13), dpi=100)
     # fig = Figure(figsize=(self.winfo_screenwidth(), self.winfo_screenheight()), dpi=100)
-    fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+    fig.subplots_adjust(left=0.03, bottom=0.02, right=0.983, top=0.976, hspace=0.14, wspace=0.195)
     a1 = fig.add_subplot(2, 6, (1, 3))                        # xbar plot
     a2 = fig.add_subplot(2, 6, (7, 9))                        # s bar plot
     a3 = fig.add_subplot(2, 6, (4, 12))                       # void mapping profile
@@ -1228,7 +1230,7 @@ def stProcessParam(vCounter, pType):
     fig = Figure(figsize=(25, 13), dpi=100)
 
     # fig = Figure(figsize=(self.winfo_screenwidth(), self.winfo_screenheight()), dpi=100)
-    fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+    fig.subplots_adjust(left=0.03, bottom=0.02, right=0.983, top=0.976, hspace=0.14, wspace=0.195)
     a1 = fig.add_subplot(2, 4, (1, 3))
     a2 = fig.add_subplot(2, 4, (5, 7))
     a3 = fig.add_subplot(2, 4, (4, 8))
@@ -1644,7 +1646,7 @@ def tgProcessParam(vCounter, pType):
 
     # Define Axes ---------------------#
     fig = Figure(figsize=(25, 13), dpi=100)
-    fig.subplots_adjust(left=0.03, bottom=0.02, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+    fig.subplots_adjust(left=0.03, bottom=0.02, right=0.983, top=0.976, hspace=0.14, wspace=0.195)
     # ----------------------------------[]
     a1 = fig.add_subplot(2, 6, (1, 3))                      # xbar plot
     a3 = fig.add_subplot(2, 6, (7, 9))                      # s bar plot
@@ -2086,7 +2088,7 @@ def tpProcessParam(vCounter, pType):  # Tape Placement
 
     # Define Axes ---------------------#
     fig = Figure(figsize=(25, 13), dpi=100)
-    fig.subplots_adjust(left=0.03, bottom=0.035, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+    fig.subplots_adjust(left=0.03, bottom=0.035, right=0.983, top=0.976, hspace=0.14, wspace=0.195)
     # ---------------------------------[]
     a1 = fig.add_subplot(2, 4, (1, 3))  # xbar plot
     a2 = fig.add_subplot(2, 4, (5, 7))  # s bar plot
@@ -2516,7 +2518,7 @@ def lpProcessParam(vCounter, pType):  # Tape Placement
 
     # Define Axes ---------------------#
     f = Figure(figsize=(25, 8), dpi=100)
-    f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
+    f.subplots_adjust(left=0.022, bottom=0.05, right=0.983, top=0.967, wspace=0.18, hspace=0.174)
     # ---------------------------------[]
     a1 = f.add_subplot(2, 4, (1, 3))  # X Bar Plot
     a2 = f.add_subplot(2, 4, (5, 7))  # S Bar Plo
@@ -2942,7 +2944,7 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 
     # Define Axes ---------------------#
     fig = Figure(figsize=(25, 13), dpi=100)
-    fig.subplots_adjust(left=0.03, bottom=0.035, right=0.99, top=0.976, hspace=0.14, wspace=0.195)
+    fig.subplots_adjust(left=0.03, bottom=0.035, right=0.983, top=0.976, hspace=0.14, wspace=0.195)
     # ---------------------------------[]
     a1 = fig.add_subplot(2, 4, (1, 3))  # xbar plot
     a2 = fig.add_subplot(2, 4, (5, 7))  # s bar plot
@@ -3324,63 +3326,13 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 # ---------------------- Port windows into parallel processing ----------[]
 
 def myMain(cMode, ProcID):
-    global pParam, smp_Sz, stp_Sz, p1, p2, p3, p4, p5, p6, p7
+    global pParam, smp_Sz, stp_Sz, p1, p2, p3, p4, p5, p6, p7, p8
     # ---------------------------
     pParam = ProcID
 
-    myMon = m.get_monitors()                    # Automatically detect attached monitors
-    if len(myMon) >= 4 and pRecipe == 'DNV':    # number of detected monitors
-        scr1 = str(myMon[0]).split(" ")         # compute screen coordinates for attached monitors
-        scr1 = scr1[0][10:11]
-        # -------------------
-        scr2 = str(myMon[1]).split(" ")
-        scr2 = scr2[0][10:14]
-        # -------------------
-        scr3 = str(myMon[2]).split(" ")
-        scr3 = scr3[0][10:14]
-        # -------------------
-        scr4 = str(myMon[3]).split(" ")
-        scr4 = scr4[0][10:14]
-        # -------------------
-        scr5 = 0
-        scr6 = 0
-        scr7 = 0
-        scr8 = 0
-    elif len(myMon) >= 8 and pRecipe == 'MGM':
-        scr1 = str(myMon[0]).split(" ")         # compute screen coordinates for attached monitors
-        scr1 = scr1[0][10:11]
-        # -------------------
-        scr2 = str(myMon[1]).split(" ")
-        scr2 = scr2[0][10:14]
-        # -------------------
-        scr3 = str(myMon[2]).split(" ")
-        scr3 = scr3[0][10:14]
-        # -------------------
-        scr4 = str(myMon[3]).split(" ")
-        scr4 = scr4[0][10:14]
-        # -------------------
-        scr5 = str(myMon[4]).split(" ")
-        scr5 = scr5[0][10:14]
-        # -------------------
-        scr6 = str(myMon[5]).split(" ")
-        scr6 = scr6[0][10:14]
-        # -------------------
-        scr7 = str(myMon[6]).split(" ")
-        scr7 = scr7[0][10:14]
-        # -------------------
-        scr8 = str(myMon[7]).split(" ")
-        scr8 = scr8[0][10:14]
-    else:
-        scr1 = 0
-        scr2 = 0
-        scr3 = 0
-        scr4 = 0
-        scr5 = 0
-        scr6 = 0
-        scr7 = 0
-        scr8 = 0
-        print('\nAttached Monitors', myMon)
-        print('Sorry, multiple screen function is NOT available, attach 4 or 8 Monitors!')
+    # Automatically detect attached monitors
+    # -----[Detect attached Screen, Extract details to Set GUI Canvas ------[]
+    aSCR, scrW1, scrW2, scrW3, scrW4, scrW5, scrW6, scrW7, scrW8 = cal.getSCRdetails()
 
     # -----------------------------[]
     if cMode == 1:
@@ -3391,39 +3343,45 @@ def myMain(cMode, ProcID):
         pMode = 'Standby/Maintenance'
 
     # print('\nP-Type..:', pType)
-    if ProcID == 'DNV': # and len(myMon) >= 4:
+    if ProcID == 'DNV' and aSCR >= 4:
         # if GPU -------------------------------------------------#
-        p1 = Process(target=ttProcessParam, args=(countA, pMode))          # name="CascadeTT")
-        p1.moveTo(x=int(scr2), y=0)  # move visualisation to screen 2
-        p2 = Process(target=stProcessParam, args=(countB, pMode))          # name="CascadeST")
-        p2.moveTo(x=int(scr3), y=0)  # move visualisation to screen 3
-        p3 = Process(target=tgProcessParam, args=(countC, pMode))          # name="CascadeTG")
-        p3.moveTo(x=int(scr4), y=0)  # move visualisation to screen 3
-        p4 = 0
+        p1 = Process(target=ttProcessParam, args=(countA, pMode))           # name="CascadeTT")
+        p1.moveTo(x=int(scrW1), y=0)                                        # move visualisation to screen 2
+        p2 = Process(target=stProcessParam, args=(countB, pMode))           # name="CascadeST")
+        p2.moveTo(x=int(scrW2), y=0)                                        # move visualisation to screen 3
+        p3 = Process(target=tgProcessParam, args=(countC, pMode))           # name="CascadeTG")
+        p3.moveTo(x=int(scrW3), y=0)                                        # move visualisation to screen 3
+        p4 = Process(target=tgProcessParam, args=(countC, pMode))           # name="CascadeTG")
+        p4.moveTo(x=int(scrW4), y=0)
         p5 = 0
         p6 = 0
         p7 = 0
+        p8 = 0
         # --------------------------------------------------------#
         p1.start()                                                          # Quality parameter 1
         p2.start()                                                          # Quality parameter 2
         p3.start()                                                          # Quality parameter 3
+        p4.start()                                                          # Quality parameter 3
 
-    elif ProcID == 'MGM' and len(myMon) >= 8:
+
+    elif ProcID == 'MGM' and aSCR >= 8:
         # if GPU -------------------------------------------------#
         p1 = Process(target=lpProcessParam, args=(countA, pMode))           # name="CascadeRF")
-        p1.moveTo(x=int(scr2), y=0)  # move visualisation to screen 2
+        p1.moveTo(x=int(scrW1), y=0)                                        # move visualisation to screen 2
         p2 = Process(target=laProcessParam, args=(countB, pMode))           # name="CascadeTT")
-        p2.moveTo(x=int(scr3), y=0)  # move visualisation to screen 2
+        p2.moveTo(x=int(scrW2), y=0)                                        # move visualisation to screen 2
         p3 = Process(target=tpProcessParam, args=(countC, pMode))           # name="CascadeST")
-        p3.moveTo(x=int(scr4), y=0)  # move visualisation to screen 2
+        p3.moveTo(x=int(scrW3), y=0)                                        # move visualisation to screen 2
         p4 = Process(target=rfProcessParam, args=(countD, pMode))           # name="CascadeTS")
-        p4.moveTo(x=int(scr5), y=0)  # move visualisation to screen 2
+        p4.moveTo(x=int(scrW4), y=0)                                        # move visualisation to screen 2
         p5 = Process(target=ttProcessParam, args=(countE, pMode))           # name="CascadeTG")
-        p5.moveTo(x=int(scr6), y=0)  # move visualisation to screen 2
+        p5.moveTo(x=int(scrW5), y=0)                                        # move visualisation to screen 2
         p6 = Process(target=stProcessParam, args=(countF, pMode))           # name="CascadeTG")
-        p6.moveTo(x=int(scr7), y=0)  # move visualisation to screen 2
+        p6.moveTo(x=int(scrW6), y=0)                                        # move visualisation to screen 2
         p7 = Process(target=tgProcessParam, args=(countG, pMode))           # name="CascadeTG")
-        p7.moveTo(x=int(scr8), y=0)  # move visualisation to screen 2
+        p7.moveTo(x=int(scrW7), y=0)                                        # move visualisation to screen 2
+        p8 = Process(target=tgProcessParam, args=(countH, pMode))           # name="CascadeTG")
+        p8.moveTo(x=int(scrW8), y=0)                                        # move visualisation to screen 2
 
         p1.start()                                                          # Quality parameter 1
         p2.start()                                                          # Quality parameter 2
@@ -3432,6 +3390,7 @@ def myMain(cMode, ProcID):
         p5.start()                                                          # Quality parameter 5
         p6.start()                                                          # Quality parameter 4
         p7.start()
+        p8.start()
 
     else:
         pass
@@ -3447,7 +3406,7 @@ def myMain(cMode, ProcID):
     # --------------------- Join the threads -----------------#
     # returned values for evaluation and closing out of the process
 
-    return p1, p2, p3, p4, p5, p6, p7
+    return p1, p2, p3, p4, p5, p6, p7, p8
 
 # -------------------------------------------------------------------------------------------------------- [if on GPU]
 """
