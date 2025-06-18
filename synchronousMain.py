@@ -638,9 +638,9 @@ def tabbed_canvas(cMode, pType):   # Tabbed Common Classes -------------------[T
     s.map("TNotebook.Tab", background=[("selected", "lightblue")], foreground=[("selected", "red")])
     # Hover color if needed  -------------------------------------------------------------------------#
 
-    common_rampCount()
-    common_climateProfile()
-    common_gapCount()
+    common_rampCount()                                      # called function
+    common_climateProfile()                                 # called function
+    common_gapCount()                                       # called function
     # Load from CFG fine and parse the variables ------[x]
 
     # Set up embedding notebook (tabs) ----------------[B]
@@ -1960,6 +1960,8 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         toolbar.update()
         canvas._tkcanvas.pack(expand=True)
 
+# ---------------------------- End of Collective Reporting Functions ----------------------------[]
+#     ********   These set of functions defines the common canvas Area  *******************
 # --------------------------------------------- COMMON VIEW CLASS OBJECTS ---------[Ramp Count Plot]
 class common_rampCount(ttk.Frame):
     # compute ram Count against cumulative layers ramp count --------[A]
@@ -1987,7 +1989,7 @@ class common_rampCount(ttk.Frame):
         window_Xmin, window_Xmax = 0, pExLayer                      # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        rcData = processWON[0] + '_RC'                              # Ramp Count
+        rcData = 'RC_'+ pWON                                        # Ramp Count
         # ----------------------------------------------------------#
 
         a1.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2174,7 +2176,7 @@ class common_climateProfile(ttk.Frame):
         window_Xmin, window_Xmax = 0, 30                            # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        evData = processWON[0] + '_EV'                              # Environmental Values Reprocessed from SQL
+        evData = 'EV_' + pWON                                       # Environmental Values Reprocessed from SQL
         # ----------------------------------------------------------#
 
         a2.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2359,7 +2361,7 @@ class common_gapCount(ttk.Frame):
         window_Xmin, window_Xmax = 0, pExLayer                      # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        vData = processWON[0] + '_VC'                               # Void Count
+        vData = 'VC_' + pWON                                       # Void Count
         # ----------------------------------------------------------#
 
         a3.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -2526,8 +2528,9 @@ class MonitorTabb(ttk.Frame):
             a4 = f.add_subplot(2, 4, (7, 8))        # Oven Temperature
 
             # Load Query Tables --------------------#
-            T1 = processWON[0] + '_GEN'             # Tape Winding Speed, Cell Tension & Oven Temp
-            T2 = processWON[0] + '_RP'              # Roller Pressure
+            T1 = 'GEN_' + pWON                      # Tape Winding Speed, Cell Tension & Oven Temp
+            T2 = 'RP1_' + pWON                      # Roller Pressure
+            T3 = 'RP2_' + pWON                      # Table 2 to be concatenated
             # --------------------------------------#
 
         elif pRecipe == 'MGM':
@@ -2541,11 +2544,14 @@ class MonitorTabb(ttk.Frame):
             a6 = f.add_subplot(2, 6, (11, 12))      # Winding Speed
 
             # Load Query Tables --------------------#
-            T1 = processWON[0] + '_GEN'             # Tape Winding Speed, Cell Tension & Oven Temp
-            T2 = processWON[0] + '_RP'              # Roller Pressure
+            T1 = 'GEN_' + pWON                      # Tape Winding Speed, Cell Tension & Oven Temp
+            T2 = 'RP1_' + pWON                      # Roller Pressure Table 1
+            T3 = 'RP2_' + pWON                      # Roller Pressure T2
             # --------------------------------------#
-            T3 = processWON[0] + '_LP'              # Laser Power
-            T4 = processWON[0] + '_LA'              # Laser Angle
+            T4 = 'LP1_' + pWON                      # Laser Power Table 1
+            T5 = 'LP2_' + pWON                      # Laser Power Table 2
+            T6 = 'LA1_' + pWON                      # Laser Angle Table 1
+            T7 = 'LA2_' + pWON                      # Laser Angle Table 2
             # --------------------------------------#
         else:
             print('\n Users params condition met....')
@@ -2813,24 +2819,38 @@ class MonitorTabb(ttk.Frame):
             if monitorP == 'DNV':
                 g1 = qpm.validCols(T1)                          # General Table
                 d1 = pd.DataFrame(dGEN, columns=g1)
-                g2 = qpm.validCols(T2)                          # Roller Pressure Table
+                g2 = qpm.validCols(T2)                          # Roller Pressure Table 1
                 d2 = pd.DataFrame(dRP, columns=g2)
+                g3 = qpm.validCols(T3)                          # Roller Pressure Table 2
+                d3 = pd.DataFrame(dRP, columns=g3)
 
-                # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2], axis=1)
+                # Concatenate all columns -----------------------[]
+                df1 = pd.concat([d1, d2, d3], axis=1)
 
             elif monitorP == 'MGM':
                 g1 = qpm.validCols(T1)                          # General Table
                 d1 = pd.DataFrame(dGEN, columns=g1)
-                g2 = qpm.validCols(T2)                          # Tape Winding Speed
+
+                g2 = qpm.validCols(T2)                          # Roller Pressure Table 1
                 d2 = pd.DataFrame(dRP, columns=g2)
-                g3 = qpm.validCols(T3)                          # Roller Pressure
-                d3 = pd.DataFrame(dLP, columns=g3)
-                g4 = qpm.validCols(T4)                          # Laser Angle
-                d4 = pd.DataFrame(dLA, columns=g4)
+
+                g3 = qpm.validCols(T3)                          # Roller Pressure Table 2
+                d3 = pd.DataFrame(dRP, columns=g3)
+
+                g4 = qpm.validCols(T4)                          # Laser Power Table 1
+                d4 = pd.DataFrame(dLP, columns=g4)
+
+                g5 = qpm.validCols(T5)                          # Laser Power Table 2
+                d5 = pd.DataFrame(dLP, columns=g5)
+
+                g6 = qpm.validCols(T6)                          # Laser Angle
+                d6 = pd.DataFrame(dLA, columns=g6)
+
+                g7 = qpm.validCols(T7)                          # Laser Angle
+                d7 = pd.DataFrame(dLA, columns=g7)
 
                 # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2, d3, d4], axis=1)
+                df1 = pd.concat([d1, d2, d3, d4, d5, d6, d7], axis=1)
             else:
                 df1 = 0
                 pass                                            # Reserve for process scaling -- RBL.
@@ -3166,7 +3186,8 @@ class laserPowerTabb(ttk.Frame):
         window_Xmin, window_Xmax = 0, (int(lpS) + 3)                # windows view = visible data points
 
         # ----------------------------------------------------------#
-        T1 = processWON[0] + '_LP'  # Laser Power
+        T1 = 'LP1_' + pWON                                          # Laser Power
+        T2 = 'LP2_' + pWON
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -3369,16 +3390,21 @@ class laserPowerTabb(ttk.Frame):
                 # Call synchronous data function ---------------[]
                 columns = qlp.validCols(T1)                     # Load defined valid columns for PLC Data
                 df1 = pd.DataFrame(lpData, columns=columns)     # Include table data into python Dataframe
-                LP = lp.loadProcesValues(df1)                   # Join data values under dataframe
+                # LP = lp.loadProcesValues(df1)                 # Join data values under dataframe
 
             else:
                 import VarSQL_DFlp as lp                        # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
                 g1 = qlp.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(lpData, columns=g1)          # Import into python Dataframe
-                LP = lp.loadProcesValues(df1)                   # Join data values under dataframe
+                d1 = pd.DataFrame(lpData, columns=g1)
+                g2 = qlp.validCols(T2)
+                d2 = pd.DataFrame(lpData, columns=g2)          # Import into python Dataframe
 
+                # Concatenate all columns -----------[]
+                df1 = pd.concat([d1, d2], axis=1)          # Join data values under dataframe
+
+            LP = lp.loadProcesValues(df1)
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -3653,7 +3679,8 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-        T1 = processWON[0] + '_LA'  # Laser Power
+        T1 = 'LA1_' + pWON          # Laser Power table 1
+        T2 = 'LA2_' + pWON          # Laser Power table 2
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -3859,9 +3886,15 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
 
                 viz_cycle = 150
                 g1 = qla.validCols(T1)                         # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(laData, columns=g1)         # Import into python Dataframe
-                LA = la.loadProcesValues(df1)                  # Join data values under dataframe
+                d1 = pd.DataFrame(laData, columns=g1)          # Import into python Dataframe
 
+                g2 = qla.validCols(T2)
+                d2 = pd.DataFrame(laData, columns=g2)
+
+                # Concatenate all columns -----------[]
+                df1 = pd.concat([d1, d2], axis=1)
+
+            LA = la.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -4055,7 +4088,7 @@ class tapePlacementTabb(ttk.Frame):
             sLCLtp = 0
             tpUSL = 0
             tpLSL = 0
-            tpPerf = '$Cp_{k' + str(sSize) + '}$'  # Using Automatic group Mean
+            tpPerf = '$Cp_{k' + str(tpSize) + '}$'  # Using Automatic group Mean
             tplabel = 'Cp'
 
         # ------------------------------------[End of Winding Speed Abstraction]
@@ -4076,11 +4109,12 @@ class tapePlacementTabb(ttk.Frame):
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minTP, YScale_maxTP = tpLSL - 8.5, tpUSL + 8.5       # Roller Force
         sBar_minTP, sBar_maxTP = sLCLtp - 80, sUCLtp + 80           # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (smp_Sz + 3)                  # windows view = visible data points
+        window_Xmin, window_Xmax = 0, 10                            # windows view = visible data points
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 27/Feb/2025
-        T1 = processWON[0] + '_TP'  # Tape Placement Error
+        T1 = 'TP1_' + pWON  # Tape Placement Error
+        T2 = 'TP2_' + pWON
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -4282,16 +4316,20 @@ class tapePlacementTabb(ttk.Frame):
                 # Call synchronous data function ---------------[]
                 columns = qtp.validCols(T1)                    # Load defined valid columns for PLC Data
                 df1 = pd.DataFrame(tpData, columns=columns)    # Include table data into python Dataframe
-                TP = tp.loadProcesValues(df1)                  # Join data values under dataframe
+                # TP = tp.loadProcesValues(df1)                # Join data values under dataframe
 
             else:
-                import VarSQLrf as tp                          # load SQL variables column names | rfVarSQL
+                import VarSQLrf as tp                           # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
-                g1 = qtp.validCols('TP')                       # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(tpData, columns=g1)         # Import into python Dataframe
-                TP = tp.loadProcesValues(df1)                  # Join data values under dataframe
+                g1 = qtp.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
+                d1 = pd.DataFrame(tpData, columns=g1)           # Import into python Dataframe
+                g2 = qtp.validCols(T2)                          # Construct Data Column selSqlColumnsTFM.py
+                d2 = pd.DataFrame(tpData, columns=g2)
+                # Concatenate all columns -----------------------[]
+                df1 = pd.concat([d1, d2], axis=1)
 
+            TP = tp.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -4332,54 +4370,54 @@ class tapePlacementTabb(ttk.Frame):
             im41.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((WS[0]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((WS[1]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((WS[2]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((WS[3]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((TP[0]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
+            im11.set_ydata((TP[1]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
+            im12.set_ydata((TP[2]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
+            im13.set_ydata((TP[3]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(tpHL, tpSize, 'TP')
             # ---------------------------------------#
-            im14.set_ydata((WS[4]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((WS[5]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((WS[6]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((WS[7]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((TP[4]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
+            im15.set_ydata((TP[5]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
+            im16.set_ydata((TP[6]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
+            im17.set_ydata((TP[7]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(tpHL, tpSize, 'TP')
             # ---------------------------------------#
-            im18.set_ydata((WS[8]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((WS[9]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((WS[10]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((WS[11]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((TP[8]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
+            im19.set_ydata((TP[9]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
+            im20.set_ydata((TP[10]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
+            im21.set_ydata((TP[11]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(tpHL, tpSize, 'TP')
             # ---------------------------------------#
-            im22.set_ydata((WS[12]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((WS[13]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((WS[14]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((WS[15]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((TP[12]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
+            im23.set_ydata((TP[13]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
+            im24.set_ydata((TP[14]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
+            im25.set_ydata((TP[15]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(tpHL, tpSize, 'TP')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((WS[0]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((WS[1]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((WS[2]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((WS[3]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((TP[0]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im27.set_ydata((TP[1]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im28.set_ydata((TP[2]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im29.set_ydata((TP[3]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
 
-            im30.set_ydata((WS[4]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((WS[5]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((WS[6]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((WS[7]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((TP[4]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im31.set_ydata((TP[5]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im32.set_ydata((TP[6]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im33.set_ydata((TP[7]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
 
-            im34.set_ydata((WS[8]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((WS[9]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((WS[10]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((WS[11]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((TP[8]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im35.set_ydata((TP[9]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im36.set_ydata((TP[10]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im37.set_ydata((TP[11]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
 
-            im38.set_ydata((WS[12]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((WS[13]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((WS[14]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((WS[15]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((TP[12]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im39.set_ydata((TP[13]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im40.set_ydata((TP[14]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im41.set_ydata((TP[15]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
 
             # Compute entire Process Capability -----------#
             if not tpHL:
@@ -4566,7 +4604,8 @@ class rollerForceTabb(ttk.Frame):
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 28/Feb/2025
-        T1 = processWON[0] + '_RF'        # Laser Power
+        T1 = 'RF1_' + pWON        # Laser Power
+        T2 = 'RF2_' + pWON
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -4771,18 +4810,22 @@ class rollerForceTabb(ttk.Frame):
 
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
-                columns = qrf.validCols(T1)                    # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(rfData, columns=columns)    # Include table data into python Dataframe
-                RF = rf.loadProcesValues(df1)                  # Join data values under dataframe
+                columns = qrf.validCols(T1)                     # Load defined valid columns for PLC Data
+                df1 = pd.DataFrame(rfData, columns=columns)     # Include table data into python Dataframe
+                # RF = rf.loadProcesValues(df1)                 # Join data values under dataframe
 
             else:
-                import VarSQLrf as rf                          # load SQL variables column names | rfVarSQL
+                import VarSQLrf as rf                           # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
-                g1 = qrf.validCols(T1)                         # Construct Data Column selSqlColumnsTFM.py
-                df1 = pd.DataFrame(rfData, columns=g1)         # Import into python Dataframe
-                RF = rf.loadProcesValues(df1)                  # Join data values under dataframe
+                g1 = qrf.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
+                d1 = pd.DataFrame(rfData, columns=g1)           # Import into python Dataframe
+                g2 = qrf.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
+                d2 = pd.DataFrame(rfData, columns=g2)
+                # Concatenate all columns -----------------------[]
+                df1 = pd.concat([d1, d2], axis=1)
 
+            RF = rf.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
