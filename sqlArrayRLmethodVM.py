@@ -16,7 +16,7 @@ Idx, dL = [], []
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
+def sqlExec(nGZ, grp_step, daq, rT1, sCentr, fetch_no):
     """
     NOTE:
     """
@@ -30,17 +30,17 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
     if len(dL) < (nGZ - 1):
         n2fetch = nGZ                                       # fetch initial specified number
         print('\nRows to Fetch:', n2fetch)
-        print('Processing SQL Row #:', int(idx) + fetch_no + 1, 'to', (int(idx) + fetch_no + 1) + n2fetch)
+        print('Processing SQL Row #:', int(sCentr) + fetch_no + 1, 'to', (int(sCentr) + fetch_no + 1) + n2fetch)
 
     elif group_step == 1 and len(dL) >= nGZ:
         print('\nSINGLE STEP SLIDE')
         print('=================')
         n2fetch = (nGZ + fetch_no)                          # fetch just one line to on top of previous fetch
-        idxA = int(idx) + (((fetch_no + 1) - 2) * nGZ) + 1
+        idxA = int(sCentr) + (((fetch_no + 1) - 2) * nGZ) + 1
         if len(Idx) > 1:
             del Idx[:1]
         Idx.append(idxA)
-        print('Processing SQL Row #:', 'T1:', idxA)
+        print('Processing Sample Distance #:', idxA)
 
     # ------------------------------------------------------------------------------------[]
     # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)

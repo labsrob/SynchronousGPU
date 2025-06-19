@@ -9,7 +9,7 @@ import os
 import snap7
 
 arrayTG, tg_list, Idx1, y_common, array2D = [], [], [], [], []
-db_number, start_offset, bit_offset = 89, 0, 0
+start_offset, bit_offset = 0, 0
 start_address = 0  					# starting address
 r_length = 4  						# double word (4 Bytes)
 b_length = 1  						# boolean size = 1 Byte
@@ -68,21 +68,19 @@ def writeInteger(db_number, start_offset, r_data):
 # --------------------------------------------------------------------------------------------------------------------[]
 
 
-def plcExec(nGZ, grp_step, fetch_no):
+def plcExec(nGZ, grp_step, DB, fetch_no):
 	"""
 	nGZ     : User defined Sample size
 	grp_step: Group Sample step
 	fetch_no: Animation Fetch Cycle
 	"""
-	timei = time.time()
-	# Get contigous data from PLC Stream --- Dealing with very volatile data frame.
-	start_offset = [922, 926, 930, 934, 938, 942, 946, 950, 954, 958, 962, 966, 970, 974, 978, 982, 986, 988, 990,
-					994, 996, 998, 990, 992, 996, 998, 1000, 1002, 1004, 1006, 1008, 1010, 1012, 1014, 1016, 1018,
-					1020, 1022, 1024, 1026, 1028, 1030, 1032, 1034, 1036, 1038, 1040, 1042, 1044, 1046, 1048, 1050,
-					1054, 1058, 1062, 1066, 1070, 1074, 1078, 1082, 1084, 1086, 1088, 1090, 1094, 1098, 1102, 1106,
-					1110, 1114, 1118, 68, 900]
+	db_number = DB
+	# Get contiguous data from PLC Stream --- Dealing with very volatile data frame.
+	start_offset = [0, 2, 4, 6, 14, 22, 26, 30, 38, 42, 46, 50, 54]
 	bit_offset = [0, 1, 2]
 	id1 = str(0)
+
+	timei = time.time()
 	# ------------------------------------------------------------------------
 	group_step = int(grp_step)  	# group size/ sample sze
 	fetch_no = int(fetch_no)  		# dbfreq = TODO look into any potential conflict
@@ -138,31 +136,31 @@ def plcExec(nGZ, grp_step, fetch_no):
 			# --------------------------------- Tape Gap Measurement Data ---------------------[14 columns]
 			TG1 = readInteger(db_number, start_offset[0], bit_offset[0])  		# time stamp
 			tg_list.append(TG1)
-			TG2 = readInteger(db_number, start_offset[2], bit_offset[0])  		# Current Layr
+			TG2 = readInteger(db_number, start_offset[1], bit_offset[0])  		# Current Layr
 			tg_list.append(TG2)
-			TG3 = readInteger(db_number, start_offset[4], bit_offset[0])  		# Sample Count
+			TG3 = readInteger(db_number, start_offset[2], bit_offset[0])  		# Sample Count
 			tg_list.append(TG3)
-			TG4 = readReal(db_number, start_offset[6], bit_offset[0])  			# Sample Centre
+			TG4 = readReal(db_number, start_offset[3], bit_offset[0])  			# Sample Centre
 			tg_list.append(TG4)
-			TG5 = readReal(db_number, start_offset[14], bit_offset[0])  		# Pipe Position
+			TG5 = readReal(db_number, start_offset[4], bit_offset[0])  		# Pipe Position
 			tg_list.append(TG5)
-			TG6 = readReal(db_number, start_offset[22], bit_offset[0])  		# Gauge A1
+			TG6 = readReal(db_number, start_offset[5], bit_offset[0])  		# Gauge A1
 			tg_list.append(TG6)
-			TG7 = readReal(db_number, start_offset[26], bit_offset[0])  		# Gauge A2
+			TG7 = readReal(db_number, start_offset[6], bit_offset[0])  		# Gauge A2
 			tg_list.append(TG7)
-			TG8 = readReal(db_number, start_offset[30], bit_offset[0])  		# Gauge A3
+			TG8 = readReal(db_number, start_offset[7], bit_offset[0])  		# Gauge A3
 			tg_list.append(TG8)
-			LP1 = readReal(db_number, start_offset[34], bit_offset[0])  		# Gauge A4
+			LP1 = readReal(db_number, start_offset[8], bit_offset[0])  		# Gauge A4
 			tg_list.append(LP1)
-			LP2 = readReal(db_number, start_offset[38], bit_offset[0])  		# Gauge B1
+			LP2 = readReal(db_number, start_offset[9], bit_offset[0])  		# Gauge B1
 			tg_list.append(LP2)
-			LP3 = readReal(db_number, start_offset[42], bit_offset[0])  		# Gauge B2
+			LP3 = readReal(db_number, start_offset[10], bit_offset[0])  		# Gauge B2
 			tg_list.append(LP3)
-			LP4 = readReal(db_number, start_offset[46], bit_offset[0])  		# Gauge B3
+			LP4 = readReal(db_number, start_offset[11], bit_offset[0])  		# Gauge B3
 			tg_list.append(LP4)
-			LA1 = readReal(db_number, start_offset[50], bit_offset[0])  	 	# Gauge B4
+			LA1 = readReal(db_number, start_offset[12], bit_offset[0])  	 	# Gauge B4
 			tg_list.append(LA1)
-			LA2 = readInteger(db_number, start_offset[54], bit_offset[0])  		# Pipe Direction
+			LA2 = readInteger(db_number, start_offset[13], bit_offset[0])  		# Pipe Direction
 			tg_list.append(LA2)
 
 

@@ -8,15 +8,15 @@ All production procedure relies on Word Order Number - Assuming a Unique identit
 Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
-# 1. Laser Power, 2. Laser Angle, 3. Tape Speed
 
 
 def loadProcesValues(df1):
-    plcTG = [df1['tStamp'], df1['cLayer'],df1['sCount'],
-             df1['sCentre'], df1['PipePos'], df1['GaugeA1'],
-             df1['GaugeA2'], df1['GaugeA3'], df1['GaugeA4'],
-             df1['GaugeB1'], df1['GaugeB2'], df1['GaugeB3'],
-             df1['GaugeB4'], df1['PipeDir']]
+    sqlLP = [df1['tStamp'], df1['cLayer'], df1['R1H1LP'],
+             df1['R1H2LP'], df1['R1H3LP'], df1['R1H4LP'],
+             df1['R2H1LP'], df1['R2H2LP'], df1['R2H3LP'],
+             df1['R2H4LP'], df1['tStamp'], df1['cLayer'],
+             df1['R3H1LP'], df1['R3H2LP'], df1['R3H3LP'],
+             df1['R3H4LP'], df1['R4H1LP'], df1['R4H2LP'],
+             df1['R4H3LP'], df1['R4H4LP']]
 
-    return plcTG
-
+    return sqlLP

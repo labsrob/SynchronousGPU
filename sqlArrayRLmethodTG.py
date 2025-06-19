@@ -16,7 +16,7 @@ Idx, Idx, dL = [], [], []
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
+def sqlExec(nGZ, grp_step, daq, rT1, sCentr, fetch_no):
     """
     NOTE:
     """
@@ -30,23 +30,23 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
     if len(dL) < (nGZ - 1):
         n2fetch = nGZ                                       # fetch initial specified number
         print('\nRows to Fetch:', n2fetch)
-        print('Processing SQL Row #:', int(idx) + fetch_no + 1, 'to', (int(idx) + fetch_no + 1) + n2fetch)
+        print('Processing SQL Row #:', int(sCentr) + fetch_no + 1, 'to', (int(sCentr) + fetch_no + 1) + n2fetch)
 
     elif group_step == 1 and len(dL) >= nGZ:
         print('\nSINGLE STEP SLIDE')
         print('=================')
         n2fetch = (nGZ + fetch_no)                          # fetch just one line to on top of previous fetch
-        idxA = int(idx) + (((fetch_no + 1) - 2) * nGZ) + 1
-        if len(Idx) > 1:
-            del Idx[:1]
+        idxA = int(sCentr) + (((fetch_no + 1) - 2) * nGZ) + 1
+        if len(sCentr) > 1:
+            del sCentr[:1]
         Idx.append(idxA)
         print('Processing SQL Row #:', 'T1:', idxA)
 
     # ------------------------------------------------------------------------------------[]
     # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data1 = daq.execute('SELECT * FROM ' + rT1 + ' WHERE DX1A > ' + str(idx)).fetchmany(n2fetch)
-    if len(data1) != 0:
-        for result in data1:
+    data = daq.execute('SELECT * FROM ' + rT1 + ' WHERE sCentre = ' + str(sCentr)).fetchmany(n2fetch)
+    if len(data) != 0:
+        for result in data:
             result = list(result)
             if UseRowIndex:
                 dataList0.append(next(idx))
@@ -81,5 +81,5 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
         time.sleep(5)
     daq.close()
 
-    return Idx, dL
+    return dL
 # -----------------------------------------------------------------------------------[Dr Labs]
