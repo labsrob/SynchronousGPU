@@ -99,12 +99,12 @@ inUseAlready = []
 # Storing the list of PLC data Block        #
 #                                           #
 # Load PLC DB address once -----------------#
-SPC_LP = 112
-SPC_LA = 103
+SPC_LP = 112 #
+SPC_LA = 103 #
 SPC_TP = 111
-SPC_RF = 71
-SPC_TT = 98
-SPC_ST = 99
+SPC_RF = 71 #
+SPC_TT = 98 #
+SPC_ST = 99 #
 SPC_TG = 101
 SPC_EV = 109
 SPC_GEN = 104
@@ -112,9 +112,9 @@ SPC_RC = 116
 SPC_VC = 117
 SPC_RM = 114
 SCP_VM = 115
-SPC_RP = 97
-SPC_WS = 100
-SPC_WA = 113
+SPC_RP = 97 #
+SPC_WS = 100 # not Tape speed
+SPC_WA = 113 #
 # ------------------------------------------#
 
 import subprocess
