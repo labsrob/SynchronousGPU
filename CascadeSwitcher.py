@@ -939,7 +939,7 @@ def ttProcessParam(vCounter, pType):
         df3 = pd.DataFrame(rmData, columns=['CumulativeRamp', 'SampleDistance'])
         RAMP = [df3['CumulativeRamp'], df3['SampleDistance']]
         # --------------------------------------------------#
-        import VarSQLrm as rm  # load SQL variables column names |
+        import VarSQL_RM as rm  # load SQL variables column names |
 
         # viz_cycle = 150
         g1 = qrm.validCols('RM')                # Construct Data Column selSqlColumnsTFM.py
@@ -955,7 +955,7 @@ def ttProcessParam(vCounter, pType):
             df1 = pd.DataFrame(ttData, columns=columns)    # Include table data into python Dataframe
             TT = tt.loadProcesValues(df1)                  # Join data values under dataframe
         else:
-            import VarSQLtt as tt                          # load SQL variables column names | rfVarSQL
+            import VarSQL_TT as tt                          # load SQL variables column names | rfVarSQL
 
             viz_cycle = 150
             g1 = qtt.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
@@ -1445,7 +1445,7 @@ def stProcessParam(vCounter, pType):
             ST = st.loadProcesValues(df1)                  # Join data values under dataframe
 
         else:
-            import VarSQLst as st                          # load SQL variables column names | rfVarSQL
+            import VarSQL_ST as st                          # load SQL variables column names | rfVarSQL
 
             viz_cycle = 150
             g1 = qst.validCols(T1)                         # Construct Data Column selSqlColumnsTFM.py
@@ -1899,7 +1899,7 @@ def tgProcessParam(vCounter, pType):
             TG = tg.loadProcesValues(df1)           # Join data values under dataframe
 
         else:
-            import VarSQLtg as tg                   # load SQL variables column names | rfVarSQL
+            import VarSQL_TG as tg                   # load SQL variables column names | rfVarSQL
 
             viz_cycle = 150
             g1 = qtg.validCols('TG')                # Construct Data Column selSqlColumnsTFM.py
@@ -1907,7 +1907,7 @@ def tgProcessParam(vCounter, pType):
             TG = tg.loadProcesValues(df1)           # Join data values under dataframe
 
         # Compulsory VoidMap function call -- SQL loader -[B]
-        import VarSQLvm as vm                       # load SQL variables column names | rfVarSQL
+        import VarSQL_VM as vm                       # load SQL variables column names | rfVarSQL
 
         viz_cycle = 150
         g1 = qvm.validCols('VM')                    # Construct Data Column selSqlColumnsTFM.py
@@ -3167,7 +3167,7 @@ def laProcessParam(vCounter, pType):  # Tape Placement
             LA = la.loadProcesValues(df1)                   # Join data values under dataframe
 
         else:
-            import VarSQLla as la                           # load SQL variables column names | rfVarSQL
+            import VarSQL_LA as la                           # load SQL variables column names | rfVarSQL
 
             viz_cycle = 150
             g1 = qla.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py

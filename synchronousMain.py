@@ -195,7 +195,7 @@ rtValues = []
 # ---- Common to all Process Procedures --------[]
 pRecipe = ""
 
-# Call function and load WON specification -----[]
+# Call function and load WON specifications per Parameter -----[]
 cDM, cSS, cGS, mLA, mLP, mCT, mOT, mRP, mWS, sStart, sStops, LP, LA, TP, RF, TT, ST, TG = dd.decryptMetricsGeneral(processWON[0])
 print('\nDecrypted MGM Parameters:', mLA, mLP, LP, LA, TP, RF, TT, ST, TG)
 print('Decrypted DNV Parameters:', mCT, mOT, mRP, mWS, TT, ST, TG)
@@ -1314,7 +1314,7 @@ class collectiveEoL(ttk.Frame):
 
             # --------------------------------------------------#
 
-            import varSQL_EOLrpt as el                            # load SQL variables column names | rfVarSQL
+            import VarSQL_EOLRPT as el                            # load SQL variables column names | rfVarSQL
 
             if EoLRep == 'DNV':
                 g1 = ott.validCols(T1)                           # Construct Table Column (Tape Temp)
@@ -2122,7 +2122,7 @@ class common_rampCount(ttk.Frame):
             dXrc = synchronousRampC(db_freq)                  # data loading functions
 
             # --------------------------------------------------#
-            import VarSQLrc as rc                               # load SQL variables column names | rfVarSQL
+            import VarSQL_RC as rc                               # load SQL variables column names | rfVarSQL
 
             viz_cycle = 150
             g1 = qrc.validCols('RC')                            # Construct Data Column selSqlColumnsTFM.py
@@ -2305,7 +2305,7 @@ class common_climateProfile(ttk.Frame):
             # Call data loader Method---------------------------#
             evData = synchronousClimate(db_freq)                # data loading functions
 
-            import VarSQLev as ev                               # load SQL variables column names | rfVarSQL
+            import VarSQL_EV as ev                               # load SQL variables column names | rfVarSQL
 
             viz_cycle = 150
             g1 = qev.validCols('EV')                            # Construct Data Column selSqlColumnsTFM.py
@@ -2488,7 +2488,7 @@ class common_gapCount(ttk.Frame):
             # Call data loader Method--------------------------#
             vcData = synchronousGapC(db_freq)                   # data loading functions
 
-            import VarSQLvc as vc                              # load SQL variables column names | rfVarSQL
+            import VarSQL_VC as vc                              # load SQL variables column names | rfVarSQL
 
             viz_cycle = 150
             g1 = qvc.validCols('VC')                           # Construct Data Column void (gap) count
@@ -2862,7 +2862,7 @@ class MonitorTabb(ttk.Frame):
             else:
                 dGEN, dRPa, dRPb, dLPa, dLPb, dLAa, dLAb = synchronousP(db_freq)            # data loading functions
 
-            import varSQL_PM as pm                            # Construct new data frame columns
+            import VarSQL_PM as pm                            # Construct new data frame columns
 
             viz_cycle = 150
             if monitorP == 'DNV':
@@ -3117,10 +3117,10 @@ class laserPowerTabb(ttk.Frame):
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
             import qParamsHL_DNV as dnv
-            lpS, lTy, olS, opS, pHL, pAL, pFO, pP1, pP2, pP3, pP4, pP5 = dnv.decryptpProcessLim(processWON[0], 'LP')
+            lpS, lpTy, olS, opS, pHL, pAL, pFO, pP1, pP2, pP3, pP4, pP5 = dnv.decryptpProcessLim(processWON[0], 'LP')
         else:
             import qParamsHL_MGM as mgm
-            lpS, lTy, olS, opS, pHL, pAL, pFO, pP1, pP2, pP3, pP4, pP5 = mgm.decryptpProcessLim(processWON[0], 'LP')
+            lpS, lpTy, olS, opS, pHL, pAL, pFO, pP1, pP2, pP3, pP4, pP5 = mgm.decryptpProcessLim(processWON[0], 'LP')
         # Break down each element to useful list ---------------[Tape Temperature]
 
         if pHL and pP1 and pP2 and pP3 and pP4 and pP5:  #
@@ -3335,7 +3335,7 @@ class laserPowerTabb(ttk.Frame):
         a3.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a3.transAxes)
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousLP(lpSize, lpgType, fetchT):
+        def synchronousLP(lpS, lpTy, fetchT):
             fetch_no = str(fetchT)                  # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
@@ -3377,14 +3377,16 @@ class laserPowerTabb(ttk.Frame):
                             autoSpcPause = True
                             # play(error)                            # Pause mode with audible Alert
                             print("\nVisualization in Paused Mode...")
-                        else:
-                            autoSpcPause = False
-                            print("Visualization in Real-time Mode...")
+
                     else:
-                        # Allow selective runtime parameter selection on production critical process
-                        procID = 'LP'
-                        lpDta = slp.paramDataRequest(procID, lpSize, lpgType, fetch_no)
-                        lpDtb = 0
+                        autoSpcPause = False
+
+                    # Play visualization ----------------------------------------------[]
+                    print("Visualization in Play Mode...")
+                    # -----------------------------------------------------------------[]
+                    procID = 'LP'
+                    lpDta = slp.plcExec(procID, lpS, lpTy, fetch_no)
+                    lpDtb = 0
 
                 else:
                     import sqlArrayRLmethodLP as slp        # DrLabs optimization method
@@ -3408,7 +3410,7 @@ class laserPowerTabb(ttk.Frame):
                             print("Visualization in Real-time Mode...")
                     else:
                         # Get list of relevant SQL Tables using conn() --------------------[]
-                        lpDta, lpDtb = slp.sqlExec(lpSize, lpgType, con_a, con_b, T1, T2, fetchT)
+                        lpDta, lpDtb = slp.sqlExec(lpS, lpTy, con_a, con_b, T1, T2, fetchT)
 
                     # ------ Inhibit iteration ----------------------------------------------------------[]
                     """
@@ -3431,7 +3433,7 @@ class laserPowerTabb(ttk.Frame):
             timei = time.time()                                 # start timing the entire loop
 
             # Bistream Data Pooling Method ---------------------#
-            lpData = synchronousLP(db_freq)                     # data loading functions
+            lpDta, lpDtb = synchronousLP(lpS, lpTy, db_freq)                     # data loading functions
             # --------------------------------------------------#
 
             if UsePLC_DBS == 1:
@@ -3440,22 +3442,22 @@ class laserPowerTabb(ttk.Frame):
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qlp.validCols(T1)                     # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(lpData, columns=columns)     # Include table data into python Dataframe
-                # LP = lp.loadProcesValues(df1)                 # Join data values under dataframe
+                df1 = pd.DataFrame(lpDta, columns=columns)      # Include table data into python Dataframe
+                LP = lp.loadProcesValues(df1)                   # Join data values under dataframe
 
             else:
                 import VarSQL_LP as lp                        # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
                 g1 = qlp.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
-                d1 = pd.DataFrame(lpData, columns=g1)
+                d1 = pd.DataFrame(lpDta, columns=g1)
                 g2 = qlp.validCols(T2)
-                d2 = pd.DataFrame(lpData, columns=g2)          # Import into python Dataframe
+                d2 = pd.DataFrame(lpDtb, columns=g2)          # Import into python Dataframe
 
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2], axis=1)          # Join data values under dataframe
+                LP = lp.loadProcesValues(df1)
 
-            LP = lp.loadProcesValues(df1)
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -3493,7 +3495,7 @@ class laserPowerTabb(ttk.Frame):
             im38.set_xdata(np.arange(db_freq))
             im39.set_xdata(np.arange(db_freq))
             im40.set_xdata(np.arange(db_freq))
-            im41.set_xdata(np.arange(db_freq))
+            im41.set_xdata(np.arange(db_freq))      # lpS, lTy
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
             im10.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
@@ -3501,28 +3503,28 @@ class laserPowerTabb(ttk.Frame):
             im12.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
             im13.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
-            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(lpHL, lpS, 'LP')
+            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(pAL, lpS, 'LP')
             # ---------------------------------------#
             im14.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
             im15.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
             im16.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
             im17.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
-            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(lpHL, lpS, 'LP')
+            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(pAL, lpS, 'LP')
             # ---------------------------------------#
             im18.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
             im19.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
             im20.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
             im21.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
-            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(lpHL, lpS, 'LP')
+            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(pAL, lpS, 'LP')
             # ---------------------------------------#
             im22.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
             im23.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
             im24.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
             im25.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
-            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(lpHL, lpS, 'LP')
+            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(pAL, lpS, 'LP')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
             im26.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
@@ -3546,8 +3548,8 @@ class laserPowerTabb(ttk.Frame):
             im41.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
 
             # Compute entire Process Capability -----------#
-            if not lpHL:
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(lpSize, mnA, mnB,
+            if not pAL:
+                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(lpS, mnA, mnB,
                                                                                                       mnC, mnD, sdA,
                                                                                                       sdB, sdC, sdD)
             else:
@@ -3612,19 +3614,19 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
     def create_widgets(self):
         """Create the widgets for the GUI"""
         # Load Quality Historical Values -----------[]
-        laSize, lagType, eolSample, eopSample, laHL, laAL, laFO, laParam1, laParam2, laParam3, laParam4, laParam5 = mgm.decryptpProcessLim(
+        laS, laTy, eolS, eopS, laHL, laAL, laFO, laP1, laP2, laP3, laP4, laP5 = mgm.decryptpProcessLim(
                 processWON[0], 'LA')
 
         # Break down each element to useful list ---------------[Tape Temperature]
-        if laHL and laParam1 and laParam2 and laParam3 and laParam4 and laParam5:  #
-            laPerf = '$Pp_{k' + str(laSize) + '}$'  # Using estimated or historical Mean
+        if laHL and laP1 and laP2 and laP3 and laP4 and laP5:  #
+            laPerf = '$Pp_{k' + str(laS) + '}$'  # Using estimated or historical Mean
             lalabel = 'Pp'
             # -------------------------------
-            One = laParam1.split(',')                   # split into list elements
-            Two = laParam2.split(',')
-            Thr = laParam3.split(',')
-            For = laParam4.split(',')
-            Fiv = laParam5.split(',')
+            One = laP1.split(',')                   # split into list elements
+            Two = laP2.split(',')
+            Thr = laP3.split(',')
+            For = laP4.split(',')
+            Fiv = laP5.split(',')
             # -------------------------------
             dTape1 = One[1].strip("' ")                 # defined Tape Width
             dTape2 = Two[1].strip("' ")                 # defined Tape Width
@@ -3704,7 +3706,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
             sLCLla = 0
             laUSL = 0
             laLSL = 0
-            laPerf = '$Cp_{k' + str(laSize) + '}$'  # Using Automatic group Mean
+            laPerf = '$Cp_{k' + str(laS) + '}$'  # Using Automatic group Mean
             lalabel = 'Cp'
 
         # ------------------------------------[End of Tape Temperature Abstraction]
@@ -3726,12 +3728,16 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minLA, YScale_maxLA = laLSL - 8.5, laUSL + 8.5       # Roller Force
         sBar_minLA, sBar_maxLA = sLCLla - 80, sUCLla + 80           # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (int(laSize) + 3)             # windows view = visible data points
+        window_Xmin, window_Xmax = 0, (int(laS) + 3)             # windows view = visible data points
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
-        T1 = 'LA1_' + pWON          # Laser Power table 1
-        T2 = 'LA2_' + pWON          # Laser Power table 2
+        # Select betweeen straem -----------------------------------#
+        if rType == 1:
+            T1 = SPC_LA
+        else:
+            T1 = 'LA1_' + pWON          # Laser Power table 1
+            T2 = 'LA2_' + pWON          # Laser Power table 2
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -3827,7 +3833,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         a3.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a3.transAxes)
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousLA(laSize, lagType, fetchT):
+        def synchronousLA(laS, laTy, fetchT):
             fetch_no = str(fetchT)  # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
@@ -3835,7 +3841,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
                 import CommsSql as q
                 q.DAQ_connect(1, 0)
             else:
-                con_la = conn.cursor()
+                con_a, con_b = conn.cursor(), conn.cursor()
 
             # Evaluate conditions for SQL Data Fetch ------------------------------[A]
             """
@@ -3869,11 +3875,14 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
                             autoSpcPause = True
                             # play(error)                            # Pause mode with audible Alert
                             print("\nVisualization in Paused Mode...")
+
                     else:
                         autoSpcPause = False
+                        procID = 'LA'
                         print("Visualization in Real-time Mode...")
                         # Allow selective runtime parameter selection on production critical process
-                        laData = sla.paramDataRequest(T1, laSize, lagType, fetch_no)
+                        laDta = sla.plcExec(procID, laS, laTy, fetch_no)
+                        laDtb = 0
 
                 else:
                     import sqlArrayRLmethodLA as sla
@@ -3898,7 +3907,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
                             print("Visualization in Real-time Mode...")
                     else:
                         # Get list of relevant SQL Tables using conn() ----------------[]
-                        laData = sla.sqlexec(laSize, lagType, con_la, T1, fetchT)
+                        laDta, laDtb = sla.sqlExec(laS, laTy, con_a, con_b, T1, T2, fetchT)
 
                     # ------ Inhibit iteration ----------------------------------------------------------[]
                     """
@@ -3906,21 +3915,22 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
                     """
                     # TODO --- values for inhibiting the SQL processing
                     if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        con_la.close()
+                        con_a.close()
+                        con_b.close()
                         print('SQL End of File, connection closes after 30 mins...')
                         time.sleep(60)
                         continue
                     else:
                         print('\nUpdating....')
 
-            return laData
+            return laDta, laDtb
 
         # ================== End of synchronous Method ==========================
         def asynchronousLA(db_freq):
             timei = time.time()                                 # start timing the entire loop
 
             # Bistream Data Pooling Method ---------------------#
-            laData = synchronousLA(laSize, lagType, db_freq)    # data loading functions
+            laDta, laDtb = synchronousLA(laS, laTy, db_freq)    # data loading functions
             # --------------------------------------------------#
 
             if UsePLC_DBS == 1:
@@ -3928,26 +3938,25 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
 
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
-                columns = qla.validCols(T1)                    # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(laData, columns=columns)    # Include table data into python Dataframe
-                LA = la.loadProcesValues(df1)                  # Join data values under dataframe
+                columns = qla.validCols(T1)                         # Load defined valid columns for PLC Data
+                df1 = pd.DataFrame(laDta, columns=columns)          # Include table data into python Dataframe
+                LA = la.loadProcesValues(df1)                       # Join data values under dataframe
 
             else:
-                import VarSQLla as la                          # load SQL variables column names | rfVarSQL
+                import VarSQL_LA as la                              # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
-                g1 = qla.validCols(T1)                         # Construct Data Column selSqlColumnsTFM.py
-                d1 = pd.DataFrame(laData, columns=g1)          # Import into python Dataframe
+                g1 = qla.validCols(T1)                              # Construct Data Column selSqlColumnsTFM.py
+                d1 = pd.DataFrame(laDta, columns=g1)                # Import into python Dataframe
 
                 g2 = qla.validCols(T2)
-                d2 = pd.DataFrame(laData, columns=g2)
+                d2 = pd.DataFrame(laDtb, columns=g2)
 
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2], axis=1)
-
-            LA = la.loadProcesValues(df1)                       # Join data values under dataframe
+                LA = la.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
-            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+            print("Memory Usage:", df1.info(verbose=False))         # Check memory utilization
 
             # -------------------------------------------------------------------------------------[]
             # Plot X-Axis data points -------- X Plot
@@ -3986,58 +3995,58 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
             im41.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((LA[0]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((LA[1]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((LA[2]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((LA[3]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((LA[0]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 1
+            im11.set_ydata((LA[1]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 2
+            im12.set_ydata((LA[2]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 3
+            im13.set_ydata((LA[3]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
-            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(laHL, laSize, 'LA')
+            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(laHL, laS, 'LA')
             # ---------------------------------------#
-            im14.set_ydata((LA[4]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((LA[5]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((LA[6]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((LA[7]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((LA[4]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 1
+            im15.set_ydata((LA[5]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 2
+            im16.set_ydata((LA[6]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 3
+            im17.set_ydata((LA[7]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
-            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(laHL, laSize, 'LA')
+            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(laHL, laS, 'LA')
             # ---------------------------------------#
-            im18.set_ydata((LA[8]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((LA[9]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((LA[10]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((LA[11]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((LA[8]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 1
+            im19.set_ydata((LA[9]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 2
+            im20.set_ydata((LA[10]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 3
+            im21.set_ydata((LA[11]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
-            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(laHL, laSize, 'LA')
+            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(laHL, laS, 'LA')
             # ---------------------------------------#
-            im22.set_ydata((LA[12]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((LA[13]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((LA[14]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((LA[15]).rolling(window=laSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((LA[12]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 1
+            im23.set_ydata((LA[13]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 2
+            im24.set_ydata((LA[14]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 3
+            im25.set_ydata((LA[15]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
-            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(laHL, laSize, 'LA')
+            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(laHL, laS, 'LA')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((LA[0]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((LA[1]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((LA[2]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((LA[3]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((LA[0]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im27.set_ydata((LA[1]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im28.set_ydata((LA[2]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im29.set_ydata((LA[3]).rolling(window=laS, min_periods=1).std()[0:db_freq])
 
-            im30.set_ydata((LA[4]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((LA[5]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((LA[6]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((LA[7]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((LA[4]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im31.set_ydata((LA[5]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im32.set_ydata((LA[6]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im33.set_ydata((LA[7]).rolling(window=laS, min_periods=1).std()[0:db_freq])
 
-            im34.set_ydata((LA[8]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((LA[9]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((LA[10]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((LA[11]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((LA[8]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im35.set_ydata((LA[9]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im36.set_ydata((LA[10]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im37.set_ydata((LA[11]).rolling(window=laS, min_periods=1).std()[0:db_freq])
 
-            im38.set_ydata((LA[12]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((LA[13]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((LA[14]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((LA[15]).rolling(window=laSize, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((LA[12]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im39.set_ydata((LA[13]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im40.set_ydata((LA[14]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im41.set_ydata((LA[15]).rolling(window=laS, min_periods=1).std()[0:db_freq])
 
             # Compute entire Process Capability -----------#
             if not laHL:
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(laSize, mnA, mnB,
+                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(laS, mnA, mnB,
                                                                                                       mnC, mnD, sdA,
                                                                                                       sdB, sdC, sdD)
             else:
@@ -4050,14 +4059,14 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
             # # Declare Plots alaributes --------------------------------------------------------[]
             # XBar Mean Plot
             a1.axhline(y=xline, color="red", linestyle="--", linewidth=0.8)
-            a1.axhspan(xlcT, xucT, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 3 Sigma span (Purple)
-            a1.axhspan(xucT, xusT, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
+            a1.axhspan(xlcT, xucT, facecolor='#F9C0FD', edgecolor='#F9C0FD')            # 3 Sigma span (Purple)
+            a1.axhspan(xucT, xusT, facecolor='#8d8794', edgecolor='#8d8794')            # grey area
             a1.axhspan(xlcT, xlsT, facecolor='#8d8794', edgecolor='#8d8794')
             # ---------------------- sBar_minLP, sBar_maxLP -------[]
             # Define Legend's Alaributes  ----
             a2.axhline(y=sline, color="blue", linestyle="--", linewidth=0.8)
-            a2.axhspan(sLCLla, sUCLla, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 1 Sigma Span
-            a2.axhspan(sUCLla, sBar_maxLA, facecolor='#CCCCFF', edgecolor='#CCCCFF')  # 1 Sigma above the Mean
+            a2.axhspan(sLCLla, sUCLla, facecolor='#F9C0FD', edgecolor='#F9C0FD')        # 1 Sigma Span
+            a2.axhspan(sUCLla, sBar_maxLA, facecolor='#CCCCFF', edgecolor='#CCCCFF')    # 1 Sigma above the Mean
             a2.axhspan(sBar_minLA, sLCLla, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
@@ -4102,15 +4111,15 @@ class tapePlacementTabb(ttk.Frame):
         """Create the widgets for the GUI"""
         # --------------------------------------------------------------------[]
         if pRecipe == 'DNV':
-            tpSize, tpgType, eolSample, eopSample, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(processWON[0],
+            tpS, tpTy, eolS, eopS, tpHL, tpAL, tptFO, tpP1, dud2, dud3, dud4, dud5 = dnv.decryptpProcessLim(processWON[0],
                                                                                                                     'TP')
         else:
-            tpSize, tpgType, eolSample, eopSample, tpHL, tpAL, tptFO, tpParam1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(processWON[0],
+            tpS, tpTy, eolS, eopS, tpHL, tpAL, tptFO, tpP1, dud2, dud3, dud4, dud5 = mgm.decryptpProcessLim(processWON[0],
                                                                                                                    'TP')
 
         # Break down each element to useful list ----------------[Winding Speed]
 
-        if tpHL and tpParam1:  # Roller Pressure TODO - layer metrics to guide TCP01
+        if tpHL and tpP1:  # Roller Pressure TODO - layer metrics to guide TCP01
             tpPerf = '$Pp_{k' + str(tpSize) + '}$'               # Using estimated or historical Mean
             tplabel = 'Pp'
             # -------------------------------
@@ -4164,8 +4173,11 @@ class tapePlacementTabb(ttk.Frame):
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 27/Feb/2025
-        T1 = 'TP1_' + pWON  # Tape Placement Error
-        T2 = 'TP2_' + pWON
+        if rType == 1:
+            T1 = SPC_TP
+        else:
+            T1 = 'TP1_' + pWON  # Tape Placement Error
+            T2 = 'TP2_' + pWON
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -4259,7 +4271,7 @@ class tapePlacementTabb(ttk.Frame):
         a3.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a3.transAxes)
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousTP(wsSize, wsgType, fetchT):
+        def synchronousTP(tpS, tpTy, fetchT):
             fetch_no = str(fetchT)  # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
@@ -4267,7 +4279,7 @@ class tapePlacementTabb(ttk.Frame):
                 import CommsSql as q
                 q.DAQ_connect(1, 0)
             else:
-                con_tp = conn.cursor()
+                con_a, con_b = conn.cursor(), conn.cursor()
 
             # Evaluate conditions for SQL Data Fetch ------------------------------[A]
             """
@@ -4307,10 +4319,9 @@ class tapePlacementTabb(ttk.Frame):
                     # Play visualization ----------------------------------------------[]
                     print("Visualization in Play Mode...")
                     # -----------------------------------------------------------------[]
-
-                    # Allow selective runtime parameter selection on production critical process
                     procID = 'TP'
-                    tpData = stp.paramDataRequest(procID, wsSize, wsgType, fetch_no)
+                    tpDta = stp.plcExec(procID, tpS, tpTy, fetch_no)
+                    tpDtb = 0
 
                 else:
                     import sqlArrayRLmethodTP as stp                # DrLabs optimization method
@@ -4335,7 +4346,7 @@ class tapePlacementTabb(ttk.Frame):
                             autoSpcPause = False
                     else:
                         # Get list of relevant SQL Tables using conn() --------------------[]
-                        tpData = stp.sqlexec(wsSize, wsgType, con_tp, T1, fetchT)
+                        tpDta, tpDtb = stp.sqlExec(tpS, tpTy, con_a, con_b, T1, T2, fetchT)
 
                     # ------ Inhibit iteration ----------------------------------------------------------[]
                     """
@@ -4343,14 +4354,15 @@ class tapePlacementTabb(ttk.Frame):
                     """
                     # TODO --- values for inhibiting the SQL processing
                     if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        con_tp.close()
+                        con_a.close()
+                        con_b.close()
                         print('SQL End of File, connection closes after 30 mins...')
                         time.sleep(60)
                         continue
                     else:
                         print('\nUpdating....')
 
-            return tpData
+            return tpDta, tpDtb
 
         # ================== End of synchronous Method ==========================
         def asynchronousTP(db_freq):
@@ -4359,28 +4371,30 @@ class tapePlacementTabb(ttk.Frame):
             UsePLC_DBS = rType                                  # Query Type
 
             # Call data loader Method---------------------------#
-            tpData = synchronousTP(tpSize, tpgType, db_freq)  # data loading functions
+            tpDta, tpDtb = synchronousTP(tpS, tpTy, db_freq)  # data loading functions
+
             if UsePLC_DBS == 1:
                 import VarPLCrf as tp
 
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qtp.validCols(T1)                    # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(tpData, columns=columns)    # Include table data into python Dataframe
-                # TP = tp.loadProcesValues(df1)                # Join data values under dataframe
+                df1 = pd.DataFrame(tpDta, columns=columns)     # Include table data into python Dataframe
+                TP = tp.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import VarSQLrf as tp                           # load SQL variables column names | rfVarSQL
+                import VarSQL_RF as tp                           # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
                 g1 = qtp.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
-                d1 = pd.DataFrame(tpData, columns=g1)           # Import into python Dataframe
+                d1 = pd.DataFrame(tpDta, columns=g1)            # Import into python Dataframe
                 g2 = qtp.validCols(T2)                          # Construct Data Column selSqlColumnsTFM.py
-                d2 = pd.DataFrame(tpData, columns=g2)
+                d2 = pd.DataFrame(tpDtb, columns=g2)
+
                 # Concatenate all columns -----------------------[]
                 df1 = pd.concat([d1, d2], axis=1)
+                TP = tp.loadProcesValues(df1)                       # Join data values under dataframe
 
-            TP = tp.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -4866,7 +4880,7 @@ class rollerForceTabb(ttk.Frame):
                 # RF = rf.loadProcesValues(df1)                 # Join data values under dataframe
 
             else:
-                import VarSQLrf as rf                           # load SQL variables column names | rfVarSQL
+                import VarSQL_RF as rf                           # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
                 g1 = qrf.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
@@ -5413,7 +5427,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             ttData = synchronousTT(db_freq)                     # data loading functions
             rmData = synchronousRM(db_freq)                     # Ramp Count
             # --------------------------------------------------#
-            import VarSQLrm as rm                               # load SQL variables column names | rfVarSQL
+            import VarSQL_RM as rm                               # load SQL variables column names | rfVarSQL
 
             # viz_cycle = 150
             g1 = qrm.validCols(T3)                              # Construct Data Column selSqlColumnsTFM.py
@@ -5429,7 +5443,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                 df1 = pd.DataFrame(ttData, columns=g1)       # Include table data into python Dataframe
 
             else:
-                import VarSQLtt as tt
+                import VarSQL_TT as tt
                 viz_cycle = 150
                 stream = 2                                  # SQL Stream
                 g1 = qtt.validCols(T1)                      # Load TT1_
@@ -5929,7 +5943,7 @@ class substTempTabb(ttk.Frame):
                 df1 = pd.DataFrame(stData, columns=g1)          # Include table data into python Dataframe
                 ST = st.loadProcesValues(df1)                   # Join data values under dataframe
             else:
-                import VarSQLst as st                           # load SQL variables column names | rfVarSQL
+                import VarSQL_ST as st                           # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
                 g1 = qst.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
@@ -6347,7 +6361,7 @@ class tapeGapPolTabb(ttk.Frame):
                 TG = tg.loadProcesValues(df1)                   # Join data values under dataframe
 
             else:
-                import VarSQLtg as tg                           # load SQL variables column names | rfVarSQL
+                import VarSQL_TG as tg                           # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
                 g1 = qtg.validCols('TG')                        # Construct Data Column selSqlColumnsTFM.py
@@ -6355,7 +6369,7 @@ class tapeGapPolTabb(ttk.Frame):
                 TG = tg.loadProcesValues(df1)                   # Join data values under dataframe
 
             # Compulsory VoidMap function call -- SQL loader -[B]
-            import VarSQLvm as vm                              # load SQL variables column names | rfVarSQL
+            import VarSQL_VM as vm                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qvm.validCols('VM')                            # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(vmData, columns=g1)              # Import into python Dataframe
@@ -7695,6 +7709,7 @@ def userMenu():     # listener, myplash
         if len(rtValues) > 1:                                           # Compute the length for dynamic arrays
             x = len(rtValues) - 1                                       # Use the last index
             print('\nTest Vars:', m1, m2, m3, m4, m5, m6)
+
             # Encrypt configuration on production params ---------------#
             dd.saveMetricspP(processWON[0],  rMode, sel_SS, sel_gT, LA, LP, CT, OT, RP, WS, sSta, sEnd, rtValues[x][0], rtValues[x][1], rtValues[x][2],
                              rtValues[x][3], rtValues[x][4], rtValues[x][5], rtValues[x][6])

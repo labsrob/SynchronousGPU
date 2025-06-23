@@ -9,9 +9,11 @@ Puthor: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
 
-
 def loadProcesValues(df1):
-    sqlEOLRP = [df1['tStmb'], df1['LyIDb'], df1['R1SPb'],  df1['R1NVb'], df1['R2SPb'],
-             df1['R2NVb'], df1['R3SPb'], df1['R3NVb'], df1['R4SPb'], df1['R4NVb'] ]
+    sqlWS = [df1['tStamp'], df1['cLayer'], df1['R1H1WS'], df1['R1H2WS'],
+             df1['R1H3WS'], df1['R1H4WS'], df1['R2H1WS'], df1['R2H2WS'],
+             df1['R2H3WS'], df1['R2H4WS'], df1['tStamp'], df1['cLayer'],
+             df1['R3H1WS'], df1['R3H2WS'], df1['R3H3WS'], df1['R3H4WS'],
+             df1['R4H1WS'], df1['R4H2WS'], df1['R4H3WS'], df1['R4H4WS']]
 
-    return sqlEOLRP
+    return sqlWS

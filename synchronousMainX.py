@@ -690,7 +690,7 @@ class common_OEE(ttk.Frame):
             # Call data loader Method---------------------------#
             oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
 
-            import VarSQLoe as qoe                              # load SQL variables column names | rfVarSQL
+            import VarSQL_OE as qoe                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qo.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
             df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe
@@ -902,7 +902,7 @@ class common_RF(ttk.Frame):     # PRODUCTION PARAM - ROLLER FORCE --------------
             # Call data loader Method---------------------------#
             rfSQL = synchronousRF(smp_Sz, stp_Sz, db_freq)      # data loading functions
 
-            import VarSQLrf as qrf                              # load SQL variables column names | rfVarSQL
+            import VarSQL_RF as qrf                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qf.validCols('RF')                             # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(rfSQL, columns=g1)              # Import into python Dataframe
@@ -2012,7 +2012,7 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
                 TT = qtt.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import VarSQLtt as qtt                          # load SQL variables column names | rfVarSQL
+                import VarSQL_TT as qtt                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qt.validCols('TT')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(ttData, columns=g1)          # Import into python Dataframe
@@ -2466,7 +2466,7 @@ class substTemp(ttk.Frame):     # -- Defines the tabbed region for QA param - Su
                 ST = qst.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import VarSQLrf as qst                          # load SQL variables column names | rfVarSQL
+                import VarSQL_RF as qst                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qs.validCols('ST')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(rpData, columns=g1)          # Import into python Dataframe
@@ -2854,7 +2854,7 @@ class windingSpeed(ttk.Frame):     # -- Defines the tabbed region for QA param -
                 WS = qws.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import VarSQLrf as qws                          # load SQL variables column names | rfVarSQL
+                import VarSQL_RF as qws                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qw.validCols('WS')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(wsData, columns=g1)          # Import into python Dataframe
@@ -3354,7 +3354,7 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
                 TG = qtg.loadProcesValues(df1)                  # Join data values under dataframe
 
             else:
-                import VarSQLtg as qtg                          # load SQL variables column names | rfVarSQL
+                import VarSQL_TG as qtg                          # load SQL variables column names | rfVarSQL
                 viz_cycle = 150
                 g1 = qg.validCols('TG')                         # Construct Data Column selSqlColumnsTFM.py
                 df1 = pd.DataFrame(tgData, columns=g1)          # Import into python Dataframe
@@ -3624,7 +3624,7 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
             # Call data loader Method---------------------------#
             rfSQL = synchronousRF(smp_Sz, stp_Sz, db_freq)  # data loading functions
 
-            import VarSQLrf as qrf                          # load SQL variables column names | rfVarSQL
+            import VarSQL_RF as qrf                          # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qf.validCols('RF')                         # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(rfSQL, columns=g1)           # Import into python Dataframe
@@ -4218,7 +4218,7 @@ class cascadeCommonViewsOEE(ttk.Frame):
             # Call data loader Method---------------------------#
             oeSQL = synchronousOEE(smp_Sz, stp_Sz, db_freq)     # data loading functions
 
-            import VarSQLoe as qoe                              # load SQL variables column names | rfVarSQL
+            import VarSQL_OE as qoe                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
             g1 = qo.validCols('OEE')                            # Construct Data Column selSqlColumnsTFM.py
             df3 = pd.DataFrame(oeSQL, columns=g1)               # Import into python Dataframe

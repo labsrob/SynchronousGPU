@@ -9,17 +9,10 @@ Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
 
-
 def loadProcesValues(df1):
-    sqlRF = [df1['cLayer'], df1['R1H1RF'], df1['R1H2RF'],
-            df1['R1H3RF'], df1['R1H4RF'],
-            df1['R2H1RF'], df1['R2H2RF'],
-            df1['R2H3RF'], df1['R2H4RF'],
-            df1['R3H1RF'], df1['R3H2RF'],
-            df1['R3H3RF'], df1['R3H4RF'],
-            df1['R4H1RF'], df1['R4H2RF'],
-            df1['R4H3RF'], df1['R4H4RF']]
+    sqlOE = [df1['tStamp'], df1['cLayer'], df1['tCode'], df1['Desc'],
+             df1['Lapsed'], df1['PipePos'], df1['nDiam'], df1['Ovality'],
+             df1['tChange'], df1['rmCount']]
 
-
-    return sqlRF
+    return sqlOE
 

@@ -11,13 +11,11 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlLA = [df1['cLayer'], df1['R1H1LA'], df1['R1H2LA'],
-            df1['R1H3LA'], df1['R1H4LA'],
-            df1['R2H1LA'], df1['R2H2LA'],
-            df1['R2H3LA'], df1['R2H4LA'],
-            df1['R3H1LA'], df1['R3H2LA'],
-            df1['R3H3LA'], df1['R3H4LA'],
-            df1['R4H1LA'], df1['R4H2LA'],
-            df1['R4H3LA'], df1['R4H4LA']]
+    sqlWA = [df1['tStamp'], df1['cLayer'], df1['R1H1WA'], df1['R1H2WA'],
+            df1['R1H3WA'], df1['R1H4WA'], df1['R2H1WA'], df1['R2H2WA'],
+            df1['R2H3WA'], df1['R2H4WA'], df1['tStamp'], df1['cLayer'],
+            df1['R3H1WA'], df1['R3H2WA'], df1['R3H3WA'], df1['R3H4WA'],
+            df1['R4H1WA'], df1['R4H2WA'], df1['R4H3WA'], df1['R4H4WA']]
 
-    return sqlLA
+
+    return sqlWA

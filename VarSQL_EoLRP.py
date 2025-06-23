@@ -11,13 +11,7 @@ Puthor: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlLP = [df1['cLayer'], df1['R1H1LP'], df1['R1H2LP'],
-            df1['R1H3LP'], df1['R1H4LP'],
-            df1['R2H1LP'], df1['R2H2LP'],
-            df1['R2H3LP'], df1['R2H4LP'],
-            df1['R3H1LP'], df1['R3H2LP'],
-            df1['R3H3LP'], df1['R3H4LP'],
-            df1['R4H1LP'], df1['R4H2LP'],
-            df1['R4H3LP'], df1['R4H4LP']]
+    sqlEOLRP = [df1['tStmf'], df1['LyIDb'], df1['R1SPb'],  df1['R1NVb'], df1['R2SPb'],
+             df1['R2NVb'], df1['R3SPb'], df1['R3NVb'], df1['R4SPb'], df1['R4NVb'] ]
 
-    return sqlLP
+    return sqlEOLRP
