@@ -8,11 +8,16 @@ YTape Void count data
 """
 
 
-def validCols(pParam):
+def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'EV':
+    if pParam == 'EV' + pWON:
         columns = ['tStamp', 'cLayer', 'cRTemp', 'cHumid', 'fDTemp',
                    'fHumid', 'locTemp', 'locHumid', 'UVIndex']
+
+    elif pParam == 'SPC_EV':
+        columns = ['cLayer', 'cRTemp', 'cHumid', 'fDTemp',
+                   'fHumid', 'locTemp', 'locHumid', 'UVIndex']
+
     else:
         print('Invalid Columns or Query error...')
 

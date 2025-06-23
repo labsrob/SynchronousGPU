@@ -13,7 +13,7 @@ import ctypes
 
 # ----- PLC/SQL Query ---#
 import selDataColsGEN as gv     # General Table
-import selDataColsEV as qev     # Environmental Values
+import selDataCols_EV as qev     # Environmental Values
 import selDataColsLA as qla     # Laser Angle
 import selDataColsLP as qlp     # Laser Power
 import selDataColsRC as qrc     # Ramp Count
@@ -3878,10 +3878,9 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
 
                     else:
                         autoSpcPause = False
-                        procID = 'LA'
                         print("Visualization in Real-time Mode...")
                         # Allow selective runtime parameter selection on production critical process
-                        laDta = sla.plcExec(procID, laS, laTy, fetch_no)
+                        laDta = sla.plcExec(T1, laS, laTy, fetch_no)
                         laDtb = 0
 
                 else:
@@ -4120,10 +4119,10 @@ class tapePlacementTabb(ttk.Frame):
         # Break down each element to useful list ----------------[Winding Speed]
 
         if tpHL and tpP1:  # Roller Pressure TODO - layer metrics to guide TCP01
-            tpPerf = '$Pp_{k' + str(tpSize) + '}$'               # Using estimated or historical Mean
+            tpPerf = '$Pp_{k' + str(tpS) + '}$'               # Using estimated or historical Mean
             tplabel = 'Pp'
             # -------------------------------
-            tpOne = tpParam1.split(',')                 # split into list elements
+            tpOne = tpP1.split(',')                 # split into list elements
             dTapetp = tpOne[1].strip("' ")              # defined Tape Width
             dLayer = tpOne[10].strip("' ")              # Defined Tape Layer
 
@@ -4148,7 +4147,7 @@ class tapePlacementTabb(ttk.Frame):
             sLCLtp = 0
             tpUSL = 0
             tpLSL = 0
-            tpPerf = '$Cp_{k' + str(tpSize) + '}$'  # Using Automatic group Mean
+            tpPerf = '$Cp_{k' + str(tpS) + '}$'  # Using Automatic group Mean
             tplabel = 'Cp'
 
         # ------------------------------------[End of Winding Speed Abstraction]
@@ -4435,58 +4434,58 @@ class tapePlacementTabb(ttk.Frame):
             im41.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((TP[0]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((TP[1]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((TP[2]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((TP[3]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((TP[0]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 1
+            im11.set_ydata((TP[1]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 2
+            im12.set_ydata((TP[2]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 3
+            im13.set_ydata((TP[3]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
-            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(tpHL, tpSize, 'TP')
+            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(tpHL, tpS, 'TP')
             # ---------------------------------------#
-            im14.set_ydata((TP[4]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((TP[5]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((TP[6]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((TP[7]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((TP[4]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 1
+            im15.set_ydata((TP[5]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 2
+            im16.set_ydata((TP[6]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 3
+            im17.set_ydata((TP[7]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
-            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(tpHL, tpSize, 'TP')
+            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(tpHL, tpS, 'TP')
             # ---------------------------------------#
-            im18.set_ydata((TP[8]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((TP[9]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((TP[10]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((TP[11]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((TP[8]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 1
+            im19.set_ydata((TP[9]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 2
+            im20.set_ydata((TP[10]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 3
+            im21.set_ydata((TP[11]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
-            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(tpHL, tpSize, 'TP')
+            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(tpHL, tpS, 'TP')
             # ---------------------------------------#
-            im22.set_ydata((TP[12]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((TP[13]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((TP[14]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((TP[15]).rolling(window=tpSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((TP[12]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 1
+            im23.set_ydata((TP[13]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 2
+            im24.set_ydata((TP[14]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 3
+            im25.set_ydata((TP[15]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
-            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(tpHL, tpSize, 'TP')
+            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(tpHL, tpS, 'TP')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((TP[0]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((TP[1]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((TP[2]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((TP[3]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((TP[0]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im27.set_ydata((TP[1]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im28.set_ydata((TP[2]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im29.set_ydata((TP[3]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
 
-            im30.set_ydata((TP[4]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((TP[5]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((TP[6]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((TP[7]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((TP[4]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im31.set_ydata((TP[5]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im32.set_ydata((TP[6]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im33.set_ydata((TP[7]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
 
-            im34.set_ydata((TP[8]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((TP[9]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((TP[10]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((TP[11]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((TP[8]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im35.set_ydata((TP[9]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im36.set_ydata((TP[10]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im37.set_ydata((TP[11]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
 
-            im38.set_ydata((TP[12]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((TP[13]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((TP[14]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((TP[15]).rolling(window=tpSize, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((TP[12]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im39.set_ydata((TP[13]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im40.set_ydata((TP[14]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im41.set_ydata((TP[15]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
 
             # Compute entire Process Capability -----------#
             if not tpHL:
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLa, dLCLa, ppT, pkT, xline, sline = tq.tAutoPerf(tpSize, mnA, mnB,
+                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLa, dLCLa, ppT, pkT, xline, sline = tq.tAutoPerf(tpS, mnA, mnB,
                                                                                                       mnC, mnD, sdA,
                                                                                                       sdB, sdC, sdD)
             else:
@@ -4517,7 +4516,7 @@ class tapePlacementTabb(ttk.Frame):
 
             # Set trip line for individual time-series plot -----------------------------------[R1]
             import triggerModule as sigma
-            sigma.trigViolations(a1, UsePLC_DBS, 'WS', YScale_minTP, YScale_maxTP, xucT, xlcT, xusT, xlsT, mnT, sdT)
+            sigma.trigViolations(a1, UsePLC_DBS, 'TP', YScale_minTP, YScale_maxTP, xucT, xlcT, xusT, xlsT, mnT, sdT)
 
             timef = time.time()
             lapsedT = timef - timei
@@ -4549,22 +4548,22 @@ class rollerForceTabb(ttk.Frame):
         """Create the widgets for the GUI"""
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
-            rfSize, rfgType, eolSample, eopSample, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = dnv.decryptpProcessLim(
+            rfS, rfTy, eolS, eopS, rfHL, rfAL, rfFO, rfP1, rfP2, rfP3, rfP4, rfP5 = dnv.decryptpProcessLim(
                 processWON[0], 'RF')
         else:
-            rfSize, rfgType, eolSample, eopSample, rfHL, rfAL, rfFO, rfParam1, rfParam2, rfParam3, rfParam4, rfParam5 = mgm.decryptpProcessLim(
+            rfS, rfTy, eolS, eopS, rfHL, rfAL, rfFO, rfP1, rfP2, rfP3, rfP4, rfP5 = mgm.decryptpProcessLim(
                 processWON[0], 'RF')
         # Break down each element to useful list ---------------[Tape Temperature]
 
-        if rfHL and rfParam1 and rfParam2 and rfParam3 and rfParam4 and rfParam5:  #
-            rfPerf = '$Pp_{k' + str(rfSize) + '}$'  # Using estimated or historical Mean
+        if rfHL and rfP1 and rfP2 and rfP3 and rfP4 and rfP5:  #
+            rfPerf = '$Pp_{k' + str(rfS) + '}$'  # Using estimated or historical Mean
             rflabel = 'Pp'
             # -------------------------------
-            One = rfParam1.split(',')                   # split into list elements
-            Two = rfParam2.split(',')
-            Thr = rfParam3.split(',')
-            For = rfParam4.split(',')
-            Fiv = rfParam5.split(',')
+            One = rfP1.split(',')                   # split into list elements
+            Two = rfP2.split(',')
+            Thr = rfP3.split(',')
+            For = rfP4.split(',')
+            Fiv = rfP5.split(',')
             # -------------------------------
             dTape1 = One[1].strip("' ")                 # defined Tape Width
             dTape2 = Two[1].strip("' ")                 # defined Tape Width
@@ -4644,7 +4643,7 @@ class rollerForceTabb(ttk.Frame):
             sLCLrf = 0
             rfUSL = 0
             rfLSL = 0
-            rfPerf = '$Cp_{k' + str(rfSize) + '}$'  # Using Automatic group Mean
+            rfPerf = '$Cp_{k' + str(rfS) + '}$'  # Using Automatic group Mean
             rflabel = 'Cp'
 
         # ------ [End of Historical abstraction -------]
@@ -4665,12 +4664,15 @@ class rollerForceTabb(ttk.Frame):
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minRF, YScale_maxRF = 10, 500                        # Roller Force
         sBar_minRF, sBar_maxRF = 10, 250                            # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (int(rfSize) + 3)             # windows view = visible data points
+        window_Xmin, window_Xmax = 0, (int(rfS) + 3)             # windows view = visible data points
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 28/Feb/2025
-        T1 = 'RF1_' + pWON        # Laser Power
-        T2 = 'RF2_' + pWON
+        if rType == 1:
+            T1 = SPC_RF
+        else:
+            T1 = 'RF1_' + pWON        # Laser Power
+            T2 = 'RF2_' + pWON
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -4768,7 +4770,7 @@ class rollerForceTabb(ttk.Frame):
         a3.text(0.080, 0.036, 'SMC Status: ' + eSMC, fontsize=12, ha='left', transform=a3.transAxes)
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousRF(fetchT):
+        def synchronousRF(rfS, rfTy, fetchT):
             fetch_no = str(fetchT)  # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
@@ -4776,7 +4778,7 @@ class rollerForceTabb(ttk.Frame):
                 import CommsPlc as q
                 q.DAQ_connect(1, 0)
             else:
-                con_rf = conn.cursor()
+                con_a, con_b = conn.cursor(), conn.cursor()
 
             # Evaluate conditions for SQL Data Fetch ------------------------------[A]
             """
@@ -4812,14 +4814,10 @@ class rollerForceTabb(ttk.Frame):
                             print("\nVisualization in Paused Mode...")
                     else:
                         autoSpcPause = False
-
-                    # Play visualization ----------------------------------------------[]
-                    print("Visualization in Play Mode...")
-                    # -----------------------------------------------------------------[]
-
-                    # Allow selective runtime parameter selection on production critical process
-                    procID = 'RF'
-                    rfData = srf.paramDataRequest(procID, rfSize, rfgType, fetch_no)
+                        procID = 'RF'
+                        print("Visualization in Play Mode...")
+                        rfDta = srf.plcExec(procID, rfS, rfTy, fetch_no)
+                        rfDtb = 0
 
                 else:
                     import sqlArrayRLmethodRF as srf  # DrLabs optimization method
@@ -4843,7 +4841,7 @@ class rollerForceTabb(ttk.Frame):
                             print("Visualization in Real-time Mode...")
                     else:
                         # Get list of relevant SQL Tables using conn() --------------------[]
-                        rfData = srf.sqlexec(rfSize, rfgType, con_rf, T1, fetchT)
+                        rfDta, rfDtb = srf.sqlExec(rfS, rfTy, con_a, con_b, T1, T2, fetchT)
 
                     # ------ Inhibit iteration ----------------------------------------------------------[]
                     """
@@ -4851,14 +4849,16 @@ class rollerForceTabb(ttk.Frame):
                     """
                     # TODO --- values for inhibiting the SQL processing
                     if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        con_rf.close()
+                        con_a.close()
+                        con_b.close()
+
                         print('SQL End of File, connection closes after 30 mins...')
                         time.sleep(60)
                         continue
                     else:
                         print('\nUpdating....')
 
-            return rfData
+            return rfDta, rfDtb
 
         # -------------------------------------[A]
 
@@ -4867,7 +4867,7 @@ class rollerForceTabb(ttk.Frame):
             timei = time.time()         # start timing the entire loop
 
             # Bistream Data Pooling Method ---------------------#
-            rfData = synchronousRF(rfSize, rfgType, db_freq)    # data loading functions
+            rfDta, rfDtb = synchronousRF(rfS, rfTy, db_freq)    # data loading functions
             # --------------------------------------------------#
 
             if UsePLC_DBS == 1:
@@ -4876,22 +4876,22 @@ class rollerForceTabb(ttk.Frame):
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qrf.validCols(T1)                     # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(rfData, columns=columns)     # Include table data into python Dataframe
-                # RF = rf.loadProcesValues(df1)                 # Join data values under dataframe
+                df1 = pd.DataFrame(rfDta, columns=columns)      # Include table data into python Dataframe
+                RF = rf.loadProcesValues(df1)                   # Join data values under dataframe
 
             else:
                 import VarSQL_RF as rf                           # load SQL variables column names | rfVarSQL
 
                 viz_cycle = 150
-                g1 = qrf.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
-                d1 = pd.DataFrame(rfData, columns=g1)           # Import into python Dataframe
-                g2 = qrf.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
-                d2 = pd.DataFrame(rfData, columns=g2)
+                g1 = qrf.validCols(T1)                           # Construct Data Column selSqlColumnsTFM.py
+                d1 = pd.DataFrame(rfDta, columns=g1)             # Import into python Dataframe
+                g2 = qrf.validCols(T1)                           # Construct Data Column selSqlColumnsTFM.py
+                d2 = pd.DataFrame(rfDtb, columns=g2)
 
                 # Concatenate all columns -----------------------[]
                 df1 = pd.concat([d1, d2], axis=1)
 
-            RF = rf.loadProcesValues(df1)                       # Join data values under dataframe
+                RF = rf.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
@@ -4932,58 +4932,58 @@ class rollerForceTabb(ttk.Frame):
             im41.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((RF[0]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((RF[1]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((RF[2]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((RF[3]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((RF[0]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
+            im11.set_ydata((RF[1]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
+            im12.set_ydata((RF[2]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
+            im13.set_ydata((RF[3]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
-            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(rfHL, rfSize, 'RF')
+            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im14.set_ydata((RF[4]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((RF[5]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((RF[6]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((RF[7]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((RF[4]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
+            im15.set_ydata((RF[5]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
+            im16.set_ydata((RF[6]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
+            im17.set_ydata((RF[7]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
-            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(rfHL, rfSize, 'RF')
+            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im18.set_ydata((RF[8]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((RF[9]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((RF[10]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((RF[11]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((RF[8]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
+            im19.set_ydata((RF[9]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
+            im20.set_ydata((RF[10]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
+            im21.set_ydata((RF[11]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
-            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(rfHL, rfSize, 'RF')
+            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im22.set_ydata((RF[12]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((RF[13]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((RF[14]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((RF[15]).rolling(window=rfSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((RF[12]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
+            im23.set_ydata((RF[13]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
+            im24.set_ydata((RF[14]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
+            im25.set_ydata((RF[15]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
-            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(rfHL, rfSize, 'RF')
+            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(rfHL, rfS, 'RF')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((RF[0]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((RF[1]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((RF[2]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((RF[3]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((RF[0]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im27.set_ydata((RF[1]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im28.set_ydata((RF[2]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im29.set_ydata((RF[3]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
 
-            im30.set_ydata((RF[4]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((RF[5]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((RF[6]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((RF[7]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((RF[4]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im31.set_ydata((RF[5]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im32.set_ydata((RF[6]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im33.set_ydata((RF[7]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
 
-            im34.set_ydata((RF[8]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((RF[9]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((RF[10]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((RF[11]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((RF[8]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im35.set_ydata((RF[9]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im36.set_ydata((RF[10]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im37.set_ydata((RF[11]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
 
-            im38.set_ydata((RF[12]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((RF[13]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((RF[14]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((RF[15]).rolling(window=rfSize, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((RF[12]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im39.set_ydata((RF[13]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im40.set_ydata((RF[14]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im41.set_ydata((RF[15]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
 
             # Compute entire Process Capability -----------#
             if not rfHL:
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(rfSize, mnA, mnB,
+                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(rfS, mnA, mnB,
                                                                                                       mnC, mnD, sdA,
                                                                                                       sdB, sdC, sdD)
             else:
@@ -5053,19 +5053,18 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         else:
             import qParamsHL_MGM as qp
         # ------------------------------------------[]
-        ttSize, ttgType, eolSample, eopSample, ttHL, ttAL, ttFO, ttParam1, ttParam2, ttParam3, ttParam4, ttParam5 = qp.decryptpProcessLim(
-                processWON[0], 'TT')
+        ttS, ttTy, eolS, eopS, ttHL, ttAL, ttFO, ttP1, ttP2, ttP3, ttP4, ttP5 = qp.decryptpProcessLim(pWON, 'TT')
         # Break down each element to useful list ---------------[Tape Temperature]
 
-        if ttHL and ttParam1 and ttParam2 and ttParam3 and ttParam4 and ttParam5:  #
-            ttPerf = '$Pp_{k' + str(ttSize) + '}$'      # Using estimated or historical Mean
+        if ttHL and ttP1 and ttP2 and ttP3 and ttP4 and ttP5:  #
+            ttPerf = '$Pp_{k' + str(ttS) + '}$'      # Using estimated or historical Mean
             ttlabel = 'Pp'
             # -------------------------------
-            One = ttParam1.split(',')                   # split into list elements
-            Two = ttParam2.split(',')
-            Thr = ttParam3.split(',')
-            For = ttParam4.split(',')
-            Fiv = ttParam5.split(',')
+            One = ttP1.split(',')                   # split into list elements
+            Two = ttP2.split(',')
+            Thr = ttP3.split(',')
+            For = ttP4.split(',')
+            Fiv = ttP5.split(',')
             # -------------------------------
             dTape1 = One[1].strip("' ")                 # defined Tape Width
             dTape2 = Two[1].strip("' ")                 # defined Tape Width
@@ -5145,7 +5144,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             sLCLtt = 0
             ttUSL = 0
             ttLSL = 0
-            ttPerf = '$Cp_{k' + str(ttSize) + '}$'  # Using Automatic group Mean
+            ttPerf = '$Cp_{k' + str(ttS) + '}$'  # Using Automatic group Mean
             ttlabel = 'Cp'
 
         # ------------------------------------[End of Tape Temperature Abstraction]
@@ -5167,7 +5166,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minTT, YScale_maxTT = ttLSL - 8.5, ttUSL + 8.5       # Tape Temperature
         sBar_minTT, sBar_maxTT = sLCLtt - 80, sUCLtt + 80           # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (int(ttSize) + 3)             # windows view = visible data points
+        window_Xmin, window_Xmax = 0, (int(ttS) + 3)             # windows view = visible data points
         # ----------------------------------------------------------#
         YScale_minRM, YScale_maxRM = 0, pExLayer                    # Valid layer number
         window_XminRM, window_XmaxRM = 0, pLength                   # Get details from SCADA PIpe Recipe TODO[1]
@@ -5175,8 +5174,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
         if rType == 1:
             # PLC Data - for Live Production Analysis
-            T1 = 'SPC_TT' + pWON           # Tape Temperature
-            # T2 = 'SPC_RM' + pWON         # Ramp Profile Mapping
+            T1 = 'SPC_TT'
+            # T2 = 'SPC_RM'        # Ramp Profile Mapping
         else:
             # SQL Data --------------------#
             T1 = 'TT1_' + pWON             # Tape Temperature
@@ -5260,7 +5259,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 
-        def synchronousTT(smp_Sz, smp_St, fetchT):
+        def synchronousTT(ttS, ttTy, fetchT):
             fetch_no = str(fetchT)                        # entry value in string sql syntax
 
             # Obtain Volatile Data from PLC Host Server ---------------------------[]
@@ -5308,9 +5307,9 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     else:
                         autoSpcPause = False
                         print("Visualization in Real-time Mode...")
-
                         # Get list of relevant PLC Tables using conn() --------------------[]
-                        ttData = pdA.paramDataRequest(T1, smp_Sz, smp_St, fetch_no)
+                        ttDta = pdA.plcExec(T1, ttS, ttTy, fetch_no)
+                        ttDtb = 0
 
                 else:
                     import sqlArrayRLmethodTT as ptt
@@ -5335,7 +5334,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
                     else:
 
-                        ttData = ptt.sqlexec(smp_Sz, smp_St, cont_A, cont_B, T1, T2, fetchT)
+                        ttDta, ttDtb = ptt.sqlExec(ttS, ttTy, cont_A, cont_B, T1, T2, fetchT)
                         print("Visualization in Play Mode...")
                     print('\nUpdating....')
 
@@ -5352,10 +5351,10 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     else:
                         print('\nUpdating....')
 
-            return ttData
+            return ttDta, ttDtb
 
         # ----------[Strictly from SQL Repo Void Profile to allow recursively cumulated data] --------#
-        def synchronousRM(smp_Sz, stp_Sz, fetchT):
+        def synchronousRM(ttS, ttTy, fetchT):
             fetch_no = str(fetchT)  # entry value in string sql syntax
 
             # Obtain Data from SQL Repo ---------------------------[]
@@ -5401,7 +5400,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     continue
 
                 else:
-                    rm_profile = srm.sqlexec(smp_Sz, stp_Sz, con_rm, T3, fetch_no)  # perform DB connections
+
+                    rm_profile = srm.sqlExec(ttS, ttTy, con_rm, T3, fetch_no)  # perform DB connections
                     print('\nUpdating....')
 
                 # ------ Inhibit iteration ----------------------------------------------------------[]
@@ -5423,33 +5423,34 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         def asynchronousTT(db_freq):
             timei = time.time()         # start timing the entire loop
 
-            # Bi-stream Data Pooling Method --------------------#
-            ttData = synchronousTT(db_freq)                     # data loading functions
-            rmData = synchronousRM(db_freq)                     # Ramp Count
-            # --------------------------------------------------#
-            import VarSQL_RM as rm                               # load SQL variables column names | rfVarSQL
+            # Bi-stream Data Pooling Method ----------------#
+            ttDta, ttDtb = synchronousTT(ttS, ttTy, db_freq)              # data loading functions
+            rmDta = synchronousRM(ttS, ttTy, db_freq)                     # Ramp Count
+            # ----------------------------------------------#
+            import VarSQL_RM as rm                          # load SQL variables column names | rfVarSQL
 
             # viz_cycle = 150
-            g1 = qrm.validCols(T3)                              # Construct Data Column selSqlColumnsTFM.py
-            df0 = pd.DataFrame(rmData, columns=g1)              # Import into python Dataframe
-            RM = rm.loadProcesValues(df0)                       # Join data values under dataframe
-            # --------------------------------------------------#
+            g1 = qrm.validCols(T3)                          # Construct Data Column selSqlColumnsTFM.py
+            df0 = pd.DataFrame(rmDta, columns=g1)           # Import into python Dataframe
+            RM = rm.loadProcesValues(df0)                   # Join data values under dataframe
+
+            # ----------------------------------------------#
             if UsePLC_DBS == 1:
                 import VarPLCtt as tt
                 viz_cycle = 10
                 stream = 1                                  # PLC Stream
                 # Call synchronous data PLC function ------[A]
-                g1 = qtt.validCols(T1)                      # Load PLC-dB [SPC_TT]
-                df1 = pd.DataFrame(ttData, columns=g1)       # Include table data into python Dataframe
+                g1 = qtt.validCols(T1, pWON)                # Load PLC-dB [SPC_TT]
+                df1 = pd.DataFrame(ttDta, columns=g1)       # Include table data into python Dataframe
 
             else:
                 import VarSQL_TT as tt
                 viz_cycle = 150
-                stream = 2                                  # SQL Stream
-                g1 = qtt.validCols(T1)                      # Load TT1_
-                d1 = pd.DataFrame(ttData, columns=g1)       # Include table data into python Dataframe
-                g2 = qtt.validCols(T2)                      # Load TT2
-                d2 = pd.DataFrame(ttData, columns=g2)
+                stream = 2                                 # SQL Stream
+                g1 = qtt.validCols(T1, pWON)               # Load TT1_
+                d1 = pd.DataFrame(ttDta, columns=g1)       # Include table data into python Dataframe
+                g2 = qtt.validCols(T2, pWON)               # Load TT2
+                d2 = pd.DataFrame(ttDtb, columns=g2)
 
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2], axis=1)
@@ -5500,58 +5501,58 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             im45.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((TT[0]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((TT[1]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((TT[2]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((TT[3]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((TT[0]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 1
+            im11.set_ydata((TT[1]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 2
+            im12.set_ydata((TT[2]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 3
+            im13.set_ydata((TT[3]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
-            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(ttHL, ttSize, 'TT')
+            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(ttHL, ttS, 'TT')
             # ---------------------------------------#
-            im14.set_ydata((TT[4]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((TT[5]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((TT[6]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((TT[7]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((TT[4]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 1
+            im15.set_ydata((TT[5]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 2
+            im16.set_ydata((TT[6]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 3
+            im17.set_ydata((TT[7]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
-            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(ttHL, ttSize, 'TT')
+            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(ttHL, ttS, 'TT')
             # ---------------------------------------#
-            im18.set_ydata((TT[8]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((TT[9]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((TT[10]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((TT[11]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((TT[8]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 1
+            im19.set_ydata((TT[9]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 2
+            im20.set_ydata((TT[10]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 3
+            im21.set_ydata((TT[11]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
-            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(ttHL, ttSize, 'TT')
+            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(ttHL, ttS, 'TT')
             # ---------------------------------------#
-            im22.set_ydata((TT[12]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((TT[13]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((TT[14]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((TT[15]).rolling(window=ttSize, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((TT[12]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 1
+            im23.set_ydata((TT[13]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 2
+            im24.set_ydata((TT[14]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 3
+            im25.set_ydata((TT[15]).rolling(window=ttS, min_periods=1).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
-            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(ttHL, ttSize, 'TT')
+            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(ttHL, ttS, 'TT')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((TT[0]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((TT[1]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((TT[2]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((TT[3]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((TT[0]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im27.set_ydata((TT[1]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im28.set_ydata((TT[2]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im29.set_ydata((TT[3]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
 
-            im30.set_ydata((TT[4]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((TT[5]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((TT[6]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((TT[7]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((TT[4]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im31.set_ydata((TT[5]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im32.set_ydata((TT[6]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im33.set_ydata((TT[7]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
 
-            im34.set_ydata((TT[8]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((TT[9]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((TT[10]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((TT[11]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((TT[8]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im35.set_ydata((TT[9]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im36.set_ydata((TT[10]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im37.set_ydata((TT[11]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
 
-            im38.set_ydata((TT[12]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((TT[13]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((TT[14]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((TT[15]).rolling(window=ttSize, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((TT[12]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im39.set_ydata((TT[13]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im40.set_ydata((TT[14]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
+            im41.set_ydata((TT[15]).rolling(window=ttS, min_periods=1).std()[0:db_freq])
 
             # Compute entire Process Capability -----------#
             if not ttHL:
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(ttSize, mnA, mnB,
+                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(ttS, mnA, mnB,
                                                                                                       mnC, mnD, sdA,
                                                                                                       sdB, sdC, sdD)
             else:

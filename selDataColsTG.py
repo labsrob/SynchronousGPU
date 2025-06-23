@@ -8,12 +8,18 @@ Tape Gap Measured in millimeters (mm)
 """
 
 
-def validCols(pParam):
+def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'TG':
+    if pParam == 'TG' + pWON:
         columns = ['tStamp', 'cLayer', 'sCount', 'sCentre', 'PipePos',
                    'GaugeA1', 'GaugeA2', 'GaugeA3', 'GaugeA4',
                    'GaugeB1', 'GaugeB2', 'GaugeB3', 'GaugeB4', 'PipeDir']
+
+    elif pParam == 'SPC_TG':
+        columns = ['cLayer', 'sCount', 'sCentre', 'PipePos',
+                   'GaugeA1', 'GaugeA2', 'GaugeA3', 'GaugeA4',
+                   'GaugeB1', 'GaugeB2', 'GaugeB3', 'GaugeB4', 'PipeDir']
+
     else:
         print('Invalid Columns or Query error...')
 

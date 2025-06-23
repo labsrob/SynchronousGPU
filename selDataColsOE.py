@@ -8,10 +8,14 @@ Overall Equipment Efficiency measured by composite/derived factors
 """
 
 
-def validCols(pParam):
+def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'OE':
-        columns = ['tStamp', 'cLayer', 'tCode', 'Desc', 'Lapsed', 'PipePos', 'nDiam', 'Ovality', 'tChange', 'rmCount', 'uMessag']
+    if pParam == 'OEE' + pWON:
+        columns = ['tStamp', 'cLayer', 'tCode', 'Desc', 'Lapsed', 'PipePos', 'nDiam', 'Ovality', 'tChange', 'rmCount']
+
+    elif pParam == 'SPC_EE':
+        columns = ['tStamp', 'cLayer', 'tCode', 'Desc', 'Lapsed', 'PipePos', 'nDiam', 'Ovality', 'tChange', 'rmCount']
+
     else:
         print('Invalid Columns or Query error...')
 

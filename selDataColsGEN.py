@@ -8,11 +8,16 @@ YTape Void count data
 """
 
 
-def validCols(pParam):
+def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'GEN':
+    if pParam == 'GEN' + pWON:
         columns = ['tStamp', 'cTensX', 'oTempA', 'oTempB', 'iTempA', 'iTempB',
                    'wSpedA', 'wSpedB', 'wSpedC', 'wSpedD', 'PipeDi', 'cLayer']
+
+    elif pParam == 'SPC_GEN':
+        columns = ['tStamp', 'cTensX', 'oTempA', 'oTempB', 'iTempA', 'iTempB',
+                   'wSpedA', 'wSpedB', 'wSpedC', 'wSpedD', 'PipeDi', 'cLayer']
+
     else:
         print('Invalid Columns or Query error...')
 

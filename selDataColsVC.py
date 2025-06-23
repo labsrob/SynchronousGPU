@@ -8,10 +8,16 @@ YTape Void count data
 """
 
 
-def validCols(pParam):
+def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'VC':
-        columns = ['sCentre', 'VDCount', 'VODPosA', 'VODPosB', 'VODPosC', 'VODPosD', 'PipeDir', 'cLayer']
+    if pParam == 'VC' + pWON:
+        columns = ['sCentre', 'VDCount', 'VODPosA', 'VODPosB',
+                   'VODPosC', 'VODPosD', 'PipeDir', 'cLayer']
+
+    elif pParam == 'SPC_VC':
+        columns = ['sCentre', 'VDCount', 'VODPosA', 'VODPosB',
+                   'VODPosC', 'VODPosD', 'PipeDir', 'cLayer']
+
     else:
         print('Invalid Columns or Query error...')
 
