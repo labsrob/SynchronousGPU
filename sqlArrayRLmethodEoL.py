@@ -18,7 +18,7 @@ st_id  = 0                                               # SQL start index unles
 eol_sr = 0.5
 
 
-def dnv_sqlexec(daq1, daq2, daq3, daq4, T1, T2, T3, T4, layerNo):
+def dnv_sqlExec(daq1, daq2, daq3, daq4, T1, T2, T3, T4, layerNo):
     """
     NOTE:
     """
@@ -28,13 +28,13 @@ def dnv_sqlexec(daq1, daq2, daq3, daq4, T1, T2, T3, T4, layerNo):
     Ra = daq1.execute(
         'Select count([R1H1TT]) AS ValidTotal from ' + "'" '%' + str(T1) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
-    Rb = daq1.execute(
+    Rb = daq2.execute(
         'Select count([R1H1RP]) AS ValidTotal from ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
-    Rc = daq1.execute(
+    Rc = daq3.execute(
         'Select count([R1H1TP]) AS ValidTotal from ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
-    Rd = daq1.execute(
+    Rd = daq4.execute(
         'Select count([R1H1WS]) AS ValidTotal from ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
             layerNo) + '%' "'").fetchone()
 

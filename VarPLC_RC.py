@@ -8,14 +8,10 @@ All production procedure relies on Word Order Number - Assuming a Unique identit
 Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
-
+# ========================= RAMP COUNT DATA TABLE ========================================#
 
 def loadProcesValues(df1):
-    plcLP = [df1['tStamp'], df1['cLayer'], df1['R1H1'],
-             df1['R1H2'], df1['R1H3'], df1['R1H4'],
-             df1['R2H1'], df1['R2H2'], df1['R2H3'],
-             df1['R2H4'], df1['R3H1'], df1['R3H2'],
-             df1['R3H3'], df1['R3H4'], df1['R4H1'],
-             df1['R4H2'], df1['R4H3'], df1['R4H4']]
+    plcRC = [df1['sCentre'], df1['RMCount'], df1['RAMPosA'], df1['RAMPosB'],
+             df1['RAMPosC'], df1['RAMPosD'], df1['PipeDir'], df1['cLayer']]
 
-    return plcLP
+    return plcRC

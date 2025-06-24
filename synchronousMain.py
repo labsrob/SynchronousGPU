@@ -5436,7 +5436,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
             # ----------------------------------------------#
             if UsePLC_DBS == 1:
-                import VarPLCtt as tt
+                import VarPLC_TT as tt
                 viz_cycle = 10
                 stream = 1                                  # PLC Stream
                 # Call synchronous data PLC function ------[A]
@@ -5936,7 +5936,7 @@ class substTempTabb(ttk.Frame):
             stData = synchronousST(stSize, stgType, db_freq)     # data loading functions
             # --------------------------------------------------#
             if UsePLC_DBS == 1:
-                import VarPLCst as st
+                import VarPLC_ST as st
 
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
@@ -6350,7 +6350,7 @@ class tapeGapPolTabb(ttk.Frame):
             # ----------------------------------------------------#
 
             if UsePLC_DBS == 1:
-                import VarPLCtg as tg
+                import VarPLC_TG as tg
 
                 viz_cycle = 10
                 dcA = qtg.validCols('TG')                   # Load defined valid columns for PLC Data
@@ -8811,8 +8811,8 @@ def userMenu():     # listener, myplash
         # creating labels and positioning them on the grid --------[]
         Label(pop, text='Real-Time Statistical Process Control System').place(x=90, y=80)
         Label(pop, text='Built Ver: 12.0, Built on: November 2024').place(x=110, y=100)
-        Label(pop, text='Author: Robert B. Labs').place(x=140, y=120)
-        Label(pop, text='Copyright (C) 2023-2025 Magma Industrialisation, United Kingdom.').place(x=30, y=180)
+        Label(pop, text='Sole Author: Robert B. Labs').place(x=140, y=120)
+        Label(pop, text='Copyright (C) 2023-2025 Group Industrialisation, United Kingdom.').place(x=30, y=180)
        # filewin = Toplevel(pop)
 
     def onlinehelp():        # TODO configure menu item to functon

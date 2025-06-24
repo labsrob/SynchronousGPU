@@ -12,13 +12,11 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    plcRP = [df1['R1H1RP'], df1['R1H2RP'],
-            df1['R1H3RP'], df1['R1H4RP'],
-            df1['R2H1RP'], df1['R2H2RP'],
-            df1['R2H3RP'], df1['R2H4RP'],
-            df1['R3H1RP'], df1['R3H2RP'],
-            df1['R3H3RP'], df1['R3H4RP'],
-            df1['R4H1RP'], df1['R4H2RP'],
-            df1['R4H3RP'], df1['R4H4RP']]
+    plcRP = [df1['cLayer'], df1['R1H1'], df1['R1H2'],
+             df1['R1H3'], df1['R1H4'], df1['R2H1'],
+             df1['R2H2'], df1['R2H3'], df1['R2H4'],
+             df1['R3H1'], df1['R3H2'], df1['R3H3'],
+             df1['R3H4'], df1['R4H1'], df1['R4H2'],
+             df1['R4H3'], df1['R4H4']]
 
     return plcRP

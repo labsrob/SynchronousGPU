@@ -68,7 +68,7 @@ def writeInteger(db_number, start_offset, r_data):
 # --------------------------------------------------------------------------------------------------------------------[]
 
 
-def plcExec(nGZ, grp_step, fetch_no):
+def plcExec(db_number, nGZ, grp_step, fetch_no):
 	"""
 	nGZ     : User defined Sample size
 	grp_step: Group Sample step

@@ -11,11 +11,8 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    plcLP = [df1['tStamp'], df1['cLayer'], df1['R1H1'],
-             df1['R1H2'], df1['R1H3'], df1['R1H4'],
-             df1['R2H1'], df1['R2H2'], df1['R2H3'],
-             df1['R2H4'], df1['R3H1'], df1['R3H2'],
-             df1['R3H3'], df1['R3H4'], df1['R4H1'],
-             df1['R4H2'], df1['R4H3'], df1['R4H4']]
+    plcWA = [df1['LyIDe'], df1['R1SPe'], df1['R1NVe'],
+             df1['R2SPe'], df1['R2NVe'], df1['R3SPe'],
+             df1['R3NVe'], df1['R4SPe'], df1['R4NVe']]
 
-    return plcLP
+    return plcWA

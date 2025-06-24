@@ -12,13 +12,11 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    plcST = [df1['R1H1ST'], df1['R1H2ST'],
-            df1['R1H3ST'], df1['R1H4ST'],
-            df1['R2H1ST'], df1['R2H2ST'],
-            df1['R2H3ST'], df1['R2H4ST'],
-            df1['R3H1ST'], df1['R3H2ST'],
-            df1['R3H3ST'], df1['R3H4ST'],
-            df1['R4H1ST'], df1['R4H2ST'],
-            df1['R4H3ST'], df1['R4H4ST']]
+    plcTG = [df1['tLayer'], df1['cLayer'], df1['sCount'],
+             df1['sCentre'], df1['PipePos'], df1['GaugeA1'],
+             df1['GaugeA2'], df1['GaugeA3'], df1['GaugeA4'],
+             df1['GaugeB1'], df1['GaugeB2'], df1['GaugeB3'],
+             df1['GaugeB4'], df1['PipeDir']]
 
-    return plcST
+    return plcTG
+

@@ -66,13 +66,14 @@ def writeInteger(db_number, start_offset, r_data):
 
 # --------------------------------------------------------------------------------------------------------------------[
 
-def plcExec(nGZ, grp_step, fetch_no):
+def plcExec(db_number, nGZ, grp_step, fetch_no):
 	"""
 	nGZ     : User defined Sample size
 	grp_step: Group Sample step
 	fetch_no: Animation Fetch Cycle
 	"""
 	timei = time.time()
+
 	# Get contigous data from PLC Stream --- Dealing with very volatile data frame.
 	start_offset = [922, 926, 930, 934, 938, 942, 946, 950, 954, 958, 962, 966, 970, 974, 978, 982, 986, 988, 990,
 					994, 996, 998, 990, 992, 996, 998, 1000, 1002, 1004, 1006, 1008, 1010, 1012, 1014, 1016, 1018,

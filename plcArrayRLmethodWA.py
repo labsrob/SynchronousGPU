@@ -1,5 +1,5 @@
 # This script is called in from Main program to load SQL execution syntax command and return a list in LisDat
-# Author: Dr Labs, RB
+# Author: Dr WAbs, RB
 from collections import deque
 from itertools import count
 from datetime import datetime, timedelta
@@ -8,7 +8,7 @@ import timeit
 import os
 import snap7
 
-arrayLP, LP_list, Idx1, y_common, array2D = [], [], [], [], []
+arrayWA, WA_list, Idx1, y_common, array2D = [], [], [], [], []
 db_number, start_offset, bit_offset = 89, 0, 0
 start_address = 0  					# starting address
 r_length = 4  						# double word (4 Bytes)
@@ -76,7 +76,7 @@ def plcExec(nGZ, grp_step, fetch_no):
 	fetch_no: Animation Fetch Cycle
 	"""
 	timei = time.time()
-	# Get contigous data from PLC Stream --- Dealing with very volatile data frame.
+	# Get contigous data from PLC Stream --- Dealing with very voWAtile data frame.
 	start_offset = [922, 926, 930, 934, 938, 942, 946, 950, 954, 958, 962, 966, 970, 974, 978, 982, 986, 988, 990,
 					994, 996, 998, 990, 992, 996, 998, 1000, 1002, 1004, 1006, 1008, 1010, 1012, 1014, 1016, 1018,
 					1020, 1022, 1024, 1026, 1028, 1030, 1032, 1034, 1036, 1038, 1040, 1042, 1044, 1046, 1048, 1050,
@@ -94,17 +94,17 @@ def plcExec(nGZ, grp_step, fetch_no):
 		print('Domino step mode..')
 		print('\nSINGLE STEP SLIDE')
 		print('=================')
-		print('Array length:', len(arrayLP), 'Fetch Value', fetch_no)
-		if len(arrayLP) == nGZ and fetch_no > 0:
+		print('Array length:', len(arrayWA), 'Fetch Value', fetch_no)
+		if len(arrayWA) == nGZ and fetch_no > 0:
 			print('TP A')
 			n2fetch = fetch_no
-		elif len(arrayLP) == nGZ and fetch_no < 1:
+		elif len(arrayWA) == nGZ and fetch_no < 1:
 			print('TP B')
 			n2fetch = 1
-		elif len(arrayLP) >= nGZ and fetch_no > 0:
+		elif len(arrayWA) >= nGZ and fetch_no > 0:
 			print('TP C')
-			n2fetch = (len(arrayLP) + fetch_no)
-		elif len(arrayLP) >= nGZ and fetch_no < 1:
+			n2fetch = (len(arrayWA) + fetch_no)
+		elif len(arrayWA) >= nGZ and fetch_no < 1:
 			print('TP D')
 			n2fetch = 0
 		else:
@@ -122,7 +122,7 @@ def plcExec(nGZ, grp_step, fetch_no):
 		print('Discrete step mode..')
 		print('\nSAMPLE SIZE SLIDE')
 		print('=================')
-		if fetch_no != 0 and len(arrayLP) >= nGZ:
+		if fetch_no != 0 and len(arrayWA) >= nGZ:
 			n2fetch = nGZ # (nGZ * fetch_no)
 		else:
 			n2fetch = nGZ  # fetch twice
@@ -138,81 +138,81 @@ def plcExec(nGZ, grp_step, fetch_no):
 		try:
 			# ------------------------ Tape Temperature Data ----------------------[17 columns]
 			# Tape Temperature ---R1
-			LPA = readInteger(db_number, start_offset[0], bit_offset[0])  		# Current Layer
-			LP_list.append(LPA)
-			LP1 = readInteger(db_number, start_offset[2], bit_offset[0])  		# R1H1
-			LP_list.append(LP1)
-			LP2 = readInteger(db_number, start_offset[4], bit_offset[0])  		# R1H2
-			LP_list.append(LP2)
-			LP3 = readInteger(db_number, start_offset[6], bit_offset[0])  		# R1H3
-			LP_list.append(LP3)
-			LP4 = readInteger(db_number, start_offset[8], bit_offset[0])  		# R1H4
-			LP_list.append(LP4)
+			WAA = readInteger(db_number, start_offset[0], bit_offset[0])  		# Current WAyer
+			WA_list.append(WAA)
+			WA1 = readInteger(db_number, start_offset[2], bit_offset[0])  		# R1H1
+			WA_list.append(WA1)
+			WA2 = readInteger(db_number, start_offset[4], bit_offset[0])  		# R1H2
+			WA_list.append(WA2)
+			WA3 = readInteger(db_number, start_offset[6], bit_offset[0])  		# R1H3
+			WA_list.append(WA3)
+			WA4 = readInteger(db_number, start_offset[8], bit_offset[0])  		# R1H4
+			WA_list.append(WA4)
 			# R2 ------
-			LP5 = readInteger(db_number, start_offset[10], bit_offset[0])  		# R2H1
-			LP_list.append(LP5)
-			LP6 = readInteger(db_number, start_offset[12], bit_offset[0])  		# R2H2
-			LP_list.append(LP6)
-			LP7 = readInteger(db_number, start_offset[14], bit_offset[0])  		# R2H3
-			LP_list.append(LP7)
-			LP8 = readInteger(db_number, start_offset[16], bit_offset[0])  		# R2H4
-			LP_list.append(LP8)
+			WA5 = readInteger(db_number, start_offset[10], bit_offset[0])  		# R2H1
+			WA_list.append(WA5)
+			WA6 = readInteger(db_number, start_offset[12], bit_offset[0])  		# R2H2
+			WA_list.append(WA6)
+			WA7 = readInteger(db_number, start_offset[14], bit_offset[0])  		# R2H3
+			WA_list.append(WA7)
+			WA8 = readInteger(db_number, start_offset[16], bit_offset[0])  		# R2H4
+			WA_list.append(WA8)
 			# R3 ------
-			LP9 = readInteger(db_number, start_offset[18], bit_offset[0])  		# R3H1
-			LP_list.append(LP9)
-			LP10 = readInteger(db_number, start_offset[20], bit_offset[0])  	# R3H2
-			LP_list.append(LP10)
-			LP11 = readInteger(db_number, start_offset[22], bit_offset[0])  	# R3H3
-			LP_list.append(LP11)
-			LP12 = readInteger(db_number, start_offset[24], bit_offset[0])  	# R3H4
-			LP_list.append(LP12)
+			WA9 = readInteger(db_number, start_offset[18], bit_offset[0])  		# R3H1
+			WA_list.append(WA9)
+			WA10 = readInteger(db_number, start_offset[20], bit_offset[0])  	# R3H2
+			WA_list.append(WA10)
+			WA11 = readInteger(db_number, start_offset[22], bit_offset[0])  	# R3H3
+			WA_list.append(WA11)
+			WA12 = readInteger(db_number, start_offset[24], bit_offset[0])  	# R3H4
+			WA_list.append(WA12)
 			# R4 ------
-			LP13 = readInteger(db_number, start_offset[26], bit_offset[0])  	# R4H1
-			LP_list.append(LP13)
-			LP14 = readInteger(db_number, start_offset[28], bit_offset[0])  	# R4H2
-			LP_list.append(LP14)
-			LP15 = readInteger(db_number, start_offset[30], bit_offset[0])  	# R4H3
-			LP_list.append(LP15)
-			LP16 = readInteger(db_number, start_offset[32], bit_offset[0])  	# R4H4
-			LP_list.append(LP16)
+			WA13 = readInteger(db_number, start_offset[26], bit_offset[0])  	# R4H1
+			WA_list.append(WA13)
+			WA14 = readInteger(db_number, start_offset[28], bit_offset[0])  	# R4H2
+			WA_list.append(WA14)
+			WA15 = readInteger(db_number, start_offset[30], bit_offset[0])  	# R4H3
+			WA_list.append(WA15)
+			WA16 = readInteger(db_number, start_offset[32], bit_offset[0])  	# R4H4
+			WA_list.append(WA16)
 
 			# Deposit list column content into rows array ----------[]
-			if len(LP_list) > 82:
-				del LP_list[0:(len(LP_list) - 82)]				# trim columns to shape
-				print('\nReset Ring Column Size...', len(LP_list))
+			if len(WA_list) > 82:
+				del WA_list[0:(len(WA_list) - 82)]				# trim columns to shape
+				print('\nReseWAing Column Size...', len(WA_list))
 
-			arrayLP.append(LP_list)
-			print('\nLIST COLUMN:', len(LP_list))
-			print('LIST D_ROWS:', len(arrayLP))
-			print('Next Break @:', (n2fetch + nGZ) - len(arrayLP))
+			arrayWA.append(WA_list)
+			print('\nLIST COLUMN:', len(WA_list))
+			print('LIST D_ROWS:', len(arrayWA))
+			print('Next Break @:', (n2fetch + nGZ) - len(arrayWA))
 
 			if group_step == 1:
 				# Beautiful Purgatory Procedure ------------------------------[]
-				if len(arrayLP) >= n2fetch and fetch_no <= 30:		# sample size = 30
-					del arrayLP[0:(len(arrayLP) - nGZ)]  			# [static window]
-					print('Reset Ring Rows on Static.', len(arrayLP))
+				if len(arrayWA) >= n2fetch and fetch_no <= 30:		# sample size = 30
+					del arrayWA[0:(len(arrayWA) - nGZ)]  			# [static window]
+					print('ReseWAing Rows on Static.', len(arrayWA))
 					break
-				elif len(arrayLP) >= 31 and (fetch_no + 1) >= 31:
-					del arrayLP[0:(len(arrayLP) - fetch_no)]  		# [moving window]
-					print('Reset Ring Rows on Move..', len(arrayLP))
+				elif len(arrayWA) >= 31 and (fetch_no + 1) >= 31:
+					del arrayWA[0:(len(arrayWA) - fetch_no)]  		# [moving window]
+					print('ReseWAing Rows on Move..', len(arrayWA))
 					break
 				else:
 					pass
 			else:
-				if group_step > 1 and len(arrayLP) == n2fetch and fetch_no <= 30:
-					print('Keeping No of Rows on Static... Array Size:', len(arrayLP))
+				if group_step > 1 and len(arrayWA) == n2fetch and fetch_no <= 30:
+					print('Keeping No of Rows on Static... Array Size:', len(arrayWA))
 					break
-				if group_step > 1 and len(arrayLP) >= (nGZ + n2fetch) and fetch_no <= 31:
-					del arrayLP[0:(len(arrayLP) - nGZ)]
-					print('Reset Ring Rows on Static... Array Size:', len(arrayLP))
+				if group_step > 1 and len(arrayWA) >= (nGZ + n2fetch) and fetch_no <= 31:
+					del arrayWA[0:(len(arrayWA) - nGZ)]
+					print('ReseWAing Rows on Static... Array Size:', len(arrayWA))
 					break
-				elif group_step > 1 and len(arrayLP) >= (nGZ + n2fetch) and fetch_no >= 31:
-					del arrayLP[0:(len(arrayLP) - fetch_no)]
-					print('Reset Ring Rows on Move.... Array Size:', len(arrayLP))
+				elif group_step > 1 and len(arrayWA) >= (nGZ + n2fetch) and fetch_no >= 31:
+					del arrayWA[0:(len(arrayWA) - fetch_no)]
+					print('ReseWAing Rows on Move.... Array Size:', len(arrayWA))
 					break
-				print('Breaking at..', (n2fetch + nGZ), ' Array Length:', len(arrayLP))
+				print('Breaking at..', (n2fetch + nGZ), ' Array Length:', len(arrayWA))
 				# break
-			LP_list.clear()  							# Clear content of the list for new round trip
+			WA_list.clear()  							# Clear content of the list for new round trip
 
 		except Exception as err:
 			print(f"Exception Error: '{err}'")
@@ -221,4 +221,4 @@ def plcExec(nGZ, grp_step, fetch_no):
 			timef = time.time()
 			print(f"Data Fetch Time: {timef - timei} sec", 'Fetch No:', fetch_no, '\n')
 
-	return arrayLP
+	return arrayWA

@@ -8,15 +8,13 @@ import timeit
 import os
 import snap7
 
-arrayLP, LP_list, Idx1, y_common, array2D = [], [], [], [], []
+arrayRC, RC_list, Idx1, y_common, array2D = [], [], [], [], []
 db_number, start_offset, bit_offset = 89, 0, 0
 start_address = 0  					# starting address
 r_length = 4  						# double word (4 Bytes)
 b_length = 1  						# boolean size = 1 Byte
 r_data = 52.4
 plc = snap7.client.Client()
-
-
 
 # ---------------------- Collective Functions ---------------------------------------
 
@@ -66,16 +64,16 @@ def writeInteger(db_number, start_offset, r_data):
 	plc.db_write(db_number, start_offset, data)
 	return
 
-# --------------------------------------------------------------------------------------------------------------------[]
+# --------------------------------------------------------------------------------------------------------------------[
 
-
-def plcExec(nGZ, grp_step, fetch_no):
+def plcExec(db_number, nGZ, grp_step, fetch_no):
 	"""
 	nGZ     : User defined Sample size
 	grp_step: Group Sample step
 	fetch_no: Animation Fetch Cycle
 	"""
 	timei = time.time()
+
 	# Get contigous data from PLC Stream --- Dealing with very volatile data frame.
 	start_offset = [922, 926, 930, 934, 938, 942, 946, 950, 954, 958, 962, 966, 970, 974, 978, 982, 986, 988, 990,
 					994, 996, 998, 990, 992, 996, 998, 1000, 1002, 1004, 1006, 1008, 1010, 1012, 1014, 1016, 1018,
@@ -89,22 +87,22 @@ def plcExec(nGZ, grp_step, fetch_no):
 	fetch_no = int(fetch_no)  		# dbfreq = TODO look into any potential conflict
 	print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
 
-	# ------------- Consistency Logic ensure list is filled with predetermined elements --------------
+	# ------------- Consistency Logic ensure list is filled with predeteRCined elements --------------
 	if group_step == 1:
 		print('Domino step mode..')
 		print('\nSINGLE STEP SLIDE')
 		print('=================')
-		print('Array length:', len(arrayLP), 'Fetch Value', fetch_no)
-		if len(arrayLP) == nGZ and fetch_no > 0:
+		print('Array length:', len(arrayRC), 'Fetch Value', fetch_no)
+		if len(arrayRC) == nGZ and fetch_no > 0:
 			print('TP A')
 			n2fetch = fetch_no
-		elif len(arrayLP) == nGZ and fetch_no < 1:
+		elif len(arrayRC) == nGZ and fetch_no < 1:
 			print('TP B')
 			n2fetch = 1
-		elif len(arrayLP) >= nGZ and fetch_no > 0:
+		elif len(arrayRC) >= nGZ and fetch_no > 0:
 			print('TP C')
-			n2fetch = (len(arrayLP) + fetch_no)
-		elif len(arrayLP) >= nGZ and fetch_no < 1:
+			n2fetch = (len(arrayRC) + fetch_no)
+		elif len(arrayRC) >= nGZ and fetch_no < 1:
 			print('TP D')
 			n2fetch = 0
 		else:
@@ -122,7 +120,7 @@ def plcExec(nGZ, grp_step, fetch_no):
 		print('Discrete step mode..')
 		print('\nSAMPLE SIZE SLIDE')
 		print('=================')
-		if fetch_no != 0 and len(arrayLP) >= nGZ:
+		if fetch_no != 0 and len(arrayRC) >= nGZ:
 			n2fetch = nGZ # (nGZ * fetch_no)
 		else:
 			n2fetch = nGZ  # fetch twice
@@ -136,83 +134,62 @@ def plcExec(nGZ, grp_step, fetch_no):
 
 	while True:
 		try:
-			# ------------------------ Tape Temperature Data ----------------------[17 columns]
-			# Tape Temperature ---R1
-			LPA = readInteger(db_number, start_offset[0], bit_offset[0])  		# Current Layer
-			LP_list.append(LPA)
-			LP1 = readInteger(db_number, start_offset[2], bit_offset[0])  		# R1H1
-			LP_list.append(LP1)
-			LP2 = readInteger(db_number, start_offset[4], bit_offset[0])  		# R1H2
-			LP_list.append(LP2)
-			LP3 = readInteger(db_number, start_offset[6], bit_offset[0])  		# R1H3
-			LP_list.append(LP3)
-			LP4 = readInteger(db_number, start_offset[8], bit_offset[0])  		# R1H4
-			LP_list.append(LP4)
-			# R2 ------
-			LP5 = readInteger(db_number, start_offset[10], bit_offset[0])  		# R2H1
-			LP_list.append(LP5)
-			LP6 = readInteger(db_number, start_offset[12], bit_offset[0])  		# R2H2
-			LP_list.append(LP6)
-			LP7 = readInteger(db_number, start_offset[14], bit_offset[0])  		# R2H3
-			LP_list.append(LP7)
-			LP8 = readInteger(db_number, start_offset[16], bit_offset[0])  		# R2H4
-			LP_list.append(LP8)
-			# R3 ------
-			LP9 = readInteger(db_number, start_offset[18], bit_offset[0])  		# R3H1
-			LP_list.append(LP9)
-			LP10 = readInteger(db_number, start_offset[20], bit_offset[0])  	# R3H2
-			LP_list.append(LP10)
-			LP11 = readInteger(db_number, start_offset[22], bit_offset[0])  	# R3H3
-			LP_list.append(LP11)
-			LP12 = readInteger(db_number, start_offset[24], bit_offset[0])  	# R3H4
-			LP_list.append(LP12)
-			# R4 ------
-			LP13 = readInteger(db_number, start_offset[26], bit_offset[0])  	# R4H1
-			LP_list.append(LP13)
-			LP14 = readInteger(db_number, start_offset[28], bit_offset[0])  	# R4H2
-			LP_list.append(LP14)
-			LP15 = readInteger(db_number, start_offset[30], bit_offset[0])  	# R4H3
-			LP_list.append(LP15)
-			LP16 = readInteger(db_number, start_offset[32], bit_offset[0])  	# R4H4
-			LP_list.append(LP16)
+			# Ramp Map Data  ------------------------------------------------------ [6 column data]
+			Ppos = readReal(db_number, start_offset[0], bit_offset[0])  			# Ring1 Position
+			RC_list.append(Ppos)
+			TLayer = readReal(db_number, start_offset[4], bit_offset[0])  			# Ring2 Position
+			RC_list.append(TLayer)
+			RP1 = readReal(db_number, start_offset[8], bit_offset[0])  				# Ring3 Position
+			RC_list.append(RP1)
+			RP2 = readReal(db_number, start_offset[12], bit_offset[0])  			# Ring4 Position
+			RC_list.append(RP2)
+			RP3 = readReal(db_number, start_offset[16], bit_offset[0])  			# Pipe Direction
+			RC_list.append(RP3)
+			RP4 = readReal(db_number, start_offset[20], bit_offset[0])  			# Current Layer
+			RC_list.append(RP4)
+			# --------------------------
+			RP5 = readReal(db_number, start_offset[24], bit_offset[0])  # Pipe Direction
+			RC_list.append(RP5)
+			RP6 = readReal(db_number, start_offset[26], bit_offset[0])  # Current Layer
+			RC_list.append(RP6)
 
 			# Deposit list column content into rows array ----------[]
-			if len(LP_list) > 82:
-				del LP_list[0:(len(LP_list) - 82)]				# trim columns to shape
-				print('\nReset Ring Column Size...', len(LP_list))
+			if len(RC_list) > 82:
+				del RC_list[0:(len(RC_list) - 82)]				# trim columns to shape
+				print('\nResetting Column Size...', len(RC_list))
 
-			arrayLP.append(LP_list)
-			print('\nLIST COLUMN:', len(LP_list))
-			print('LIST D_ROWS:', len(arrayLP))
-			print('Next Break @:', (n2fetch + nGZ) - len(arrayLP))
+			arrayRC.append(RC_list)
+			print('\nLIST COLUMN:', len(RC_list))
+			print('LIST D_ROWS:', len(arrayRC))
+			print('Next Break @:', (n2fetch + nGZ) - len(arrayRC))
 
 			if group_step == 1:
-				# Beautiful Purgatory Procedure ------------------------------[]
-				if len(arrayLP) >= n2fetch and fetch_no <= 30:		# sample size = 30
-					del arrayLP[0:(len(arrayLP) - nGZ)]  			# [static window]
-					print('Reset Ring Rows on Static.', len(arrayLP))
+				# Beautiful Purgatory Procedure ------------------------------[TODO - CODEFY SAMPLE SIZE]
+				if len(arrayRC) >= n2fetch and fetch_no <= 30:		# Sample Size
+					del arrayRC[0:(len(arrayRC) - nGZ)]  			# [static window]
+					print('Resetting Rows on Static.', len(arrayRC))
 					break
-				elif len(arrayLP) >= 31 and (fetch_no + 1) >= 31:
-					del arrayLP[0:(len(arrayLP) - fetch_no)]  		# [moving window]
-					print('Reset Ring Rows on Move..', len(arrayLP))
+				elif len(arrayRC) >= 31 and (fetch_no + 1) >= 31:
+					del arrayRC[0:(len(arrayRC) - fetch_no)]  		# [moving window]
+					print('Resetting Rows on Move..', len(arrayRC))
 					break
 				else:
 					pass
 			else:
-				if group_step > 1 and len(arrayLP) == n2fetch and fetch_no <= 30:
-					print('Keeping No of Rows on Static... Array Size:', len(arrayLP))
+				if group_step > 1 and len(arrayRC) == n2fetch and fetch_no <= 30:
+					print('Keeping No of Rows on Static... Array Size:', len(arrayRC))
 					break
-				if group_step > 1 and len(arrayLP) >= (nGZ + n2fetch) and fetch_no <= 31:
-					del arrayLP[0:(len(arrayLP) - nGZ)]
-					print('Reset Ring Rows on Static... Array Size:', len(arrayLP))
+				if group_step > 1 and len(arrayRC) >= (nGZ + n2fetch) and fetch_no <= 31:
+					del arrayRC[0:(len(arrayRC) - nGZ)]
+					print('Resetting Rows on Static... Array Size:', len(arrayRC))
 					break
-				elif group_step > 1 and len(arrayLP) >= (nGZ + n2fetch) and fetch_no >= 31:
-					del arrayLP[0:(len(arrayLP) - fetch_no)]
-					print('Reset Ring Rows on Move.... Array Size:', len(arrayLP))
+				elif group_step > 1 and len(arrayRC) >= (nGZ + n2fetch) and fetch_no >= 31:
+					del arrayRC[0:(len(arrayRC) - fetch_no)]
+					print('Resetting Rows on Move.... Array Size:', len(arrayRC))
 					break
-				print('Breaking at..', (n2fetch + nGZ), ' Array Length:', len(arrayLP))
+				print('Breaking at..', (n2fetch + nGZ), ' Array Length:', len(arrayRC))
 				# break
-			LP_list.clear()  							# Clear content of the list for new round trip
+			RC_list.clear()  							# Clear content of the list for new round trip
 
 		except Exception as err:
 			print(f"Exception Error: '{err}'")
@@ -221,4 +198,4 @@ def plcExec(nGZ, grp_step, fetch_no):
 			timef = time.time()
 			print(f"Data Fetch Time: {timef - timei} sec", 'Fetch No:', fetch_no, '\n')
 
-	return arrayLP
+	return arrayRC

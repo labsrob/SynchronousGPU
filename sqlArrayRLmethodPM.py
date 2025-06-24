@@ -18,7 +18,7 @@ dGEN, dRPa, dRPb, dLPa, dLPb, dLAa,  dLAb = [], [], [], [], [], [], []
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def dnv_sqlexec(nGZ, grp_step, daq1, daq2, daq3, T1, T2, T3, fetch_no):
+def dnv_sqlExec(nGZ, grp_step, daq1, daq2, daq3, T1, T2, T3, fetch_no):
     """
     NOTE:
     """
@@ -167,7 +167,7 @@ def dnv_sqlexec(nGZ, grp_step, daq1, daq2, daq3, T1, T2, T3, fetch_no):
 # -------------------------------------------------------------------------------------------------------------[XXXXXXX]
 
 
-def mgm_sqlexec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, T1, T2, T3, T4, T5, T6, T7, fetch_no):
+def mgm_sqlExec(nGZ, grp_step, daq1, daq2, daq3, daq4, daq5, daq6, daq7, T1, T2, T3, T4, T5, T6, T7, fetch_no):
     """
     NOTE:
     """

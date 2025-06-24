@@ -1480,7 +1480,7 @@ class rollerPressure(ttk.Frame):            # -- Defines the tabbed region for Q
             # Call data loader Method---------------------------#
             rpData = synchronousRP(rpSize, rpgType, db_freq)    # data loading functions
             if UsePLC_DBS == 1:
-                import VarPLCrp as qrp
+                import VarPLC_RP as qrp
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qp.validCols('RP')                    # Load defined valid columns for PLC Data
@@ -2004,7 +2004,7 @@ class tapeTemp(ttk.Frame):      # -- Defines the tabbed region for QA param - Ta
             # --------------------------------------------------#
 
             if UsePLC_DBS == 1:
-                import VarPLCtt as qtt
+                import VarPLC_TT as qtt
                 viz_cycle = 10
                 # Call synchronous data function ---------------[]
                 columns = qt.validCols('TT')                    # Load defined valid columns for PLC Data
@@ -3347,7 +3347,7 @@ class tapeGap(ttk.Frame):       # -- Defines the tabbed region for QA param - Ta
             # ----------------------------------------------------------#
 
             if UsePLC_DBS == 1:
-                import VarPLCtg as qtg
+                import VarPLC_TG as qtg
                 viz_cycle = 10
                 columns = qg.validCols('TG')                    # Load defined valid columns for PLC Data
                 df1 = pd.DataFrame(tgData, columns=columns)     # Include table data into python Dataframe

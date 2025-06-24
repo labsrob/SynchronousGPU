@@ -27,19 +27,19 @@ def validCols(pParam, pWON=None):
     elif pParam == 'LP1_' + pWON:
         columns = [ # Laser Power ------------------[]
                    'cLayer', 'cLayer',
-                    'R1H1LP', 'R1H2LP', 'R1H3LP', 'R1H4LP',
-                    'R2H1LP', 'R2H2LP', 'R2H3LP', 'R2H4LP']
+                   'R1H1LP', 'R1H2LP', 'R1H3LP', 'R1H4LP',
+                   'R2H1LP', 'R2H2LP', 'R2H3LP', 'R2H4LP']
 
     elif pParam == 'LP2_':
-        columns = [  # Laser Power ------------------[]
-            'cLayer', 'cLayer',
-            'R3H1LP', 'R3H2LP', 'R3H3LP', 'R3H4LP',
-            'R4H1LP', 'R4H2LP', 'R4H3LP', 'R4H4LP']
+        columns = [ # Laser Power ------------------[]
+                    'cLayer', 'cLayer',
+                    'R3H1LP', 'R3H2LP', 'R3H3LP', 'R3H4LP',
+                    'R4H1LP', 'R4H2LP', 'R4H3LP', 'R4H4LP']
 
     elif pParam == 'LA1_':
         columns = [ # Laser Angle ---------------------[]
                    'cLayer', 'cLayer',
-                    'R1H1LA', 'R1H2LA', 'R1H3LA', 'R1H4LA',
+                   'R1H1LA', 'R1H2LA', 'R1H3LA', 'R1H4LA',
                    'R2H1LA', 'R2H2LA', 'R2H3LA', 'R2H4LA']
 
     elif pParam == 'LA2_':

@@ -8,14 +8,15 @@ All production procedure relies on Word Order Number - Assuming a Unique identit
 Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
+# 1. Laser Power, 2. Laser Angle, 3. Tape Speed
 
 
 def loadProcesValues(df1):
-    plcLP = [df1['tStamp'], df1['cLayer'], df1['R1H1'],
-             df1['R1H2'], df1['R1H3'], df1['R1H4'],
-             df1['R2H1'], df1['R2H2'], df1['R2H3'],
-             df1['R2H4'], df1['R3H1'], df1['R3H2'],
-             df1['R3H3'], df1['R3H4'], df1['R4H1'],
-             df1['R4H2'], df1['R4H3'], df1['R4H4']]
+    plcST = [df1['cLayer'], df1['R1H1ST'], df1['R1H2ST'],
+             df1['R1H3ST'], df1['R1H4ST'], df1['R2H1ST'],
+             df1['R2H2ST'], df1['R2H3ST'], df1['R2H4ST'],
+             df1['R3H1ST'], df1['R3H2ST'], df1['R3H3ST'],
+             df1['R3H4ST'], df1['R4H1ST'], df1['R4H2ST'],
+             df1['R4H3ST'], df1['R4H4ST']]
 
-    return plcLP
+    return plcST

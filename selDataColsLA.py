@@ -9,6 +9,7 @@ Laser Angle measured in Degrees - This function is common to PLC data and SQL da
 
 
 def validCols(pParam, pWON=None):
+
     # print('Detected RingHead Combo:', configH)
     if pParam == 'LA1_' + pWON:
         columns = ['tStamp', 'cLayer', 'R1H1LA', 'R1H2LA', 'R1H3LA',

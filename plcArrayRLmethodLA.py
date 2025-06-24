@@ -69,7 +69,7 @@ def writeInteger(db_number, start_offset, r_data):
 # --------------------------------------------------------------------------------------------------------------------[]
 
 
-def plcExec(nGZ, grp_step, fetch_no):
+def plcExec(db_number, nGZ, grp_step, fetch_no):
 	"""
 	nGZ     : User defined Sample size
 	grp_step: Group Sample step
@@ -142,38 +142,38 @@ def plcExec(nGZ, grp_step, fetch_no):
 			LA_list.append(LAA)
 			LA1 = readInteger(db_number, start_offset[2], bit_offset[0])  		# R1H1
 			LA_list.append(LA1)
-			LA2 = readInteger(db_number, start_offset[4], bit_offset[0])  		# R1H2
+			LA2 = readInteger(db_number, start_offset[6], bit_offset[0])  		# R1H2
 			LA_list.append(LA2)
-			LA3 = readInteger(db_number, start_offset[6], bit_offset[0])  		# R1H3
+			LA3 = readInteger(db_number, start_offset[10], bit_offset[0])  		# R1H3
 			LA_list.append(LA3)
-			LA4 = readInteger(db_number, start_offset[8], bit_offset[0])  		# R1H4
+			LA4 = readInteger(db_number, start_offset[14], bit_offset[0])  		# R1H4
 			LA_list.append(LA4)
 			# R2 ------
-			LA5 = readInteger(db_number, start_offset[10], bit_offset[0])  		# R2H1
+			LA5 = readInteger(db_number, start_offset[18], bit_offset[0])  		# R2H1
 			LA_list.append(LA5)
-			LA6 = readInteger(db_number, start_offset[12], bit_offset[0])  		# R2H2
+			LA6 = readInteger(db_number, start_offset[22], bit_offset[0])  		# R2H2
 			LA_list.append(LA6)
-			LA7 = readInteger(db_number, start_offset[14], bit_offset[0])  		# R2H3
+			LA7 = readInteger(db_number, start_offset[26], bit_offset[0])  		# R2H3
 			LA_list.append(LA7)
-			LA8 = readInteger(db_number, start_offset[16], bit_offset[0])  		# R2H4
+			LA8 = readInteger(db_number, start_offset[30], bit_offset[0])  		# R2H4
 			LA_list.append(LA8)
 			# R3 ------
-			LA9 = readInteger(db_number, start_offset[18], bit_offset[0])  		# R3H1
+			LA9 = readInteger(db_number, start_offset[34], bit_offset[0])  		# R3H1
 			LA_list.append(LA9)
-			LA10 = readInteger(db_number, start_offset[20], bit_offset[0])  	# R3H2
+			LA10 = readInteger(db_number, start_offset[38], bit_offset[0])  	# R3H2
 			LA_list.append(LA10)
-			LA11 = readInteger(db_number, start_offset[22], bit_offset[0])  	# R3H3
+			LA11 = readInteger(db_number, start_offset[42], bit_offset[0])  	# R3H3
 			LA_list.append(LA11)
-			LA12 = readInteger(db_number, start_offset[24], bit_offset[0])  	# R3H4
+			LA12 = readInteger(db_number, start_offset[46], bit_offset[0])  	# R3H4
 			LA_list.append(LA12)
 			# R4 ------
-			LA13 = readInteger(db_number, start_offset[26], bit_offset[0])  	# R4H1
+			LA13 = readInteger(db_number, start_offset[50], bit_offset[0])  	# R4H1
 			LA_list.append(LA13)
-			LA14 = readInteger(db_number, start_offset[28], bit_offset[0])  	# R4H2
+			LA14 = readInteger(db_number, start_offset[54], bit_offset[0])  	# R4H2
 			LA_list.append(LA14)
-			LA15 = readInteger(db_number, start_offset[30], bit_offset[0])  	# R4H3
+			LA15 = readInteger(db_number, start_offset[58], bit_offset[0])  	# R4H3
 			LA_list.append(LA15)
-			LA16 = readInteger(db_number, start_offset[32], bit_offset[0])  	# R4H4
+			LA16 = readInteger(db_number, start_offset[62], bit_offset[0])  	# R4H4
 			LA_list.append(LA16)
 
 			# Deposit list column content into rows array ----------[]

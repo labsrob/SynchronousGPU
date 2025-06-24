@@ -947,7 +947,7 @@ def ttProcessParam(vCounter, pType):
         RM = rm.loadProcesValues(df0)           # Join data values under dataframe
 
         if UsePLC_DBS == 1:
-            import VarPLCtt as tt
+            import VarPLC_TT as tt
             viz_cycle = 10
 
             # Call synchronous data function ---------------[]
@@ -1436,7 +1436,7 @@ def stProcessParam(vCounter, pType):
         # --------------------------------------------------#
 
         if UsePLC_DBS == 1:
-            import VarPLCst as st
+            import VarPLC_ST as st
 
             viz_cycle = 10
             # Call synchronous data function ---------------[]
@@ -1891,7 +1891,7 @@ def tgProcessParam(vCounter, pType):
         # ----------------------------------------------------#
 
         if UsePLC_DBS == 1:
-            import VarPLCtg as tg
+            import VarPLC_TG as tg
 
             viz_cycle = 10
             columns = qtg.validCols('TG')           # Load defined valid columns for PLC Data

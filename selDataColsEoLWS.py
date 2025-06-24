@@ -10,12 +10,12 @@ Check SQL data columns ...
 
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'WS' + pWON:
+    if pParam == 'ZWS' + pWON:      # EOL_WS is so named as ZWS
         columns = [ # Tape Temperature --------------[]
                    'tStmd', 'LyIDd', 'R1SPd', 'R1NVd', 'R2SPd',
                    'R2NVd', 'R3SPd', 'R3NVd', 'R4SPd',  'R4NVd']
 
-    elif pParam == 'SPC_WS':
+    elif pParam == 'SPC_EoLWS':
         columns = [ # Tape Temperature --------------[]
                    'tStmd', 'LyIDd', 'R1SPd', 'R1NVd', 'R2SPd',
                    'R2NVd', 'R3SPd', 'R3NVd', 'R4SPd',  'R4NVd']

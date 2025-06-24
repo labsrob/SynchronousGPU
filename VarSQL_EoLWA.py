@@ -8,17 +8,11 @@ All production procedure relies on Word Order Number - Assuming a Unique identit
 Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
-# 1. Laser Power, 2. Laser Angle, 3. Tape Speed
 
 
 def loadProcesValues(df1):
-    plcWS = [df1['R1H1WS'], df1['R1H2WS'],
-            df1['R1H3WS'], df1['R1H4WS'],
-            df1['R2H1WS'], df1['R2H2WS'],
-            df1['R2H3WS'], df1['R2H4WS'],
-            df1['R3H1WS'], df1['R3H2WS'],
-            df1['R3H3WS'], df1['R3H4WS'],
-            df1['R4H1WS'], df1['R4H2WS'],
-            df1['R4H3WS'], df1['R4H4WS']]
+    sqpWA = [df1['tStme'], df1['LyIDe'], df1['R1SPe'], df1['R1NVe'],
+             df1['R2SPe'], df1['R2NVe'], df1['R3SPe'],
+             df1['R3NVe'], df1['R4SPe'], df1['R4NVe']]
 
-    return plcWS
+    return sqpWA
