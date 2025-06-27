@@ -28,14 +28,16 @@ import selDataColsVM as qvm     # Void mapping
 # ------------ EoL Report ------#
 # import selDataColsEoLTS as xts
 # ------------------------------#
+import selDataColsEoLLP as olp  # EoL Laser Power (on DNV)
+import selDataColsEoLLA as ola  # EoL Laser Angle (on DNV)
+# import selDataColsEoLRP as orp  # EoL Roller Pressure (on MGM)
+# ------------------------------#
 import selDataColsEoLTT as ott  # EoL Tape Temperature (Control Temperature)
 import selDataColsEoLST as ost  # EoL Substrate Temperature (on DNV)
 import selDataColsEoLTG as otg  # EoL Tape Gape (on DNV)
 import selDataColsEoLWS as ows  # EoL Winding Speed (on DNV)
-# ------------------------------#
-import selDataColsEoLLP as olp  # EoL Laser Power (on DNV)
-import selDataColsEoLLA as ola  # EoL Laser Angle (on DNV)
 import selDataColsEoLWA as owa  # EoL Winding Angle (on MGM)
+
 
 # ----- DNV/MGM Params ---#
 import selDataColsPM as qpm        # Production Monitors
@@ -923,22 +925,19 @@ class collectiveEoL(ttk.Frame):
             a8 = f.add_subplot(2, 5, 8)         # s bar plot
             a9 = f.add_subplot(2, 5, 9)
         else:
-            a1 = f.add_subplot(2, 8, 1)         # xbar plot
-            a2 = f.add_subplot(2, 8, 2)         # s bar plot
-            a3 = f.add_subplot(2, 8, 3)         # s bar plot
-            a4 = f.add_subplot(2, 8, 4)
-            a5 = f.add_subplot(2, 8, 5)         # PDF Report Space
-            a6 = f.add_subplot(2, 8, 6)         # s bar plot
-            a7 = f.add_subplot(2, 8, 7)         # s bar plot
-            a8 = f.add_subplot(2, 8, (8, 16))   # s bar plot
-            a9 = f.add_subplot(2, 8, 9)         # xbar plot
-            a10 = f.add_subplot(2, 8, 10)        # xbar plot
-            a11 = f.add_subplot(2, 8, 11)       # s bar plot
-            a12 = f.add_subplot(2, 8, 12)
-            a13 = f.add_subplot(2, 8, 13)       # PDF Report Space
-            a14 = f.add_subplot(2, 8, 14)       # s bar plot
-            a15 = f.add_subplot(2, 8, 15)       # s bar plot
-            # a16 = f.add_subplot(2, 8, 16)     # s bar plot
+            a1 = f.add_subplot(2, 7, 1)         # xbar plot
+            a2 = f.add_subplot(2, 7, 2)         # s bar plot
+            a3 = f.add_subplot(2, 7, 3)         # s bar plot
+            a4 = f.add_subplot(2, 7, 4)
+            a5 = f.add_subplot(2, 7, 5)         # PDF Report Space
+            a6 = f.add_subplot(2, 7, 6)         # s bar plot
+            a7 = f.add_subplot(2, 7, (7, 14))   # s bar plot
+            a8 = f.add_subplot(2, 7, 8)         # xbar plot
+            a9 = f.add_subplot(2, 7, 9)        # xbar plot
+            a10 = f.add_subplot(2, 7, 10)       # s bar plot
+            a11 = f.add_subplot(2, 7, 11)
+            a12 = f.add_subplot(2, 7, 12)       # PDF Report Space
+            a13 = f.add_subplot(2, 7, 13)       # s bar plot
 
         # Declare Plots attributes ----------------------------[H]
         plt.rcParams.update({'font.size': 7})                   # Reduce font size to 7pt for all legends
@@ -964,13 +963,12 @@ class collectiveEoL(ttk.Frame):
             # --------- Based on Group's URS -------------------#
             T1 = 'ZLP_' + pWON          # Identify Laser Power EOL Table
             T2 = 'ZLA_' + pWON          # Identify Laser Angle EOL Table
-            T3 = 'ZRP_' + pWON          # Identify Roller Pressure EOL Table
-            T4 = 'ZTT_' + pWON          # Identify Tape Temperature EOL Table
-            T5 = 'ZST_' + pWON          # Identify Substrate Temperature EOL Table
-            T6 = 'ZTG_' + pWON          # Identify Tape Gap EOL Table
-            T7 = 'ZWA_' + pWON          # Identify Winding Angle EOL Table
-            T8 = 'RC_' + pWON           # Identify RampCount Table
-            T9 = 'VC_' + pWON           # Identify Void count table
+            T3 = 'ZTT_' + pWON          # Identify Tape Temperature EOL Table
+            T4 = 'ZST_' + pWON          # Identify Substrate Temperature EOL Table
+            T5 = 'ZTG_' + pWON          # Identify Tape Gap EOL Table
+            T6 = 'ZWA_' + pWON          # Identify Winding Angle EOL Table
+            T7 = 'RC_' + pWON           # Identify RampCount Table
+            T8 = 'VC_' + pWON           # Identify Void count table
 
         else:
             pass
@@ -1037,31 +1035,26 @@ class collectiveEoL(ttk.Frame):
             a5.get_xaxis().set_visible(False)
 
         else:
-            a9.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+            a8.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
             # -----------------------------
             a1.set_title('EoL - Laser Power [XBar]', fontsize=12, fontweight='bold')
-            a9.set_title('EoL - Laser Power [SDev]', fontsize=12, fontweight='bold')
+            a8.set_title('EoL - Laser Power [SDev]', fontsize=12, fontweight='bold')
             # ------
             a2.set_title('EoL - Laser Angle [XBar]', fontsize=12, fontweight='bold')
-            a10.set_title('EoL - Laser Angle [SDev]', fontsize=12, fontweight='bold')
+            a9.set_title('EoL - Laser Angle [SDev]', fontsize=12, fontweight='bold')
             # -------------------
-            a3.set_title('EoL - Roller Pressure [XBar]', fontsize=12, fontweight='bold')
-            a11.set_title('EoL - Roller Pressure [SDev]', fontsize=12, fontweight='bold')
-            # -------------------
-            a4.set_title('EoL - Tape Temperature [XBar]', fontsize=12, fontweight='bold')
-            a12.set_title('EoL - Tape Temperature [SDev]', fontsize=12, fontweight='bold')
+            a3.set_title('EoL - Tape Temperature [XBar]', fontsize=12, fontweight='bold')
+            a10.set_title('EoL - Tape Temperature [SDev]', fontsize=12, fontweight='bold')
             # ------
-            a5.set_title('EoL - Substrate Temperature [XBar]', fontsize=12, fontweight='bold')
-            a13.set_title('EoL - Substrate Temperature [SDev]', fontsize=12, fontweight='bold')
+            a4.set_title('EoL - Substrate Temperature [XBar]', fontsize=12, fontweight='bold')
+            a11.set_title('EoL - Substrate Temperature [SDev]', fontsize=12, fontweight='bold')
             # -------------------
-            a6.set_title('EoL - Tape Gap Measurement [XBar]', fontsize=12, fontweight='bold')
-            a14.set_title('EoL - Tape Gap Measurement [SDev]', fontsize=12, fontweight='bold')
+            a5.set_title('EoL - Tape Gap Measurement [XBar]', fontsize=12, fontweight='bold')
+            a12.set_title('EoL - Tape Gap Measurement [SDev]', fontsize=12, fontweight='bold')
             # -------------------
-            a7.set_title('EoL - Tape Winding Angle [XBar]', fontsize=12, fontweight='bold')
-            a15.set_title('EoL - Tape Winding Angle [SDev]', fontsize=12, fontweight='bold')
+            a6.set_title('EoL - Tape Winding Angle [XBar]', fontsize=12, fontweight='bold')
+            a13.set_title('EoL - Tape Winding Angle [SDev]', fontsize=12, fontweight='bold')
             # ------
-            # a8.set_title('EoL - Tape Winding Speed [XBar]', fontsize=12, fontweight='bold')
-            # a16.set_title('EoL - Tape Winding Speed [SDev]', fontsize=12, fontweight='bold')
             # -----------------------------------------------------
             a1.grid(color="0.5", linestyle='-', linewidth=0.5)
             a2.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -1069,72 +1062,61 @@ class collectiveEoL(ttk.Frame):
             a4.grid(color="0.5", linestyle='-', linewidth=0.5)
             a5.grid(color="0.5", linestyle='-', linewidth=0.5)
             a6.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a7.grid(color="0.5", linestyle='-', linewidth=0.5)
+
             a8.grid(color="0.5", linestyle='-', linewidth=0.5)
             a9.grid(color="0.5", linestyle='-', linewidth=0.5)
             a10.grid(color="0.5", linestyle='-', linewidth=0.5)
             a11.grid(color="0.5", linestyle='-', linewidth=0.5)
             a12.grid(color="0.5", linestyle='-', linewidth=0.5)
             a13.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a14.grid(color="0.5", linestyle='-', linewidth=0.5)
-            a15.grid(color="0.5", linestyle='-', linewidth=0.5)
-            # a16.grid(color="0.5", linestyle='-', linewidth=0.5)
 
-            a1.legend(loc='upper right', title='EoL - Tape Temperature')
-            a2.legend(loc='upper right', title='EoL - Substrate Temperature')
-            a3.legend(loc='upper right', title='EoL - Tape Gap Measurement')
-            a4.legend(loc='upper right', title='EoL - Winding Speed')
-            a5.legend(loc='upper right', title='EoL - Tape Temperature')
-            a6.legend(loc='upper right', title='EoL - Substrate Temperature')
-            a7.legend(loc='upper right', title='EoL - Tape Gap Measurement')
-            a8.legend(loc='upper right', title='EoL - Winding Speed')
+            a1.legend(loc='upper right', title='EoL - Laser Power')
+            a2.legend(loc='upper right', title='EoL - Laser Angle')
+            a3.legend(loc='upper right', title='EoL - Tape Temperature')
+            a4.legend(loc='upper right', title='EoL - Substrate Temperature')
+            a5.legend(loc='upper right', title='EoL - Tape Gap Measurement')
+            a6.legend(loc='upper right', title='EoL - Tape Winding Speed')
 
             # ----------------------------------------------------------#
             a1.set_ylim([YScale_minEOL, YScale_maxEOL], auto=True)
             a1.set_xlim([window_Xmin, window_Xmax])
 
-            a9.set_ylim([0, 10], auto=True)
-            a9.set_xlim([window_Xmin, window_Xmax])
+            a8.set_ylim([0, 10], auto=True)
+            a8.set_xlim([window_Xmin, window_Xmax])
 
             a2.set_ylim([YScale_minEOL, YScale_maxEOL], auto=True)
             a2.set_xlim([window_Xmin, window_Xmax])
 
-            a10.set_ylim([0, 10], auto=True)
-            a10.set_xlim([window_Xmin, window_Xmax])
+            a9.set_ylim([0, 10], auto=True)
+            a9.set_xlim([window_Xmin, window_Xmax])
 
             a3.set_ylim([YScale_minEOL, YScale_maxEOL], auto=True)
             a3.set_xlim([window_Xmin, window_Xmax])
 
-            a11.set_ylim([0, 10], auto=True)
-            a11.set_xlim([window_Xmin, window_Xmax])
+            a10.set_ylim([0, 10], auto=True)
+            a10.set_xlim([window_Xmin, window_Xmax])
 
             a4.set_ylim([YScale_minEOL, YScale_maxEOL], auto=True)
             a4.set_xlim([window_Xmin, window_Xmax])
 
-            a12.set_ylim([0, 10], auto=True)
-            a12.set_xlim([window_Xmin, window_Xmax])
+            a11.set_ylim([0, 10], auto=True)
+            a11.set_xlim([window_Xmin, window_Xmax])
 
             a5.set_ylim([YScale_minEOL, YScale_maxEOL], auto=True)
             a5.set_xlim([window_Xmin, window_Xmax])
 
-            a13.set_ylim([0, 10], auto=True)
-            a13.set_xlim([window_Xmin, window_Xmax])
+            a12.set_ylim([0, 10], auto=True)
+            a12.set_xlim([window_Xmin, window_Xmax])
 
             a6.set_ylim([YScale_minEOL, YScale_maxEOL], auto=True)
             a6.set_xlim([window_Xmin, window_Xmax])
 
-            a14.set_ylim([0, 10], auto=True)
-            a14.set_xlim([window_Xmin, window_Xmax])
-
-            a7.set_ylim([YScale_minEOL, YScale_maxEOL], auto=True)
-            a7.set_xlim([window_Xmin, window_Xmax])
-
-            a15.set_ylim([0, 10], auto=True)
-            a15.set_xlim([window_Xmin, window_Xmax])
-
-            a8.cla()
-            a8.get_yaxis().set_visible(False)
-            a8.get_xaxis().set_visible(False)
+            a13.set_ylim([0, 10], auto=True)
+            a13.set_xlim([window_Xmin, window_Xmax])
+            # ---- Report window for RC and VC ----
+            a7.cla()
+            a7.get_yaxis().set_visible(False)
+            a7.get_xaxis().set_visible(False)
 
         # ---------------------------------------------------------[]
         # Define Plot area and axes -
@@ -1236,38 +1218,39 @@ class collectiveEoL(ttk.Frame):
         else:
             EoLRep = 'MGM'
             # ---------------------------------------------------[Laser Power T5 x16]
-            im94, = a2.plot([], [], 'o-', label='Laser Power - (R1H1)')
-            im95, = a2.plot([], [], 'o-', label='Laser Power - (R1H2)')
-            im96, = a2.plot([], [], 'o-', label='Laser Power - (R1H3)')
-            im97, = a2.plot([], [], 'o-', label='Laser Power - (R1H4)')
-            im98, = a2.plot([], [], 'o-', label='Laser Power - (R2H1)')
-            im99, = a2.plot([], [], 'o-', label='Laser Power - (R2H2)')
-            im100, = a2.plot([], [], 'o-', label='Laser Power - (R2H3)')
-            im101, = a2.plot([], [], 'o-', label='Laser Power - (R2H4)')
-            im102, = a2.plot([], [], 'o-', label='Laser Power - (R3H1)')
-            im103, = a2.plot([], [], 'o-', label='Laser Power - (R3H2)')
-            im104, = a2.plot([], [], 'o-', label='Laser Power - (R3H3)')
-            im105, = a2.plot([], [], 'o-', label='Laser Power - (R3H4)')
-            im106, = a2.plot([], [], 'o-', label='Laser Power - (R4H1)')
-            im107, = a2.plot([], [], 'o-', label='Laser Power - (R4H2)')
-            im108, = a2.plot([], [], 'o-', label='Laser Power - (R4H3)')
-            im109, = a2.plot([], [], 'o-', label='Laser Power - (R4H4)')
-            im110, = a6.plot([], [], 'o-', label='Laser Power')
-            im111, = a6.plot([], [], 'o-', label='Laser Power')
-            im112, = a6.plot([], [], 'o-', label='Laser Power')
-            im113, = a6.plot([], [], 'o-', label='Laser Power')
-            im114, = a6.plot([], [], 'o-', label='Laser Power')
-            im115, = a6.plot([], [], 'o-', label='Laser Power')
-            im116, = a6.plot([], [], 'o-', label='Laser Power')
-            im117, = a6.plot([], [], 'o-', label='Laser Power')
-            im118, = a6.plot([], [], 'o-', label='Laser Power')
-            im119, = a6.plot([], [], 'o-', label='Laser Power')
-            im120, = a6.plot([], [], 'o-', label='Laser Power')
-            im121, = a6.plot([], [], 'o-', label='Laser Power')
-            im122, = a6.plot([], [], 'o-', label='Laser Power')
-            im123, = a6.plot([], [], 'o-', label='Laser Power')
-            im124, = a6.plot([], [], 'o-', label='Laser Power')
-            im125, = a6.plot([], [], 'o-', label='Laser Power')
+            im94, = a1.plot([], [], 'o-', label='Laser Power - (R1H1)')
+            im95, = a1.plot([], [], 'o-', label='Laser Power - (R1H2)')
+            im96, = a1.plot([], [], 'o-', label='Laser Power - (R1H3)')
+            im97, = a1.plot([], [], 'o-', label='Laser Power - (R1H4)')
+            im98, = a1.plot([], [], 'o-', label='Laser Power - (R2H1)')
+            im99, = a1.plot([], [], 'o-', label='Laser Power - (R2H2)')
+            im100, = a1.plot([], [], 'o-', label='Laser Power - (R2H3)')
+            im101, = a1.plot([], [], 'o-', label='Laser Power - (R2H4)')
+            im102, = a1.plot([], [], 'o-', label='Laser Power - (R3H1)')
+            im103, = a1.plot([], [], 'o-', label='Laser Power - (R3H2)')
+            im104, = a1.plot([], [], 'o-', label='Laser Power - (R3H3)')
+            im105, = a1.plot([], [], 'o-', label='Laser Power - (R3H4)')
+            im106, = a1.plot([], [], 'o-', label='Laser Power - (R4H1)')
+            im107, = a1.plot([], [], 'o-', label='Laser Power - (R4H2)')
+            im108, = a1.plot([], [], 'o-', label='Laser Power - (R4H3)')
+            im109, = a1.plot([], [], 'o-', label='Laser Power - (R4H4)')
+
+            im110, = a8.plot([], [], 'o-', label='Laser Power')
+            im111, = a8.plot([], [], 'o-', label='Laser Power')
+            im112, = a8.plot([], [], 'o-', label='Laser Power')
+            im113, = a8.plot([], [], 'o-', label='Laser Power')
+            im114, = a8.plot([], [], 'o-', label='Laser Power')
+            im115, = a8.plot([], [], 'o-', label='Laser Power')
+            im116, = a8.plot([], [], 'o-', label='Laser Power')
+            im117, = a8.plot([], [], 'o-', label='Laser Power')
+            im118, = a8.plot([], [], 'o-', label='Laser Power')
+            im119, = a8.plot([], [], 'o-', label='Laser Power')
+            im120, = a8.plot([], [], 'o-', label='Laser Power')
+            im121, = a8.plot([], [], 'o-', label='Laser Power')
+            im122, = a8.plot([], [], 'o-', label='Laser Power')
+            im123, = a8.plot([], [], 'o-', label='Laser Power')
+            im124, = a8.plot([], [], 'o-', label='Laser Power')
+            im125, = a8.plot([], [], 'o-', label='Laser Power')
             # ---------------------------------------------------[Laser Angle x16]
             im126, = a2.plot([], [], 'o-', label='Laser Angle - (R1H1)')
             im127, = a2.plot([], [], 'o-', label='Laser Angle - (R1H2)')
@@ -1286,148 +1269,119 @@ class collectiveEoL(ttk.Frame):
             im140, = a2.plot([], [], 'o-', label='Laser Angle - (R4H3)')
             im141, = a2.plot([], [], 'o-', label='Laser Angle - (R4H4)')
             # -----------------------------------------------------------------
-            im142, = a6.plot([], [], 'o-', label='Laser Angle')
-            im143, = a6.plot([], [], 'o-', label='Laser Angle')
-            im144, = a6.plot([], [], 'o-', label='Laser Angle')
-            im145, = a6.plot([], [], 'o-', label='Laser Angle')
-            im146, = a6.plot([], [], 'o-', label='Laser Angle')
-            im147, = a6.plot([], [], 'o-', label='Laser Angle')
-            im148, = a6.plot([], [], 'o-', label='Laser Angle')
-            im149, = a6.plot([], [], 'o-', label='Laser Angle')
-            im150, = a6.plot([], [], 'o-', label='Laser Angle')
-            im151, = a6.plot([], [], 'o-', label='Laser Angle')
-            im152, = a6.plot([], [], 'o-', label='Laser Angle')
-            im153, = a6.plot([], [], 'o-', label='Laser Angle')
-            im154, = a6.plot([], [], 'o-', label='Laser Angle')
-            im155, = a6.plot([], [], 'o-', label='Laser Angle')
-            im156, = a6.plot([], [], 'o-', label='Laser Angle')
-            im157, = a6.plot([], [], 'o-', label='Laser Angle')
-            # ----------------------------------------[Roller Pressure]
-
-            im10, = a1.plot([], [], 'o-', label='Roller Pressure - (R1H1)')
-            im11, = a1.plot([], [], 'o-', label='Roller Pressure - (R1H2)')
-            im12, = a1.plot([], [], 'o-', label='Roller Pressure - (R1H3)')
-            im13, = a1.plot([], [], 'o-', label='Roller Pressure - (R1H4)')
-            im14, = a1.plot([], [], 'o-', label='Roller Pressure - (R2H1)')
-            im15, = a1.plot([], [], 'o-', label='Roller Pressure - (R2H2)')
-            im16, = a1.plot([], [], 'o-', label='Roller Pressure - (R2H3)')
-            im17, = a1.plot([], [], 'o-', label='Roller Pressure - (R2H4)')
-            im18, = a1.plot([], [], 'o-', label='Roller Pressure - (R3H1)')
-            im19, = a1.plot([], [], 'o-', label='Roller Pressure - (R3H2)')
-            im20, = a1.plot([], [], 'o-', label='Roller Pressure - (R3H3)')
-            im21, = a1.plot([], [], 'o-', label='Roller Pressure - (R3H4)')
-            im22, = a1.plot([], [], 'o-', label='Roller Pressure - (R4H1)')
-            im23, = a1.plot([], [], 'o-', label='Roller Pressure - (R4H2)')
-            im24, = a1.plot([], [], 'o-', label='Roller Pressure - (R4H3)')
-            im25, = a1.plot([], [], 'o-', label='Roller Pressure - (R4H4)')
-
-            im26, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im27, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im28, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im29, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im30, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im31, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im32, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im33, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im34, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im35, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im36, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im37, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im38, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im39, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im40, = a5.plot([], [], 'o-', label='Roller Pressure')
-            im41, = a5.plot([], [], 'o-', label='Roller Pressure')
+            im142, = a9.plot([], [], 'o-', label='Laser Angle')
+            im143, = a9.plot([], [], 'o-', label='Laser Angle')
+            im144, = a9.plot([], [], 'o-', label='Laser Angle')
+            im145, = a9.plot([], [], 'o-', label='Laser Angle')
+            im146, = a9.plot([], [], 'o-', label='Laser Angle')
+            im147, = a9.plot([], [], 'o-', label='Laser Angle')
+            im148, = a9.plot([], [], 'o-', label='Laser Angle')
+            im149, = a9.plot([], [], 'o-', label='Laser Angle')
+            im150, = a9.plot([], [], 'o-', label='Laser Angle')
+            im151, = a9.plot([], [], 'o-', label='Laser Angle')
+            im152, = a9.plot([], [], 'o-', label='Laser Angle')
+            im153, = a9.plot([], [], 'o-', label='Laser Angle')
+            im154, = a9.plot([], [], 'o-', label='Laser Angle')
+            im155, = a9.plot([], [], 'o-', label='Laser Angle')
+            im156, = a9.plot([], [], 'o-', label='Laser Angle')
+            im157, = a9.plot([], [], 'o-', label='Laser Angle')
 
             # ----------------------------------------[Tape Temperature x16]
-            im10, = a1.plot([], [], 'o-', label='Tape Temp - (R1H1)')
-            im11, = a1.plot([], [], 'o-', label='Tape Temp - (R1H2)')
-            im12, = a1.plot([], [], 'o-', label='Tape Temp - (R1H3)')
-            im13, = a1.plot([], [], 'o-', label='Tape Temp - (R1H4)')
-            im14, = a1.plot([], [], 'o-', label='Tape Temp - (R2H1)')
-            im15, = a1.plot([], [], 'o-', label='Tape Temp - (R2H2)')
-            im16, = a1.plot([], [], 'o-', label='Tape Temp - (R2H3)')
-            im17, = a1.plot([], [], 'o-', label='Tape Temp - (R2H4)')
-            im18, = a1.plot([], [], 'o-', label='Tape Temp - (R3H1)')
-            im19, = a1.plot([], [], 'o-', label='Tape Temp - (R3H2)')
-            im20, = a1.plot([], [], 'o-', label='Tape Temp - (R3H3)')
-            im21, = a1.plot([], [], 'o-', label='Tape Temp - (R3H4)')
-            im22, = a1.plot([], [], 'o-', label='Tape Temp - (R4H1)')
-            im23, = a1.plot([], [], 'o-', label='Tape Temp - (R4H2)')
-            im24, = a1.plot([], [], 'o-', label='Tape Temp - (R4H3)')
-            im25, = a1.plot([], [], 'o-', label='Tape Temp - (R4H4)')
+            im10, = a3.plot([], [], 'o-', label='Tape Temp - (R1H1)')
+            im11, = a3.plot([], [], 'o-', label='Tape Temp - (R1H2)')
+            im12, = a3.plot([], [], 'o-', label='Tape Temp - (R1H3)')
+            im13, = a3.plot([], [], 'o-', label='Tape Temp - (R1H4)')
+            im14, = a3.plot([], [], 'o-', label='Tape Temp - (R2H1)')
+            im15, = a3.plot([], [], 'o-', label='Tape Temp - (R2H2)')
+            im16, = a3.plot([], [], 'o-', label='Tape Temp - (R2H3)')
+            im17, = a3.plot([], [], 'o-', label='Tape Temp - (R2H4)')
+            im18, = a3.plot([], [], 'o-', label='Tape Temp - (R3H1)')
+            im19, = a3.plot([], [], 'o-', label='Tape Temp - (R3H2)')
+            im20, = a3.plot([], [], 'o-', label='Tape Temp - (R3H3)')
+            im21, = a3.plot([], [], 'o-', label='Tape Temp - (R3H4)')
+            im22, = a3.plot([], [], 'o-', label='Tape Temp - (R4H1)')
+            im23, = a3.plot([], [], 'o-', label='Tape Temp - (R4H2)')
+            im24, = a3.plot([], [], 'o-', label='Tape Temp - (R4H3)')
+            im25, = a3.plot([], [], 'o-', label='Tape Temp - (R4H4)')
 
-            im26, = a5.plot([], [], 'o-', label='Tape Temp')
-            im27, = a5.plot([], [], 'o-', label='Tape Temp')
-            im28, = a5.plot([], [], 'o-', label='Tape Temp')
-            im29, = a5.plot([], [], 'o-', label='Tape Temp')
-            im30, = a5.plot([], [], 'o-', label='Tape Temp')
-            im31, = a5.plot([], [], 'o-', label='Tape Temp')
-            im32, = a5.plot([], [], 'o-', label='Tape Temp')
-            im33, = a5.plot([], [], 'o-', label='Tape Temp')
-            im34, = a5.plot([], [], 'o-', label='Tape Temp')
-            im35, = a5.plot([], [], 'o-', label='Tape Temp')
-            im36, = a5.plot([], [], 'o-', label='Tape Temp')
-            im37, = a5.plot([], [], 'o-', label='Tape Temp')
-            im38, = a5.plot([], [], 'o-', label='Tape Temp')
-            im39, = a5.plot([], [], 'o-', label='Tape Temp')
-            im40, = a5.plot([], [], 'o-', label='Tape Temp')
-            im41, = a5.plot([], [], 'o-', label='Tape Temp')
+            im26, = a10.plot([], [], 'o-', label='Tape Temp')
+            im27, = a10.plot([], [], 'o-', label='Tape Temp')
+            im28, = a10.plot([], [], 'o-', label='Tape Temp')
+            im29, = a10.plot([], [], 'o-', label='Tape Temp')
+            im30, = a10.plot([], [], 'o-', label='Tape Temp')
+            im31, = a10.plot([], [], 'o-', label='Tape Temp')
+            im32, = a10.plot([], [], 'o-', label='Tape Temp')
+            im33, = a10.plot([], [], 'o-', label='Tape Temp')
+            im34, = a10.plot([], [], 'o-', label='Tape Temp')
+            im35, = a10.plot([], [], 'o-', label='Tape Temp')
+            im36, = a10.plot([], [], 'o-', label='Tape Temp')
+            im37, = a10.plot([], [], 'o-', label='Tape Temp')
+            im38, = a10.plot([], [], 'o-', label='Tape Temp')
+            im39, = a10.plot([], [], 'o-', label='Tape Temp')
+            im40, = a10.plot([], [], 'o-', label='Tape Temp')
+            im41, = a10.plot([], [], 'o-', label='Tape Temp')
             # ----------------------------------------[Substrate Temperature x16]
-            im42, = a2.plot([], [], 'o-', label='Substrate Temp - (R1H1)')
-            im43, = a2.plot([], [], 'o-', label='Substrate Temp - (R1H2)')
-            im44, = a2.plot([], [], 'o-', label='Substrate Temp - (R1H3)')
-            im45, = a2.plot([], [], 'o-', label='Substrate Temp - (R1H4)')
-            im46, = a2.plot([], [], 'o-', label='Substrate Temp - (R2H1)')
-            im47, = a2.plot([], [], 'o-', label='Substrate Temp - (R2H2)')
-            im48, = a2.plot([], [], 'o-', label='Substrate Temp - (R2H3)')
-            im49, = a2.plot([], [], 'o-', label='Substrate Temp - (R2H4)')
-            im50, = a2.plot([], [], 'o-', label='Substrate Temp - (R3H1)')
-            im51, = a2.plot([], [], 'o-', label='Substrate Temp - (R3H2)')
-            im52, = a2.plot([], [], 'o-', label='Substrate Temp - (R3H3)')
-            im53, = a2.plot([], [], 'o-', label='Substrate Temp - (R3H4)')
-            im54, = a2.plot([], [], 'o-', label='Substrate Temp - (R4H1)')
-            im55, = a2.plot([], [], 'o-', label='Substrate Temp - (R4H2)')
-            im56, = a2.plot([], [], 'o-', label='Substrate Temp - (R4H3)')
-            im57, = a2.plot([], [], 'o-', label='Substrate Temp - (R4H4)')
-            im58, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im59, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im60, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im61, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im62, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im63, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im64, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im65, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im66, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im67, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im68, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im69, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im70, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im71, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im72, = a6.plot([], [], 'o-', label='Substrate Temp')
-            im73, = a6.plot([], [], 'o-', label='Substrate Temp')
-            # --------------------------------------------------[Tape Gap x8]
-            im74, = a3.plot([], [], 'o-', label='Tape Gap - (A1)')
-            im75, = a3.plot([], [], 'o-', label='Tape Gap - (A2)')
-            im76, = a3.plot([], [], 'o-', label='Tape Gap - (A3)')
-            im77, = a3.plot([], [], 'o-', label='Tape Gap - (A4)')
-            im78, = a3.plot([], [], 'o-', label='Tape Gap - (B1)')
-            im79, = a3.plot([], [], 'o-', label='Tape Gap - (B2)')
-            im80, = a3.plot([], [], 'o-', label='Tape Gap - (B3)')
-            im81, = a3.plot([], [], 'o-', label='Tape Gap - (B4)')
-            im82, = a7.plot([], [], 'o-', label='Tape Gap')
-            im83, = a7.plot([], [], 'o-', label='Tape Gap')
-            im84, = a7.plot([], [], 'o-', label='Tape Gap')
-            im85, = a7.plot([], [], 'o-', label='Tape Gap')
-            im86, = a7.plot([], [], 'o-', label='Tape Gap')
-            im87, = a7.plot([], [], 'o-', label='Tape Gap')
-            im88, = a7.plot([], [], 'o-', label='Tape Gap')
-            im89, = a7.plot([], [], 'o-', label='Tape Gap')
-            # -------------------------------------------------------[Ramp Data T4]
-            im90, = a3.plot([], [], 'o-', label='Winding Angle - (R1)')  # Ring 1 value count per layer
-            im91, = a3.plot([], [], 'o-', label='Winding Angle - (R2)')  # Ring 2 value count per layer
-            im92, = a3.plot([], [], 'o-', label='Winding Angle - (R3)')  # Ring 3 value count per layer
-            im93, = a3.plot([], [], 'o-', label='Winding Angle - (R4)')  # Ring 4 value count per layer
+            im42, = a4.plot([], [], 'o-', label='Substrate Temp - (R1H1)')
+            im43, = a4.plot([], [], 'o-', label='Substrate Temp - (R1H2)')
+            im44, = a4.plot([], [], 'o-', label='Substrate Temp - (R1H3)')
+            im45, = a4.plot([], [], 'o-', label='Substrate Temp - (R1H4)')
+            im46, = a4.plot([], [], 'o-', label='Substrate Temp - (R2H1)')
+            im47, = a4.plot([], [], 'o-', label='Substrate Temp - (R2H2)')
+            im48, = a4.plot([], [], 'o-', label='Substrate Temp - (R2H3)')
+            im49, = a4.plot([], [], 'o-', label='Substrate Temp - (R2H4)')
+            im50, = a4.plot([], [], 'o-', label='Substrate Temp - (R3H1)')
+            im51, = a4.plot([], [], 'o-', label='Substrate Temp - (R3H2)')
+            im52, = a4.plot([], [], 'o-', label='Substrate Temp - (R3H3)')
+            im53, = a4.plot([], [], 'o-', label='Substrate Temp - (R3H4)')
+            im54, = a4.plot([], [], 'o-', label='Substrate Temp - (R4H1)')
+            im55, = a4.plot([], [], 'o-', label='Substrate Temp - (R4H2)')
+            im56, = a4.plot([], [], 'o-', label='Substrate Temp - (R4H3)')
+            im57, = a4.plot([], [], 'o-', label='Substrate Temp - (R4H4)')
 
+            im58, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im59, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im60, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im61, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im62, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im63, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im64, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im65, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im66, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im67, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im68, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im69, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im70, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im71, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im72, = a11.plot([], [], 'o-', label='Substrate Temp')
+            im73, = a11.plot([], [], 'o-', label='Substrate Temp')
+            # --------------------------------------------------[Tape Gap x8]
+            im74, = a5.plot([], [], 'o-', label='Tape Gap - (A1)')
+            im75, = a5.plot([], [], 'o-', label='Tape Gap - (A2)')
+            im76, = a5.plot([], [], 'o-', label='Tape Gap - (A3)')
+            im77, = a5.plot([], [], 'o-', label='Tape Gap - (A4)')
+            im78, = a5.plot([], [], 'o-', label='Tape Gap - (B1)')
+            im79, = a5.plot([], [], 'o-', label='Tape Gap - (B2)')
+            im80, = a5.plot([], [], 'o-', label='Tape Gap - (B3)')
+            im81, = a5.plot([], [], 'o-', label='Tape Gap - (B4)')
+
+            im82, = a12.plot([], [], 'o-', label='Tape Gap')
+            im83, = a12.plot([], [], 'o-', label='Tape Gap')
+            im84, = a12.plot([], [], 'o-', label='Tape Gap')
+            im85, = a12.plot([], [], 'o-', label='Tape Gap')
+            im86, = a12.plot([], [], 'o-', label='Tape Gap')
+            im87, = a12.plot([], [], 'o-', label='Tape Gap')
+            im88, = a12.plot([], [], 'o-', label='Tape Gap')
+            im89, = a12.plot([], [], 'o-', label='Tape Gap')
+            # -------------------------------------------------------[Ramp Data T4]
+            im90, = a6.plot([], [], 'o-', label='Winding Angle - (R1)')  # Ring 1 value count per layer
+            im91, = a6.plot([], [], 'o-', label='Winding Angle - (R2)')  # Ring 2 value count per layer
+            im92, = a6.plot([], [], 'o-', label='Winding Angle - (R3)')  # Ring 3 value count per layer
+            im93, = a6.plot([], [], 'o-', label='Winding Angle - (R4)')  # Ring 4 value count per layer
+            # ---
+            im90, = a13.plot([], [], 'o-', label='Winding Angle - (R1)')  # Ring 1 value count per layer
+            im91, = a13.plot([], [], 'o-', label='Winding Angle - (R2)')  # Ring 2 value count per layer
+            im92, = a13.plot([], [], 'o-', label='Winding Angle - (R3)')  # Ring 3 value count per layer
+            im93, = a13.plot([], [], 'o-', label='Winding Angle - (R4)')
 
             # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
 
@@ -1435,12 +1389,10 @@ class collectiveEoL(ttk.Frame):
 
             # Initialise SQL Data connection per listed Table --------------------[]
             if EoLRep == 'DNV':
-                l1, l2, l3, l4 = conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor()
-            elif EoLRep == 'MGM':
-                l1, l2, l3, l4, l5, l6 = (conn.cursor(), conn.cursor(), conn.cursor(),
-                                      conn.cursor(), conn.cursor(), conn.cursor())
-            else:
-                pass  # reserved for bespoke configuration
+                l1, l2, l3, l4, l5, l6 = conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor()
+            else: # EoLRep == 'MGM':
+                l1, l2, l3, l4, l5, l6, l7, l8 = (conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor(),
+                                                  conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor())
 
             """
             Load watchdog function with synchronous function every seconds
@@ -1457,19 +1409,22 @@ class collectiveEoL(ttk.Frame):
             while True:
                 import sqlArrayRLmethodEoL as sel                   # DrLabs optimization method
 
-                # ------ Process data fetch sequences --------------------------#
+                # ------ Process data fetch sequences pData, Void Count + Ramp Count ----------------------#
                 if EoLRep == 'DNV':
-                    rpTT, rpST, rpTG, rpWS, Ra, Rb, Rc, Rd = sel.dnv_sqlexec(l1, l2, l3, l4, T1, T2, T3, T4,  layerNo)
+                    rpTT, rpST, rpTG, rpWS, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC = sel.dnv_sqlExec(
+                        l1, l2, l3, l4, l5, l6, T1, T2, T3, T4, T5, T6, layerNo)
                 else:
-                    rpTT, rpST, rpTG, rpWA, rpLP, rpLA, Ra, Rb, Rc, Rd, Re, Rf = sel.mgm_sqlexec(l1, l2, l3, l4, l5, l6, T1, T2, T3, T4, T5, T6, layerNo)
+                    rpLP, rpLA, rpTT, rpST, rpTG, rpWA, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC = sel.mgm_sqlExec(
+                        l1, l2, l3, l4, l5, l6, l7, l8, T1, T2, T3, T4, T5, T6, T7, T8, layerNo)
 
-                if rpTT > 0 and rpST > 0 and rpTG > 0 and rpWS > 0:
+                # --- Conditional break when ----- Assuming all data were pooled at once ---
+                if rpTT > 0 and rpST > 0 and rpTG > 0 and rpLA > 0:
                     break
 
             if EoLRep == 'DNV':
-                 return rpTT, rpST, rpTG, rpWS
+                 return rpTT, rpST, rpTG, rpWS, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC
             else:
-                return rpTT, rpST, rpTG, rpWA, rpLP, rpLA
+                return rpLP, rpLA, rpTT, rpST, rpTG, rpWA, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC
 
         # ================== End of synchronous Method ==========================
         def asynchronousEoL(layerNo):
@@ -1478,19 +1433,9 @@ class collectiveEoL(ttk.Frame):
 
             # Obtain fetch SQl data from respective Tables -----#
             if EoLRep == 'DNV':
-                rpTT, rpST, rpTG, rpWS, Ra, Rb, Rc, Rd = synchronousEoL(layerNo)
-                dbA = range(0, Ra)
-                dbB = range(0, Rb)
-                dbC = range(0, Rc)
-                dbD = range(0, Rd)
+                rpTT, rpST, rpTG, rpWS, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC = synchronousEoL(layerNo)
             else:
-                rpTT, rpST, rpTG, rpWA, rpLP, rpLA, Ra, Rb, Rc, Rd, Re, Rf = synchronousEoL(layerNo)
-                dbA = range(0, Ra)
-                dbB = range(0, Rb)
-                dbC = range(0, Rc)
-                dbD = range(0, Rd)
-                dbE = range(0, Re)
-                dbF = range(0, Rf)
+                rpLP, rpLA, rpRP, rpTT, rpST, rpTG, rpWA, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC = synchronousEoL(layerNo)
 
             # --------------------------------------------------#
 
@@ -1512,10 +1457,20 @@ class collectiveEoL(ttk.Frame):
                 df1 = pd.concat([d1, d2, d3, d4], axis=1)
 
             elif EoLRep == 'MGM':
-                g1 = ott.validCols(T1)                          # Construct Table Column (Tape Temp)
+
+                g1 = olp.validCols(T1)                          # Laser Power - Construct Table Column (Tape Temp)
+                d1 = pd.DataFrame(rpLP, columns=g1)
+
+                g2 = ola.validCols(T2)                          # Laser Angle - Construc Table Column (Sub Temp)
+                d2 = pd.DataFrame(rpLA, columns=g2)
+
+                g3 = orp.validCols(T3)                          # Construct Table Column (Tape Gap)
+                d3 = pd.DataFrame(rpRP, columns=g3)
+
+                g1 = ott.validCols(T4)                          # Construct Table Column (Tape Temp)
                 d1 = pd.DataFrame(rpTT, columns=g1)
 
-                g2 = ost.validCols(T2)                          # Construct Table Column (Sub Temp)
+                g2 = ost.validCols(T5)                          # Construct Table Column (Sub Temp)
                 d2 = pd.DataFrame(rpST, columns=g2)
 
                 g3 = otg.validCols(T3)                          # Construct Table Column (Tape Gap)
