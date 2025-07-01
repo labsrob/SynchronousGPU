@@ -10,7 +10,7 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'VM'+pWON:
+    if pParam == 'VM_' +pWON:
         columns = ['sCount', 'sCenter', 'AvgGap',
                    'MaxGap', 'cLayer', 'sDistance']
 

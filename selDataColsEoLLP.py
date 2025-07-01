@@ -8,9 +8,9 @@ Check SQL data columns ...
 """
 
 
-def validCols(pParam):
+def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'LP':
+    if pParam == 'ZLP_' + pWON:
         columns = [ # Tape Temperature --------------[]
                    'tStmf', 'LyIDf', 'R1SPf', 'R1NVf', 'R2SPf',
                    'R2NVf', 'R3SPf', 'R3NVf', 'R4SPf',  'R4NVf']

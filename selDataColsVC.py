@@ -10,7 +10,7 @@ YTape Void count data
 
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'VC' + pWON:
+    if pParam == 'VC_' + pWON:
         columns = ['sCentre', 'VDCount', 'VODPosA', 'VODPosB',
                    'VODPosC', 'VODPosD', 'PipeDir', 'cLayer']
 
