@@ -8,15 +8,11 @@ All production procedure relies on Word Order Number - Assuming a Unique identit
 Author: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
-# 1. Laser Power, 2. Laser Angle, 3. Tape Speed
 
-
+# pull data from simotion and Met Office for location specific data
 def loadProcesValues(df1):
-    plcTG = [df1['tLayer'], df1['cLayer'], df1['sCount'],
-             df1['gCentre'], df1['PipePos'], df1['GaugeA1'],
-             df1['GaugeA2'], df1['GaugeA3'], df1['GaugeA4'],
-             df1['GaugeB1'], df1['GaugeB2'], df1['GaugeB3'],
-             df1['GaugeB4'], df1['PipeDir']]
+    plcGEN = [df1['tStamp'], df1['cTensX'], df1['oTempA'], df1['oTempB'],
+              df1['iTempA'], df1['iTempB'], df1['wSpedA'], df1['wSpedB'],
+              df1['wSpedC'], df1['wSpedD'], df1['PipeDi'], df1['cLayer']]
 
-    return plcTG
-
+    return plcGEN

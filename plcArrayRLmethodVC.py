@@ -143,25 +143,25 @@ def plcExec(nGZ, grp_step, fetch_no):
             # Void Map Data  ----------------------------------------------- [6 column data]
             sCntr = readInteger(db_number, start_offset[0], bit_offset[0])           # Sample Count
             VC_list.append(sCntr)
-            cCont = readReal(db_number, start_offset[4], bit_offset[0])              # Sample Centre
+            cCont = readReal(db_number, start_offset[8], bit_offset[0])              # Sample Centre
             VC_list.append(cCont)
-            PosA = readReal(db_number, start_offset[8], bit_offset[0])              # Average Gap/Sample
+            PosA = readReal(db_number, start_offset[16], bit_offset[0])              # Average Gap/Sample
             VC_list.append(PosA)
-            PosB = readReal(db_number, start_offset[12], bit_offset[0])             # Maximum Gap/Sample
+            PosB = readReal(db_number, start_offset[24], bit_offset[0])             # Maximum Gap/Sample
             VC_list.append(PosB)
-            PosC = readInteger(db_number, start_offset[16], bit_offset[0])          # Current Layer
+            PosC = readInteger(db_number, start_offset[32], bit_offset[0])          # Current Layer
             VC_list.append(PosC)
-            PosD = readInteger(db_number, start_offset[20], bit_offset[0])          # Sample Distance
+            PosD = readInteger(db_number, start_offset[40], bit_offset[0])          # Sample Distance
             VC_list.append(PosD)
             # -------------------------------------------
-            PipeD = readInteger(db_number, start_offset[24], bit_offset[0])          # Current Layer
+            PipeD = readInteger(db_number, start_offset[48], bit_offset[0])          # Current Layer
             VC_list.append(PipeD)
-            cLayr = readInteger(db_number, start_offset[26], bit_offset[0])          # Sample Distance
+            cLayr = readInteger(db_number, start_offset[50], bit_offset[0])          # Sample Distance
             VC_list.append(cLayr)
 
             # Deposit list column content into rows array ----------[]
-            if len(VC_list) > 82:
-                del VC_list[0:(len(VC_list) - 82)]  # trim columns to shape
+            if len(VC_list) > 8:
+                del VC_list[0:(len(VC_list) - 8)]  # trim columns to shape
                 print('\nResetting Column Size...', len(VC_list))
 
             arrayVC.append(VC_list)

@@ -16,7 +16,7 @@ def validCols(pParam, pWON=None):
                    'GaugeB1', 'GaugeB2', 'GaugeB3', 'GaugeB4', 'PipeDir']
 
     elif pParam == 'SPC_TG':
-        columns = ['cLayer', 'sCount', 'sCentre', 'PipePos',
+        columns = ['tLayer', 'cLayer', 'sCount', 'gCentre', 'PipePos',
                    'GaugeA1', 'GaugeA2', 'GaugeA3', 'GaugeA4',
                    'GaugeB1', 'GaugeB2', 'GaugeB3', 'GaugeB4', 'PipeDir']
 

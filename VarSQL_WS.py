@@ -10,10 +10,6 @@ Puthor: Dr Robert Labs
 # Variables required here: The aggregated plots for monitoring process variables
 
 def loadProcesValues(df1):
-    sqlWS = [df1['tStamp'], df1['cLayer'], df1['R1H1WS'], df1['R1H2WS'],
-             df1['R1H3WS'], df1['R1H4WS'], df1['R2H1WS'], df1['R2H2WS'],
-             df1['R2H3WS'], df1['R2H4WS'], df1['tStamp'], df1['cLayer'],
-             df1['R3H1WS'], df1['R3H2WS'], df1['R3H3WS'], df1['R3H4WS'],
-             df1['R4H1WS'], df1['R4H2WS'], df1['R4H3WS'], df1['R4H4WS']]
+    sqlWS = [df1['tStamp'], df1['cLayer'], df1['Ring1'], df1['Ring2'], df1['Ring3'], df1['Ring4']]
 
     return sqlWS

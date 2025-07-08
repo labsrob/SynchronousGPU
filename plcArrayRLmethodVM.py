@@ -141,22 +141,22 @@ def plcExec(nGZ, grp_step, fetch_no):
     while True:
         try:
             # Void Map Data  ----------------------------------------------- [6 column data]
-            sCnt = readInteger(db_number, start_offset[0], bit_offset[0])       # Sample Count
+            sCnt = readInteger(db_number, start_offset[0], bit_offset[0])        # Sample Count
             rm_list.append(sCnt)
-            cCtr = readReal(db_number, start_offset[2], bit_offset[0])        # Sample Centre
+            cCtr = readReal(db_number, start_offset[8], bit_offset[0])           # Sample Centre
             rm_list.append(cCtr)
-            avgG = readReal(db_number, start_offset[6], bit_offset[0])           # Average Gap/Sample
+            avgG = readReal(db_number, start_offset[16], bit_offset[0])          # Average Gap/Sample
             rm_list.append(avgG )
-            maxG = readReal(db_number, start_offset[10], bit_offset[0])          # Maximum Gap/Sample
+            maxG = readReal(db_number, start_offset[20], bit_offset[0])          # Maximum Gap/Sample
             rm_list.append(maxG)
-            cLyr = readInteger(db_number, start_offset[14], bit_offset[0])       # Current Layer
+            cLyr = readInteger(db_number, start_offset[24], bit_offset[0])       # Current Layer
             rm_list.append(cLyr)
-            sDst = readInteger(db_number, start_offset[16], bit_offset[0])       # Sample Distance
+            sDst = readInteger(db_number, start_offset[26], bit_offset[0])       # Sample Distance
             rm_list.append(sDst)
 
             # Deposit list column content into rows array ----------[]
-            if len(rm_list) > 82:
-                del rm_list[0:(len(rm_list) - 82)]  # trim columns to shape
+            if len(rm_list) > 6:
+                del rm_list[0:(len(rm_list) - 6)]  # trim columns to shape
                 print('\nResetting Column Size...', len(rm_list))
 
             arrayRM.append(rm_list)

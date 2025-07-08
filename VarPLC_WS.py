@@ -12,10 +12,6 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    plcWS = [df1['cLayer'], df1['R1H1'], df1['R1H2'], df1['R1H3'],
-             df1['R1H4'], df1['R2H1'], df1['R2H2'], df1['R2H3'],
-             df1['R2H4'], df1['R3H1'], df1['R3H2'], df1['R3H3'],
-             df1['R3H4'], df1['R4H1'], df1['R4H2'], df1['R4H3'],
-             df1['R4H4']]
+    plcWS = [df1['cLayer'], df1['Ring1'], df1['Ring2'], df1['Ring3'], df1['Ring4']]
 
     return plcWS

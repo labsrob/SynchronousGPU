@@ -69,7 +69,7 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
                 del dL[0:(len(dL) - nGZ)]  # delete overflow data
 
             # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+            elif group_step == 1 and (fetch_no + 1) >= 22:  # After window limit (move)
                 del dL[0:(len(dL) - fetch_no)]
 
             else:  # len(dL1) < nGZ:

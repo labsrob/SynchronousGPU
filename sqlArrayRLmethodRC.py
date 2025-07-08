@@ -82,5 +82,5 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
         time.sleep(5)
     daq.close()
 
-    return Idx, dL
+    return dL
 # -----------------------------------------------------------------------------------[Dr Labs]

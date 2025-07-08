@@ -177,8 +177,8 @@ def plcExec(db_number, nGZ, grp_step, fetch_no):
 			tt_list.append(TT16)
 
 			# Deposit list column content into rows array ----------[]
-			if len(tt_list) > 82:
-				del tt_list[0:(len(tt_list) - 82)]				# trim columns to shape
+			if len(tt_list) > 17:
+				del tt_list[0:(len(tt_list) - 17)]				# trim columns to shape
 				print('\nResetting Column Size...', len(tt_list))
 
 			arrayTT.append(tt_list)
