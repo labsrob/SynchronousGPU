@@ -868,7 +868,7 @@ def readEoP(text_widget, rptID):        # End of Pipe Report
             text_widget.insert(tk.END, content)
 
 
-# -------- Defines the collective screen structure -------------------------------------[EOL Reports]
+# -------- Defines the collective screen structure -----------------------[EOL Reports]
 
 
 class collectiveEoL(ttk.Frame):
@@ -1986,7 +1986,7 @@ class collectiveEoL(ttk.Frame):
         canvas._tkcanvas.pack(expand=True)
 
 
-# ------- Defines the collective screen structure -------------------------------------[EOP Reports]
+# ------- Defines the collective screen structure ------------------------[EOP Reports]
 class collectiveEoP(ttk.Frame):                                # End of Layer Progressive Report Tabb
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -2132,7 +2132,7 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
 # ---------------------------- End of Collective Reporting Functions ----------------------------[]
 
 #     ********   These set of functions defines the common canvas Area  *******************
-# --------------------------------------------- COMMON VIEW CLASS OBJECTS ---------[Ramp Count Plot]
+# ---------------------------------- COMMON VIEW CLASS OBJECTS ---------[Ramp Count Plot]
 class common_rampCount(ttk.Frame):
     # compute ram Count against cumulative layers ramp count --------[A]
     def __init__(self, master=None):
@@ -2339,7 +2339,7 @@ class common_rampCount(ttk.Frame):
         toolbar.update()
         canvas._tkcanvas.pack(expand=True)
 
-# --------------------------------------------- COMMON VIEW CLASS OBJECTS ------[Climatic Variables]
+# ---------------------------------- COMMON VIEW CLASS OBJECTS ------[Climatic Variables]
 class common_climateProfile(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -2564,7 +2564,7 @@ class common_climateProfile(ttk.Frame):
         toolbar.update()
         canvas._tkcanvas.pack(expand=True)
 
-# -------------------------------------------- COMMON VIEW CLASS OBJECTS -----------[Gap Count Plot]
+# ---------------------------------- COMMON VIEW CLASS OBJECTS -----------[Gap Count Plot]
 class common_gapCount(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -2789,6 +2789,7 @@ class MonitorTabb(ttk.Frame):
             T1 = 'GEN_' + pWON                      # Tape Winding Speed, Cell Tension & Oven Temp
             T2 = 'RP1_' + pWON                      # Roller Pressure
             T3 = 'RP2_' + pWON                      # Table 2 to be concatenated
+            T4 = 'WS_' + pWON                       # Winding Speed Table
             # --------------------------------------#
 
         elif pRecipe == 'MGM':
@@ -2811,11 +2812,7 @@ class MonitorTabb(ttk.Frame):
             T5 = 'LP2_' + pWON                      # Laser Power Table 2
             T6 = 'LA1_' + pWON                      # Laser Angle Table 1
             T7 = 'LA2_' + pWON                      # Laser Angle Table 2
-            # else:
-            # T1 = SPC_GEN
-            # T2 = SPC_RP
-            # T3 = SPC_LP
-            # T4 = SPC_LA
+
             # --------------------------------------#
         else:
             print('\n Users params condition met....')
@@ -2991,7 +2988,7 @@ class MonitorTabb(ttk.Frame):
 
             # Obtain SQL Data Host Server ---------------------------[GEN, RP, LP, LA]
             if pRecipe == 'DNV':
-                conA, conB, conC  = conn.cursor(), conn.cursor(), conn.cursor()     # Establish connection for SQL
+                conA, conB, conC, conD  = conn.cursor(),  conn.cursor(), conn.cursor(), conn.cursor()     # SQL stream
             elif pRecipe == 'MGM':
                 conA, conB, conC, conD, conE, conF, conG  = (conn.cursor(), conn.cursor(), conn.cursor(),
                                                              conn.cursor(), conn.cursor(), conn.cursor(), conn.cursor())
@@ -3038,7 +3035,7 @@ class MonitorTabb(ttk.Frame):
                 else:
                     # Get list of relevant SQL Tables using conn() and execute real-time query --------------------[]
                     if pRecipe == 'DNV':
-                        dGEN, dRPa, dRPb = spm.dnv_sqlExec(mtS, mtTy, conA, conB, conC, T1, T2, T3, fetch_no)
+                        dGEN, dRPa, dRPb, dRPc = spm.dnv_sqlExec(mtS, mtTy, conA, conB, conC, conD, T1, T2, T3, T4, fetch_no)
 
                     elif pRecipe == 'MGM':
                         dGEN, dRPa, dRPb, dLPa, dLPb, dLAa, dLAb = spm.mgm_sqlExec(mtS, mtTy, conA, conB, conC,
@@ -3065,7 +3062,7 @@ class MonitorTabb(ttk.Frame):
                     print('\nUpdating....')
 
             if monitorP == 'DNV':
-                return dGEN, dRPa, dRPb
+                return dGEN, dRPa, dRPb, dRPc
             else:
                 return dGEN, dRPa, dRPb, dLPa, dLPb, dLAa, dLAb
 
@@ -3076,7 +3073,7 @@ class MonitorTabb(ttk.Frame):
 
             # declare asynchronous variables ------------------[]
             if monitorP == 'DNV':
-                dGEN, dRPa, dRPb = synchronousP(db_freq)                                    # data loading functions
+                dGEN, dRPa, dRPb, dRPc = synchronousP(db_freq)                                    # data loading functions
             else:
                 dGEN, dRPa, dRPb, dLPa, dLPb, dLAa, dLAb = synchronousP(db_freq)            # data loading functions
 
@@ -3084,15 +3081,17 @@ class MonitorTabb(ttk.Frame):
 
             viz_cycle = 150
             if monitorP == 'DNV':
-                g1 = qpm.validCols(T1)                          # General Table
+                g1 = qpm.validCols(T1)                          # General Table (OT/CT)
                 d1 = pd.DataFrame(dGEN, columns=g1)
                 g2 = qpm.validCols(T2)                          # Roller Pressure Table 1
                 d2 = pd.DataFrame(dRPa, columns=g2)
-                g3 = qpm.validCols(T3)                          # Roller Pressure Table 1
+                g3 = qpm.validCols(T3)                          # Roller Pressure Table 2
                 d3 = pd.DataFrame(dRPb, columns=g3)
+                g4 = qpm.validCols(T4)                          # Winding Speed
+                d4 = pd.DataFrame(dRPc, columns=g4)
 
                 # Concatenate all columns -----------------------[]
-                df1 = pd.concat([d1, d2, d3], axis=1)
+                df1 = pd.concat([d1, d2, d3, d4], axis=1)
 
             elif monitorP == 'MGM':
                 g1 = qpm.validCols(T1)                          # General Table

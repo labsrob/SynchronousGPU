@@ -45,7 +45,7 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
 
     # ------------------------------------------------------------------------------------[]
     # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data1 = daq.execute('SELECT * FROM ' + rT1 + ' WHERE DX1A > ' + str(idx)).fetchmany(n2fetch)
+    data1 = daq.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
     if len(data1) != 0:
         for result in data1:
             result = list(result)
@@ -82,5 +82,5 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
         time.sleep(5)
     daq.close()
 
-    return Idx, dL
+    return dL
 # -----------------------------------------------------------------------------------[Dr Labs]

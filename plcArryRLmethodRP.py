@@ -22,7 +22,7 @@ plc = snap7.client.Client()
 def readBool(db_number, RPart_offset, bit_offset):
 	reading = plc.db_read(db_number, RPart_offset, b_length)
 	a = snap7.util.get_bool(reading, 0, bit_offset)
-	print('DB Number: ' + RPr(db_number) + ' Bit: ' + RPr(RPart_offset) + '.' + RPr(bit_offset) + ' Value: ' + RPr(a))
+	print('DB Number: ' + str(db_number) + ' Bit: ' + str(RPart_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
 	return a
 
 
@@ -42,7 +42,7 @@ def readRPring(db_number, RPart_offset, bit_offset):
 	r_length = 16
 	reading = plc.db_read(db_number, RPart_offset, r_length)
 	a = snap7.util.get_RPring(reading, 0)
-	print('DB Number: ' + RPr(db_number) + ' Bit: ' + RPr(RPart_offset) + '.' + RPr(bit_offset) + ' Value: ' + RPr(a))
+	print('DB Number: ' + str(db_number) + ' Bit: ' + str(RPart_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
 	return a
 
 def writeBool(db_number, RPart_offset, bit_offset, value):
@@ -82,7 +82,7 @@ def plcExec(db_number, nGZ, grp_RPep, fetch_no):
 					1054, 1058, 1062, 1066, 1070, 1074, 1078, 1082, 1084, 1086, 1088, 1090, 1094, 1098, 1102, 1106,
 					1110, 1114, 1118, 68, 900]
 	bit_offset = [0, 1, 2]
-	id1 = RPr(0)
+	id1 = str(0)
 	# ------------------------------------------------------------------------
 	group_RPep = int(grp_RPep)  	# group size/ sample sze
 	fetch_no = int(fetch_no)  		# dbfreq = TODO look into any potential conflict
@@ -175,8 +175,8 @@ def plcExec(db_number, nGZ, grp_RPep, fetch_no):
 			RP_liRP.append(TS4)
 
 			# Deposit liRP column content into rows array ----------[]
-			if len(RP_liRP) > 82:
-				del RP_liRP[0:(len(RP_liRP) - 82)]				# trim columns to shape
+			if len(RP_liRP) > 17:
+				del RP_liRP[0:(len(RP_liRP) - 17)]				# trim columns to shape
 				print('\nResetting Column Size...', len(RP_liRP))
 
 			arrayRP.append(RP_liRP)

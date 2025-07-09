@@ -13,12 +13,12 @@ idx = count()
 now = datetime.now()
 
 dataList0 = []
-dGEN, dRPa, dRPb, dLPa, dLPb, dLAa,  dLAb = [], [], [], [], [], [], []
+dGEN, dRPa, dRPb, dLPa, dLPb, dLAa, dLAb, dRPc = [], [], [], [], [], [], [], []
 
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def dnv_sqlExec(nGZ, grp_step, daq1, daq2, daq3, T1, T2, T3, fetch_no):
+def dnv_sqlExec(nGZ, grp_step, daq1, daq2, daq3, daq4, T1, T2, T3, T4, fetch_no):
     """
     NOTE:
     """
@@ -47,7 +47,7 @@ def dnv_sqlExec(nGZ, grp_step, daq1, daq2, daq3, T1, T2, T3, fetch_no):
 
     # ------------------------------------------------------------------------------------[]
 
-    # Roller Pressure procedure ----------------------------------[A]
+    # Cell Tension, Oven Temperature ----------------------------------[A]
     dataGEN = daq1.execute('SELECT * FROM ' + T1).fetchmany(n2fetch)
     if len(dataGEN) != 0:
         for result in dataGEN:
@@ -85,7 +85,7 @@ def dnv_sqlExec(nGZ, grp_step, daq1, daq2, daq3, T1, T2, T3, fetch_no):
         time.sleep(5)
     daq1.close()
 
-    # Tape Winding procedure ----------------------------------[B]
+    # Roller Pressure Part 1 ----------------------------------[B]
     dataRPa = daq2.execute('SELECT * FROM ' + T2).fetchmany(n2fetch)
     if len(dataRPa) != 0:
         for result in dataRPa:
@@ -124,7 +124,7 @@ def dnv_sqlExec(nGZ, grp_step, daq1, daq2, daq3, T1, T2, T3, fetch_no):
 
     daq2.close()
 
-    # Tape Winding procedure ----------------------------------[B]
+    # Roller Pressure Part 2 ----------------------------------[B]
     dataRPb = daq3.execute('SELECT * FROM ' + T3).fetchmany(n2fetch)
     if len(dataRPb) != 0:
         for result in dataRPb:
@@ -163,7 +163,46 @@ def dnv_sqlExec(nGZ, grp_step, daq1, daq2, daq3, T1, T2, T3, fetch_no):
 
     daq3.close()
 
-    return dGEN, dRPa, dRPb
+    # Roller Pressure Part 2 ----------------------------------[B]
+    dataRPc = daq4.execute('SELECT * FROM ' + T4).fetchmany(n2fetch)
+    if len(dataRPc) != 0:
+        for result in dataRPc:
+            result = list(result)
+            if UseRowIndex:
+                dataList0.append(next(idx))
+            else:
+                now = time.strftime("%H:%M:%S")
+                dataList0.append(time.strftime(now))
+            dRPc.append(result)
+
+            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
+            # Step processing rate >1 ---[static window]
+            if group_step > 1 and len(dRPc) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
+                del dRPc[0:(len(dRPb) - nGZ)]
+
+            # Step processing rate >1 ---[moving window]
+            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dRPc[0:(len(dRPc) - fetch_no)]
+
+            # Step processing rate =1 ---[static window]
+            elif group_step == 1 and len(dRPc) >= (nGZ + n2fetch) and fetch_no <= 21:
+                del dRPc[0:(len(dRPc) - nGZ)]  # delete overflow data
+
+            # Step processing rate =1 ---[moving window]
+            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dRPc[0:(len(dRPc) - fetch_no)]
+
+            else:  # len(dL1) < nGZ:
+                pass
+
+    else:
+        print('Process EOF reached...')
+        print('SPC Halting for 5 Minutes...')
+        time.sleep(5)
+
+    daq4.close()
+
+    return dGEN, dRPa, dRPb, dRPc
 # -------------------------------------------------------------------------------------------------------------[XXXXXXX]
 
 
