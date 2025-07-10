@@ -11,12 +11,12 @@ YTape Void count data
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'VC_' + pWON:
-        columns = ['sCentre', 'VDCount', 'VODPosA', 'VODPosB',
-                   'VODPosC', 'VODPosD', 'PipeDir', 'cLayer']
+        columns = ['sCentre', 'VODPosA', 'vMarkerA', 'VODPosB', 'vMarkerB', 'VODPosC',
+                   'vMarkerC', 'VODPosD', 'vMarkerD', 'PipeDir', 'cLayer', 'totalV']
 
     elif pParam == 'SPC_VC':
-        columns = ['sCentre', 'VDCount', 'VODPosA', 'VODPosB',
-                   'VODPosC', 'VODPosD', 'PipeDir', 'cLayer']
+        columns = ['sCentre', 'VODPosA', 'vMarkerA', 'VODPosB', 'vMarkerB', 'VODPosC',
+                   'vMarkerC', 'VODPosD', 'vMarkerD', 'PipeDir', 'cLayer', 'totalV']
 
     else:
         print('Invalid Columns or Query error...')

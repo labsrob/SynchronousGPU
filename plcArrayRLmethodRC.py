@@ -137,25 +137,34 @@ def plcExec(db_number, nGZ, grp_step, fetch_no):
 			# Ramp Map Data  ------------------------------------------------------ [6 column data]
 			Ppos = readReal(db_number, start_offset[0], bit_offset[0])  			# Ring1 Position
 			RC_list.append(Ppos)
-			TLayer = readReal(db_number, start_offset[4], bit_offset[0])  			# Ring2 Position
+			TLayer = readReal(db_number, start_offset[8], bit_offset[0])  			# Ring2 Position
 			RC_list.append(TLayer)
-			RP1 = readReal(db_number, start_offset[8], bit_offset[0])  				# Ring3 Position
+			RP1 = readReal(db_number, start_offset[16], bit_offset[0])  			# Ring3 Position
 			RC_list.append(RP1)
-			RP2 = readReal(db_number, start_offset[12], bit_offset[0])  			# Ring4 Position
+			RP2 = readReal(db_number, start_offset[18], bit_offset[0])  			# Ring4 Position
 			RC_list.append(RP2)
-			RP3 = readReal(db_number, start_offset[16], bit_offset[0])  			# Pipe Direction
+			RP3 = readReal(db_number, start_offset[26], bit_offset[0])  			# Pipe Direction
 			RC_list.append(RP3)
-			RP4 = readReal(db_number, start_offset[20], bit_offset[0])  			# Current Layer
+			RP4 = readReal(db_number, start_offset[28], bit_offset[0])  			# Current Layer
 			RC_list.append(RP4)
 			# --------------------------
-			RP5 = readReal(db_number, start_offset[24], bit_offset[0])  # Pipe Direction
+			RP5 = readReal(db_number, start_offset[36], bit_offset[0])  			# Pipe Direction
 			RC_list.append(RP5)
-			RP6 = readReal(db_number, start_offset[26], bit_offset[0])  # Current Layer
+			RP6 = readReal(db_number, start_offset[38], bit_offset[0])  			# Current Layer
 			RC_list.append(RP6)
+			# -----
+			RP7 = readReal(db_number, start_offset[46], bit_offset[0])  			# Pipe Direction
+			RC_list.append(RP7)
+			RP8 = readReal(db_number, start_offset[48], bit_offset[0])  			# Current Layer
+			RC_list.append(RP8)
+			RP9 = readReal(db_number, start_offset[50], bit_offset[0])  			# Pipe Direction
+			RC_list.append(RP9)
+			RP10= readReal(db_number, start_offset[52], bit_offset[0])  			# Current Layer
+			RC_list.append(RP10)
 
 			# Deposit list column content into rows array ----------[]
-			if len(RC_list) > 82:
-				del RC_list[0:(len(RC_list) - 82)]				# trim columns to shape
+			if len(RC_list) > 12:
+				del RC_list[0:(len(RC_list) - 12)]				# trim columns to shape
 				print('\nResetting Column Size...', len(RC_list))
 
 			arrayRC.append(RC_list)

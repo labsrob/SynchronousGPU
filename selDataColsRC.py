@@ -11,10 +11,10 @@ Ramp count data
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'RC_' + pWON:
-        columns = ['sCentre', 'RMCount', 'RAMPosA', 'RAMPosB', 'RAMPosC', 'RAMPosD', 'PipeDir', 'cLayer']
+        columns = ['sCentre', 'RAMPosA', 'rMarkerA', 'RAMPosB', 'rMarkerB', 'RAMPosC', 'rMarkerC', 'RAMPosD', 'rMarkerD', 'PipeDir', 'cLayer', 'totalR']
 
     elif pParam == 'SPC_RC':
-        columns = ['sCentre', 'RMCount', 'RAMPosA', 'RAMPosB', 'RAMPosC', 'RAMPosD', 'PipeDir', 'cLayer']
+        columns = ['sCentre', 'RAMPosA', 'rMarkerA', 'RAMPosB', 'rMarkerB', 'RAMPosC', 'rMarkerC', 'RAMPosD', 'rMarkerD', 'PipeDir', 'cLayer', 'totalR']
 
     else:
         print('Invalid Columns or Query error...')
