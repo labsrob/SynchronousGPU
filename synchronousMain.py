@@ -46,6 +46,7 @@ import selDataColsWA as qwa                 # winding angle
 # -------------------------#
 import GPUtil as gp
 import screeninfo as m
+from random import randint
 
 import pdfkit
 from fpdf import FPDF
@@ -230,16 +231,20 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
     # --------------------------------------[]
     from pylab import title, figure, xlabel, ylabel, xticks, bar, legend, axis, savefig
 
-    # Initialise dataframe from Tables ----------
-    reportID = rptID
-    proj = custm
-    pID = cPipe
-    oID = usrID
-    dID = datetime.datetime.now()
-    lID = layrN
-    # ---------------------------[]
-    processID = cProc
-    # ---------------------------[]
+    # Initialise dataframe from Tables ----------[]
+    if rptID == 'EoL':
+        rpID = ' Layer (EoL)'       # Report ID/Description
+    else:
+        rpID = ' Layer (EoP)'       # Report ID/Description
+
+    proj = custm                    # Project ID
+    pID = cPipe                     # Pipe ID
+    oID = usrID                     # User ID
+    dID = datetime.datetime.now()   # Date ID
+    lID = layrN                     # Layer ID
+    # ------------------------------------------[]
+    proID = cProc                   # Process ID
+    # ------------------------------------------[]
 
     df = pd.DataFrame()
     df['RingID'] = [ringA, ringB, ringC, ringD]
@@ -271,7 +276,7 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
     # -- Construct new validation method ----
     df["Status"] = [A, B, C, D]
 
-    title(reportID + " Report")
+    title(rpID + " Report")     # Report ID + 'Report'
     xlabel('Ring Analytics')
     ylabel('Rated Quality')
 
@@ -294,7 +299,7 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 14)
     pdf.cell(60)
-    pdf.cell(75, 10, "End of Layer (EoL) Report", 0, 2, 'C')
+    pdf.cell(75, 10, rpID + " Report", 0, 2, 'C')
     pdf.cell(90, 10, " ", 0, 2, 'C')
 
     pdf.cell(-40)
@@ -303,7 +308,7 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
     pdf.cell(5, 10, "Operators ID            : " + (str(oID)), 0, 2, 'L')
     pdf.cell(5, 10, "Date Time                : " + (str(dID)), 0, 2, 'L')
     pdf.cell(5, 10, "Layer Number         : " + (str(lID)), 0, 2, 'L')
-    # pdf.cell(5, 10, "Process Name         : " + (str(processID)), 0, 2, 'L')
+    pdf.cell(5, 10, "Process Name         : " + (str(proID)), 0, 2, 'L')
 
     pdf.cell(40)
     pdf.cell(90, 10, " ", 0, 2, 'C')
@@ -311,7 +316,7 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
     pdf.rect(x=20.0, y=20.5, w=150.0, h=50, style='')
     # construct report header
     pdf.cell(-40)
-    pdf.cell(5, 10, (str(processID)), 0, 2, 'L')
+    pdf.cell(5, 10, (str(proID)), 0, 2, 'L')
     pdf.cell(35, 8, 'RingID', 1, 0, 'C')
     pdf.cell(25, 8, 'Actual', 1, 0, 'C')
     pdf.cell(25, 8, 'Nominal', 1, 0, 'C')
@@ -347,56 +352,89 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
 
     pdf.output("QualityEOL.pdf")
 
+# ---------------------------------------------------------------------[]
+
+def random_with_N_digits(n):
+    range_start = 10 ** (n - 1)
+    range_end = (10 ** n) - 1
+
+    return randint(range_start, range_end)
 
 def get_data():
     sptDat, valuDat, stdDat, tolDat = [], [], [], []
 
-    # connect to SQL tabel EoL, perform minimal statistic and print report
-    T1 = 'EoL_RP' + processWON          # Identify Table
-    T2 = 'EoL_TP' + processWON          # Identify Table
-    T3 = 'EoL_TT' + processWON          # Identify Table  TODO --- sort out the connection !
+    # connect to DNV's SQL tabel EoL, perform minimal statistic and print report
+    # T1 = 'ZTT_' + pWON          # Identify Table
+    # T2 = 'ZST_' + pWON          # Identify Table
+    # T3 = 'ZTG_' + pWON          # Identify Table
+    # T4 = 'ZWS_' + pWON          # Winding Speed
+    # connect to MGM's SQL tabel EoL ----------#
+    # T1 = 'ZTT_' + pWON          # Identify Table
+    # T2 = 'ZST_' + pWON          # Identify Table
+    # T3 = 'ZTG_' + pWON          # Identify Table
+    # T4 = 'ZWA_' + pWON          # Winding Speed
 
-    # Define dataframe columns ---------------------------------------------------------[]
-    colu = ['tStamp', 'Pipe', 'pID', 'cID', 'yID', 'rR1', 'rR2', 'rR3', 'rR4', 'pSP', 'pRV', 'pDV', 'pTo', 'oID']
-    df3 = pd.DataFrame(dX3, columns=colu)               # porte sql data into dataframe
-
-    if T1:
-        rptID = ' Layer (EoL)'
+    # Split Process & Map SQL data columns into Dataframe --------------------------------------------[]
+    coluA = ['tStamp', 'LyIDa', 'R1SPa', 'R1NVa', 'R2SPa', 'R2NVa', 'R3SPa', 'R3NVa', 'R4SPa', 'R4NVa']
+    coluB = ['tStamp', 'LyIDb', 'R1SPb', 'R1NVb', 'R2SPb', 'R2NVb', 'R3SPb', 'R3NVb', 'R4SPb', 'R4NVb']
+    coluC = ['tStamp', 'LyIDc', 'R1SPc', 'R1NVc', 'R2SPc', 'R2NVc', 'R3SPc', 'R3NVc', 'R4SPc', 'R4NVc']
+    if pRecipe == 'MGM':                                    # Winding Angle Parameter
+        coluD = ['tStamp', 'LyIDe', 'R1SPe', 'R1NVe', 'R2SPe', 'R2NVe', 'R3SPe', 'R3NVe', 'R4SPe', 'R4NVe']
+    else:                                                   # Winding Speed Parameter
+        coluD = ['tStamp', 'LyIDd', 'R1SPd', 'R1NVd', 'R2SPd', 'R2NVd', 'R3SPd', 'R3NVd', 'R4SPd', 'R4NVd']
+    # ------------------------------------
+    df1 = pd.DataFrame(zTT, columns=coluA)                  # Inherited from global variable EoL/EoP Process
+    df2 = pd.DataFrame(zST, columns=coluB)
+    df3 = pd.DataFrame(zTG, columns=coluC)
+    if pRecipe == 'MGM':
+        df4 = pd.DataFrame(zWA, columns=coluD)
     else:
-        rptID = ' Layer (EoP)'
+        df4 = pd.DataFrame(zWS, columns=coluD)
+    # ------------------------------
+    pRPT = [df1, df2, df3, df4]                             # Dynamic aggregated List
+    # ------------------------------
 
-    cPipe = df3['Pipe']         # PIpe ID
-    cProc = df3['pID']          # Process ID
-    custm = df3['cID']          # Customer ID
-    usrID = df3['oID']          # User ID
-    # --------------------------#
-    layrNO = df3['LyID']        # Layer ID
+    # Constants per Pipe -----------
+    cPipe = 'Pipe XXXX'                     # Pipe ID TODO -- Automate varibles
+    custm = 'Customer cID'                  # Customer ID
+    usrID = 'Operator ID'                   # User ID
 
-    ring1A = df3['R1SP']        # Head 1
-    ring1B = df3['R1NV']        # Head 2
-
-    ring2A = df3['R2SP']        # Head 1
-    ring2B = df3['R2NV']        # Head 2
-
-    ring3A = df3['R3SP']        # Head 1
-    ring3B = df3['R3NV']        # Head 2
-
-    ring4A = df3['R4SP']        # Head 1
-    ring4B = df3['R4NV']        # Head 2
-
-    # --------------------------#
-    SetPt = df3['pSP']          # Process Set Point values (Average all the ring values)
-    Value = df3['pRV']          # Process Measured values (ringValue/Average total ring0
-    Stdev = df3['pDV']          # Standard Deviation
-    Tvalu = df3['pTo']          # Tolerance
-
-
-    sptDat.append(SetPt)
-    valuDat.append(Value)
-    stdDat.append(Stdev)
-    tolDat.append(Tvalu)
-
-    generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, sptDat, valuDat, stdDat, tolDat, usrID)
+    for proP in pRPT:
+        if proP[0]:
+            cProc = 'Tape Temperature'       # Process ID
+        elif proP[1]:
+            cProc = 'Substrate Temperature'  # Process ID
+        elif proP[2]:
+            cProc = 'Gap Measurement'       # Process ID
+        elif proP[3] and pRecipe == 'MGM':
+            cProc = 'Winding Angle'         # Process ID
+        else:
+            cProc = 'Winding Speed'         # Process ID
+        # --------------------------# From SQL Data
+        layrNO = proP['LyID']               # Layer ID
+        ring1A = proP['R1SP']               # Head 1
+        ring1B = proP['R1NV']               # Head 2
+        ring2A = proP['R2SP']               # Head 1
+        ring2B = proP['R2NV']               # Head 2
+        ring3A = proP['R3SP']               # Head 1
+        ring3B = proP['R3NV']               # Head 2
+        ring4A = proP['R4SP']               # Head 1
+        ring4B = proP['R4NV']               # Head 2
+        # --------------------------#
+        SetPt = proP['pSP']          # Process Set Point values (Average all the ring values)
+        Value = proP['pRV']          # Process Measured values (ringValue/Average total ring0
+        Stdev = proP['pDV']          # Standard Deviation
+        Tvalu = proP['pTo']          # Tolerance
+        # ---------------------------#
+        sptDat.append(SetPt)
+        valuDat.append(Value)
+        stdDat.append(Stdev)
+        tolDat.append(Tvalu)
+        # Send values to PDG generator and repeat until last process --------------------[]
+        generate_pdf(rptID, cPipe, cProc, custm, usrID, layrNO, ring1A, ring1B, ring2A, ring2B, ring3A, ring3B, ring4A,
+                     ring4B, sptDat[0], valuDat[0], stdDat[0], tolDat[0])
+    else:
+        print('\nEnd of Report')
 
     # -------------------------------------------------[]
 
@@ -1441,7 +1479,7 @@ class collectiveEoL(ttk.Frame):
                 import sqlArrayRLmethodEoL as sel                   # DrLabs optimization method
 
                 # ------ Process data fetch sequences pData, Void Count + Ramp Count ----------------------#
-                if EoLRep == 'DNV':
+                if EoLRep == 'DNV': # [+ RampCount & VoidCount]
                     rpTT, rpST, rpTG, rpWS, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC = sel.dnv_sqlExec(
                         l1, l2, l3, l4, l5, l6, T1, T2, T3, T4, T5, T6, layerNo)
                 else:
@@ -1459,10 +1497,13 @@ class collectiveEoL(ttk.Frame):
 
         # ================== End of synchronous Method =======================================================[]
         def asynchronousEoL(layerNo):
+            global zTT, zST, zTG, zWS, zWA, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC, rptID
 
-            timei = time.time()                                 # start timing the entire loop
-
+            timei = time.time()  # start timing the entire loop
+            # --------- Generate Unique ID for pdf report ------#
+            rptID = random_with_N_digits(10)
             # Obtain fetch SQl data from respective Tables -----#
+
             if EoLRep == 'DNV':
                 zTT, zST, zTG, zWS, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC = synchronousEoL(layerNo)
             else:
