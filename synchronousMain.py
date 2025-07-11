@@ -314,7 +314,7 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
     pdf.cell(90, 10, " ", 0, 2, 'C')
     # draw a rectangle over the text area for Report header ----
     pdf.rect(x=20.0, y=20.5, w=150.0, h=50, style='')
-    # construct report header
+    # construct report header r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC,
     pdf.cell(-40)
     pdf.cell(5, 10, (str(proID)), 0, 2, 'L')
     pdf.cell(35, 8, 'RingID', 1, 0, 'C')
@@ -352,7 +352,7 @@ def generate_pdf(rptID, cPipe, cProc, custm, layrN, ringA, ringB, ringC, ringD, 
 
     pdf.output("QualityEOL.pdf")
 
-# ---------------------------------------------------------------------[]
+# -------------------------------------------------------------------------------------------------[]
 
 def random_with_N_digits(n):
     range_start = 10 ** (n - 1)
@@ -363,18 +363,7 @@ def random_with_N_digits(n):
 def get_data():
     sptDat, valuDat, stdDat, tolDat = [], [], [], []
 
-    # connect to DNV's SQL tabel EoL, perform minimal statistic and print report
-    # T1 = 'ZTT_' + pWON          # Identify Table
-    # T2 = 'ZST_' + pWON          # Identify Table
-    # T3 = 'ZTG_' + pWON          # Identify Table
-    # T4 = 'ZWS_' + pWON          # Winding Speed
-    # connect to MGM's SQL tabel EoL ----------#
-    # T1 = 'ZTT_' + pWON          # Identify Table
-    # T2 = 'ZST_' + pWON          # Identify Table
-    # T3 = 'ZTG_' + pWON          # Identify Table
-    # T4 = 'ZWA_' + pWON          # Winding Speed
-
-    # Split Process & Map SQL data columns into Dataframe --------------------------------------------[]
+    # Split Process & Map SQL data columns into Dataframe -------------------------------------------[]
     coluA = ['tStamp', 'LyIDa', 'R1SPa', 'R1NVa', 'R2SPa', 'R2NVa', 'R3SPa', 'R3NVa', 'R4SPa', 'R4NVa']
     coluB = ['tStamp', 'LyIDb', 'R1SPb', 'R1NVb', 'R2SPb', 'R2NVb', 'R3SPb', 'R3NVb', 'R4SPb', 'R4NVb']
     coluC = ['tStamp', 'LyIDc', 'R1SPc', 'R1NVc', 'R2SPc', 'R2NVc', 'R3SPc', 'R3NVc', 'R4SPc', 'R4NVc']
@@ -410,7 +399,7 @@ def get_data():
             cProc = 'Winding Angle'         # Process ID
         else:
             cProc = 'Winding Speed'         # Process ID
-        # --------------------------# From SQL Data
+        # --------------------------#       # From SQL Data
         layrNO = proP['LyID']               # Layer ID
         ring1A = proP['R1SP']               # Head 1
         ring1B = proP['R1NV']               # Head 2
@@ -421,10 +410,10 @@ def get_data():
         ring4A = proP['R4SP']               # Head 1
         ring4B = proP['R4NV']               # Head 2
         # --------------------------#
-        SetPt = proP['pSP']          # Process Set Point values (Average all the ring values)
-        Value = proP['pRV']          # Process Measured values (ringValue/Average total ring0
-        Stdev = proP['pDV']          # Standard Deviation
-        Tvalu = proP['pTo']          # Tolerance
+        SetPt = proP['pSP']                 # Process Set Point values (Average all the ring values)
+        Value = proP['pRV']                 # Process Measured values (ringValue/Average total ring0
+        Stdev = proP['pDV']                 # Standard Deviation
+        Tvalu = proP['pTo']                 # Tolerance
         # ---------------------------#
         sptDat.append(SetPt)
         valuDat.append(Value)
@@ -1496,6 +1485,7 @@ class collectiveEoL(ttk.Frame):
                 return rpLP, rpLA, rpTT, rpST, rpTG, rpWA, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC
 
         # ================== End of synchronous Method =======================================================[]
+
         def asynchronousEoL(layerNo):
             global zTT, zST, zTG, zWS, zWA, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC, rptID
 
@@ -7479,7 +7469,7 @@ def userMenu():     # listener, myplash
     # canvas = autoResizableCanvas(root)
     # filename.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif'))
     icon1 = 'C:\\CuttingEdge\\SPC_ver12\\crb.png'
-    # ----------------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------------[]
 
     # Define volatile runtime variables -------------------[]
     svar1 = IntVar()
@@ -7515,7 +7505,7 @@ def userMenu():     # listener, myplash
 
         return sqlRO
 
-    # function to allow historical limits entry--------------------------------------------------------------[]
+    # function to allow historical limits entry---------------------------------------------[]
     def errorConfig():
         messagebox.showerror("Configuration:", "Enable Statistic on Two Parameters")
 
@@ -7938,7 +7928,7 @@ def userMenu():     # listener, myplash
 
         pRP, pTT, pST, pWS, pTG = IntVar(), IntVar(), IntVar(), IntVar(), IntVar()
 
-        # --------------------------------------------------------------------------------------------------------[]
+        # ----------------------------------------------------------------------------------[]
         modal.resizable(False, False)
 
         w, h = 615, 250
@@ -7949,7 +7939,7 @@ def userMenu():     # listener, myplash
         y_c = int((screen_h / 2) - (h / 2))
         modal.geometry("{}x{}+{}+{}".format(w, h, x_c, y_c))
 
-        # --------------------------------------------------------[]
+        # ----------------------------------------------------------------------------------[]
         # a1 = Checkbutton(modal, text="RollerPressure", font=("bold", 10), variable=pRP, command=runChecksA)
         # a1.place(x=20, y=10)
         a2 = Checkbutton(modal, text="TapeTemp", font=("bold", 10), variable=pTT, command=runChecksB)
@@ -8000,7 +7990,7 @@ def userMenu():     # listener, myplash
 
         pLP, pLA, pTP, pRF, pTT, pST, pTG = IntVar(), IntVar(), IntVar(), IntVar(), IntVar(), IntVar(), IntVar()
 
-        # --------------------------------------------------------------------------------------------------------[]
+        # ----------------------------------------------------------------------------------------[]
         modal.resizable(False, False)
 
         w, h = 750, 250
@@ -8541,7 +8531,7 @@ def userMenu():     # listener, myplash
 
         return
 
-    # ------------------------------------------------------------------
+    # ------------------------------------------------------------------[]
     def serverPLCConfig():
         global pop, sqlRO, hostName, hostIPv4, deviceNm, authopwd, e4
 
@@ -8551,7 +8541,7 @@ def userMenu():     # listener, myplash
         # pop.wm_attributes('-topmost', True)
         pop.wm_attributes('-alpha', 0.9)
 
-        # Define and initialise essential popup variables -------------------------------------
+        # Define and initialise essential popup variables --------------[]
         hostName, hostIPv4, deviceNm, authopwd = StringVar(pop), StringVar(pop), StringVar(pop), StringVar(pop)
         print('State:', sqlRO)
 
@@ -8663,17 +8653,18 @@ def userMenu():     # listener, myplash
 
         try:
             # Test server connection over TCP/IP ---------------------[]
-            netTX = sq.testNetworkConn([server_IP], 1)  # if ICMP ping response is allowed on the server
+            netTX = sq.testNetworkConn([server_IP], 1)
+            # if ICMP ping response is allowed on the server
             if netTX:
-                hostConnect()  # acknowledgement
+                hostConnect()       # acknowledgement
                 conn = 'true'
             else:
-                pingError()  # Ping error failed -------
+                pingError()         # Ping error failed -------
                 conn = 'none'
 
         except Exception as err:
             errorLog(f"{err}")
-            errorNoServer()  # errorNoServer()
+            errorNoServer()         # errorNoServer()
             conn = 'none'
 
         return conn
@@ -8759,7 +8750,7 @@ def userMenu():     # listener, myplash
 
     def retroPlay():
         # Declare global variable available to all processes
-        global stpd, processWON, processID, OEEdataID, hostConn
+        global stpd, pWON, pID, OeeID, hostConn
 
         # ------------------------------[ Check valid number of attached Monitors]
         # myMon = m.get_monitors()                    # Automatically detect attached monitors
@@ -8862,7 +8853,7 @@ def userMenu():     # listener, myplash
 
     def realTimePlay():
         # Declare global variable available to all processes
-        global stpd, processWON, processID, OEEdataID, hostConn
+        global stpd, pWON, pID, OeeID, hostConn
 
         # ------------------------------[ Check valid number of attached Monitors]
         import screeninfo as m

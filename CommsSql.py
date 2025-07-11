@@ -64,7 +64,7 @@ def DAQ_connect():
     # ---------------------------------------------------------#
 
     if conn == None:
-        print('Connecting to SQL server...')
+        print('\nConnecting to SQL server...')
         try:
             conn = pyodbc.connect('Driver={SQL Server};'
                                   'Server=' + server_IP + ';'
@@ -74,7 +74,7 @@ def DAQ_connect():
                                   'uid=' + isAtho + ';'
                                   'pwd=' + yekref + ';'
                                   'MultipleActiveResultSets=True')
-            # conn = 'true'
+            # conn = 'True'
             print('SQL Server connection active!\n')
 
         except Exception as err:
@@ -82,12 +82,7 @@ def DAQ_connect():
             errorConnect()
             print('[ODBC ver18] Connector failure: SQL Server is inaccessible...')
             conn = 'failed'
-        # else:
-        #     # SQL sends acknowledgement to SCADA ---#
-        #     if agent == 1:
-        #         autoConn()                          # feedback to SCADA data [SQLConnACK]
-        #     else:
-        #         successNote()                       # popup message
+
     else:                                           # when connection = 1 and requires disconnect
         try:
             conn.close()
