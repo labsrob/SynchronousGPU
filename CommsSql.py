@@ -10,8 +10,9 @@ import loadSQLConfig as tx
 from tkinter import messagebox
 today = date.today()
 
-# Initialise relevant variables and load configuration settings ---------------------------
-server_IP, db_ref, isAtho, yekref = tx.load_configSQL('checksumError.ini')  # server editable connection
+# Initialise relevant variables and load configuration settings ----------[]
+server_IP, db_ref, isAtho, yekref = tx.load_configSQL('checksumError.ini')
+
 # print('ServerUse Details:', server_IP, db_ref, isAtho, yekref)
 Encrypt = 'no'                  # Added today 06/08/2024 [optional]
 Certify = 'yes'                 # DITTO
@@ -58,7 +59,7 @@ def DAQ_connect():
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
     """
-
+    # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
     # ---------------------------------------------------------#

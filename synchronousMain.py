@@ -102,12 +102,12 @@ inUseAlready = []
 # Storing the list of PLC data Block        #
 #                                           #
 # Load PLC DB address once -----------------#
-SPC_LP = 112 #
-SPC_LA = 103 #
+SPC_LP = 112    #
+SPC_LA = 103    #
 SPC_TP = 111
-SPC_RF = 71 #
-SPC_TT = 98 #
-SPC_ST = 99 #
+SPC_RF = 71     #
+SPC_TT = 98     #
+SPC_ST = 99     #
 SPC_TG = 101
 SPC_EV = 109
 SPC_GEN = 104
@@ -115,9 +115,9 @@ SPC_RC = 116
 SPC_VC = 117
 SPC_RM = 114
 SCP_VM = 115
-SPC_RP = 97 #
-SPC_WS = 100 # not Tape speed
-SPC_WA = 113 #
+SPC_RP = 97     #
+SPC_WS = 100    # not Tape speed
+SPC_WA = 113    #
 # ------------------------------------------#
 
 import subprocess
@@ -6662,9 +6662,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         canvas._tkcanvas.pack(expand=True)
 
 # ============================================= CASCADE CLASS METHODS ===============================================#
-#                                                                                                                    #
 # This class procedure allows SCADA operator to split the screen into respective runtime process                     #
-#                                                                                                                    #
 # ===================================================================================================================#
 
 class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
@@ -7181,14 +7179,105 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
         else:
             import qParamsHL_MGM as qp
         # ------------------------------------------------------------[]
+        rfS, rfTy, rfSoL, rfSoP, rfHL, rfAL, rfFO, rfP1, rfP2, rfP3, rfP4, rfP5 = qp.decryptpProcessLim(pWON, 'RF')
+        # Break down each element to useful list -----[Tape Temperature]
+
+        if rfHL and rfP1 and rfP2 and rfP3 and rfP4 and rfP5:  #
+            rfPerf = '$Pp_{k' + str(rfS) + '}$'  # Using estimated or historical Mean
+            rflabel = 'Pp'
+            # -------------------------------------[]
+            One = rfP1.split(',')  # split into list elements
+            Two = rfP2.split(',')
+            Thr = rfP3.split(',')
+            For = rfP4.split(',')
+            Fiv = rfP5.split(',')
+            # -------------------------------
+            dTape1 = One[1].strip("' ")  # defined Tape Width
+            dTape2 = Two[1].strip("' ")  # defined Tape Width
+            dTape3 = Thr[1].strip("' ")  # defined Tape Width
+            dTape4 = For[1].strip("' ")  # defined Tape Width
+            dTape5 = Fiv[1].strip("' ")  # defined Tape Width
+            # --------------------------------
+            dLayer1 = One[10].strip("' ")  # Defined Tape Layer
+            dLayer2 = Two[10].strip("' ")
+            dLayer3 = Thr[10].strip("' ")
+            dLayer4 = For[10].strip("' ")
+            dLayer5 = Fiv[10].strip("' ")
+            # Load historical limits for the process----#
+            if cpLayerNo == 1:  # '22mm'|'18mm',  1-40 | 41+ TODO
+                rfUCL = float(One[2].strip("' "))  # Strip out the element of the list
+                rfLCL = float(One[3].strip("' "))
+                rfMean = float(One[4].strip("' "))
+                rfDev = float(One[5].strip("' "))
+                # --------------------------------
+                sUCLrf = float(One[6].strip("' "))
+                sLCLrf = float(One[7].strip("' "))
+                # --------------------------------
+                rfUSL = (rfUCL - rfMean) / 3 * 6
+                rfLSL = (rfMean - rfLCL) / 3 * 6
+                # --------------------------------
+            elif cpTapeW == dTape2 and cpLayerNo == 2:
+                rfUCL = float(Two[2].strip("' "))  # Strip out the element of the list
+                rfLCL = float(Two[3].strip("' "))
+                rfMean = float(Two[4].strip("' "))
+                rfDev = float(Two[5].strip("' "))
+                # --------------------------------
+                sUCLrf = float(Two[6].strip("' "))
+                sLCLrf = float(Two[7].strip("' "))
+                # --------------------------------
+                rfUSL = (rfUCL - rfMean) / 3 * 6
+                rfLSL = (rfMean - rfLCL) / 3 * 6
+            elif cpTapeW == dTape3 and cpLayerNo == range(3, 40):
+                rfUCL = float(Thr[2].strip("' "))  # Strip out the element of the list
+                rfLCL = float(Thr[3].strip("' "))
+                rfMean = float(Thr[4].strip("' "))
+                rfDev = float(Thr[5].strip("' "))
+                # --------------------------------
+                sUCLrf = float(Thr[6].strip("' "))
+                sLCLrf = float(Thr[7].strip("' "))
+                # --------------------------------
+                rfUSL = (rfUCL - rfMean) / 3 * 6
+                rfLSL = (rfMean - rfLCL) / 3 * 6
+            elif cpTapeW == dTape4 and cpLayerNo == 41:
+                rfUCL = float(For[2].strip("' "))  # Strip out the element of the list
+                rfLCL = float(For[3].strip("' "))
+                rfMean = float(For[4].strip("' "))
+                rfDev = float(For[5].strip("' "))
+                # --------------------------------
+                sUCLrf = float(For[6].strip("' "))
+                sLCLrf = float(For[7].strip("' "))
+                # --------------------------------
+                rfUSL = (rfUCL - rfMean) / 3 * 6
+                rfLSL = (rfMean - rfLCL) / 3 * 6
+            else:
+                rfUCL = float(Fiv[2].strip("' "))  # Strip out the element of the list
+                rfLCL = float(Fiv[3].strip("' "))
+                rfMean = float(Fiv[4].strip("' "))
+                rfDev = float(Fiv[5].strip("' "))
+                # --------------------------------
+                sUCLrf = float(Fiv[6].strip("' "))
+                sLCLrf = float(Fiv[7].strip("' "))
+                # --------------------------------
+                rfUSL = (rfUCL - rfMean) / 3 * 6
+                rfLSL = (rfMean - rfLCL) / 3 * 6
+                # -------------------------------
+        else:  # Computes Shewhart constants (Automatic Limits)
+            rfUCL = 0
+            rfLCL = 0
+            rfMean = 0
+            rfDev = 0
+            sUCLrf = 0
+            sLCLrf = 0
+            rfUSL = 0
+            rfLSL = 0
+            rfPerf = '$Cp_{k' + str(rfS) + '}$'  # Using Automatic group Mean
+            rflabel = 'Cp'
 
         label = ttk.Label(self, text="JIT - End of Layer Processing", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
         # Define Axes ---------------------#
         fig = Figure(figsize=(12.5, 5.5), dpi=100)
-
-        # Attempt to auto screen size ---
         fig.subplots_adjust(left=0.043, bottom=0.043, right=0.986, top=0.96, hspace=0.14, wspace=0.195)
         # ----------------------------------
         a1 = fig.add_subplot(2, 2, (1, 2))                          # Cell Tension X Bar Plot
@@ -7225,7 +7314,7 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
         a2.set_ylim([sBar_minEOL, sBar_maxEOL], auto=True)
         a2.set_xlim([window_Xmin, window_Xmax])
 
-        # ---------------------------------------------------------[]
+        # ----------------------------------------------------------[]
         # Define Plot area and axes -
         # ----------------------------------------------------------#
         im10, = a1.plot([], [], 'o-', label='Roller Force - (R1H1)')
@@ -7237,30 +7326,35 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
         im16, = a2.plot([], [], 'o-', label='Roller Force')
         im17, = a2.plot([], [], 'o-', label='Roller Force')
 
+        im18, = a1.plot([], [], 'o-', label='Roller Force - (R2H1)')
+        im19, = a1.plot([], [], 'o-', label='Roller Force - (R2H2)')
+        im20, = a1.plot([], [], 'o-', label='Roller Force - (R2H3)')
+        im21, = a1.plot([], [], 'o-', label='Roller Force - (R2H4)')
+        im22, = a2.plot([], [], 'o-', label='Roller Force')
+        im23, = a2.plot([], [], 'o-', label='Roller Force')
+        im24, = a2.plot([], [], 'o-', label='Roller Force')
+        im25, = a2.plot([], [], 'o-', label='Roller Force')
 
-        # Define limits for X Bar Plots -----------------------#
-        a1.axhline(y=hMeanB, color="green", linestyle="-", linewidth=1)
-        a1.axhspan(hLCLb, hUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
-        # Sigma 6 line (99.997% deviation) ------- times 6 above the mean value
-        a1.axhspan(hUCLb, hUSLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-        a1.axhspan(hLSLb, hLCLb, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-        # clean up when Mean line changes ---
-        a1.axhspan(hUSLb, hUSLb + 10, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-        a1.axhspan(hLSLb - 10, hLSLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
+        im26, = a1.plot([], [], 'o-', label='Roller Force - (R3H1)')
+        im27, = a1.plot([], [], 'o-', label='Roller Force - (R3H2)')
+        im28, = a1.plot([], [], 'o-', label='Roller Force - (R3H3)')
+        im29, = a1.plot([], [], 'o-', label='Roller Force - (R3H4)')
+        im30, = a2.plot([], [], 'o-', label='Roller Force')
+        im31, = a2.plot([], [], 'o-', label='Roller Force')
+        im32, = a2.plot([], [], 'o-', label='Roller Force')
+        im33, = a2.plot([], [], 'o-', label='Roller Force')
 
-        # Define limits for S Bar Plot -----------------------#
-        a2.axhline(y=hDevB, color="green", linestyle="-", linewidth=1)
-        a2.axhspan(dLCLb, dUCLb, facecolor='#A9EF91', edgecolor='#A9EF91')  # Light Green
-
-        # clean up when Mean line changes ---
-        a2.axhspan(dUCLb, dUCLb + 0.005, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-        a2.axhspan(dLCLb - 0.05, dLCLb, facecolor='#FFFFFF', edgecolor='#FFFFFF')
-
-        # Model data --------------------------------------------------[]
-        a1.plot([105, 120, 114, 109, 110, 86, 102, 103, 101, 100])
-        # -------------------------------------------------------------[]
-        # Calibrate the rest of the Plots -----------------------------#
-        # ----------------------------------------------------------[]
+        im34, = a1.plot([], [], 'o-', label='Roller Force - (R4H1)')
+        im35, = a1.plot([], [], 'o-', label='Roller Force - (R4H2)')
+        im36, = a1.plot([], [], 'o-', label='Roller Force - (R4H3)')
+        im37, = a1.plot([], [], 'o-', label='Roller Force - (R4H4)')
+        im38, = a2.plot([], [], 'o-', label='Roller Force')
+        im39, = a2.plot([], [], 'o-', label='Roller Force')
+        im40, = a2.plot([], [], 'o-', label='Roller Force')
+        im41, = a2.plot([], [], 'o-', label='Roller Force')
+        # -----------------------------------------------------------#
+        # Calibrate the rest of the Plots ---------------------------#
+        # -----------------------------------------------------------[]
         # Define Plot area and axes -
         # ----------------------------------------------------------#
         im10, = a1.plot([], [], 'o-', label='Cell Tension A (N/mm2)')
@@ -8784,14 +8878,14 @@ def userMenu():     # listener, myplash
                     runType.append(cMode)
 
                     # Connect to SQL Server -----------------------[]
-                    oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)     # Query record [pType=DnV/MGM]
-                    print('\nSearch Return:', oeeValid, organicID)
+                    oeeValid, organicID, pType, nTables = wo.srcTable(sDate1, sDate2, uWON)     # Query record [pType=DnV/MGM]
+                    print('\nSearch Return:', oeeValid, organicID, nTables)
                     # ---------------------------------------------[]
-                    if organicID != 'G' and aSCR >= 4 and pRecipe == 'DNV':
+                    if organicID != 'G' and aSCR >= 4 and pRecipe == 'DNV' and nTables >=18:
                         print('\nSelecting Cascade View....')
                         tabbed_cascadeMode(cMode, pType)                        # Cascade View
 
-                    elif organicID != 'G' and aSCR >= 8 and pRecipe == 'MGM':
+                    elif organicID != 'G' and aSCR >= 8 and pRecipe == 'MGM' and nTables <= 30:
                         print('\nSelecting Cascade View....')
                         tabbed_cascadeMode(cMode, pType)                        # Cascade View
 
@@ -8828,11 +8922,11 @@ def userMenu():     # listener, myplash
                     runType.append(cMode)
 
                     # connect SQL Server and obtain Process ID ----#
-                    oeeValid, organicID, pType = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
-                    print('\nSearch Return:', oeeValid, organicID)
+                    oeeValid, organicID, pType, nTables = wo.srcTable(sDate1, sDate2, uWON)    # Query SQL record
+                    print('\nSearch Return:', oeeValid, organicID, nTables)
 
                     # ---------------------------------------------[]
-                    if organicID != 'G':
+                    if organicID != 'G' and nTables >= 18 or nTables ==30:
                         print('\nSelecting Tabbed View....')
                         tabbed_canvas(cMode, pType)        # Tabbed View
                     else:

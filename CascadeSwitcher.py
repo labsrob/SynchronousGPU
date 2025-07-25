@@ -52,6 +52,7 @@ except Exception:
 # -------------------------------#
 pPos = str(3345)
 layer = str(10)
+inUseAlready = []
 # -------------------------------#
 WON = "275044"
 eSMC = 'Getting started...'
@@ -313,7 +314,7 @@ def rfProcessParam(vCounter, pType):
             import CommsPlc as q
             q.DAQ_connect(1, 0)
         else:
-            con_rf = conn.cursor()
+            con_rf = conn.cursor(), conn.cursor()
 
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
         """
