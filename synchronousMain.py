@@ -6874,7 +6874,7 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
         # ------- Process Performance Pp (the spread)---------------------
         a3.text(0.145, 0.804, rflabel, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
         a3.text(0.328, 0.658, '#Pp Value', fontsize=24, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.650, 0.820, 'Ring ' + rflabel + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
+        a3.text(0.650, 0.820, 'Ring '+ rflabel +' Data', fontsize=14, ha='left', transform=a3.transAxes)
         a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
         a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
         a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
@@ -6882,7 +6882,7 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
         # ------- Process Performance Ppk (Performance)---------------------
         a3.text(0.145, 0.403, rfPerf, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
         a3.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.640, 0.420, 'Ring ' + rfPerf + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
+        a3.text(0.640, 0.420, 'Ring '+ rfPerf +' Data', fontsize=14, ha='left', transform=a3.transAxes)
         # -------------------------------------
         a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
         a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
