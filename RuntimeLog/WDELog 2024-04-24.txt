@@ -1,0 +1,2 @@
+2024-04-24 09:59.16 --- b' ISO : An error occurred during send TCP : Connection timed out'
+2024-04-24 10:08.51 --- b' ISO : An error occurred during send TCP : Connection timed out'

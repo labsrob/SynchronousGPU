@@ -1,0 +1,3712 @@
+=== TCP1 - Processing Speed Tracker - Domino Samples ===
+Rolling Type	Sample	Parameters#	Regime	LapsedTime
+----------------------------------------------------------
+Domino	20	10 + 2 VPlots	05hz	1.306
+Domino	20	10 + 2 VPlots	05hz	1.74
+Domino	20	10 + 2 VPlots	05hz	2.864
+Domino	20	10 + 2 VPlots	05hz	7.782
+Domino	20	10 + 2 VPlots	05hz	5.546
+Domino	20	10 + 2 VPlots	05hz	3.8
+Domino	20	10 + 2 VPlots	05hz	2.51
+Domino	20	10 + 2 VPlots	05hz	1.485
+Domino	20	10 + 2 VPlots	05hz	5.823
+Domino	20	10 + 2 VPlots	05hz	4.83
+Domino	20	10 + 2 VPlots	05hz	1.635
+Domino	20	10 + 2 VPlots	05hz	10.418
+Domino	20	10 + 2 VPlots	05hz	1.287
+Domino	20	10 + 2 VPlots	05hz	2.161
+Domino	20	10 + 2 VPlots	05hz	8.251
+Domino	20	10 + 2 VPlots	05hz	5.102
+Domino	20	10 + 2 VPlots	05hz	1.723
+Domino	20	10 + 2 VPlots	05hz	0.703
+Domino	20	10 + 2 VPlots	05hz	1.046
+Domino	20	10 + 2 VPlots	05hz	0.876
+Domino	20	10 + 2 VPlots	05hz	2.836
+Domino	20	10 + 2 VPlots	05hz	8.365
+Domino	20	10 + 2 VPlots	05hz	6.239
+Domino	20	10 + 2 VPlots	05hz	34.91
+Domino	20	10 + 2 VPlots	05hz	5.593
+Domino	20	10 + 2 VPlots	05hz	9.957
+Domino	20	10 + 2 VPlots	05hz	9.864
+Domino	20	10 + 2 VPlots	05hz	7.902
+Domino	20	10 + 2 VPlots	05hz	6.431
+Domino	20	10 + 2 VPlots	05hz	9.451
+Domino	20	10 + 2 VPlots	05hz	7.321
+Domino	20	10 + 2 VPlots	05hz	14.203
+Domino	20	10 + 2 VPlots	05hz	7.062
+Domino	20	10 + 2 VPlots	05hz	12.098
+Domino	20	10 + 2 VPlots	05hz	8.027
+Domino	20	10 + 2 VPlots	05hz	8.508
+Domino	20	10 + 2 VPlots	05hz	16.002
+Domino	20	10 + 2 VPlots	05hz	17.037
+Domino	20	10 + 2 VPlots	05hz	4.605
+Domino	20	10 + 2 VPlots	05hz	10.907
+Domino	20	10 + 2 VPlots	05hz	6.759
+Domino	20	10 + 2 VPlots	05hz	5.718
+Domino	20	10 + 2 VPlots	05hz	15.519
+Domino	20	10 + 2 VPlots	05hz	9.902
+Domino	20	10 + 2 VPlots	05hz	12.387
+Domino	20	10 + 2 VPlots	05hz	8.089
+Domino	20	10 + 2 VPlots	05hz	8.802
+Domino	20	10 + 2 VPlots	05hz	5.237
+Domino	20	10 + 2 VPlots	05hz	7.849
+Domino	20	10 + 2 VPlots	05hz	8.476
+Domino	20	10 + 2 VPlots	05hz	7.782
+Domino	20	10 + 2 VPlots	05hz	8.525
+Domino	20	10 + 2 VPlots	05hz	9.369
+Domino	20	10 + 2 VPlots	05hz	6.969
+Domino	20	10 + 2 VPlots	05hz	8.07
+Domino	20	10 + 2 VPlots	05hz	7.419
+Domino	20	10 + 2 VPlots	05hz	7.11
+Domino	20	10 + 2 VPlots	05hz	13.757
+Domino	20	10 + 2 VPlots	05hz	8.502
+Domino	20	10 + 2 VPlots	05hz	15.42
+Domino	20	10 + 2 VPlots	05hz	6.888
+Domino	20	10 + 2 VPlots	05hz	3.693
+Domino	20	10 + 2 VPlots	05hz	7.961
+Domino	20	10 + 2 VPlots	05hz	7.808
+Domino	20	10 + 2 VPlots	05hz	27.365
+Domino	20	10 + 2 VPlots	05hz	8.241
+Domino	20	10 + 2 VPlots	05hz	9.322
+Domino	20	10 + 2 VPlots	05hz	6.075
+Domino	20	10 + 2 VPlots	05hz	19.665
+Domino	20	10 + 2 VPlots	05hz	10.174
+Domino	20	10 + 2 VPlots	05hz	4.582
+Domino	20	10 + 2 VPlots	05hz	16.725
+Domino	20	10 + 2 VPlots	05hz	6.819
+Domino	20	10 + 2 VPlots	05hz	6.488
+Domino	20	10 + 2 VPlots	05hz	9.651
+Domino	20	10 + 2 VPlots	05hz	10.13
+Domino	20	10 + 2 VPlots	05hz	5.752
+Domino	20	10 + 2 VPlots	05hz	10.211
+Domino	20	10 + 2 VPlots	05hz	9.046
+Domino	20	10 + 2 VPlots	05hz	7.182
+Domino	20	10 + 2 VPlots	05hz	14.606
+Domino	20	10 + 2 VPlots	05hz	7.516
+Domino	20	10 + 2 VPlots	05hz	12.117
+Domino	20	10 + 2 VPlots	05hz	5.274
+Domino	20	10 + 2 VPlots	05hz	5.418
+Domino	20	10 + 2 VPlots	05hz	11.115
+Domino	20	10 + 2 VPlots	05hz	13.829
+Domino	20	10 + 2 VPlots	05hz	4.733
+Domino	20	10 + 2 VPlots	05hz	6.011
+Domino	20	10 + 2 VPlots	05hz	6.352
+Domino	20	10 + 2 VPlots	05hz	4.114
+Domino	20	10 + 2 VPlots	05hz	14.985
+Domino	20	10 + 2 VPlots	05hz	18.49
+Domino	20	10 + 2 VPlots	05hz	12.82
+Domino	20	10 + 2 VPlots	05hz	5.073
+Domino	20	10 + 2 VPlots	05hz	6.161
+Domino	20	10 + 2 VPlots	05hz	6.376
+Domino	20	10 + 2 VPlots	05hz	8.84
+Domino	20	10 + 2 VPlots	05hz	9.778
+Domino	20	10 + 2 VPlots	05hz	15.294
+Domino	20	10 + 2 VPlots	05hz	5.24
+Domino	20	10 + 2 VPlots	05hz	9.732
+Domino	20	10 + 2 VPlots	05hz	10.608
+Domino	20	10 + 2 VPlots	05hz	4.776
+Domino	20	10 + 2 VPlots	05hz	11.213
+Domino	20	10 + 2 VPlots	05hz	13.749
+Domino	20	10 + 2 VPlots	05hz	6.8
+Domino	20	10 + 2 VPlots	05hz	9.23
+Domino	20	10 + 2 VPlots	05hz	6.828
+Domino	20	10 + 2 VPlots	05hz	5.191
+Domino	20	10 + 2 VPlots	05hz	10.96
+Domino	20	10 + 2 VPlots	05hz	10.228
+Domino	20	10 + 2 VPlots	05hz	4.784
+Domino	20	10 + 2 VPlots	05hz	5.188
+Domino	20	10 + 2 VPlots	05hz	7.225
+Domino	20	10 + 2 VPlots	05hz	8.893
+Domino	20	10 + 2 VPlots	05hz	6.953
+Domino	20	10 + 2 VPlots	05hz	4.916
+Domino	20	10 + 2 VPlots	05hz	9.912
+Domino	20	10 + 2 VPlots	05hz	12.481
+Domino	20	10 + 2 VPlots	05hz	7.921
+Domino	20	10 + 2 VPlots	05hz	7.43
+Domino	20	10 + 2 VPlots	05hz	8.848
+Domino	20	10 + 2 VPlots	05hz	14.587
+Domino	20	10 + 2 VPlots	05hz	7.847
+Domino	20	10 + 2 VPlots	05hz	9.428
+Domino	20	10 + 2 VPlots	05hz	8.207
+Domino	20	10 + 2 VPlots	05hz	4.922
+Domino	20	10 + 2 VPlots	05hz	11.592
+Domino	20	10 + 2 VPlots	05hz	6.851
+Domino	20	10 + 2 VPlots	05hz	8.838
+Domino	20	10 + 2 VPlots	05hz	7.326
+Domino	20	10 + 2 VPlots	05hz	3.784
+Domino	20	10 + 2 VPlots	05hz	8.383
+Domino	20	8 + 2 VPlot	05hz	1.24
+Domino	20	8 + 2 VPlot	05hz	1.188
+Domino	20	8 + 2 VPlot	05hz	1.096
+Domino	20	8 + 2 VPlot	05hz	1.01
+Domino	20	8 + 2 VPlot	05hz	2.422
+Domino	20	8 + 2 VPlot	05hz	13.646
+Domino	20	8 + 2 VPlot	05hz	9.122
+Domino	20	8 + 2 VPlot	05hz	4.275
+Domino	20	8 + 2 VPlot	05hz	3.621
+Domino	20	8 + 2 VPlot	05hz	13.533
+Domino	20	8 + 2 VPlot	05hz	4.066
+Domino	20	8 + 2 VPlot	05hz	13.453
+Domino	20	8 + 2 VPlot	05hz	7.001
+Domino	20	8 + 2 VPlot	05hz	4.578
+Domino	20	8 + 2 VPlot	05hz	9.862
+Domino	20	8 + 2 VPlot	05hz	11.82
+Domino	20	8 + 2 VPlot	05hz	6.502
+Domino	20	8 + 2 VPlot	05hz	1.1
+Domino	20	8 + 2 VPlot	05hz	14.491
+Domino	20	8 + 2 VPlot	05hz	5.21
+Domino	20	8 + 2 VPlot	05hz	4.259
+Domino	20	8 + 2 VPlot	05hz	3.156
+Domino	20	8 + 2 VPlot	05hz	3.916
+Domino	20	8 + 2 VPlot	05hz	1.073
+Domino	20	8 + 2 VPlot	05hz	3.177
+Domino	20	8 + 2 VPlot	05hz	2.411
+Domino	20	8 + 2 VPlot	05hz	1.603
+Domino	20	8 + 2 VPlot	05hz	2.241
+Domino	20	8 + 2 VPlot	05hz	3.385
+Domino	20	8 + 2 VPlot	05hz	3.139
+Domino	20	8 + 2 VPlot	05hz	13.068
+Domino	20	10 + 2 VPlots	05hz	1.042
+Domino	20	10 + 2 VPlots	05hz	2.47
+Domino	20	10 + 2 VPlots	05hz	2.291
+Domino	20	10 + 2 VPlots	05hz	2.654
+Domino	20	10 + 2 VPlots	05hz	13.838
+Domino	20	10 + 2 VPlots	05hz	14.126
+Domino	20	10 + 2 VPlots	05hz	0.954
+Domino	20	10 + 2 VPlots	05hz	2.814
+Domino	20	10 + 2 VPlots	05hz	44.57
+Domino	20	10 + 2 VPlots	05hz	9.785
+Domino	20	10 + 2 VPlots	05hz	1.448
+Domino	20	10 + 2 VPlots	05hz	1.774
+Domino	20	10 + 2 VPlots	05hz	7.488
+Domino	20	10 + 2 VPlots	05hz	31.539
+Domino	20	10 + 2 VPlots	05hz	18.544
+Domino	20	10 + 2 VPlots	05hz	16.916
+Domino	20	10 + 2 VPlots	05hz	9.862
+Domino	20	10 + 2 VPlots	05hz	1.851
+Domino	20	10 + 2 VPlots	05hz	1.541
+Domino	20	10 + 2 VPlots	05hz	1.332
+Domino	20	10 + 2 VPlots	05hz	1.355
+Domino	20	10 + 2 VPlots	05hz	1.001
+Domino	20	10 + 2 VPlots	05hz	1.722
+Domino	20	10 + 2 VPlots	05hz	4.235
+Domino	20	10 + 2 VPlots	05hz	1.909
+Domino	20	10 + 2 VPlots	05hz	1.62
+Domino	20	10 + 2 VPlots	05hz	1.605
+Domino	20	10 + 2 VPlots	05hz	1.197
+Domino	20	10 + 2 VPlots	05hz	1.284
+Domino	20	10 + 2 VPlots	05hz	1.144
+Domino	20	10 + 2 VPlots	05hz	0.923
+Domino	20	10 + 2 VPlots	05hz	5.983
+Domino	20	10 + 2 VPlots	05hz	38.051
+Domino	20	10 + 2 VPlots	05hz	7.757
+Domino	20	10 + 2 VPlots	05hz	2.236
+Domino	20	10 + 2 VPlots	05hz	2.101
+Domino	20	10 + 2 VPlots	05hz	1.569
+Domino	20	10 + 2 VPlots	05hz	2.296
+Domino	20	10 + 2 VPlots	05hz	3.4
+Domino	20	10 + 2 VPlots	05hz	2.659
+Domino	20	10 + 2 VPlots	05hz	2.061
+Domino	20	10 + 2 VPlots	05hz	2.271
+Domino	20	10 + 2 VPlots	05hz	6.528
+Domino	20	10 + 2 VPlots	05hz	2.354
+Domino	20	10 + 2 VPlots	05hz	2.886
+Domino	20	10 + 2 VPlots	05hz	3.019
+Domino	20	10 + 2 VPlots	05hz	1.853
+Domino	20	10 + 2 VPlots	05hz	1.223
+Domino	20	10 + 2 VPlots	05hz	4.251
+Domino	20	10 + 2 VPlots	05hz	8.503
+Domino	20	10 + 2 VPlots	05hz	11.296
+Domino	20	10 + 2 VPlots	05hz	12.802
+Domino	20	10 + 2 VPlots	05hz	8.169
+Domino	20	10 + 2 VPlots	05hz	4.289
+Domino	20	10 + 2 VPlots	05hz	37.054
+Domino	20	10 + 2 VPlots	05hz	6.47
+Domino	20	10 + 2 VPlots	05hz	6.623
+Domino	20	10 + 2 VPlots	05hz	1.921
+Domino	20	10 + 2 VPlots	05hz	1.852
+Domino	20	10 + 2 VPlots	05hz	2.638
+Domino	20	10 + 2 VPlots	05hz	4.802
+Domino	20	10 + 2 VPlots	05hz	2.421
+Domino	20	10 + 2 VPlots	05hz	19.392
+Domino	20	10 + 2 VPlots	05hz	18.484
+Domino	20	10 + 2 VPlots	05hz	6.298
+Domino	20	10 + 2 VPlots	05hz	27.594
+Domino	20	10 + 2 VPlots	05hz	14.002
+Domino	20	10 + 2 VPlots	05hz	3.753
+Domino	20	10 + 2 VPlots	05hz	13.872
+Domino	20	10 + 2 VPlots	05hz	1.496
+Domino	20	10 + 2 VPlots	05hz	1.542
+Domino	20	10 + 2 VPlots	05hz	1.372
+Domino	20	10 + 2 VPlots	05hz	1.615
+Domino	20	10 + 2 VPlots	05hz	1.7
+Domino	20	10 + 2 VPlots	05hz	2.883
+Domino	20	10 + 2 VPlots	05hz	15.272
+Domino	20	10 + 2 VPlots	05hz	8.703
+Domino	20	10 + 2 VPlots	05hz	10.423
+Domino	20	10 + 2 VPlots	05hz	12.561
+Domino	20	10 + 2 VPlots	05hz	1.21
+Domino	20	10 + 2 VPlots	05hz	5.457
+Domino	20	10 + 2 VPlots	05hz	10.401
+Domino	20	10 + 2 VPlots	05hz	11.367
+Domino	20	10 + 2 VPlots	05hz	14.746
+Domino	20	10 + 2 VPlots	05hz	14.663
+Domino	20	10 + 2 VPlots	05hz	24.153
+Domino	20	10 + 2 VPlots	05hz	8.447
+Domino	20	10 + 2 VPlots	05hz	13.788
+Domino	20	10 + 2 VPlots	05hz	9.187
+Domino	20	10 + 2 VPlots	05hz	54.818
+Domino	20	10 + 2 VPlots	05hz	8.65
+Domino	20	10 + 2 VPlots	05hz	5.71
+Domino	20	10 + 2 VPlots	05hz	1.631
+Domino	20	10 + 2 VPlots	05hz	2.01
+Domino	20	10 + 2 VPlots	05hz	2.775
+Domino	20	10 + 2 VPlots	05hz	6.252
+Domino	20	10 + 2 VPlots	05hz	2.332
+Domino	20	10 + 2 VPlots	05hz	12.984
+Domino	20	10 + 2 VPlots	05hz	17.21
+Domino	20	10 + 2 VPlots	05hz	18.925
+Domino	20	10 + 2 VPlots	05hz	6.741
+Domino	20	10 + 2 VPlots	05hz	15.499
+Domino	20	10 + 2 VPlots	05hz	20.537
+Domino	20	10 + 2 VPlots	05hz	13.738
+Domino	20	10 + 2 VPlots	05hz	14.222
+Domino	20	8 + 2 VPlot	05hz	0.896
+Domino	20	8 + 2 VPlot	05hz	1.105
+Domino	20	8 + 2 VPlot	05hz	1.293
+Domino	20	8 + 2 VPlot	05hz	1.062
+Domino	20	8 + 2 VPlot	05hz	1.773
+Domino	20	8 + 2 VPlot	05hz	2.16
+Domino	20	8 + 2 VPlot	05hz	1.172
+Domino	20	8 + 2 VPlot	05hz	1.253
+Domino	20	8 + 2 VPlot	05hz	6.764
+Domino	20	8 + 2 VPlot	05hz	8.845
+Domino	20	8 + 2 VPlot	05hz	5.38
+Domino	20	8 + 2 VPlot	05hz	7.338
+Domino	20	8 + 2 VPlot	05hz	11.619
+Domino	20	8 + 2 VPlot	05hz	5.07
+Domino	20	8 + 2 VPlot	05hz	6.369
+Domino	20	8 + 2 VPlot	05hz	9.494
+Domino	20	8 + 2 VPlot	05hz	9.622
+Domino	20	8 + 2 VPlot	05hz	5.541
+Domino	20	8 + 2 VPlot	05hz	5.96
+Domino	20	8 + 2 VPlot	05hz	22.574
+Domino	20	8 + 2 VPlot	05hz	9.027
+Domino	20	8 + 2 VPlot	05hz	21.431
+Domino	20	8 + 2 VPlot	05hz	3.808
+Domino	20	8 + 2 VPlot	05hz	4.282
+Domino	20	8 + 2 VPlot	05hz	0.807
+Domino	20	8 + 2 VPlot	05hz	0.742
+Domino	20	8 + 2 VPlot	05hz	7.95
+Domino	20	8 + 2 VPlot	05hz	4.014
+Domino	20	8 + 2 VPlot	05hz	7.612
+Domino	20	8 + 2 VPlot	05hz	3.691
+Domino	20	8 + 2 VPlot	05hz	7.816
+Domino	20	8 + 2 VPlot	05hz	4.369
+Domino	20	8 + 2 VPlot	05hz	4.222
+Domino	20	8 + 2 VPlot	05hz	15.659
+Domino	20	8 + 2 VPlot	05hz	4.803
+Domino	20	8 + 2 VPlot	05hz	3.594
+Domino	20	8 + 2 VPlot	05hz	2.152
+Domino	20	8 + 2 VPlot	05hz	15.017
+Domino	20	8 + 2 VPlot	05hz	10.204
+Domino	20	8 + 2 VPlot	05hz	15.198
+Domino	20	8 + 2 VPlot	05hz	21.205
+Domino	20	8 + 2 VPlot	05hz	34.067
+Domino	20	8 + 2 VPlot	05hz	38.639
+Domino	20	8 + 2 VPlot	05hz	27.539
+Domino	20	8 + 2 VPlot	05hz	17.934
+Domino	20	8 + 2 VPlot	05hz	12.966
+Domino	20	8 + 2 VPlot	05hz	15.86
+Domino	20	8 + 2 VPlot	05hz	17.518
+Domino	20	8 + 2 VPlot	05hz	13.492
+Domino	20	8 + 2 VPlot	05hz	1.17
+Domino	20	8 + 2 VPlot	05hz	1.074
+Domino	20	8 + 2 VPlot	05hz	1.828
+Domino	20	8 + 2 VPlot	05hz	3.225
+Domino	20	8 + 2 VPlot	05hz	1.206
+Domino	20	8 + 2 VPlot	05hz	1.105
+Domino	20	8 + 2 VPlot	05hz	1.181
+Domino	20	8 + 2 VPlot	05hz	1.121
+Domino	20	8 + 2 VPlot	05hz	1.214
+Domino	20	8 + 2 VPlot	05hz	1.467
+Domino	20	8 + 2 VPlot	05hz	4.231
+Domino	20	8 + 2 VPlot	05hz	1.257
+Domino	20	8 + 2 VPlot	05hz	1.201
+Domino	20	8 + 2 VPlot	05hz	1.071
+Domino	20	8 + 2 VPlot	05hz	11.496
+Domino	20	8 + 2 VPlot	05hz	10.375
+Domino	20	8 + 2 VPlot	05hz	9.366
+Domino	20	8 + 2 VPlot	05hz	12.524
+Domino	20	8 + 2 VPlot	05hz	12.521
+Domino	20	8 + 2 VPlot	05hz	7.204
+Domino	20	8 + 2 VPlot	05hz	0.906
+Domino	20	8 + 2 VPlot	05hz	6.845
+Domino	20	8 + 2 VPlot	05hz	1.071
+Domino	20	8 + 2 VPlot	05hz	1.128
+Domino	20	8 + 2 VPlot	05hz	1.776
+Domino	20	8 + 2 VPlot	05hz	2.593
+Domino	20	8 + 2 VPlot	05hz	15.181
+Domino	20	8 + 2 VPlot	05hz	8.995
+Domino	20	8 + 2 VPlot	05hz	9.831
+Domino	20	8 + 2 VPlot	05hz	6.231
+Domino	20	8 + 2 VPlot	05hz	6.926
+Domino	20	8 + 2 VPlot	05hz	5.087
+Domino	20	8 + 2 VPlot	05hz	9.152
+Domino	20	8 + 2 VPlot	05hz	4.319
+Domino	20	8 + 2 VPlot	05hz	7.099
+Domino	20	8 + 2 VPlot	05hz	8.001
+Domino	20	8 + 2 VPlot	05hz	5.827
+Domino	20	8 + 2 VPlot	05hz	0.693
+Domino	20	8 + 2 VPlot	05hz	5.614
+Domino	20	8 + 2 VPlot	05hz	0.977
+Domino	20	8 + 2 VPlot	05hz	14.247
+Domino	20	8 + 2 VPlot	05hz	2.464
+Domino	20	8 + 2 VPlot	05hz	12.868
+Domino	20	8 + 2 VPlot	05hz	0.738
+Domino	20	8 + 2 VPlot	05hz	3.687
+Domino	20	8 + 2 VPlot	05hz	0.656
+Domino	20	8 + 2 VPlot	05hz	0.569
+Domino	20	8 + 2 VPlot	05hz	1.118
+Domino	20	8 + 2 VPlot	05hz	1.164
+Domino	20	8 + 2 VPlot	05hz	0.913
+Domino	20	8 + 2 VPlot	05hz	8.712
+Domino	20	8 + 2 VPlot	05hz	4.676
+Domino	20	8 + 2 VPlot	05hz	4.925
+Domino	20	8 + 2 VPlot	05hz	16.144
+Domino	20	8 + 2 VPlot	05hz	7.322
+Domino	20	8 + 2 VPlot	05hz	6.529
+Domino	20	8 + 2 VPlot	05hz	6.218
+Domino	20	8 + 2 VPlot	05hz	6.093
+Domino	20	8 + 2 VPlot	05hz	14.314
+Domino	20	8 + 2 VPlot	05hz	7.925
+Domino	20	8 + 2 VPlot	05hz	4.771
+Domino	20	8 + 2 VPlot	05hz	14.1
+Domino	20	8 + 2 VPlot	05hz	9.572
+Domino	20	8 + 2 VPlot	05hz	22.372
+Domino	20	8 + 2 VPlot	05hz	9.818
+Domino	20	8 + 2 VPlot	05hz	6.959
+Domino	20	8 + 2 VPlot	05hz	1.066
+Domino	20	8 + 2 VPlot	05hz	1.171
+Domino	20	8 + 2 VPlot	05hz	4.475
+Domino	20	8 + 2 VPlot	05hz	1.379
+Domino	20	8 + 2 VPlot	05hz	0.655
+Domino	20	8 + 2 VPlot	05hz	4.129
+Domino	20	8 + 2 VPlot	05hz	5.146
+Domino	20	8 + 2 VPlot	05hz	8.834
+Domino	20	8 + 2 VPlot	05hz	4.179
+Domino	20	8 + 2 VPlot	05hz	9.172
+Domino	20	8 + 2 VPlot	05hz	3.732
+Domino	20	8 + 2 VPlot	05hz	8.315
+Domino	20	8 + 2 VPlot	05hz	4.629
+Domino	20	8 + 2 VPlot	05hz	7.625
+Domino	20	8 + 2 VPlot	05hz	5.402
+Domino	20	8 + 2 VPlot	05hz	8.126
+Domino	20	8 + 2 VPlot	05hz	9.025
+Domino	20	8 + 2 VPlot	05hz	8.683
+Domino	20	8 + 2 VPlot	05hz	23.996
+Domino	20	8 + 2 VPlot	05hz	4.833
+Domino	20	8 + 2 VPlot	05hz	12.322
+Domino	20	8 + 2 VPlot	05hz	6.773
+Domino	20	8 + 2 VPlot	05hz	11.468
+Domino	20	8 + 2 VPlot	05hz	7.088
+Domino	20	8 + 2 VPlot	05hz	6.356
+Domino	20	8 + 2 VPlot	05hz	8.828
+Domino	20	8 + 2 VPlot	05hz	6.929
+Domino	20	8 + 2 VPlot	05hz	8.236
+Domino	20	8 + 2 VPlot	05hz	6.784
+Domino	20	8 + 2 VPlot	05hz	9.707
+Domino	20	8 + 2 VPlot	05hz	6.765
+Domino	20	8 + 2 VPlot	05hz	6.939
+Domino	20	8 + 2 VPlot	05hz	9.816
+Domino	20	8 + 2 VPlot	05hz	10.511
+Domino	20	8 + 2 VPlot	05hz	11.309
+Domino	20	8 + 2 VPlot	05hz	4.394
+Domino	20	8 + 2 VPlot	05hz	25.923
+Domino	20	8 + 2 VPlot	05hz	9.275
+Domino	20	8 + 2 VPlot	05hz	7.218
+Domino	20	8 + 2 VPlot	05hz	8.114
+Domino	20	8 + 2 VPlot	05hz	6.725
+Domino	20	8 + 2 VPlot	05hz	7.044
+Domino	20	8 + 2 VPlot	05hz	9.203
+Domino	20	8 + 2 VPlot	05hz	8.805
+Domino	20	8 + 2 VPlot	05hz	17.415
+Domino	20	8 + 2 VPlot	05hz	10.758
+Domino	20	8 + 2 VPlot	05hz	9.132
+Domino	20	8 + 2 VPlot	05hz	9.092
+Domino	20	8 + 2 VPlot	05hz	10.108
+Domino	20	8 + 2 VPlot	05hz	5.008
+Domino	20	8 + 2 VPlot	05hz	8.225
+Domino	20	8 + 2 VPlot	05hz	7.165
+Domino	20	8 + 2 VPlot	05hz	10.339
+Domino	20	8 + 2 VPlot	05hz	8.671
+Domino	20	8 + 2 VPlot	05hz	10.469
+Domino	20	8 + 2 VPlot	05hz	10.352
+Domino	20	8 + 2 VPlot	05hz	8.485
+Domino	20	8 + 2 VPlot	05hz	10.074
+Domino	20	8 + 2 VPlot	05hz	9.244
+Domino	20	8 + 2 VPlot	05hz	4.991
+Domino	20	8 + 2 VPlot	05hz	18.89
+Domino	20	8 + 2 VPlot	05hz	6.724
+Domino	20	8 + 2 VPlot	05hz	16.308
+Domino	20	8 + 2 VPlot	05hz	9.366
+Domino	20	8 + 2 VPlot	05hz	9.276
+Domino	20	8 + 2 VPlot	05hz	5.627
+Domino	20	8 + 2 VPlot	05hz	9.659
+Domino	20	8 + 2 VPlot	05hz	9.539
+Domino	20	8 + 2 VPlot	05hz	10.109
+Domino	20	8 + 2 VPlot	05hz	9.046
+Domino	20	8 + 2 VPlot	05hz	18.143
+Domino	20	8 + 2 VPlot	05hz	0.772
+Domino	20	8 + 2 VPlot	05hz	3.769
+Domino	20	8 + 2 VPlot	05hz	1.702
+Domino	20	8 + 2 VPlot	05hz	1.026
+Domino	20	8 + 2 VPlot	05hz	1.359
+Domino	20	8 + 2 VPlot	05hz	3.57
+Domino	20	8 + 2 VPlot	05hz	7.108
+Domino	20	8 + 2 VPlot	05hz	4.969
+Domino	20	8 + 2 VPlot	05hz	4.621
+Domino	20	8 + 2 VPlot	05hz	5.558
+Domino	20	8 + 2 VPlot	05hz	4.519
+Domino	20	8 + 2 VPlot	05hz	8.05
+Domino	20	8 + 2 VPlot	05hz	6.24
+Domino	20	8 + 2 VPlot	05hz	9.226
+Domino	20	8 + 2 VPlot	05hz	0.912
+Domino	20	8 + 2 VPlot	05hz	0.821
+Domino	20	8 + 2 VPlot	05hz	0.781
+Domino	20	8 + 2 VPlot	05hz	0.53
+Domino	20	8 + 2 VPlot	05hz	0.797
+Domino	20	8 + 2 VPlot	05hz	6.531
+Domino	20	8 + 2 VPlot	05hz	3.899
+Domino	20	8 + 2 VPlot	05hz	5.282
+Domino	20	8 + 2 VPlot	05hz	4.68
+Domino	20	8 + 2 VPlot	05hz	4.141
+Domino	20	8 + 2 VPlot	05hz	6.815
+Domino	20	8 + 2 VPlot	05hz	2.218
+Domino	20	8 + 2 VPlot	05hz	2.19
+Domino	20	8 + 2 VPlot	05hz	2.861
+Domino	20	8 + 2 VPlot	05hz	9.23
+Domino	20	8 + 2 VPlot	05hz	3.571
+Domino	20	8 + 2 VPlot	05hz	5.658
+Domino	20	8 + 2 VPlot	05hz	2.827
+Domino	20	8 + 2 VPlot	05hz	3.209
+Domino	20	8 + 2 VPlot	05hz	2.088
+Domino	20	8 + 2 VPlot	05hz	7.956
+Domino	20	8 + 2 VPlot	05hz	3.257
+Domino	20	8 + 2 VPlot	05hz	13.944
+Domino	20	8 + 2 VPlot	05hz	2.71
+Domino	20	8 + 2 VPlot	05hz	7.093
+Domino	20	8 + 2 VPlot	05hz	2.973
+Domino	20	8 + 2 VPlot	05hz	3.3
+Domino	20	8 + 2 VPlot	05hz	5.678
+Domino	20	8 + 2 VPlot	05hz	3.054
+Domino	20	8 + 2 VPlot	05hz	3.7
+Domino	20	8 + 2 VPlot	05hz	5.205
+Domino	20	8 + 2 VPlot	05hz	2.492
+Domino	20	8 + 2 VPlot	05hz	3.81
+Domino	20	8 + 2 VPlot	05hz	3.45
+Domino	20	8 + 2 VPlot	05hz	5.65
+Domino	20	8 + 2 VPlot	05hz	2.586
+Domino	20	8 + 2 VPlot	05hz	2.141
+Domino	20	8 + 2 VPlot	05hz	2.813
+Domino	20	8 + 2 VPlot	05hz	2.871
+Domino	20	8 + 2 VPlot	05hz	1.424
+Domino	20	8 + 2 VPlot	05hz	6.329
+Domino	20	8 + 2 VPlot	05hz	2.762
+Domino	20	8 + 2 VPlot	05hz	4.211
+Domino	20	8 + 2 VPlot	05hz	6.786
+Domino	20	8 + 2 VPlot	05hz	2.727
+Domino	20	8 + 2 VPlot	05hz	3.38
+Domino	20	8 + 2 VPlot	05hz	13.09
+Domino	20	8 + 2 VPlot	05hz	3.532
+Domino	20	8 + 2 VPlot	05hz	1.558
+Domino	20	8 + 2 VPlot	05hz	7.095
+Domino	20	8 + 2 VPlot	05hz	3.395
+Domino	20	8 + 2 VPlot	05hz	5.265
+Domino	20	8 + 2 VPlot	05hz	7.386
+Domino	20	10 + 2 VPlots	05hz	1.283
+Domino	20	10 + 2 VPlots	05hz	1.104
+Domino	20	10 + 2 VPlots	05hz	0.837
+Domino	20	10 + 2 VPlots	05hz	0.839
+Domino	20	10 + 2 VPlots	05hz	1.231
+Domino	20	10 + 2 VPlots	05hz	1.504
+Domino	20	10 + 2 VPlots	05hz	1.392
+Domino	20	10 + 2 VPlots	05hz	3.53
+Domino	20	10 + 2 VPlots	05hz	8.5
+Domino	20	10 + 2 VPlots	05hz	7.932
+Domino	20	10 + 2 VPlots	05hz	5.035
+Domino	20	10 + 2 VPlots	05hz	4.729
+Domino	20	10 + 2 VPlots	05hz	4.07
+Domino	20	10 + 2 VPlots	05hz	2.816
+Domino	20	10 + 2 VPlots	05hz	1.419
+Domino	20	10 + 2 VPlots	05hz	1.144
+Domino	20	10 + 2 VPlots	05hz	2.208
+Domino	20	10 + 2 VPlots	05hz	1.946
+Domino	20	10 + 2 VPlots	05hz	2.438
+Domino	20	10 + 2 VPlots	05hz	1.924
+Domino	20	10 + 2 VPlots	05hz	12.123
+Domino	20	10 + 2 VPlots	05hz	15.614
+Domino	20	10 + 2 VPlots	05hz	18.746
+Domino	20	10 + 2 VPlots	05hz	18.309
+Domino	20	10 + 2 VPlots	05hz	19.982
+Domino	20	10 + 2 VPlots	05hz	15.311
+Domino	20	10 + 2 VPlots	05hz	20.075
+Domino	20	10 + 2 VPlots	05hz	25.56
+Domino	20	10 + 2 VPlots	05hz	25.535
+Domino	20	10 + 2 VPlots	05hz	16.873
+Domino	20	10 + 2 VPlots	05hz	23.148
+Domino	20	10 + 2 VPlots	05hz	24.544
+Domino	20	10 + 2 VPlots	05hz	22.107
+Domino	20	10 + 2 VPlots	05hz	10.792
+Domino	20	10 + 2 VPlots	05hz	12.478
+Domino	20	10 + 2 VPlots	05hz	30.851
+Domino	20	10 + 2 VPlots	05hz	26.217
+Domino	20	10 + 2 VPlots	05hz	11.251
+Domino	20	10 + 2 VPlots	05hz	24.685
+Domino	20	10 + 2 VPlots	05hz	28.051
+Domino	20	10 + 2 VPlots	05hz	16.911
+Domino	20	10 + 2 VPlots	05hz	9.757
+Domino	20	10 + 2 VPlots	05hz	7.464
+Domino	20	10 + 2 VPlots	05hz	21.04
+Domino	20	10 + 2 VPlots	05hz	15.884
+Domino	20	10 + 2 VPlots	05hz	5.057
+Domino	20	10 + 2 VPlots	05hz	6.508
+Domino	20	10 + 2 VPlots	05hz	10.065
+Domino	20	10 + 2 VPlots	05hz	8.404
+Domino	20	10 + 2 VPlots	05hz	6.584
+Domino	20	10 + 2 VPlots	05hz	25.003
+Domino	20	10 + 2 VPlots	05hz	13.522
+Domino	20	10 + 2 VPlots	05hz	15.233
+Domino	20	10 + 2 VPlots	05hz	17.884
+Domino	20	10 + 2 VPlots	05hz	16.075
+Domino	20	10 + 2 VPlots	05hz	18.41
+Domino	20	10 + 2 VPlots	05hz	14.313
+Domino	20	10 + 2 VPlots	05hz	2.983
+Domino	20	10 + 2 VPlots	05hz	3.619
+Domino	20	10 + 2 VPlots	05hz	5.338
+Domino	20	10 + 2 VPlots	05hz	2.802
+Domino	20	10 + 2 VPlots	05hz	2.883
+Domino	20	10 + 2 VPlots	05hz	31.19
+Domino	20	10 + 2 VPlots	05hz	18.527
+Domino	20	10 + 2 VPlots	05hz	14.594
+Domino	20	10 + 2 VPlots	05hz	11.03
+Domino	20	10 + 2 VPlots	05hz	6.517
+Domino	20	10 + 2 VPlots	05hz	8.72
+Domino	20	8 + 2 VPlot	05hz	7.486
+Domino	20	8 + 2 VPlot	05hz	11.613
+Domino	20	8 + 2 VPlot	05hz	2.581
+Domino	20	8 + 2 VPlot	05hz	2.032
+Domino	20	8 + 2 VPlot	05hz	3.355
+Domino	20	8 + 2 VPlot	05hz	2.994
+Domino	20	8 + 2 VPlot	05hz	2.419
+Domino	20	8 + 2 VPlot	05hz	4.566
+Domino	20	8 + 2 VPlot	05hz	3.161
+Domino	20	8 + 2 VPlot	05hz	2.93
+Domino	20	8 + 2 VPlot	05hz	4.376
+Domino	20	8 + 2 VPlot	05hz	2.805
+Domino	20	8 + 2 VPlot	05hz	3.65
+Domino	20	8 + 2 VPlot	05hz	2.554
+Domino	20	8 + 2 VPlot	05hz	3.186
+Domino	20	8 + 2 VPlot	05hz	3.082
+Domino	20	8 + 2 VPlot	05hz	9.863
+Domino	20	8 + 2 VPlot	05hz	1.938
+Domino	20	8 + 2 VPlot	05hz	9.763
+Domino	20	8 + 2 VPlot	05hz	12.98
+Domino	20	8 + 2 VPlot	05hz	2.418
+Domino	20	8 + 2 VPlot	05hz	3.125
+Domino	20	8 + 2 VPlot	05hz	2.755
+Domino	20	8 + 2 VPlot	05hz	2.689
+Domino	20	8 + 2 VPlot	05hz	3.112
+Domino	20	8 + 2 VPlot	05hz	2.406
+Domino	20	8 + 2 VPlot	05hz	12.267
+Domino	20	8 + 2 VPlot	05hz	3.398
+Domino	20	8 + 2 VPlot	05hz	3.343
+Domino	20	8 + 2 VPlot	05hz	2.458
+Domino	20	8 + 2 VPlot	05hz	2.212
+Domino	20	8 + 2 VPlot	05hz	3.477
+Domino	20	8 + 2 VPlot	05hz	2.657
+Domino	20	10 + 2 VPlots	05hz	6.095
+Domino	20	10 + 2 VPlots	05hz	2.873
+Domino	20	10 + 2 VPlots	05hz	2.993
+Domino	20	10 + 2 VPlots	05hz	6.086
+Domino	20	10 + 2 VPlots	05hz	5.269
+Domino	20	10 + 2 VPlots	05hz	5.277
+Domino	20	10 + 2 VPlots	05hz	14.943
+Domino	20	10 + 2 VPlots	05hz	5.134
+Domino	20	10 + 2 VPlots	05hz	5.083
+Domino	20	10 + 2 VPlots	05hz	5.908
+Domino	20	10 + 2 VPlots	05hz	5.278
+Domino	20	10 + 2 VPlots	05hz	9.294
+Domino	20	10 + 2 VPlots	05hz	4.184
+Domino	20	10 + 2 VPlots	05hz	4.823
+Domino	20	10 + 2 VPlots	05hz	3.303
+Domino	20	10 + 2 VPlots	05hz	4.978
+Domino	20	10 + 2 VPlots	05hz	12.735
+Domino	20	10 + 2 VPlots	05hz	7.555
+Domino	20	10 + 2 VPlots	05hz	18.121
+Domino	20	10 + 2 VPlots	05hz	23.39
+Domino	20	10 + 2 VPlots	05hz	13.677
+Domino	20	10 + 2 VPlots	05hz	12.654
+Domino	20	10 + 2 VPlots	05hz	23.256
+Domino	20	10 + 2 VPlots	05hz	1.637
+Domino	20	10 + 2 VPlots	05hz	1.66
+Domino	20	10 + 2 VPlots	05hz	1.615
+Domino	20	10 + 2 VPlots	05hz	10.17
+Domino	20	10 + 2 VPlots	05hz	1.625
+Domino	20	10 + 2 VPlots	05hz	1.598
+Domino	20	10 + 2 VPlots	05hz	8.094
+Domino	20	10 + 2 VPlots	05hz	5.864
+Domino	20	10 + 2 VPlots	05hz	2.467
+Domino	20	10 + 2 VPlots	05hz	19.289
+Domino	20	10 + 2 VPlots	05hz	7.631
+Domino	20	10 + 2 VPlots	05hz	2.198
+Domino	20	10 + 2 VPlots	05hz	3.577
+Domino	20	10 + 2 VPlots	05hz	1.69
+Domino	20	10 + 2 VPlots	05hz	15.441
+Domino	20	10 + 2 VPlots	05hz	9.217
+Domino	20	10 + 2 VPlots	05hz	1.617
+Domino	20	10 + 2 VPlots	05hz	2.727
+Domino	20	10 + 2 VPlots	05hz	2.332
+Domino	20	10 + 2 VPlots	05hz	2.003
+Domino	20	10 + 2 VPlots	05hz	1.561
+Domino	20	10 + 2 VPlots	05hz	1.949
+Domino	20	10 + 2 VPlots	05hz	29.184
+Domino	20	10 + 2 VPlots	05hz	1.162
+Domino	20	10 + 2 VPlots	05hz	2.747
+Domino	20	10 + 2 VPlots	05hz	1.88
+Domino	20	10 + 2 VPlots	05hz	14.495
+Domino	20	10 + 2 VPlots	05hz	12.765
+Domino	20	10 + 2 VPlots	05hz	16.823
+Domino	20	10 + 2 VPlots	05hz	14.36
+Domino	20	10 + 2 VPlots	05hz	13.574
+Domino	20	10 + 2 VPlots	05hz	9.599
+Domino	20	10 + 2 VPlots	05hz	16.195
+Domino	20	10 + 2 VPlots	05hz	17.214
+Domino	20	10 + 2 VPlots	05hz	10.231
+Domino	20	10 + 2 VPlots	05hz	0.754
+Domino	20	10 + 2 VPlots	05hz	2.703
+Domino	20	10 + 2 VPlots	05hz	0.732
+Domino	20	10 + 2 VPlots	05hz	3.981
+Domino	20	10 + 2 VPlots	05hz	1.042
+Domino	20	10 + 2 VPlots	05hz	1.543
+Domino	20	10 + 2 VPlots	05hz	1.749
+Domino	20	10 + 2 VPlots	05hz	2.054
+Domino	20	10 + 2 VPlots	05hz	1.028
+Domino	20	10 + 2 VPlots	05hz	1.782
+Domino	20	10 + 2 VPlots	05hz	3.126
+Domino	20	10 + 2 VPlots	05hz	3.218
+Domino	20	10 + 2 VPlots	05hz	5.398
+Domino	20	10 + 2 VPlots	05hz	1.828
+Domino	20	10 + 2 VPlots	05hz	2.068
+Domino	20	10 + 2 VPlots	05hz	2.463
+Domino	20	10 + 2 VPlots	05hz	1.979
+Domino	20	10 + 2 VPlots	05hz	3.644
+Domino	20	10 + 2 VPlots	05hz	2.429
+Domino	20	10 + 2 VPlots	05hz	2.503
+Domino	20	10 + 2 VPlots	05hz	4.787
+Domino	20	10 + 2 VPlots	05hz	2.537
+Domino	20	10 + 2 VPlots	05hz	2.112
+Domino	20	10 + 2 VPlots	05hz	2.8
+Domino	20	10 + 2 VPlots	05hz	3.094
+Domino	20	10 + 2 VPlots	05hz	2.054
+Domino	20	10 + 2 VPlots	05hz	2.392
+Domino	20	10 + 2 VPlots	05hz	5.432
+Domino	20	10 + 2 VPlots	05hz	2.059
+Domino	20	10 + 2 VPlots	05hz	2.131
+Domino	20	10 + 2 VPlots	05hz	2.722
+Domino	20	10 + 2 VPlots	05hz	3.349
+Domino	20	10 + 2 VPlots	05hz	1.986
+Domino	20	10 + 2 VPlots	05hz	2.646
+Domino	20	10 + 2 VPlots	05hz	6.422
+Domino	20	10 + 2 VPlots	05hz	1.993
+Domino	20	10 + 2 VPlots	05hz	7.07
+Domino	20	10 + 2 VPlots	05hz	2.849
+Domino	20	10 + 2 VPlots	05hz	2.308
+Domino	20	10 + 2 VPlots	05hz	4.347
+Domino	20	10 + 2 VPlots	05hz	2.38
+Domino	20	10 + 2 VPlots	05hz	2.941
+Domino	20	10 + 2 VPlots	05hz	7.929
+Domino	20	10 + 2 VPlots	05hz	4.065
+Domino	20	10 + 2 VPlots	05hz	2.246
+Domino	20	10 + 2 VPlots	05hz	2.53
+Domino	20	10 + 2 VPlots	05hz	0.886
+Domino	20	10 + 2 VPlots	05hz	5.016
+Domino	20	10 + 2 VPlots	05hz	2.693
+Domino	20	10 + 2 VPlots	05hz	6.386
+Domino	20	10 + 2 VPlots	05hz	3.025
+Domino	20	10 + 2 VPlots	05hz	0.944
+Domino	20	10 + 2 VPlots	05hz	1.253
+Domino	20	10 + 2 VPlots	05hz	6.97
+Domino	20	10 + 2 VPlots	05hz	1.099
+Domino	20	10 + 2 VPlots	05hz	1.711
+Domino	20	10 + 2 VPlots	05hz	1.48
+Domino	20	10 + 2 VPlots	05hz	5.096
+Domino	20	10 + 2 VPlots	05hz	5.774
+Domino	20	10 + 2 VPlots	05hz	1.572
+Domino	20	10 + 2 VPlots	05hz	3.835
+Domino	20	10 + 2 VPlots	05hz	1.825
+Domino	20	10 + 2 VPlots	05hz	22.751
+Domino	20	10 + 2 VPlots	05hz	3.857
+Domino	20	10 + 2 VPlots	05hz	3.581
+Domino	20	10 + 2 VPlots	05hz	2.36
+Domino	20	10 + 2 VPlots	05hz	5.508
+Domino	20	10 + 2 VPlots	05hz	2.854
+Domino	20	10 + 2 VPlots	05hz	3.653
+Domino	20	10 + 2 VPlots	05hz	2.822
+Domino	20	10 + 2 VPlots	05hz	0.546
+Domino	20	10 + 2 VPlots	05hz	1.242
+Domino	20	10 + 2 VPlots	05hz	1.199
+Domino	20	10 + 2 VPlots	05hz	2.904
+Domino	20	10 + 2 VPlots	05hz	2.246
+Domino	20	10 + 2 VPlots	05hz	3.29
+Domino	20	10 + 2 VPlots	05hz	2.281
+Domino	20	10 + 2 VPlots	05hz	3.616
+Domino	20	10 + 2 VPlots	05hz	4.284
+Domino	20	10 + 2 VPlots	05hz	2.255
+Domino	20	10 + 2 VPlots	05hz	2.474
+Domino	20	10 + 2 VPlots	05hz	2.292
+Domino	20	10 + 2 VPlots	05hz	5.359
+Domino	20	10 + 2 VPlots	05hz	2.283
+Domino	20	10 + 2 VPlots	05hz	1.026
+Domino	20	10 + 2 VPlots	05hz	1.563
+Domino	20	10 + 2 VPlots	05hz	13.956
+Domino	20	10 + 2 VPlots	05hz	3.579
+Domino	20	10 + 2 VPlots	05hz	3.816
+Domino	20	10 + 2 VPlots	05hz	1.833
+Domino	20	10 + 2 VPlots	05hz	1.639
+Domino	20	10 + 2 VPlots	05hz	1.653
+Domino	20	10 + 2 VPlots	05hz	4.555
+Domino	20	10 + 2 VPlots	05hz	2.093
+Domino	20	10 + 2 VPlots	05hz	2.502
+Domino	20	10 + 2 VPlots	05hz	1.986
+Domino	20	10 + 2 VPlots	05hz	9.441
+Domino	20	10 + 2 VPlots	05hz	2.353
+Domino	20	10 + 2 VPlots	05hz	5.45
+Domino	20	10 + 2 VPlots	05hz	2.987
+Domino	20	10 + 2 VPlots	05hz	1.95
+Domino	20	10 + 2 VPlots	05hz	4.825
+Domino	20	10 + 2 VPlots	05hz	0.33
+Domino	20	10 + 2 VPlots	05hz	0.339
+Domino	20	10 + 2 VPlots	05hz	0.291
+Domino	20	10 + 2 VPlots	05hz	0.255
+Domino	20	10 + 2 VPlots	05hz	0.332
+Domino	20	10 + 2 VPlots	05hz	0.311
+Domino	20	10 + 2 VPlots	05hz	0.497
+Domino	20	10 + 2 VPlots	05hz	8.667
+Domino	20	10 + 2 VPlots	05hz	0.895
+Domino	20	10 + 2 VPlots	05hz	0.754
+Domino	20	10 + 2 VPlots	05hz	3.981
+Domino	20	10 + 2 VPlots	05hz	1.272
+Domino	20	10 + 2 VPlots	05hz	1.362
+Domino	20	10 + 2 VPlots	05hz	1.104
+Domino	20	10 + 2 VPlots	05hz	0.992
+Domino	20	10 + 2 VPlots	05hz	0.801
+Domino	20	10 + 2 VPlots	05hz	2.331
+Domino	20	10 + 2 VPlots	05hz	1.06
+Domino	20	10 + 2 VPlots	05hz	0.872
+Domino	20	10 + 2 VPlots	05hz	1.04
+Domino	20	10 + 2 VPlots	05hz	0.963
+Domino	20	10 + 2 VPlots	05hz	0.985
+Domino	20	10 + 2 VPlots	05hz	1.033
+Domino	20	10 + 2 VPlots	05hz	1.694
+Domino	20	10 + 2 VPlots	05hz	3.315
+Domino	20	10 + 2 VPlots	05hz	6.031
+Domino	20	10 + 2 VPlots	05hz	2.491
+Domino	20	10 + 2 VPlots	05hz	2.373
+Domino	20	10 + 2 VPlots	05hz	5.81
+Domino	20	10 + 2 VPlots	05hz	2.934
+Domino	20	10 + 2 VPlots	05hz	0.879
+Domino	20	10 + 2 VPlots	05hz	0.975
+Domino	20	10 + 2 VPlots	05hz	1.116
+Domino	20	10 + 2 VPlots	05hz	1.1
+Domino	20	10 + 2 VPlots	05hz	0.911
+Domino	20	10 + 2 VPlots	05hz	1.07
+Domino	20	10 + 2 VPlots	05hz	0.692
+Domino	20	10 + 2 VPlots	05hz	0.962
+Domino	20	10 + 2 VPlots	05hz	4.588
+Domino	20	10 + 2 VPlots	05hz	1.782
+Domino	20	10 + 2 VPlots	05hz	1.26
+Domino	20	10 + 2 VPlots	05hz	1.878
+Domino	20	10 + 2 VPlots	05hz	5.435
+Domino	20	10 + 2 VPlots	05hz	2.124
+Domino	20	10 + 2 VPlots	05hz	2.013
+Domino	20	8 + 2 VPlot	05hz	0.752
+Domino	20	8 + 2 VPlot	05hz	4.438
+Domino	20	8 + 2 VPlot	05hz	1.934
+Domino	20	8 + 2 VPlot	05hz	2.13
+Domino	20	8 + 2 VPlot	05hz	1.83
+Domino	20	8 + 2 VPlot	05hz	3.058
+Domino	20	8 + 2 VPlot	05hz	6.421
+Domino	20	8 + 2 VPlot	05hz	4.905
+Domino	20	8 + 2 VPlot	05hz	5.926
+Domino	20	8 + 2 VPlot	05hz	2.757
+Domino	20	8 + 2 VPlot	05hz	3.798
+Domino	20	8 + 2 VPlot	05hz	3.776
+Domino	20	8 + 2 VPlot	05hz	4.546
+Domino	20	8 + 2 VPlot	05hz	6.885
+Domino	20	8 + 2 VPlot	05hz	4.189
+Domino	20	8 + 2 VPlot	05hz	6.806
+Domino	20	8 + 2 VPlot	05hz	5.38
+Domino	20	8 + 2 VPlot	05hz	9.375
+Domino	20	8 + 2 VPlot	05hz	14.272
+Domino	20	8 + 2 VPlot	05hz	4.289
+Domino	20	8 + 2 VPlot	05hz	9.028
+Domino	20	8 + 2 VPlot	05hz	11.306
+Domino	20	8 + 2 VPlot	05hz	9.758
+Domino	20	8 + 2 VPlot	05hz	5.606
+Domino	20	8 + 2 VPlot	05hz	7.43
+Domino	20	8 + 2 VPlot	05hz	2.553
+Domino	20	8 + 2 VPlot	05hz	6.107
+Domino	20	8 + 2 VPlot	05hz	7.481
+Domino	20	8 + 2 VPlot	05hz	13.679
+Domino	20	8 + 2 VPlot	05hz	8.895
+Domino	20	8 + 2 VPlot	05hz	5.451
+Domino	20	8 + 2 VPlot	05hz	7.015
+Domino	20	8 + 2 VPlot	05hz	3.546
+Domino	20	8 + 2 VPlot	05hz	6.424
+Domino	20	8 + 2 VPlot	05hz	3.679
+Domino	20	8 + 2 VPlot	05hz	4.369
+Domino	20	8 + 2 VPlot	05hz	16.252
+Domino	20	8 + 2 VPlot	05hz	1.025
+Domino	20	8 + 2 VPlot	05hz	0.903
+Domino	20	8 + 2 VPlot	05hz	0.692
+Domino	20	8 + 2 VPlot	05hz	1.409
+Domino	20	8 + 2 VPlot	05hz	1.328
+Domino	20	8 + 2 VPlot	05hz	0.999
+Domino	20	8 + 2 VPlot	05hz	6.012
+Domino	20	8 + 2 VPlot	05hz	3.436
+Domino	20	8 + 2 VPlot	05hz	6.926
+Domino	20	8 + 2 VPlot	05hz	6.361
+Domino	20	8 + 2 VPlot	05hz	6.184
+Domino	20	8 + 2 VPlot	05hz	1.81
+Domino	20	8 + 2 VPlot	05hz	5.119
+Domino	20	8 + 2 VPlot	05hz	5.656
+Domino	20	8 + 2 VPlot	05hz	3.227
+Domino	20	8 + 2 VPlot	05hz	1.979
+Domino	20	8 + 2 VPlot	05hz	5.239
+Domino	20	8 + 2 VPlot	05hz	2.213
+Domino	20	8 + 2 VPlot	05hz	3.534
+Domino	20	8 + 2 VPlot	05hz	5.593
+Domino	20	8 + 2 VPlot	05hz	1.376
+Domino	20	8 + 2 VPlot	05hz	1.573
+Domino	20	8 + 2 VPlot	05hz	1.422
+Domino	20	8 + 2 VPlot	05hz	5.049
+Domino	20	8 + 2 VPlot	05hz	1.771
+Domino	20	8 + 2 VPlot	05hz	2.854
+Domino	20	8 + 2 VPlot	05hz	6.215
+Domino	20	8 + 2 VPlot	05hz	1.968
+Domino	20	8 + 2 VPlot	05hz	3.556
+Domino	20	8 + 2 VPlot	05hz	3.654
+Domino	20	8 + 2 VPlot	05hz	2.544
+Domino	20	8 + 2 VPlot	05hz	2.081
+Domino	20	8 + 2 VPlot	05hz	4.659
+Domino	20	8 + 2 VPlot	05hz	2.196
+Domino	20	8 + 2 VPlot	05hz	2.215
+Domino	20	8 + 2 VPlot	05hz	5.154
+Domino	20	8 + 2 VPlot	05hz	1.941
+Domino	20	8 + 2 VPlot	05hz	1.954
+Domino	20	8 + 2 VPlot	05hz	2.759
+Domino	20	8 + 2 VPlot	05hz	4.335
+Domino	20	8 + 2 VPlot	05hz	2.252
+Domino	20	8 + 2 VPlot	05hz	1.964
+Domino	20	8 + 2 VPlot	05hz	2.279
+Domino	20	8 + 2 VPlot	05hz	7.94
+Domino	20	8 + 2 VPlot	05hz	2.21
+Domino	20	8 + 2 VPlot	05hz	6.44
+Domino	20	8 + 2 VPlot	05hz	1.355
+Domino	20	8 + 2 VPlot	05hz	2.49
+Domino	20	8 + 2 VPlot	05hz	2.111
+Domino	20	8 + 2 VPlot	05hz	4.881
+Domino	20	8 + 2 VPlot	05hz	0.629
+Domino	20	8 + 2 VPlot	05hz	0.386
+Domino	20	8 + 2 VPlot	05hz	0.557
+Domino	20	8 + 2 VPlot	05hz	1.413
+Domino	20	8 + 2 VPlot	05hz	1.148
+Domino	20	8 + 2 VPlot	05hz	1.146
+Domino	20	8 + 2 VPlot	05hz	1.697
+Domino	20	8 + 2 VPlot	05hz	2.463
+Domino	20	8 + 2 VPlot	05hz	0.794
+Domino	20	8 + 2 VPlot	05hz	1.101
+Domino	20	8 + 2 VPlot	05hz	1.363
+Domino	20	8 + 2 VPlot	05hz	1.573
+Domino	20	8 + 2 VPlot	05hz	0.986
+Domino	20	8 + 2 VPlot	05hz	1.164
+Domino	20	8 + 2 VPlot	05hz	1.231
+Domino	20	8 + 2 VPlot	05hz	1.338
+Domino	20	8 + 2 VPlot	05hz	1.406
+Domino	20	8 + 2 VPlot	05hz	4.528
+Domino	20	8 + 2 VPlot	05hz	3.055
+Domino	20	8 + 2 VPlot	05hz	5.173
+Domino	20	8 + 2 VPlot	05hz	7.117
+Domino	20	8 + 2 VPlot	05hz	5.771
+Domino	20	8 + 2 VPlot	05hz	2.877
+Domino	20	8 + 2 VPlot	05hz	3.046
+Domino	20	8 + 2 VPlot	05hz	13.491
+Domino	20	8 + 2 VPlot	05hz	5.22
+Domino	20	8 + 2 VPlot	05hz	3.201
+Domino	20	8 + 2 VPlot	05hz	3.944
+Domino	20	8 + 2 VPlot	05hz	5.802
+Domino	20	8 + 2 VPlot	05hz	3.048
+Domino	20	8 + 2 VPlot	05hz	7.582
+Domino	20	8 + 2 VPlot	05hz	3.423
+Domino	20	8 + 2 VPlot	05hz	5.912
+Domino	20	8 + 2 VPlot	05hz	2.647
+Domino	20	8 + 2 VPlot	05hz	2.748
+Domino	20	8 + 2 VPlot	05hz	6.316
+Domino	20	8 + 2 VPlot	05hz	0.923
+Domino	20	8 + 2 VPlot	05hz	1.274
+Domino	20	8 + 2 VPlot	05hz	2.831
+Domino	20	8 + 2 VPlot	05hz	10.904
+Domino	20	8 + 2 VPlot	05hz	8.972
+Domino	20	8 + 2 VPlot	05hz	2.143
+Domino	20	8 + 2 VPlot	05hz	1.972
+Domino	20	8 + 2 VPlot	05hz	2.666
+Domino	20	8 + 2 VPlot	05hz	7.179
+Domino	20	8 + 2 VPlot	05hz	2.636
+Domino	20	8 + 2 VPlot	05hz	1.77
+Domino	20	8 + 2 VPlot	05hz	5.453
+Domino	20	8 + 2 VPlot	05hz	3.017
+Domino	20	8 + 2 VPlot	05hz	1.92
+Domino	20	8 + 2 VPlot	05hz	5.89
+Domino	20	8 + 2 VPlot	05hz	2.958
+Domino	20	8 + 2 VPlot	05hz	2.089
+Domino	20	8 + 2 VPlot	05hz	5.701
+Domino	20	8 + 2 VPlot	05hz	2.739
+Domino	20	8 + 2 VPlot	05hz	2.097
+Domino	20	8 + 2 VPlot	05hz	4.788
+Domino	20	8 + 2 VPlot	05hz	3.108
+Domino	20	8 + 2 VPlot	05hz	2.874
+Domino	20	8 + 2 VPlot	05hz	4.869
+Domino	20	8 + 2 VPlot	05hz	3.002
+Domino	20	8 + 2 VPlot	05hz	1.528
+Domino	20	8 + 2 VPlot	05hz	3.119
+Domino	20	8 + 2 VPlot	05hz	2.91
+Domino	20	8 + 2 VPlot	05hz	2.103
+Domino	20	8 + 2 VPlot	05hz	3.55
+Domino	20	8 + 2 VPlot	05hz	2.455
+Domino	20	8 + 2 VPlot	05hz	1.895
+Domino	20	8 + 2 VPlot	05hz	5.412
+Domino	20	8 + 2 VPlot	05hz	2.067
+Domino	20	8 + 2 VPlot	05hz	2.619
+Domino	20	8 + 2 VPlot	05hz	3.282
+Domino	20	8 + 2 VPlot	05hz	2.011
+Domino	20	8 + 2 VPlot	05hz	1.715
+Domino	20	8 + 2 VPlot	05hz	0.573
+Domino	20	8 + 2 VPlot	05hz	0.307
+Domino	20	8 + 2 VPlot	05hz	3.851
+Domino	20	8 + 2 VPlot	05hz	1.759
+Domino	20	8 + 2 VPlot	05hz	1.134
+Domino	20	8 + 2 VPlot	05hz	1.296
+Domino	20	8 + 2 VPlot	05hz	7.874
+Domino	20	8 + 2 VPlot	05hz	0.982
+Domino	20	8 + 2 VPlot	05hz	1.403
+Domino	20	8 + 2 VPlot	05hz	4.421
+Domino	20	8 + 2 VPlot	05hz	1.264
+Domino	20	8 + 2 VPlot	05hz	1.843
+Domino	20	8 + 2 VPlot	05hz	1.762
+Domino	20	8 + 2 VPlot	05hz	3.088
+Domino	20	8 + 2 VPlot	05hz	1.71
+Domino	20	8 + 2 VPlot	05hz	1.549
+Domino	20	8 + 2 VPlot	05hz	1.165
+Domino	20	8 + 2 VPlot	05hz	0.923
+Domino	20	8 + 2 VPlot	05hz	1.247
+Domino	20	8 + 2 VPlot	05hz	1.213
+Domino	20	8 + 2 VPlot	05hz	1.258
+Domino	20	8 + 2 VPlot	05hz	1.23
+Domino	20	8 + 2 VPlot	05hz	4.416
+Domino	20	8 + 2 VPlot	05hz	4.675
+Domino	20	8 + 2 VPlot	05hz	2.291
+Domino	20	8 + 2 VPlot	05hz	8.831
+Domino	20	8 + 2 VPlot	05hz	4.625
+Domino	20	8 + 2 VPlot	05hz	6.831
+Domino	20	8 + 2 VPlot	05hz	3.17
+Domino	20	8 + 2 VPlot	05hz	3.002
+Domino	20	8 + 2 VPlot	05hz	6.292
+Domino	20	8 + 2 VPlot	05hz	3.533
+Domino	20	8 + 2 VPlot	05hz	5.985
+Domino	20	8 + 2 VPlot	05hz	3.622
+Domino	20	8 + 2 VPlot	05hz	6.547
+Domino	20	8 + 2 VPlot	05hz	2.676
+Domino	20	8 + 2 VPlot	05hz	3.651
+Domino	20	8 + 2 VPlot	05hz	4.497
+Domino	20	8 + 2 VPlot	05hz	3.515
+Domino	20	8 + 2 VPlot	05hz	6.362
+Domino	20	8 + 2 VPlot	05hz	5.097
+Domino	20	8 + 2 VPlot	05hz	2.957
+Domino	20	8 + 2 VPlot	05hz	5.545
+Domino	20	8 + 2 VPlot	05hz	2.903
+Domino	20	8 + 2 VPlot	05hz	2.667
+Domino	20	8 + 2 VPlot	05hz	6.324
+Domino	20	8 + 2 VPlot	05hz	5.481
+Domino	20	8 + 2 VPlot	05hz	9.924
+Domino	20	8 + 2 VPlot	05hz	2.486
+Domino	20	8 + 2 VPlot	05hz	6.868
+Domino	20	8 + 2 VPlot	05hz	3.154
+Domino	20	8 + 2 VPlot	05hz	8.016
+Domino	20	8 + 2 VPlot	05hz	3.08
+Domino	20	8 + 2 VPlot	05hz	3.368
+Domino	20	8 + 2 VPlot	05hz	3.158
+Domino	20	8 + 2 VPlot	05hz	4.543
+Domino	20	8 + 2 VPlot	05hz	2.02
+Domino	20	8 + 2 VPlot	05hz	8.107
+Domino	20	8 + 2 VPlot	05hz	5.336
+Domino	20	8 + 2 VPlot	05hz	0.709
+Domino	20	8 + 2 VPlot	05hz	0.926
+Domino	20	8 + 2 VPlot	05hz	2.556
+Domino	20	8 + 2 VPlot	05hz	5.058
+Domino	20	8 + 2 VPlot	05hz	4.19
+Domino	20	8 + 2 VPlot	05hz	9.093
+Domino	20	8 + 2 VPlot	05hz	10.291
+Domino	20	8 + 2 VPlot	05hz	8.891
+Domino	20	8 + 2 VPlot	05hz	0.712
+Domino	20	8 + 2 VPlot	05hz	1.191
+Domino	20	8 + 2 VPlot	05hz	2.281
+Domino	20	8 + 2 VPlot	05hz	2.076
+Domino	20	8 + 2 VPlot	05hz	1.222
+Domino	20	8 + 2 VPlot	05hz	1.649
+Domino	20	8 + 2 VPlot	05hz	1.768
+Domino	20	8 + 2 VPlot	05hz	4.718
+Domino	20	8 + 2 VPlot	05hz	4.555
+Domino	20	8 + 2 VPlot	05hz	8.543
+Domino	20	8 + 2 VPlot	05hz	6.083
+Domino	20	8 + 2 VPlot	05hz	10.914
+Domino	20	8 + 2 VPlot	05hz	3.248
+Domino	20	8 + 2 VPlot	05hz	10.478
+Domino	20	8 + 2 VPlot	05hz	4.029
+Domino	20	8 + 2 VPlot	05hz	4.865
+Domino	20	8 + 2 VPlot	05hz	29.734
+Domino	20	8 + 2 VPlot	05hz	13.758
+Domino	20	8 + 2 VPlot	05hz	19.526
+Domino	20	8 + 2 VPlot	05hz	1.724
+Domino	20	8 + 2 VPlot	05hz	1.251
+Domino	20	8 + 2 VPlot	05hz	2.251
+Domino	20	8 + 2 VPlot	05hz	1.412
+Domino	20	8 + 2 VPlot	05hz	2.642
+Domino	20	8 + 2 VPlot	05hz	2.332
+Domino	20	8 + 2 VPlot	05hz	1.864
+Domino	20	8 + 2 VPlot	05hz	5.003
+Domino	20	8 + 2 VPlot	05hz	2.747
+Domino	20	8 + 2 VPlot	05hz	2.553
+Domino	20	8 + 2 VPlot	05hz	5.398
+Domino	20	8 + 2 VPlot	05hz	2.859
+Domino	20	8 + 2 VPlot	05hz	2.268
+Domino	20	8 + 2 VPlot	05hz	5.279
+Domino	20	8 + 2 VPlot	05hz	3.97
+Domino	20	8 + 2 VPlot	05hz	1.468
+Domino	20	8 + 2 VPlot	05hz	2.234
+Domino	20	8 + 2 VPlot	05hz	2.551
+Domino	20	8 + 2 VPlot	05hz	2.119
+Domino	20	8 + 2 VPlot	05hz	1.947
+Domino	20	8 + 2 VPlot	05hz	5.225
+Domino	20	8 + 2 VPlot	05hz	1.984
+Domino	20	8 + 2 VPlot	05hz	2.273
+Domino	20	8 + 2 VPlot	05hz	8.933
+Domino	20	8 + 2 VPlot	05hz	2.044
+Domino	20	8 + 2 VPlot	05hz	6.349
+Domino	20	8 + 2 VPlot	05hz	1.549
+Domino	20	8 + 2 VPlot	05hz	2.525
+Domino	20	8 + 2 VPlot	05hz	3.38
+Domino	20	8 + 2 VPlot	05hz	2.985
+Domino	20	8 + 2 VPlot	05hz	1.947
+Domino	20	8 + 2 VPlot	05hz	4.164
+Domino	20	8 + 2 VPlot	05hz	2.094
+Domino	20	8 + 2 VPlot	05hz	1.865
+Domino	20	8 + 2 VPlot	05hz	2.327
+Domino	20	8 + 2 VPlot	05hz	7.799
+Domino	20	8 + 2 VPlot	05hz	12.39
+Domino	20	8 + 2 VPlot	05hz	2.55
+Domino	20	8 + 2 VPlot	05hz	11.457
+Domino	20	8 + 2 VPlot	05hz	5.026
+Domino	20	8 + 2 VPlot	05hz	1.746
+Domino	20	8 + 2 VPlot	05hz	1.548
+Domino	20	8 + 2 VPlot	05hz	4.363
+Domino	20	8 + 2 VPlot	05hz	7.362
+Domino	20	8 + 2 VPlot	05hz	2.719
+Domino	20	8 + 2 VPlot	05hz	3.363
+Domino	20	8 + 2 VPlot	05hz	2.256
+Domino	20	8 + 2 VPlot	05hz	3.302
+Domino	20	8 + 2 VPlot	05hz	2.031
+Domino	20	8 + 2 VPlot	05hz	2.302
+Domino	20	8 + 2 VPlot	05hz	7.092
+Domino	20	8 + 2 VPlot	05hz	0.98
+Domino	20	8 + 2 VPlot	05hz	2.28
+Domino	20	8 + 2 VPlot	05hz	1.624
+Domino	20	8 + 2 VPlot	05hz	1.093
+Domino	20	8 + 2 VPlot	05hz	2.64
+Domino	20	8 + 2 VPlot	05hz	1.17
+Domino	20	8 + 2 VPlot	05hz	3.561
+Domino	20	8 + 2 VPlot	05hz	2.669
+Domino	20	8 + 2 VPlot	05hz	5.601
+Domino	20	8 + 2 VPlot	05hz	14.474
+Domino	20	8 + 2 VPlot	05hz	0.806
+Domino	20	8 + 2 VPlot	05hz	1.032
+Domino	20	8 + 2 VPlot	05hz	6.366
+Domino	20	8 + 2 VPlot	05hz	3.646
+Domino	20	8 + 2 VPlot	05hz	10.791
+Domino	20	8 + 2 VPlot	05hz	4.301
+Domino	20	8 + 2 VPlot	05hz	8.641
+Domino	20	8 + 2 VPlot	05hz	2.623
+Domino	20	8 + 2 VPlot	05hz	1.041
+Domino	20	8 + 2 VPlot	05hz	1.288
+Domino	20	8 + 2 VPlot	05hz	0.963
+Domino	20	8 + 2 VPlot	05hz	1.012
+Domino	20	8 + 2 VPlot	05hz	0.757
+Domino	20	8 + 2 VPlot	05hz	0.833
+Domino	20	8 + 2 VPlot	05hz	0.92
+Domino	20	8 + 2 VPlot	05hz	0.793
+Domino	20	8 + 2 VPlot	05hz	2.18
+Domino	20	8 + 2 VPlot	05hz	2.917
+Domino	20	8 + 2 VPlot	05hz	1.036
+Domino	20	8 + 2 VPlot	05hz	1.358
+Domino	20	8 + 2 VPlot	05hz	1.958
+Domino	20	8 + 2 VPlot	05hz	1.747
+Domino	20	8 + 2 VPlot	05hz	1.154
+Domino	20	8 + 2 VPlot	05hz	2.396
+Domino	20	8 + 2 VPlot	05hz	4.658
+Domino	20	8 + 2 VPlot	05hz	5.512
+Domino	20	8 + 2 VPlot	05hz	0.943
+Domino	20	8 + 2 VPlot	05hz	0.811
+Domino	20	8 + 2 VPlot	05hz	0.741
+Domino	20	8 + 2 VPlot	05hz	3.729
+Domino	20	8 + 2 VPlot	05hz	2.004
+Domino	20	8 + 2 VPlot	05hz	1.337
+Domino	20	8 + 2 VPlot	05hz	5.31
+Domino	20	8 + 2 VPlot	05hz	10.561
+Domino	20	8 + 2 VPlot	05hz	4.041
+Domino	20	8 + 2 VPlot	05hz	6.581
+Domino	20	8 + 2 VPlot	05hz	8.021
+Domino	20	8 + 2 VPlot	05hz	3.816
+Domino	20	8 + 2 VPlot	05hz	0.813
+Domino	20	8 + 2 VPlot	05hz	1.187
+Domino	20	8 + 2 VPlot	05hz	0.797
+Domino	20	8 + 2 VPlot	05hz	0.899
+Domino	20	8 + 2 VPlot	05hz	0.778
+Domino	20	8 + 2 VPlot	05hz	0.83
+Domino	20	8 + 2 VPlot	05hz	0.656
+Domino	20	8 + 2 VPlot	05hz	0.97
+Domino	20	8 + 2 VPlot	05hz	2.815
+Domino	20	8 + 2 VPlot	05hz	2.176
+Domino	20	8 + 2 VPlot	05hz	2.139
+Domino	20	8 + 2 VPlot	05hz	3.216
+Domino	20	8 + 2 VPlot	05hz	2.958
+Domino	20	8 + 2 VPlot	05hz	6.841
+Domino	20	8 + 2 VPlot	05hz	2.526
+Domino	20	8 + 2 VPlot	05hz	3.25
+Domino	20	8 + 2 VPlot	05hz	6.608
+Domino	20	8 + 2 VPlot	05hz	2.235
+Domino	20	8 + 2 VPlot	05hz	1.969
+Domino	20	8 + 2 VPlot	05hz	1.833
+Domino	20	8 + 2 VPlot	05hz	4.115
+Domino	20	8 + 2 VPlot	05hz	1.306
+Domino	20	8 + 2 VPlot	05hz	1.772
+Domino	20	8 + 2 VPlot	05hz	2.013
+Domino	20	8 + 2 VPlot	05hz	4.651
+Domino	20	8 + 2 VPlot	05hz	1.531
+Domino	20	8 + 2 VPlot	05hz	1.322
+Domino	20	8 + 2 VPlot	05hz	1.313
+Domino	20	8 + 2 VPlot	05hz	3.736
+Domino	20	8 + 2 VPlot	05hz	2.294
+Domino	20	8 + 2 VPlot	05hz	1.753
+Domino	20	8 + 2 VPlot	05hz	1.069
+Domino	20	8 + 2 VPlot	05hz	1.186
+Domino	20	8 + 2 VPlot	05hz	7.593
+Domino	20	8 + 2 VPlot	05hz	1.651
+Domino	20	8 + 2 VPlot	05hz	2.057
+Domino	20	8 + 2 VPlot	05hz	1.665
+Domino	20	8 + 2 VPlot	05hz	3.806
+Domino	20	8 + 2 VPlot	05hz	1.686
+Domino	20	8 + 2 VPlot	05hz	1.552
+Domino	20	8 + 2 VPlot	05hz	1.191
+Domino	20	8 + 2 VPlot	05hz	2.376
+Domino	20	8 + 2 VPlot	05hz	2.032
+Domino	20	8 + 2 VPlot	05hz	1.501
+Domino	20	8 + 2 VPlot	05hz	1.547
+Domino	20	8 + 2 VPlot	05hz	1.272
+Domino	20	8 + 2 VPlot	05hz	4.932
+Domino	20	8 + 2 VPlot	05hz	3.313
+Domino	20	8 + 2 VPlot	05hz	4.539
+Domino	20	8 + 2 VPlot	05hz	8.816
+Domino	20	8 + 2 VPlot	05hz	1.727
+Domino	20	8 + 2 VPlot	05hz	6.437
+Domino	20	8 + 2 VPlot	05hz	3.418
+Domino	20	8 + 2 VPlot	05hz	1.337
+Domino	20	8 + 2 VPlot	05hz	4.408
+Domino	20	8 + 2 VPlot	05hz	5.158
+Domino	20	8 + 2 VPlot	05hz	4.879
+Domino	20	8 + 2 VPlot	05hz	1.785
+Domino	20	8 + 2 VPlot	05hz	2.88
+Domino	20	8 + 2 VPlot	05hz	1.045
+Domino	20	8 + 2 VPlot	05hz	0.909
+Domino	20	8 + 2 VPlot	05hz	10.462
+Domino	20	8 + 2 VPlot	05hz	5.545
+Domino	20	8 + 2 VPlot	05hz	3.699
+Domino	20	8 + 2 VPlot	05hz	1.814
+Domino	20	8 + 2 VPlot	05hz	0.892
+Domino	20	8 + 2 VPlot	05hz	0.699
+Domino	20	8 + 2 VPlot	05hz	1.213
+Domino	20	8 + 2 VPlot	05hz	0.527
+Domino	20	8 + 2 VPlot	05hz	0.315
+Domino	20	8 + 2 VPlot	05hz	0.352
+Domino	20	8 + 2 VPlot	05hz	0.251
+Domino	20	8 + 2 VPlot	05hz	0.396
+Domino	20	8 + 2 VPlot	05hz	0.313
+Domino	20	8 + 2 VPlot	05hz	0.329
+Domino	20	8 + 2 VPlot	05hz	0.352
+Domino	20	8 + 2 VPlot	05hz	0.448
+Domino	20	8 + 2 VPlot	05hz	0.382
+Domino	20	8 + 2 VPlot	05hz	1.501
+Domino	20	8 + 2 VPlot	05hz	1.603
+Domino	20	8 + 2 VPlot	05hz	8.307
+Domino	20	8 + 2 VPlot	05hz	1.147
+Domino	20	8 + 2 VPlot	05hz	1.075
+Domino	20	8 + 2 VPlot	05hz	1.322
+Domino	20	8 + 2 VPlot	05hz	0.895
+Domino	20	8 + 2 VPlot	05hz	1.308
+Domino	20	8 + 2 VPlot	05hz	1.965
+Domino	20	8 + 2 VPlot	05hz	1.953
+Domino	20	8 + 2 VPlot	05hz	1.296
+Domino	20	8 + 2 VPlot	05hz	1.702
+Domino	20	8 + 2 VPlot	05hz	1.449
+Domino	20	8 + 2 VPlot	05hz	2.13
+Domino	20	8 + 2 VPlot	05hz	1.127
+Domino	20	8 + 2 VPlot	05hz	2.142
+Domino	20	8 + 2 VPlot	05hz	3.801
+Domino	20	8 + 2 VPlot	05hz	1.413
+Domino	20	8 + 2 VPlot	05hz	2.148
+Domino	20	8 + 2 VPlot	05hz	3.673
+Domino	20	8 + 2 VPlot	05hz	1.623
+Domino	20	8 + 2 VPlot	05hz	1.599
+Domino	20	8 + 2 VPlot	05hz	1.126
+Domino	20	8 + 2 VPlot	05hz	1.448
+Domino	20	8 + 2 VPlot	05hz	2.303
+Domino	20	8 + 2 VPlot	05hz	1.903
+Domino	20	8 + 2 VPlot	05hz	3.054
+Domino	20	8 + 2 VPlot	05hz	1.304
+Domino	20	8 + 2 VPlot	05hz	0.592
+Domino	20	8 + 2 VPlot	05hz	0.95
+Domino	20	8 + 2 VPlot	05hz	0.963
+Domino	20	8 + 2 VPlot	05hz	1.092
+Domino	20	8 + 2 VPlot	05hz	1.042
+Domino	20	8 + 2 VPlot	05hz	1.169
+Domino	20	8 + 2 VPlot	05hz	0.788
+Domino	20	8 + 2 VPlot	05hz	1.007
+Domino	20	8 + 2 VPlot	05hz	1.024
+Domino	20	8 + 2 VPlot	05hz	1.18
+Domino	20	8 + 2 VPlot	05hz	3.111
+Domino	20	8 + 2 VPlot	05hz	0.759
+Domino	20	8 + 2 VPlot	05hz	0.997
+Domino	20	8 + 2 VPlot	05hz	1.419
+Domino	20	8 + 2 VPlot	05hz	1.515
+Domino	20	8 + 2 VPlot	05hz	4.696
+Domino	20	8 + 2 VPlot	05hz	1.47
+Domino	20	8 + 2 VPlot	05hz	1.129
+Domino	20	8 + 2 VPlot	05hz	1.693
+Domino	20	8 + 2 VPlot	05hz	1.214
+Domino	20	8 + 2 VPlot	05hz	2.169
+Domino	20	8 + 2 VPlot	05hz	3.717
+Domino	20	8 + 2 VPlot	05hz	9.182
+Domino	20	8 + 2 VPlot	05hz	3.025
+Domino	20	8 + 2 VPlot	05hz	7.326
+Domino	20	8 + 2 VPlot	05hz	3.801
+Domino	20	8 + 2 VPlot	05hz	7.498
+Domino	20	8 + 2 VPlot	05hz	5.525
+Domino	20	8 + 2 VPlot	05hz	4.578
+Domino	20	8 + 2 VPlot	05hz	7.104
+Domino	20	8 + 2 VPlot	05hz	5.959
+Domino	20	8 + 2 VPlot	05hz	10.205
+Domino	20	8 + 2 VPlot	05hz	2.073
+Domino	20	8 + 2 VPlot	05hz	1.673
+Domino	20	8 + 2 VPlot	05hz	2.514
+Domino	20	8 + 2 VPlot	05hz	2.147
+Domino	20	8 + 2 VPlot	05hz	2.161
+Domino	20	8 + 2 VPlot	05hz	3.103
+Domino	20	8 + 2 VPlot	05hz	2.536
+Domino	20	8 + 2 VPlot	05hz	5.723
+Domino	20	8 + 2 VPlot	05hz	0.959
+Domino	20	8 + 2 VPlot	05hz	1.126
+Domino	20	8 + 2 VPlot	05hz	3.592
+Domino	20	8 + 2 VPlot	05hz	3.249
+Domino	20	8 + 2 VPlot	05hz	2.828
+Domino	20	8 + 2 VPlot	05hz	2.4
+Domino	20	8 + 2 VPlot	05hz	2.562
+Domino	20	8 + 2 VPlot	05hz	1.492
+Domino	20	8 + 2 VPlot	05hz	1.425
+Domino	20	8 + 2 VPlot	05hz	1.435
+Domino	20	8 + 2 VPlot	05hz	3.087
+Domino	20	8 + 2 VPlot	05hz	3.354
+Domino	20	8 + 2 VPlot	05hz	1.323
+Domino	20	8 + 2 VPlot	05hz	1.079
+Domino	20	8 + 2 VPlot	05hz	1.21
+Domino	20	8 + 2 VPlot	05hz	1.108
+Domino	20	8 + 2 VPlot	05hz	0.829
+Domino	20	8 + 2 VPlot	05hz	1.08
+Domino	20	8 + 2 VPlot	05hz	1.034
+Domino	20	8 + 2 VPlot	05hz	4.104
+Domino	20	8 + 2 VPlot	05hz	3.818
+Domino	20	8 + 2 VPlot	05hz	1.484
+Domino	20	8 + 2 VPlot	05hz	2.462
+Domino	20	8 + 2 VPlot	05hz	2.53
+Domino	20	8 + 2 VPlot	05hz	2.035
+Domino	20	8 + 2 VPlot	05hz	2.577
+Domino	20	8 + 2 VPlot	05hz	3.464
+Domino	20	8 + 2 VPlot	05hz	1.981
+Domino	20	8 + 2 VPlot	05hz	2.416
+Domino	20	8 + 2 VPlot	05hz	2.148
+Domino	20	8 + 2 VPlot	05hz	6.379
+Domino	20	8 + 2 VPlot	05hz	2.498
+Domino	20	8 + 2 VPlot	05hz	1.898
+Domino	20	8 + 2 VPlot	05hz	5.207
+Domino	20	8 + 2 VPlot	05hz	2.826
+Domino	20	8 + 2 VPlot	05hz	1.935
+Domino	20	8 + 2 VPlot	05hz	2.463
+Domino	20	8 + 2 VPlot	05hz	5.847
+Domino	20	8 + 2 VPlot	05hz	2.829
+Domino	20	8 + 2 VPlot	05hz	2.151
+Domino	20	8 + 2 VPlot	05hz	2.325
+Domino	20	8 + 2 VPlot	05hz	4.526
+Domino	20	8 + 2 VPlot	05hz	1.917
+Domino	20	8 + 2 VPlot	05hz	2.548
+Domino	20	8 + 2 VPlot	05hz	2.67
+Domino	20	8 + 2 VPlot	05hz	2.822
+Domino	20	8 + 2 VPlot	05hz	2.101
+Domino	20	8 + 2 VPlot	05hz	2.911
+Domino	20	8 + 2 VPlot	05hz	1.361
+Domino	20	8 + 2 VPlot	05hz	4.567
+Domino	20	8 + 2 VPlot	05hz	2.396
+Domino	20	8 + 2 VPlot	05hz	3.101
+Domino	20	8 + 2 VPlot	05hz	6.645
+Domino	20	8 + 2 VPlot	05hz	2.363
+Domino	20	8 + 2 VPlot	05hz	2.924
+Domino	20	8 + 2 VPlot	05hz	4.341
+Domino	20	8 + 2 VPlot	05hz	1.267
+Domino	20	8 + 2 VPlot	05hz	1.54
+Domino	20	8 + 2 VPlot	05hz	1.353
+Domino	20	8 + 2 VPlot	05hz	11.783
+Domino	20	8 + 2 VPlot	05hz	1.361
+Domino	20	8 + 2 VPlot	05hz	5.42
+Domino	20	8 + 2 VPlot	05hz	2.378
+Domino	20	8 + 2 VPlot	05hz	1.599
+Domino	20	8 + 2 VPlot	05hz	1.736
+Domino	20	8 + 2 VPlot	05hz	1.757
+Domino	20	8 + 2 VPlot	05hz	11.696
+Domino	20	8 + 2 VPlot	05hz	1.619
+Domino	20	8 + 2 VPlot	05hz	1.713
+Domino	20	8 + 2 VPlot	05hz	0.578
+Domino	20	8 + 2 VPlot	05hz	0.75
+Domino	20	8 + 2 VPlot	05hz	0.831
+Domino	20	8 + 2 VPlot	05hz	0.694
+Domino	20	8 + 2 VPlot	05hz	0.674
+Domino	20	8 + 2 VPlot	05hz	0.652
+Domino	20	8 + 2 VPlot	05hz	0.715
+Domino	20	8 + 2 VPlot	05hz	0.775
+Domino	20	8 + 2 VPlot	05hz	0.791
+Domino	20	8 + 2 VPlot	05hz	0.728
+Domino	20	8 + 2 VPlot	05hz	0.687
+Domino	20	8 + 2 VPlot	05hz	0.646
+Domino	20	8 + 2 VPlot	05hz	0.683
+Domino	20	8 + 2 VPlot	05hz	0.713
+Domino	20	8 + 2 VPlot	05hz	0.738
+Domino	20	8 + 2 VPlot	05hz	0.91
+Domino	20	8 + 2 VPlot	05hz	1.532
+Domino	20	8 + 2 VPlot	05hz	1.656
+Domino	20	8 + 2 VPlot	05hz	11.609
+Domino	20	8 + 2 VPlot	05hz	1.91
+Domino	20	8 + 2 VPlot	05hz	11.842
+Domino	20	8 + 2 VPlot	05hz	1.706
+Domino	20	8 + 2 VPlot	05hz	9.781
+Domino	20	8 + 2 VPlot	05hz	1.47
+Domino	20	8 + 2 VPlot	05hz	1.29
+Domino	20	8 + 2 VPlot	05hz	11.072
+Domino	20	8 + 2 VPlot	05hz	1.465
+Domino	20	8 + 2 VPlot	05hz	1.823
+Domino	20	8 + 2 VPlot	05hz	6.236
+Domino	20	8 + 2 VPlot	05hz	0.854
+Domino	20	8 + 2 VPlot	05hz	0.843
+Domino	20	8 + 2 VPlot	05hz	0.714
+Domino	20	8 + 2 VPlot	05hz	0.778
+Domino	20	8 + 2 VPlot	05hz	0.6
+Domino	20	8 + 2 VPlot	05hz	0.618
+Domino	20	8 + 2 VPlot	05hz	0.728
+Domino	20	8 + 2 VPlot	05hz	1.791
+Domino	20	8 + 2 VPlot	05hz	2.586
+Domino	20	8 + 2 VPlot	05hz	9.84
+Domino	20	8 + 2 VPlot	05hz	1.481
+Domino	20	8 + 2 VPlot	05hz	1.349
+Domino	20	8 + 2 VPlot	05hz	1.366
+Domino	20	8 + 2 VPlot	05hz	1.354
+Domino	20	8 + 2 VPlot	05hz	1.965
+Domino	20	8 + 2 VPlot	05hz	1.516
+Domino	20	8 + 2 VPlot	05hz	11.996
+Domino	20	8 + 2 VPlot	05hz	1.792
+Domino	20	8 + 2 VPlot	05hz	12.056
+Domino	20	8 + 2 VPlot	05hz	2.059
+Domino	20	8 + 2 VPlot	05hz	12.459
+Domino	20	8 + 2 VPlot	05hz	2.207
+Domino	20	8 + 2 VPlot	05hz	7.432
+Domino	20	8 + 2 VPlot	05hz	1.471
+Domino	20	8 + 2 VPlot	05hz	2.496
+Domino	20	10 + 2 VPlots	05hz	2.755
+Domino	20	10 + 2 VPlots	05hz	1.953
+Domino	20	10 + 2 VPlots	05hz	0.718
+Domino	20	10 + 2 VPlots	05hz	0.564
+Domino	20	10 + 2 VPlots	05hz	0.665
+Domino	20	10 + 2 VPlots	05hz	0.884
+Domino	20	10 + 2 VPlots	05hz	2.46
+Domino	20	10 + 2 VPlots	05hz	3.219
+Domino	20	10 + 2 VPlots	05hz	1.814
+Domino	20	10 + 2 VPlots	05hz	2.276
+Domino	20	10 + 2 VPlots	05hz	1.26
+Domino	20	10 + 2 VPlots	05hz	1.486
+Domino	20	10 + 2 VPlots	05hz	1.49
+Domino	20	10 + 2 VPlots	05hz	1.624
+Domino	20	10 + 2 VPlots	05hz	1.977
+Domino	20	10 + 2 VPlots	05hz	1.332
+Domino	20	10 + 2 VPlots	05hz	1.365
+Domino	20	10 + 2 VPlots	05hz	4.162
+Domino	20	10 + 2 VPlots	05hz	1.329
+Domino	20	10 + 2 VPlots	05hz	2.725
+Domino	20	10 + 2 VPlots	05hz	1.019
+Domino	20	10 + 2 VPlots	05hz	1.179
+Domino	20	10 + 2 VPlots	05hz	1.58
+Domino	20	10 + 2 VPlots	05hz	1.977
+Domino	20	10 + 2 VPlots	05hz	1.173
+Domino	20	10 + 2 VPlots	05hz	0.974
+Domino	20	10 + 2 VPlots	05hz	1.665
+Domino	20	10 + 2 VPlots	05hz	1.474
+Domino	20	10 + 2 VPlots	05hz	6.769
+Domino	20	10 + 2 VPlots	05hz	2.673
+Domino	20	10 + 2 VPlots	05hz	4.185
+Domino	20	10 + 2 VPlots	05hz	6.614
+Domino	20	10 + 2 VPlots	05hz	2.601
+Domino	20	10 + 2 VPlots	05hz	2.979
+Domino	20	10 + 2 VPlots	05hz	11.721
+Domino	20	10 + 2 VPlots	05hz	10.164
+Domino	20	10 + 2 VPlots	05hz	5.693
+Domino	20	10 + 2 VPlots	05hz	0.937
+Domino	20	10 + 2 VPlots	05hz	1.069
+Domino	20	10 + 2 VPlots	05hz	1.98
+Domino	20	10 + 2 VPlots	05hz	1.197
+Domino	20	10 + 2 VPlots	05hz	4.466
+Domino	20	10 + 2 VPlots	05hz	9.539
+Domino	20	10 + 2 VPlots	05hz	9.305
+Domino	20	10 + 2 VPlots	05hz	9.024
+Domino	20	10 + 2 VPlots	05hz	3.679
+Domino	20	10 + 2 VPlots	05hz	9.055
+Domino	20	10 + 2 VPlots	05hz	4.091
+Domino	20	10 + 2 VPlots	05hz	16.418
+Domino	20	10 + 2 VPlots	05hz	23.892
+Domino	20	10 + 2 VPlots	05hz	24.231
+Domino	20	10 + 2 VPlots	05hz	8.406
+Domino	20	10 + 2 VPlots	05hz	13.859
+Domino	20	10 + 2 VPlots	05hz	0.783
+Domino	20	10 + 2 VPlots	05hz	0.616
+Domino	20	10 + 2 VPlots	05hz	0.82
+Domino	20	10 + 2 VPlots	05hz	0.788
+Domino	20	10 + 2 VPlots	05hz	1.089
+Domino	20	10 + 2 VPlots	05hz	4.053
+Domino	20	10 + 2 VPlots	05hz	3.89
+Domino	20	10 + 2 VPlots	05hz	3.056
+Domino	20	10 + 2 VPlots	05hz	7.421
+Domino	20	10 + 2 VPlots	05hz	2.932
+Domino	20	10 + 2 VPlots	05hz	3.385
+Domino	20	10 + 2 VPlots	05hz	6.19
+Domino	20	10 + 2 VPlots	05hz	3.302
+Domino	20	10 + 2 VPlots	05hz	5.942
+Domino	20	10 + 2 VPlots	05hz	3.329
+Domino	20	10 + 2 VPlots	05hz	4.348
+Domino	20	10 + 2 VPlots	05hz	5.771
+Domino	20	10 + 2 VPlots	05hz	2.557
+Domino	20	10 + 2 VPlots	05hz	10.519
+Domino	20	10 + 2 VPlots	05hz	2.818
+Domino	20	10 + 2 VPlots	05hz	9.006
+Domino	20	10 + 2 VPlots	05hz	6.955
+Domino	20	10 + 2 VPlots	05hz	2.997
+Domino	20	10 + 2 VPlots	05hz	1.377
+Domino	20	10 + 2 VPlots	05hz	1.154
+Domino	20	10 + 2 VPlots	05hz	4.582
+Domino	20	10 + 2 VPlots	05hz	2.699
+Domino	20	10 + 2 VPlots	05hz	15.34
+Domino	20	10 + 2 VPlots	05hz	11.841
+Domino	20	10 + 2 VPlots	05hz	0.988
+Domino	20	10 + 2 VPlots	05hz	0.876
+Domino	20	10 + 2 VPlots	05hz	1.265
+Domino	20	10 + 2 VPlots	05hz	2.033
+Domino	20	10 + 2 VPlots	05hz	1.913
+Domino	20	10 + 2 VPlots	05hz	2.261
+Domino	20	10 + 2 VPlots	05hz	5.984
+Domino	20	10 + 2 VPlots	05hz	6.494
+Domino	20	10 + 2 VPlots	05hz	7.868
+Domino	20	10 + 2 VPlots	05hz	4.304
+Domino	20	10 + 2 VPlots	05hz	47.085
+Domino	20	10 + 2 VPlots	05hz	5.301
+Domino	20	10 + 2 VPlots	05hz	1.836
+Domino	20	10 + 2 VPlots	05hz	1.6
+Domino	20	10 + 2 VPlots	05hz	1.461
+Domino	20	10 + 2 VPlots	05hz	1.631
+Domino	20	10 + 2 VPlots	05hz	2.01
+Domino	20	10 + 2 VPlots	05hz	4.224
+Domino	20	10 + 2 VPlots	05hz	2.543
+Domino	20	10 + 2 VPlots	05hz	1.746
+Domino	20	10 + 2 VPlots	05hz	1.598
+Domino	20	10 + 2 VPlots	05hz	2.363
+Domino	20	10 + 2 VPlots	05hz	1.871
+Domino	20	10 + 2 VPlots	05hz	1.962
+Domino	20	10 + 2 VPlots	05hz	4.531
+Domino	20	10 + 2 VPlots	05hz	2.783
+Domino	20	10 + 2 VPlots	05hz	1.995
+Domino	20	10 + 2 VPlots	05hz	1.732
+Domino	20	10 + 2 VPlots	05hz	1.412
+Domino	20	10 + 2 VPlots	05hz	1.955
+Domino	20	10 + 2 VPlots	05hz	5.046
+Domino	20	10 + 2 VPlots	05hz	2.448
+Domino	20	10 + 2 VPlots	05hz	2.135
+Domino	20	10 + 2 VPlots	05hz	1.409
+Domino	20	10 + 2 VPlots	05hz	2.384
+Domino	20	10 + 2 VPlots	05hz	0.741
+Domino	20	10 + 2 VPlots	05hz	0.607
+Domino	20	10 + 2 VPlots	05hz	0.695
+Domino	20	10 + 2 VPlots	05hz	0.763
+Domino	20	10 + 2 VPlots	05hz	9.935
+Domino	20	10 + 2 VPlots	05hz	1.81
+Domino	20	10 + 2 VPlots	05hz	4.891
+Domino	20	10 + 2 VPlots	05hz	2.918
+Domino	20	10 + 2 VPlots	05hz	2.126
+Domino	20	10 + 2 VPlots	05hz	1.226
+Domino	20	10 + 2 VPlots	05hz	5.011
+Domino	20	10 + 2 VPlots	05hz	2.409
+Domino	20	10 + 2 VPlots	05hz	1.778
+Domino	20	10 + 2 VPlots	05hz	1.596
+Domino	20	10 + 2 VPlots	05hz	2.263
+Domino	20	10 + 2 VPlots	05hz	2.29
+Domino	20	10 + 2 VPlots	05hz	1.523
+Domino	20	10 + 2 VPlots	05hz	1.158
+Domino	20	10 + 2 VPlots	05hz	1.772
+Domino	20	10 + 2 VPlots	05hz	5.082
+Domino	20	10 + 2 VPlots	05hz	2.512
+Domino	20	10 + 2 VPlots	05hz	0.862
+Domino	20	10 + 2 VPlots	05hz	2.491
+Domino	20	10 + 2 VPlots	05hz	1.507
+Domino	20	10 + 2 VPlots	05hz	1.686
+Domino	20	10 + 2 VPlots	05hz	2.506
+Domino	20	10 + 2 VPlots	05hz	2.147
+Domino	20	10 + 2 VPlots	05hz	2.881
+Domino	20	10 + 2 VPlots	05hz	2.263
+Domino	20	10 + 2 VPlots	05hz	3.735
+Domino	20	10 + 2 VPlots	05hz	9.398
+Domino	20	10 + 2 VPlots	05hz	3.157
+Domino	20	10 + 2 VPlots	05hz	5.358
+Domino	20	10 + 2 VPlots	05hz	0.641
+Domino	20	10 + 2 VPlots	05hz	1.426
+Domino	20	10 + 2 VPlots	05hz	11.867
+Domino	20	10 + 2 VPlots	05hz	2.1
+Domino	20	10 + 2 VPlots	05hz	3.291
+Domino	20	10 + 2 VPlots	05hz	8.215
+Domino	20	10 + 2 VPlots	05hz	2.46
+Domino	20	10 + 2 VPlots	05hz	1.561
+Domino	20	10 + 2 VPlots	05hz	4.993
+Domino	20	10 + 2 VPlots	05hz	2.923
+Domino	20	10 + 2 VPlots	05hz	2.602
+Domino	20	10 + 2 VPlots	05hz	2.941
+Domino	20	10 + 2 VPlots	05hz	1.404
+Domino	20	10 + 2 VPlots	05hz	6.754
+Domino	20	10 + 2 VPlots	05hz	3.955
+Domino	20	10 + 2 VPlots	05hz	1.437
+Domino	20	10 + 2 VPlots	05hz	4.968
+Domino	20	10 + 2 VPlots	05hz	1.598
+Domino	20	10 + 2 VPlots	05hz	2.426
+Domino	20	10 + 2 VPlots	05hz	3.885
+Domino	20	10 + 2 VPlots	05hz	23.333
+Domino	20	10 + 2 VPlots	05hz	1.635
+Domino	20	10 + 2 VPlots	05hz	2.573
+Domino	20	10 + 2 VPlots	05hz	2.214
+Domino	20	10 + 2 VPlots	05hz	1.916
+Domino	20	10 + 2 VPlots	05hz	0.804
+Domino	20	10 + 2 VPlots	05hz	1.032
+Domino	20	10 + 2 VPlots	05hz	2.103
+Domino	20	10 + 2 VPlots	05hz	2.527
+Domino	20	10 + 2 VPlots	05hz	2.225
+Domino	20	10 + 2 VPlots	05hz	1.976
+Domino	20	10 + 2 VPlots	05hz	1.189
+Domino	20	10 + 2 VPlots	05hz	1.142
+Domino	20	10 + 2 VPlots	05hz	1.463
+Domino	20	10 + 2 VPlots	05hz	2.883
+Domino	20	10 + 2 VPlots	05hz	1.413
+Domino	20	10 + 2 VPlots	05hz	0.788
+Domino	20	10 + 2 VPlots	05hz	1.505
+Domino	20	10 + 2 VPlots	05hz	2.313
+Domino	20	10 + 2 VPlots	05hz	1.288
+Domino	20	10 + 2 VPlots	05hz	1.566
+Domino	20	10 + 2 VPlots	05hz	2.318
+Domino	20	10 + 2 VPlots	05hz	2.521
+Domino	20	10 + 2 VPlots	05hz	3.052
+Domino	20	10 + 2 VPlots	05hz	4.824
+Domino	20	10 + 2 VPlots	05hz	6.72
+Domino	20	10 + 2 VPlots	05hz	3.045
+Domino	20	10 + 2 VPlots	05hz	3.19
+Domino	20	10 + 2 VPlots	05hz	6.99
+Domino	20	10 + 2 VPlots	05hz	3.247
+Domino	20	10 + 2 VPlots	05hz	5.136
+Domino	20	10 + 2 VPlots	05hz	5.339
+Domino	20	10 + 2 VPlots	05hz	2.61
+Domino	20	10 + 2 VPlots	05hz	2.375
+Domino	20	10 + 2 VPlots	05hz	6.675
+Domino	20	10 + 2 VPlots	05hz	3.596
+Domino	20	10 + 2 VPlots	05hz	1.96
+Domino	20	10 + 2 VPlots	05hz	3.777
+Domino	20	10 + 2 VPlots	05hz	13.561
+Domino	20	10 + 2 VPlots	05hz	3.951
+Domino	20	10 + 2 VPlots	05hz	4.582
+Domino	20	10 + 2 VPlots	05hz	5.158
+Domino	20	10 + 2 VPlots	05hz	3.056
+Domino	20	10 + 2 VPlots	05hz	5.796
+Domino	20	10 + 2 VPlots	05hz	2.822
+Domino	20	10 + 2 VPlots	05hz	3.727
+Domino	20	10 + 2 VPlots	05hz	6.168
+Domino	20	10 + 2 VPlots	05hz	5.583
+Domino	20	10 + 2 VPlots	05hz	5.799
+Domino	20	10 + 2 VPlots	05hz	3.51
+Domino	20	10 + 2 VPlots	05hz	3.548
+Domino	20	10 + 2 VPlots	05hz	5.582
+Domino	20	10 + 2 VPlots	05hz	2.856
+Domino	20	10 + 2 VPlots	05hz	2.716
+Domino	20	10 + 2 VPlots	05hz	5.701
+Domino	20	10 + 2 VPlots	05hz	2.982
+Domino	20	10 + 2 VPlots	05hz	2.546
+Domino	20	10 + 2 VPlots	05hz	3.372
+Domino	20	10 + 2 VPlots	05hz	1.973
+Domino	20	10 + 2 VPlots	05hz	1.35
+Domino	20	10 + 2 VPlots	05hz	1.693
+Domino	20	10 + 2 VPlots	05hz	1.304
+Domino	20	10 + 2 VPlots	05hz	1.438
+Domino	20	10 + 2 VPlots	05hz	1.365
+Domino	20	10 + 2 VPlots	05hz	1.686
+Domino	20	10 + 2 VPlots	05hz	1.445
+Domino	20	10 + 2 VPlots	05hz	1.983
+Domino	20	10 + 2 VPlots	05hz	1.879
+Domino	20	10 + 2 VPlots	05hz	1.731
+Domino	20	10 + 2 VPlots	05hz	1.514
+Domino	20	10 + 2 VPlots	05hz	2.367
+Domino	20	10 + 2 VPlots	05hz	3.047
+Domino	20	10 + 2 VPlots	05hz	22.115
+Domino	20	10 + 2 VPlots	05hz	1.4
+Domino	20	10 + 2 VPlots	05hz	1.038
+Domino	20	10 + 2 VPlots	05hz	1.459
+Domino	20	10 + 2 VPlots	05hz	1.349
+Domino	20	10 + 2 VPlots	05hz	2.864
+Domino	20	10 + 2 VPlots	05hz	1.089
+Domino	20	10 + 2 VPlots	05hz	1.021
+Domino	20	10 + 2 VPlots	05hz	0.81
+Domino	20	10 + 2 VPlots	05hz	0.543
+Domino	20	10 + 2 VPlots	05hz	0.905
+Domino	20	10 + 2 VPlots	05hz	0.782
+Domino	20	10 + 2 VPlots	05hz	0.702
+Domino	20	10 + 2 VPlots	05hz	0.844
+Domino	20	10 + 2 VPlots	05hz	0.971
+Domino	20	10 + 2 VPlots	05hz	1.244
+Domino	20	10 + 2 VPlots	05hz	1.447
+Domino	20	10 + 2 VPlots	05hz	1.57
+Domino	20	10 + 2 VPlots	05hz	2.618
+Domino	20	10 + 2 VPlots	05hz	6.193
+Domino	20	10 + 2 VPlots	05hz	3.016
+Domino	20	10 + 2 VPlots	05hz	6.295
+Domino	20	10 + 2 VPlots	05hz	2.426
+Domino	20	10 + 2 VPlots	05hz	1.799
+Domino	20	10 + 2 VPlots	05hz	2.536
+Domino	20	10 + 2 VPlots	05hz	1.59
+Domino	20	10 + 2 VPlots	05hz	1.872
+Domino	20	10 + 2 VPlots	05hz	5.986
+Domino	20	10 + 2 VPlots	05hz	1.878
+Domino	20	10 + 2 VPlots	05hz	2.949
+Domino	20	10 + 2 VPlots	05hz	6.273
+Domino	20	10 + 2 VPlots	05hz	2.478
+Domino	20	10 + 2 VPlots	05hz	1.883
+Domino	20	10 + 2 VPlots	05hz	1.857
+Domino	20	10 + 2 VPlots	05hz	5.48
+Domino	20	10 + 2 VPlots	05hz	1.636
+Domino	20	10 + 2 VPlots	05hz	1.993
+Domino	20	10 + 2 VPlots	05hz	1.497
+Domino	20	10 + 2 VPlots	05hz	12.38
+Domino	20	8 + 2 VPlot	05hz	0.439
+Domino	20	8 + 2 VPlot	05hz	0.293
+Domino	20	8 + 2 VPlot	05hz	5.144
+Domino	20	8 + 2 VPlot	05hz	0.297
+Domino	20	8 + 2 VPlot	05hz	0.33
+Domino	20	8 + 2 VPlot	05hz	0.351
+Domino	20	8 + 2 VPlot	05hz	0.363
+Domino	20	8 + 2 VPlot	05hz	0.469
+Domino	20	8 + 2 VPlot	05hz	0.58
+Domino	20	8 + 2 VPlot	05hz	0.609
+Domino	20	8 + 2 VPlot	05hz	0.694
+Domino	20	8 + 2 VPlot	05hz	0.868
+Domino	20	8 + 2 VPlot	05hz	1.225
+Domino	20	8 + 2 VPlot	05hz	3.079
+Domino	20	10 + 2 VPlots	05hz	2.038
+Domino	20	10 + 2 VPlots	05hz	1.694
+Domino	20	10 + 2 VPlots	05hz	2.426
+Domino	20	10 + 2 VPlots	05hz	2.14
+Domino	20	10 + 2 VPlots	05hz	1.956
+Domino	20	10 + 2 VPlots	05hz	1.889
+Domino	20	10 + 2 VPlots	05hz	2.697
+Domino	20	10 + 2 VPlots	05hz	1.901
+Domino	20	10 + 2 VPlots	05hz	5.459
+Domino	20	10 + 2 VPlots	05hz	2.732
+Domino	20	10 + 2 VPlots	05hz	1.782
+Domino	20	10 + 2 VPlots	05hz	1.549
+Domino	20	10 + 2 VPlots	05hz	5.513
+Domino	20	10 + 2 VPlots	05hz	2.052
+Domino	20	10 + 2 VPlots	05hz	1.392
+Domino	20	10 + 2 VPlots	05hz	1.385
+Domino	20	10 + 2 VPlots	05hz	1.987
+Domino	20	10 + 2 VPlots	05hz	6.253
+Domino	20	10 + 2 VPlots	05hz	2.029
+Domino	20	10 + 2 VPlots	05hz	2.105
+Domino	20	10 + 2 VPlots	05hz	1.608
+Domino	20	10 + 2 VPlots	05hz	13.79
+Domino	20	10 + 2 VPlots	05hz	8.705
+Domino	20	10 + 2 VPlots	05hz	2.352
+Domino	20	10 + 2 VPlots	05hz	17.349
+Domino	20	10 + 2 VPlots	05hz	12.246
+Domino	20	10 + 2 VPlots	05hz	10.724
+Domino	20	10 + 2 VPlots	05hz	3.414
+Domino	20	10 + 2 VPlots	05hz	9.273
+Domino	20	10 + 2 VPlots	05hz	1.74
+Domino	20	10 + 2 VPlots	05hz	1.221
+Domino	20	10 + 2 VPlots	05hz	1.416
+Domino	20	10 + 2 VPlots	05hz	2.035
+Domino	20	10 + 2 VPlots	05hz	1.435
+Domino	20	10 + 2 VPlots	05hz	1.626
+Domino	20	10 + 2 VPlots	05hz	1.04
+Domino	20	10 + 2 VPlots	05hz	2.913
+Domino	20	10 + 2 VPlots	05hz	1.986
+Domino	20	10 + 2 VPlots	05hz	1.621
+Domino	20	10 + 2 VPlots	05hz	1.106
+Domino	20	10 + 2 VPlots	05hz	0.951
+Domino	20	10 + 2 VPlots	05hz	2.653
+Domino	20	10 + 2 VPlots	05hz	2.001
+Domino	20	10 + 2 VPlots	05hz	1.682
+Domino	20	10 + 2 VPlots	05hz	1.11
+Domino	20	10 + 2 VPlots	05hz	1.246
+Domino	20	10 + 2 VPlots	05hz	6.656
+Domino	20	10 + 2 VPlots	05hz	1.077
+Domino	20	10 + 2 VPlots	05hz	1.08
+Domino	20	10 + 2 VPlots	05hz	1.146
+Domino	20	10 + 2 VPlots	05hz	3.586
+Domino	20	10 + 2 VPlots	05hz	2.058
+Domino	20	10 + 2 VPlots	05hz	1.788
+Domino	20	10 + 2 VPlots	05hz	5.841
+Domino	20	10 + 2 VPlots	05hz	2.003
+Domino	20	10 + 2 VPlots	05hz	1.126
+Domino	20	10 + 2 VPlots	05hz	1.454
+Domino	20	10 + 2 VPlots	05hz	3.545
+Domino	20	10 + 2 VPlots	05hz	1.58
+Domino	20	10 + 2 VPlots	05hz	1.41
+Domino	20	10 + 2 VPlots	05hz	1.157
+Domino	20	10 + 2 VPlots	05hz	7.926
+Domino	20	10 + 2 VPlots	05hz	2.666
+Domino	20	10 + 2 VPlots	05hz	1.669
+Domino	20	10 + 2 VPlots	05hz	1.223
+Domino	20	10 + 2 VPlots	05hz	1.307
+Domino	20	10 + 2 VPlots	05hz	2.391
+Domino	20	10 + 2 VPlots	05hz	1.622
+Domino	20	10 + 2 VPlots	05hz	1.882
+Domino	20	10 + 2 VPlots	05hz	1.944
+Domino	20	10 + 2 VPlots	05hz	5.154
+Domino	20	10 + 2 VPlots	05hz	2.14
+Domino	20	10 + 2 VPlots	05hz	1.784
+Domino	20	10 + 2 VPlots	05hz	1.675
+Domino	20	10 + 2 VPlots	05hz	2.045
+Domino	20	10 + 2 VPlots	05hz	1.907
+Domino	20	10 + 2 VPlots	05hz	2.556
+Domino	20	10 + 2 VPlots	05hz	7.373
+Domino	20	10 + 2 VPlots	05hz	1.868
+Domino	20	10 + 2 VPlots	05hz	1.257
+Domino	20	10 + 2 VPlots	05hz	4.368
+Domino	20	10 + 2 VPlots	05hz	2.405
+Domino	20	10 + 2 VPlots	05hz	1.618
+Domino	20	10 + 2 VPlots	05hz	2.416
+Domino	20	10 + 2 VPlots	05hz	5.262
+Domino	20	10 + 2 VPlots	05hz	2.162
+Domino	20	10 + 2 VPlots	05hz	3.415
+Domino	20	10 + 2 VPlots	05hz	4.66
+Domino	20	10 + 2 VPlots	05hz	1.321
+Domino	20	10 + 2 VPlots	05hz	1.466
+Domino	20	10 + 2 VPlots	05hz	2.017
+Domino	20	10 + 2 VPlots	05hz	2.506
+Domino	20	10 + 2 VPlots	05hz	1.325
+Domino	20	10 + 2 VPlots	05hz	1.229
+Domino	20	10 + 2 VPlots	05hz	2.695
+Domino	20	10 + 2 VPlots	05hz	1.573
+Domino	20	10 + 2 VPlots	05hz	1.918
+Domino	20	10 + 2 VPlots	05hz	1.788
+Domino	20	10 + 2 VPlots	05hz	2.295
+Domino	20	10 + 2 VPlots	05hz	5.078
+Domino	20	10 + 2 VPlots	05hz	1.45
+Domino	20	10 + 2 VPlots	05hz	1.772
+Domino	20	10 + 2 VPlots	05hz	2.213
+Domino	20	10 + 2 VPlots	05hz	5.211
+Domino	20	10 + 2 VPlots	05hz	2.672
+Domino	20	10 + 2 VPlots	05hz	2.046
+Domino	20	10 + 2 VPlots	05hz	2.054
+Domino	20	10 + 2 VPlots	05hz	4.89
+Domino	20	10 + 2 VPlots	05hz	2.374
+Domino	20	10 + 2 VPlots	05hz	5.757
+Domino	20	10 + 2 VPlots	05hz	1.763
+Domino	20	10 + 2 VPlots	05hz	1.272
+Domino	20	10 + 2 VPlots	05hz	1.081
+Domino	20	10 + 2 VPlots	05hz	0.952
+Domino	20	10 + 2 VPlots	05hz	1.226
+Domino	20	10 + 2 VPlots	05hz	4.104
+Domino	20	10 + 2 VPlots	05hz	1.727
+Domino	20	10 + 2 VPlots	05hz	1.927
+Domino	20	10 + 2 VPlots	05hz	2.296
+Domino	20	10 + 2 VPlots	05hz	3.153
+Domino	20	10 + 2 VPlots	05hz	1.637
+Domino	20	10 + 2 VPlots	05hz	1.566
+Domino	20	10 + 2 VPlots	05hz	2.241
+Domino	20	10 + 2 VPlots	05hz	2.061
+Domino	20	10 + 2 VPlots	05hz	4.23
+Domino	20	10 + 2 VPlots	05hz	1.447
+Domino	20	10 + 2 VPlots	05hz	2.177
+Domino	20	10 + 2 VPlots	05hz	2.001
+Domino	20	10 + 2 VPlots	05hz	5.098
+Domino	20	10 + 2 VPlots	05hz	1.707
+Domino	20	10 + 2 VPlots	05hz	2.571
+Domino	20	10 + 2 VPlots	05hz	3.038
+Domino	20	10 + 2 VPlots	05hz	1.036
+Domino	20	10 + 2 VPlots	05hz	1.47
+Domino	20	10 + 2 VPlots	05hz	2.36
+Domino	20	10 + 2 VPlots	05hz	2.883
+Domino	20	10 + 2 VPlots	05hz	4.755
+Domino	20	10 + 2 VPlots	05hz	1.427
+Domino	20	10 + 2 VPlots	05hz	6.177
+Domino	20	10 + 2 VPlots	05hz	1.324
+Domino	20	10 + 2 VPlots	05hz	3.699
+Domino	20	10 + 2 VPlots	05hz	1.198
+Domino	20	10 + 2 VPlots	05hz	2.585
+Domino	20	10 + 2 VPlots	05hz	1.468
+Domino	20	10 + 2 VPlots	05hz	9.324
+Domino	20	10 + 2 VPlots	05hz	2.715
+Domino	20	10 + 2 VPlots	05hz	2.073
+Domino	20	10 + 2 VPlots	05hz	5.898
+Domino	20	10 + 2 VPlots	05hz	0.761
+Domino	20	10 + 2 VPlots	05hz	1.061
+Domino	20	10 + 2 VPlots	05hz	14.521
+Domino	20	10 + 2 VPlots	05hz	6.279
+Domino	20	10 + 2 VPlots	05hz	3.675
+Domino	20	10 + 2 VPlots	05hz	2.35
+Domino	20	10 + 2 VPlots	05hz	7.787
+Domino	20	10 + 2 VPlots	05hz	2.938
+Domino	20	10 + 2 VPlots	05hz	4.054
+Domino	20	10 + 2 VPlots	05hz	5.411
+Domino	20	10 + 2 VPlots	05hz	3.336
+Domino	20	10 + 2 VPlots	05hz	4.077
+Domino	20	10 + 2 VPlots	05hz	3.906
+Domino	20	10 + 2 VPlots	05hz	12.447
+Domino	20	10 + 2 VPlots	05hz	5.105
+Domino	20	10 + 2 VPlots	05hz	10.224
+Domino	20	10 + 2 VPlots	05hz	4.797
+Domino	20	10 + 2 VPlots	05hz	3.61
+Domino	20	10 + 2 VPlots	05hz	0.721
+Domino	20	10 + 2 VPlots	05hz	0.861
+Domino	20	10 + 2 VPlots	05hz	1.188
+Domino	20	10 + 2 VPlots	05hz	0.718
+Domino	20	10 + 2 VPlots	05hz	5.075
+Domino	20	10 + 2 VPlots	05hz	5.55
+Domino	20	10 + 2 VPlots	05hz	2.712
+Domino	20	10 + 2 VPlots	05hz	5.222
+Domino	20	10 + 2 VPlots	05hz	1.613
+Domino	20	10 + 2 VPlots	05hz	2.174
+Domino	20	10 + 2 VPlots	05hz	1.187
+Domino	20	10 + 2 VPlots	05hz	1.248
+Domino	20	10 + 2 VPlots	05hz	1.515
+Domino	20	10 + 2 VPlots	05hz	2.157
+Domino	20	10 + 2 VPlots	05hz	1.923
+Domino	20	10 + 2 VPlots	05hz	2.086
+Domino	20	10 + 2 VPlots	05hz	11.612
+Domino	20	10 + 2 VPlots	05hz	1.072
+Domino	20	10 + 2 VPlots	05hz	4.0
+Domino	20	10 + 2 VPlots	05hz	1.379
+Domino	20	10 + 2 VPlots	05hz	1.222
+Domino	20	10 + 2 VPlots	05hz	1.331
+Domino	20	10 + 2 VPlots	05hz	0.813
+Domino	20	10 + 2 VPlots	05hz	0.913
+Domino	20	10 + 2 VPlots	05hz	0.956
+Domino	20	10 + 2 VPlots	05hz	1.067
+Domino	20	10 + 2 VPlots	05hz	1.828
+Domino	20	10 + 2 VPlots	05hz	1.541
+Domino	20	10 + 2 VPlots	05hz	2.562
+Domino	20	10 + 2 VPlots	05hz	2.859
+Domino	20	10 + 2 VPlots	05hz	1.415
+Domino	20	10 + 2 VPlots	05hz	11.878
+Domino	20	10 + 2 VPlots	05hz	1.343
+Domino	20	10 + 2 VPlots	05hz	1.704
+Domino	20	10 + 2 VPlots	05hz	1.512
+Domino	20	10 + 2 VPlots	05hz	0.613
+Domino	20	10 + 2 VPlots	05hz	0.923
+Domino	20	10 + 2 VPlots	05hz	4.897
+Domino	20	10 + 2 VPlots	05hz	1.795
+Domino	20	10 + 2 VPlots	05hz	5.216
+Domino	20	10 + 2 VPlots	05hz	3.558
+Domino	20	10 + 2 VPlots	05hz	7.158
+Domino	20	10 + 2 VPlots	05hz	0.462
+Domino	20	10 + 2 VPlots	05hz	0.216
+Domino	20	10 + 2 VPlots	05hz	0.231
+Domino	20	10 + 2 VPlots	05hz	0.22
+Domino	20	10 + 2 VPlots	05hz	0.309
+Domino	20	10 + 2 VPlots	05hz	0.303
+Domino	20	10 + 2 VPlots	05hz	0.337
+Domino	20	10 + 2 VPlots	05hz	0.671
+Domino	20	10 + 2 VPlots	05hz	0.987
+Domino	20	10 + 2 VPlots	05hz	0.785
+Domino	20	10 + 2 VPlots	05hz	0.695
+Domino	20	10 + 2 VPlots	05hz	0.693
+Domino	20	10 + 2 VPlots	05hz	0.711
+Domino	20	10 + 2 VPlots	05hz	0.486
+Domino	20	10 + 2 VPlots	05hz	0.978
+Domino	20	10 + 2 VPlots	05hz	0.887
+Domino	20	10 + 2 VPlots	05hz	0.781
+Domino	20	10 + 2 VPlots	05hz	0.666
+Domino	20	10 + 2 VPlots	05hz	0.771
+Domino	20	8 + 2 VPlot	05hz	1.685
+Domino	20	8 + 2 VPlot	05hz	1.083
+Domino	20	8 + 2 VPlot	05hz	1.948
+Domino	20	8 + 2 VPlot	05hz	1.96
+Domino	20	8 + 2 VPlot	05hz	2.215
+Domino	20	8 + 2 VPlot	05hz	1.402
+Domino	20	8 + 2 VPlot	05hz	1.508
+Domino	20	8 + 2 VPlot	05hz	2.443
+Domino	20	8 + 2 VPlot	05hz	1.339
+Domino	20	8 + 2 VPlot	05hz	1.444
+Domino	20	8 + 2 VPlot	05hz	1.99
+Domino	20	8 + 2 VPlot	05hz	3.677
+Domino	20	8 + 2 VPlot	05hz	1.501
+Domino	20	8 + 2 VPlot	05hz	2.437
+Domino	20	8 + 2 VPlot	05hz	1.991
+Domino	20	8 + 2 VPlot	05hz	2.455
+Domino	20	8 + 2 VPlot	05hz	2.046
+Domino	20	8 + 2 VPlot	05hz	1.678
+Domino	20	8 + 2 VPlot	05hz	1.702
+Domino	20	8 + 2 VPlot	05hz	2.059
+Domino	20	10 + 2 VPlots	05hz	2.119
+Domino	20	10 + 2 VPlots	05hz	1.035
+Domino	20	10 + 2 VPlots	05hz	0.995
+Domino	20	10 + 2 VPlots	05hz	0.808
+Domino	20	10 + 2 VPlots	05hz	0.827
+Domino	20	10 + 2 VPlots	05hz	0.587
+Domino	20	10 + 2 VPlots	05hz	0.446
+Domino	20	10 + 2 VPlots	05hz	0.436
+Domino	20	10 + 2 VPlots	05hz	1.115
+Domino	20	10 + 2 VPlots	05hz	0.853
+Domino	20	10 + 2 VPlots	05hz	2.022
+Domino	20	10 + 2 VPlots	05hz	5.943
+Domino	20	10 + 2 VPlots	05hz	3.229
+Domino	20	10 + 2 VPlots	05hz	2.56
+Domino	20	10 + 2 VPlots	05hz	3.467
+Domino	20	10 + 2 VPlots	05hz	7.198
+Domino	20	10 + 2 VPlots	05hz	2.652
+Domino	20	8 + 2 VPlot	05hz	1.014
+Domino	20	8 + 2 VPlot	05hz	11.497
+Domino	20	8 + 2 VPlot	05hz	4.674
+Domino	20	8 + 2 VPlot	05hz	1.417
+Domino	20	8 + 2 VPlot	05hz	1.733
+Domino	20	8 + 2 VPlot	05hz	2.2
+Domino	20	8 + 2 VPlot	05hz	11.431
+Domino	20	8 + 2 VPlot	05hz	1.117
+Domino	20	8 + 2 VPlot	05hz	1.894
+Domino	20	8 + 2 VPlot	05hz	7.968
+Domino	20	8 + 2 VPlot	05hz	1.38
+Domino	20	8 + 2 VPlot	05hz	1.669
+Domino	20	8 + 2 VPlot	05hz	1.507
+Domino	20	8 + 2 VPlot	05hz	1.134
+Domino	20	8 + 2 VPlot	05hz	1.934
+Domino	20	8 + 2 VPlot	05hz	1.117
+Domino	20	8 + 2 VPlot	05hz	11.291
+Domino	20	8 + 2 VPlot	05hz	0.978
+Domino	20	8 + 2 VPlot	05hz	9.04
+Domino	20	8 + 2 VPlot	05hz	1.501
+Domino	20	8 + 2 VPlot	05hz	4.184
+Domino	20	8 + 2 VPlot	05hz	2.362
+Domino	20	8 + 2 VPlot	05hz	1.97
+Domino	20	8 + 2 VPlot	05hz	8.201
+Domino	20	8 + 2 VPlot	05hz	1.051
+Domino	20	8 + 2 VPlot	05hz	1.257
+Domino	20	8 + 2 VPlot	05hz	5.664
+Domino	20	8 + 2 VPlot	05hz	2.346
+Domino	20	8 + 2 VPlot	05hz	12.753
+Domino	20	8 + 2 VPlot	05hz	2.12
+Domino	20	8 + 2 VPlot	05hz	2.513
+Domino	20	8 + 2 VPlot	05hz	2.122
+Domino	20	8 + 2 VPlot	05hz	1.621
+Domino	20	8 + 2 VPlot	05hz	2.118
+Domino	20	8 + 2 VPlot	05hz	5.428
+Domino	20	8 + 2 VPlot	05hz	3.015
+Domino	20	8 + 2 VPlot	05hz	2.287
+Domino	20	8 + 2 VPlot	05hz	0.817
+Domino	20	8 + 2 VPlot	05hz	1.155
+Domino	20	8 + 2 VPlot	05hz	1.417
+Domino	20	8 + 2 VPlot	05hz	6.471
+Domino	20	8 + 2 VPlot	05hz	4.558
+Domino	20	8 + 2 VPlot	05hz	4.225
+Domino	20	8 + 2 VPlot	05hz	3.55
+Domino	20	8 + 2 VPlot	05hz	8.942
+Domino	20	8 + 2 VPlot	05hz	5.134
+Domino	20	8 + 2 VPlot	05hz	11.153
+Domino	20	8 + 2 VPlot	05hz	6.527
+Domino	20	8 + 2 VPlot	05hz	14.74
+Domino	20	8 + 2 VPlot	05hz	7.754
+Domino	20	8 + 2 VPlot	05hz	12.015
+Domino	20	8 + 2 VPlot	05hz	2.74
+Domino	20	8 + 2 VPlot	05hz	4.77
+Domino	20	8 + 2 VPlot	05hz	2.489
+Domino	20	8 + 2 VPlot	05hz	7.113
+Domino	20	8 + 2 VPlot	05hz	8.381
+Domino	20	8 + 2 VPlot	05hz	3.525
+Domino	20	8 + 2 VPlot	05hz	3.009
+Domino	20	8 + 2 VPlot	05hz	3.821
+Domino	20	8 + 2 VPlot	05hz	3.625
+Domino	20	8 + 2 VPlot	05hz	4.527
+Domino	20	8 + 2 VPlot	05hz	2.566
+Domino	20	8 + 2 VPlot	05hz	3.343
+Domino	20	8 + 2 VPlot	05hz	7.514
+Domino	20	8 + 2 VPlot	05hz	3.984
+Domino	20	8 + 2 VPlot	05hz	3.63
+Domino	20	8 + 2 VPlot	05hz	2.902
+Domino	20	8 + 2 VPlot	05hz	1.988
+Domino	20	8 + 2 VPlot	05hz	4.548
+Domino	20	8 + 2 VPlot	05hz	3.164
+Domino	20	8 + 2 VPlot	05hz	2.9
+Domino	20	8 + 2 VPlot	05hz	3.438
+Domino	20	8 + 2 VPlot	05hz	2.45
+Domino	20	8 + 2 VPlot	05hz	7.256
+Domino	20	8 + 2 VPlot	05hz	6.764
+Domino	20	8 + 2 VPlot	05hz	4.107
+Domino	20	8 + 2 VPlot	05hz	5.242
+Domino	20	8 + 2 VPlot	05hz	3.504
+Domino	20	8 + 2 VPlot	05hz	5.895
+Domino	20	8 + 2 VPlot	05hz	5.335
+Domino	20	8 + 2 VPlot	05hz	2.567
+Domino	20	8 + 2 VPlot	05hz	15.212
+Domino	20	8 + 2 VPlot	05hz	4.133
+Domino	20	8 + 2 VPlot	05hz	2.744
+Domino	20	8 + 2 VPlot	05hz	3.094
+Domino	20	8 + 2 VPlot	05hz	2.618
+Domino	20	8 + 2 VPlot	05hz	3.302
+Domino	20	8 + 2 VPlot	05hz	4.677
+Domino	20	8 + 2 VPlot	05hz	2.901
+Domino	20	8 + 2 VPlot	05hz	31.493
+Domino	20	8 + 2 VPlot	05hz	4.469
+Domino	20	8 + 2 VPlot	05hz	4.018
+Domino	20	8 + 2 VPlot	05hz	2.627
+Domino	20	8 + 2 VPlot	05hz	1.997
+Domino	20	8 + 2 VPlot	05hz	8.86
+Domino	20	8 + 2 VPlot	05hz	2.947
+Domino	20	8 + 2 VPlot	05hz	3.189
+Domino	20	8 + 2 VPlot	05hz	3.614
+Domino	20	8 + 2 VPlot	05hz	13.386
+Domino	20	8 + 2 VPlot	05hz	2.87
+Domino	20	8 + 2 VPlot	05hz	4.15
+Domino	20	8 + 2 VPlot	05hz	3.824
+Domino	20	8 + 2 VPlot	05hz	6.138
+Domino	20	8 + 2 VPlot	05hz	2.961
+Domino	20	8 + 2 VPlot	05hz	8.424
+Domino	20	8 + 2 VPlot	05hz	2.753
+Domino	20	8 + 2 VPlot	05hz	4.883
+Domino	20	8 + 2 VPlot	05hz	18.215
+Domino	20	8 + 2 VPlot	05hz	5.701
+Domino	20	8 + 2 VPlot	05hz	3.164
+Domino	20	8 + 2 VPlot	05hz	13.309
+Domino	20	8 + 2 VPlot	05hz	9.815
+Domino	20	8 + 2 VPlot	05hz	3.786
+Domino	20	8 + 2 VPlot	05hz	3.938
+Domino	20	8 + 2 VPlot	05hz	2.915
+Domino	20	8 + 2 VPlot	05hz	3.002
+Domino	20	8 + 2 VPlot	05hz	26.462
+Domino	20	8 + 2 VPlot	05hz	3.62
+Domino	20	8 + 2 VPlot	05hz	3.776
+Domino	20	8 + 2 VPlot	05hz	1.159
+Domino	20	8 + 2 VPlot	05hz	1.567
+Domino	20	8 + 2 VPlot	05hz	13.245
+Domino	20	8 + 2 VPlot	05hz	3.692
+Domino	20	8 + 2 VPlot	05hz	8.136
+Domino	20	8 + 2 VPlot	05hz	17.514
+Domino	20	10 + 2 VPlots	05hz	14.585
+Domino	20	10 + 2 VPlots	05hz	1.959
+Domino	20	10 + 2 VPlots	05hz	1.027
+Domino	20	10 + 2 VPlots	05hz	1.118
+Domino	20	10 + 2 VPlots	05hz	2.949
+Domino	20	10 + 2 VPlots	05hz	4.888
+Domino	20	10 + 2 VPlots	05hz	3.607
+Domino	20	10 + 2 VPlots	05hz	2.995
+Domino	20	10 + 2 VPlots	05hz	5.165
+Domino	20	10 + 2 VPlots	05hz	4.173
+Domino	20	10 + 2 VPlots	05hz	8.271
+Domino	20	10 + 2 VPlots	05hz	10.201
+Domino	20	10 + 2 VPlots	05hz	14.882
+Domino	20	10 + 2 VPlots	05hz	1.212
+Domino	20	10 + 2 VPlots	05hz	0.93
+Domino	20	10 + 2 VPlots	05hz	0.579
+Domino	20	10 + 2 VPlots	05hz	0.613
+Domino	20	10 + 2 VPlots	05hz	0.625
+Domino	20	10 + 2 VPlots	05hz	0.714
+Domino	20	10 + 2 VPlots	05hz	0.648
+Domino	20	10 + 2 VPlots	05hz	0.697
+Domino	20	10 + 2 VPlots	05hz	0.771
+Domino	20	10 + 2 VPlots	05hz	2.233
+Domino	20	10 + 2 VPlots	05hz	2.645
+Domino	20	10 + 2 VPlots	05hz	2.559
+Domino	20	10 + 2 VPlots	05hz	3.094
+Domino	20	10 + 2 VPlots	05hz	1.691
+Domino	20	10 + 2 VPlots	05hz	6.566
+Domino	20	10 + 2 VPlots	05hz	2.898
+Domino	20	10 + 2 VPlots	05hz	7.52
+Domino	20	10 + 2 VPlots	05hz	2.155
+Domino	20	10 + 2 VPlots	05hz	8.94
+Domino	20	10 + 2 VPlots	05hz	15.318
+Domino	20	10 + 2 VPlots	05hz	12.014
+Domino	20	10 + 2 VPlots	05hz	11.79
+Domino	20	10 + 2 VPlots	05hz	0.889
+Domino	20	10 + 2 VPlots	05hz	3.703
+Domino	20	10 + 2 VPlots	05hz	1.441
+Domino	20	10 + 2 VPlots	05hz	1.162
+Domino	20	10 + 2 VPlots	05hz	1.14
+Domino	20	10 + 2 VPlots	05hz	5.995
+Domino	20	10 + 2 VPlots	05hz	17.441
+Domino	20	10 + 2 VPlots	05hz	3.726
+Domino	20	10 + 2 VPlots	05hz	7.303
+Domino	20	10 + 2 VPlots	05hz	4.157
+Domino	20	10 + 2 VPlots	05hz	8.311
+Domino	20	10 + 2 VPlots	05hz	2.854
+Domino	20	10 + 2 VPlots	05hz	8.213
+Domino	20	10 + 2 VPlots	05hz	2.596
+Domino	20	10 + 2 VPlots	05hz	6.165
+Domino	20	10 + 2 VPlots	05hz	4.49
+Domino	20	10 + 2 VPlots	05hz	13.528
+Domino	20	10 + 2 VPlots	05hz	13.457
+Domino	20	10 + 2 VPlots	05hz	4.836
+Domino	20	10 + 2 VPlots	05hz	4.27
+Domino	20	10 + 2 VPlots	05hz	4.526
+Domino	20	10 + 2 VPlots	05hz	2.653
+Domino	20	10 + 2 VPlots	05hz	5.861
+Domino	20	10 + 2 VPlots	05hz	3.76
+Domino	20	10 + 2 VPlots	05hz	6.775
+Domino	20	10 + 2 VPlots	05hz	2.631
+Domino	20	10 + 2 VPlots	05hz	3.263
+Domino	20	10 + 2 VPlots	05hz	2.303
+Domino	20	10 + 2 VPlots	05hz	13.449
+Domino	20	10 + 2 VPlots	05hz	2.417
+Domino	20	10 + 2 VPlots	05hz	3.054
+Domino	20	10 + 2 VPlots	05hz	3.595
+Domino	20	10 + 2 VPlots	05hz	11.303
+Domino	20	10 + 2 VPlots	05hz	3.286
+Domino	20	10 + 2 VPlots	05hz	2.514
+Domino	20	10 + 2 VPlots	05hz	2.251
+Domino	20	10 + 2 VPlots	05hz	3.127
+Domino	20	10 + 2 VPlots	05hz	4.839
+Domino	20	10 + 2 VPlots	05hz	2.447
+Domino	20	10 + 2 VPlots	05hz	2.761
+Domino	20	10 + 2 VPlots	05hz	2.682
+Domino	20	10 + 2 VPlots	05hz	3.622
+Domino	20	10 + 2 VPlots	05hz	2.802
+Domino	20	10 + 2 VPlots	05hz	2.532
+Domino	20	10 + 2 VPlots	05hz	12.79
+Domino	20	10 + 2 VPlots	05hz	3.542
+Domino	20	10 + 2 VPlots	05hz	2.953
+Domino	20	10 + 2 VPlots	05hz	6.85
+Domino	20	10 + 2 VPlots	05hz	3.177
+Domino	20	10 + 2 VPlots	05hz	3.963
+Domino	20	10 + 2 VPlots	05hz	5.981
+Domino	20	10 + 2 VPlots	05hz	4.977
+Domino	20	10 + 2 VPlots	05hz	4.06
+Domino	20	10 + 2 VPlots	05hz	2.614
+Domino	20	10 + 2 VPlots	05hz	2.929
+Domino	20	10 + 2 VPlots	05hz	2.443
+Domino	20	10 + 2 VPlots	05hz	2.545
+Domino	20	10 + 2 VPlots	05hz	2.808
+Domino	20	10 + 2 VPlots	05hz	2.531
+Domino	20	10 + 2 VPlots	05hz	3.127
+Domino	20	10 + 2 VPlots	05hz	5.828
+Domino	20	10 + 2 VPlots	05hz	3.375
+Domino	20	10 + 2 VPlots	05hz	2.791
+Domino	20	10 + 2 VPlots	05hz	2.523
+Domino	20	10 + 2 VPlots	05hz	2.413
+Domino	20	10 + 2 VPlots	05hz	6.611
+Domino	20	10 + 2 VPlots	05hz	3.696
+Domino	20	10 + 2 VPlots	05hz	4.389
+Domino	20	10 + 2 VPlots	05hz	5.552
+Domino	20	10 + 2 VPlots	05hz	3.248
+Domino	20	10 + 2 VPlots	05hz	6.122
+Domino	20	8 + 2 VPlot	05hz	1.174
+Domino	20	8 + 2 VPlot	05hz	1.408
+Domino	20	8 + 2 VPlot	05hz	17.388
+Domino	20	8 + 2 VPlot	05hz	14.29
+Domino	20	8 + 2 VPlot	05hz	17.595
+Domino	20	8 + 2 VPlot	05hz	5.736
+Domino	20	8 + 2 VPlot	05hz	4.326
+Domino	20	8 + 2 VPlot	05hz	5.17
+Domino	20	8 + 2 VPlot	05hz	9.477
+Domino	20	8 + 2 VPlot	05hz	3.884
+Domino	20	8 + 2 VPlot	05hz	7.411
+Domino	20	8 + 2 VPlot	05hz	7.075
+Domino	20	8 + 2 VPlot	05hz	4.586
+Domino	20	8 + 2 VPlot	05hz	17.574
+Domino	20	8 + 2 VPlot	05hz	5.363
+Domino	20	8 + 2 VPlot	05hz	9.18
+Domino	20	8 + 2 VPlot	05hz	9.279
+Domino	20	8 + 2 VPlot	05hz	4.516
+Domino	20	8 + 2 VPlot	05hz	14.274
+Domino	20	8 + 2 VPlot	05hz	13.96
+Domino	20	8 + 2 VPlot	05hz	7.267
+Domino	20	8 + 2 VPlot	05hz	5.507
+Domino	20	8 + 2 VPlot	05hz	6.527
+Domino	20	8 + 2 VPlot	05hz	9.525
+Domino	20	8 + 2 VPlot	05hz	4.104
+Domino	20	8 + 2 VPlot	05hz	3.813
+Domino	20	8 + 2 VPlot	05hz	6.736
+Domino	20	8 + 2 VPlot	05hz	7.868
+Domino	20	8 + 2 VPlot	05hz	4.534
+Domino	20	8 + 2 VPlot	05hz	5.051
+Domino	20	8 + 2 VPlot	05hz	2.968
+Domino	20	8 + 2 VPlot	05hz	1.636
+Domino	20	8 + 2 VPlot	05hz	2.727
+Domino	20	8 + 2 VPlot	05hz	3.016
+Domino	20	8 + 2 VPlot	05hz	3.459
+Domino	20	8 + 2 VPlot	05hz	3.477
+Domino	20	8 + 2 VPlot	05hz	4.923
+Domino	20	8 + 2 VPlot	05hz	3.394
+Domino	20	8 + 2 VPlot	05hz	6.845
+Domino	20	8 + 2 VPlot	05hz	2.273
+Domino	20	8 + 2 VPlot	05hz	2.222
+Domino	20	8 + 2 VPlot	05hz	9.871
+Domino	20	8 + 2 VPlot	05hz	5.259
+Domino	20	8 + 2 VPlot	05hz	3.042
+Domino	20	8 + 2 VPlot	05hz	3.709
+Domino	20	8 + 2 VPlot	05hz	6.229
+Domino	20	8 + 2 VPlot	05hz	2.253
+Domino	20	8 + 2 VPlot	05hz	7.039
+Domino	20	8 + 2 VPlot	05hz	4.7
+Domino	20	8 + 2 VPlot	05hz	12.609
+Domino	20	8 + 2 VPlot	05hz	6.682
+Domino	20	8 + 2 VPlot	05hz	3.649
+Domino	20	8 + 2 VPlot	05hz	5.737
+Domino	20	8 + 2 VPlot	05hz	2.296
+Domino	20	8 + 2 VPlot	05hz	15.256
+Domino	20	8 + 2 VPlot	05hz	6.283
+Domino	20	8 + 2 VPlot	05hz	3.77
+Domino	20	8 + 2 VPlot	05hz	2.614
+Domino	20	8 + 2 VPlot	05hz	3.636
+Domino	20	8 + 2 VPlot	05hz	4.083
+Domino	20	8 + 2 VPlot	05hz	11.94
+Domino	20	8 + 2 VPlot	05hz	4.038
+Domino	20	8 + 2 VPlot	05hz	1.916
+Domino	20	8 + 2 VPlot	05hz	2.919
+Domino	20	8 + 2 VPlot	05hz	2.419
+Domino	20	8 + 2 VPlot	05hz	2.258
+Domino	20	8 + 2 VPlot	05hz	1.793
+Domino	20	8 + 2 VPlot	05hz	3.876
+Domino	20	8 + 2 VPlot	05hz	3.083
+Domino	20	8 + 2 VPlot	05hz	1.879
+Domino	20	8 + 2 VPlot	05hz	2.453
+Domino	20	8 + 2 VPlot	05hz	2.685
+Domino	20	8 + 2 VPlot	05hz	2.352
+Domino	20	8 + 2 VPlot	05hz	3.313
+Domino	20	8 + 2 VPlot	05hz	1.679
+Domino	20	8 + 2 VPlot	05hz	2.96
+Domino	20	8 + 2 VPlot	05hz	2.132
+Domino	20	8 + 2 VPlot	05hz	3.03
+Domino	20	8 + 2 VPlot	05hz	2.099
+Domino	20	8 + 2 VPlot	05hz	3.203
+Domino	20	8 + 2 VPlot	05hz	8.015
+Domino	20	8 + 2 VPlot	05hz	5.474
+Domino	20	8 + 2 VPlot	05hz	3.47
+Domino	20	8 + 2 VPlot	05hz	6.875
+Domino	20	8 + 2 VPlot	05hz	4.253
+Domino	20	8 + 2 VPlot	05hz	5.307
+Domino	20	8 + 2 VPlot	05hz	3.093
+Domino	20	8 + 2 VPlot	05hz	2.989
+Domino	20	8 + 2 VPlot	05hz	2.62
+Domino	20	8 + 2 VPlot	05hz	3.553
+Domino	20	8 + 2 VPlot	05hz	2.873
+Domino	20	8 + 2 VPlot	05hz	4.448
+Domino	20	8 + 2 VPlot	05hz	2.531
+Domino	20	8 + 2 VPlot	05hz	4.377
+Domino	20	8 + 2 VPlot	05hz	2.611
+Domino	20	8 + 2 VPlot	05hz	11.099
+Domino	20	8 + 2 VPlot	05hz	2.225
+Domino	20	8 + 2 VPlot	05hz	5.573
+Domino	20	8 + 2 VPlot	05hz	8.613
+Domino	20	8 + 2 VPlot	05hz	3.987
+Domino	20	8 + 2 VPlot	05hz	3.237
+Domino	20	8 + 2 VPlot	05hz	2.798
+Domino	20	8 + 2 VPlot	05hz	4.001
+Domino	20	8 + 2 VPlot	05hz	3.289
+Domino	20	8 + 2 VPlot	05hz	2.841
+Domino	20	8 + 2 VPlot	05hz	6.833
+Domino	20	8 + 2 VPlot	05hz	4.091
+Domino	20	8 + 2 VPlot	05hz	1.407
+Domino	20	8 + 2 VPlot	05hz	1.332
+Domino	20	8 + 2 VPlot	05hz	0.784
+Domino	20	8 + 2 VPlot	05hz	0.955
+Domino	20	8 + 2 VPlot	05hz	0.948
+Domino	20	8 + 2 VPlot	05hz	4.733
+Domino	20	8 + 2 VPlot	05hz	4.651
+Domino	20	8 + 2 VPlot	05hz	3.104
+Domino	20	8 + 2 VPlot	05hz	4.7
+Domino	20	8 + 2 VPlot	05hz	4.151
+Domino	20	8 + 2 VPlot	05hz	7.763
+Domino	20	8 + 2 VPlot	05hz	6.845
+Domino	20	8 + 2 VPlot	05hz	3.934
+Domino	20	8 + 2 VPlot	05hz	4.517
+Domino	20	8 + 2 VPlot	05hz	3.312
+Domino	20	8 + 2 VPlot	05hz	13.564
+Domino	20	8 + 2 VPlot	05hz	12.648
+Domino	20	8 + 2 VPlot	05hz	7.93
+Domino	20	8 + 2 VPlot	05hz	2.885
+Domino	20	8 + 2 VPlot	05hz	4.962
+Domino	20	8 + 2 VPlot	05hz	2.589
+Domino	20	8 + 2 VPlot	05hz	5.641
+Domino	20	8 + 2 VPlot	05hz	3.548
+Domino	20	8 + 2 VPlot	05hz	2.392
+Domino	20	8 + 2 VPlot	05hz	14.514
+Domino	20	8 + 2 VPlot	05hz	4.212
+Domino	20	8 + 2 VPlot	05hz	3.418
+Domino	20	8 + 2 VPlot	05hz	2.391
+Domino	20	8 + 2 VPlot	05hz	3.63
+Domino	20	8 + 2 VPlot	05hz	3.425
+Domino	20	8 + 2 VPlot	05hz	13.018
+Domino	20	8 + 2 VPlot	05hz	12.384
+Domino	20	8 + 2 VPlot	05hz	4.768
+Domino	20	8 + 2 VPlot	05hz	8.095
+Domino	20	8 + 2 VPlot	05hz	4.775
+Domino	20	8 + 2 VPlot	05hz	2.451
+Domino	20	8 + 2 VPlot	05hz	5.034
+Domino	20	8 + 2 VPlot	05hz	12.245
+Domino	20	8 + 2 VPlot	05hz	3.088
+Domino	20	8 + 2 VPlot	05hz	8.868
+Domino	20	8 + 2 VPlot	05hz	7.228
+Domino	20	8 + 2 VPlot	05hz	5.248
+Domino	20	8 + 2 VPlot	05hz	13.155
+Domino	20	8 + 2 VPlot	05hz	3.33
+Domino	20	8 + 2 VPlot	05hz	2.956
+Domino	20	8 + 2 VPlot	05hz	7.545
+Domino	20	10 + 2 VPlots	05hz	4.369
+Domino	20	10 + 2 VPlots	05hz	6.814
+Domino	20	10 + 2 VPlots	05hz	3.996
+Domino	20	10 + 2 VPlots	05hz	3.047
+Domino	20	10 + 2 VPlots	05hz	3.704
+Domino	20	10 + 2 VPlots	05hz	4.56
+Domino	20	10 + 2 VPlots	05hz	3.658
+Domino	20	10 + 2 VPlots	05hz	7.453
+Domino	20	10 + 2 VPlots	05hz	3.25
+Domino	20	10 + 2 VPlots	05hz	6.769
+Domino	20	10 + 2 VPlots	05hz	4.832
+Domino	20	10 + 2 VPlots	05hz	2.554
+Domino	20	10 + 2 VPlots	05hz	5.108
+Domino	20	10 + 2 VPlots	05hz	4.173
+Domino	20	10 + 2 VPlots	05hz	5.534
+Domino	20	10 + 2 VPlots	05hz	2.486
+Domino	20	10 + 2 VPlots	05hz	5.874
+Domino	20	10 + 2 VPlots	05hz	3.56
+Domino	20	10 + 2 VPlots	05hz	4.83
+Domino	20	10 + 2 VPlots	05hz	2.754
+Domino	20	10 + 2 VPlots	05hz	5.348
+Domino	20	10 + 2 VPlots	05hz	4.844
+Domino	20	10 + 2 VPlots	05hz	8.352
+Domino	20	10 + 2 VPlots	05hz	7.122
+Domino	20	10 + 2 VPlots	05hz	8.739
+Domino	20	10 + 2 VPlots	05hz	16.145
+Domino	20	10 + 2 VPlots	05hz	11.761
+Domino	20	10 + 2 VPlots	05hz	8.459
+Domino	20	10 + 2 VPlots	05hz	3.569
+Domino	20	10 + 2 VPlots	05hz	7.948
+Domino	20	10 + 2 VPlots	05hz	3.363
+Domino	20	10 + 2 VPlots	05hz	18.605
+Domino	20	10 + 2 VPlots	05hz	15.942
+Domino	20	10 + 2 VPlots	05hz	4.264
+Domino	20	10 + 2 VPlots	05hz	19.876
+Domino	20	10 + 2 VPlots	05hz	3.717
+Domino	20	10 + 2 VPlots	05hz	6.35
+Domino	20	10 + 2 VPlots	05hz	3.671
+Domino	20	10 + 2 VPlots	05hz	4.017
+Domino	20	10 + 2 VPlots	05hz	3.844
+Domino	20	10 + 2 VPlots	05hz	9.788
+Domino	20	10 + 2 VPlots	05hz	15.116
+Domino	20	10 + 2 VPlots	05hz	2.582
+Domino	20	10 + 2 VPlots	05hz	3.09
+Domino	20	10 + 2 VPlots	05hz	2.886
+Domino	20	10 + 2 VPlots	05hz	3.078
+Domino	20	10 + 2 VPlots	05hz	3.127
+Domino	20	10 + 2 VPlots	05hz	3.604
+Domino	20	10 + 2 VPlots	05hz	4.517
+Domino	20	10 + 2 VPlots	05hz	5.063
+Domino	20	10 + 2 VPlots	05hz	4.086
+Domino	20	10 + 2 VPlots	05hz	4.951
+Domino	20	10 + 2 VPlots	05hz	4.117
+Domino	20	10 + 2 VPlots	05hz	4.637
+Domino	20	10 + 2 VPlots	05hz	4.982
+Domino	20	10 + 2 VPlots	05hz	3.417
+Domino	20	10 + 2 VPlots	05hz	4.307
+Domino	20	10 + 2 VPlots	05hz	15.847
+Domino	20	10 + 2 VPlots	05hz	4.724
+Domino	20	10 + 2 VPlots	05hz	7.436
+Domino	20	10 + 2 VPlots	05hz	4.233
+Domino	20	10 + 2 VPlots	05hz	9.566
+Domino	20	10 + 2 VPlots	05hz	15.139
+Domino	20	10 + 2 VPlots	05hz	8.306
+Domino	20	10 + 2 VPlots	05hz	7.158
+Domino	20	10 + 2 VPlots	05hz	3.648
+Domino	20	10 + 2 VPlots	05hz	7.157
+Domino	20	10 + 2 VPlots	05hz	3.059
+Domino	20	10 + 2 VPlots	05hz	8.543
+Domino	20	10 + 2 VPlots	05hz	3.856
+Domino	20	10 + 2 VPlots	05hz	3.99
+Domino	20	10 + 2 VPlots	05hz	6.793
+Domino	20	10 + 2 VPlots	05hz	4.477
+Domino	20	10 + 2 VPlots	05hz	12.274
+Domino	20	10 + 2 VPlots	05hz	4.289
+Domino	20	10 + 2 VPlots	05hz	2.919
+Domino	20	10 + 2 VPlots	05hz	6.183
+Domino	20	10 + 2 VPlots	05hz	8.204
+Domino	20	10 + 2 VPlots	05hz	4.021
+Domino	20	10 + 2 VPlots	05hz	15.007
+Domino	20	10 + 2 VPlots	05hz	2.963
+Domino	20	10 + 2 VPlots	05hz	5.332
+Domino	20	10 + 2 VPlots	05hz	11.666
+Domino	20	8 + 2 VPlot	05hz	0.726
+Domino	20	8 + 2 VPlot	05hz	1.186
+Domino	20	8 + 2 VPlot	05hz	3.945
+Domino	20	8 + 2 VPlot	05hz	3.455
+Domino	20	8 + 2 VPlot	05hz	2.942
+Domino	20	8 + 2 VPlot	05hz	2.838
+Domino	20	8 + 2 VPlot	05hz	6.801
+Domino	20	8 + 2 VPlot	05hz	2.631
+Domino	20	8 + 2 VPlot	05hz	3.749
+Domino	20	8 + 2 VPlot	05hz	8.765
+Domino	20	8 + 2 VPlot	05hz	3.137
+Domino	20	8 + 2 VPlot	05hz	4.557
+Domino	20	8 + 2 VPlot	05hz	6.482
+Domino	20	8 + 2 VPlot	05hz	1.684
+Domino	20	8 + 2 VPlot	05hz	1.847
+Domino	20	8 + 2 VPlot	05hz	6.558
+Domino	20	10 + 2 VPlots	05hz	10.522
+Domino	20	10 + 2 VPlots	05hz	3.332
+Domino	20	10 + 2 VPlots	05hz	3.297
+Domino	20	10 + 2 VPlots	05hz	2.63
+Domino	20	10 + 2 VPlots	05hz	3.027
+Domino	20	10 + 2 VPlots	05hz	2.674
+Domino	20	10 + 2 VPlots	05hz	10.329
+Domino	20	10 + 2 VPlots	05hz	1.283
+Domino	20	10 + 2 VPlots	05hz	4.806
+Domino	20	10 + 2 VPlots	05hz	2.384
+Domino	20	10 + 2 VPlots	05hz	3.316
+Domino	20	10 + 2 VPlots	05hz	1.757
+Domino	20	10 + 2 VPlots	05hz	4.448
+Domino	20	10 + 2 VPlots	05hz	1.4
+Domino	20	10 + 2 VPlots	05hz	2.802
+Domino	20	8 + 2 VPlot	05hz	1.604
+Domino	20	8 + 2 VPlot	05hz	5.555
+Domino	20	8 + 2 VPlot	05hz	4.033
+Domino	20	8 + 2 VPlot	05hz	2.226
+Domino	20	8 + 2 VPlot	05hz	1.464
+Domino	20	8 + 2 VPlot	05hz	1.506
+Domino	20	8 + 2 VPlot	05hz	2.164
+Domino	20	8 + 2 VPlot	05hz	1.403
+Domino	20	8 + 2 VPlot	05hz	1.321
+Domino	20	8 + 2 VPlot	05hz	1.11
+Domino	20	8 + 2 VPlot	05hz	0.771
+Domino	20	8 + 2 VPlot	05hz	0.97
+Domino	20	8 + 2 VPlot	05hz	1.231
+Domino	20	8 + 2 VPlot	05hz	0.677
+Domino	20	8 + 2 VPlot	05hz	1.23
+Domino	20	8 + 2 VPlot	05hz	1.655
+Domino	20	8 + 2 VPlot	05hz	0.983
+Domino	20	8 + 2 VPlot	05hz	4.586
+Domino	20	8 + 2 VPlot	05hz	2.561
+Domino	20	8 + 2 VPlot	05hz	1.86
+Domino	20	8 + 2 VPlot	05hz	1.698
+Domino	20	8 + 2 VPlot	05hz	2.19
+Domino	20	8 + 2 VPlot	05hz	1.771
+Domino	20	8 + 2 VPlot	05hz	0.713
+Domino	20	8 + 2 VPlot	05hz	13.563
+Domino	20	8 + 2 VPlot	05hz	5.147
+Domino	20	8 + 2 VPlot	05hz	1.723
+Domino	20	8 + 2 VPlot	05hz	2.33
+Domino	20	8 + 2 VPlot	05hz	1.982
+Domino	20	8 + 2 VPlot	05hz	2.49
+Domino	20	8 + 2 VPlot	05hz	1.156
+Domino	20	8 + 2 VPlot	05hz	2.356
+Domino	20	8 + 2 VPlot	05hz	1.229
+Domino	20	8 + 2 VPlot	05hz	0.998
+Domino	20	8 + 2 VPlot	05hz	0.975
+Domino	20	8 + 2 VPlot	05hz	4.397
+Domino	20	8 + 2 VPlot	05hz	3.161
+Domino	20	8 + 2 VPlot	05hz	1.977
+Domino	20	8 + 2 VPlot	05hz	1.051
+Domino	20	8 + 2 VPlot	05hz	1.098
+Domino	20	8 + 2 VPlot	05hz	1.735
+Domino	20	8 + 2 VPlot	05hz	4.919
+Domino	20	8 + 2 VPlot	05hz	2.819
+Domino	20	8 + 2 VPlot	05hz	2.393
+Domino	20	8 + 2 VPlot	05hz	1.609
+Domino	20	8 + 2 VPlot	05hz	1.643
+Domino	20	8 + 2 VPlot	05hz	2.041
+Domino	20	8 + 2 VPlot	05hz	2.191
+Domino	20	8 + 2 VPlot	05hz	7.501
+Domino	20	8 + 2 VPlot	05hz	1.362
+Domino	20	8 + 2 VPlot	05hz	2.222
+Domino	20	8 + 2 VPlot	05hz	1.921
+Domino	20	8 + 2 VPlot	05hz	1.539
+Domino	20	8 + 2 VPlot	05hz	1.181
+Domino	20	8 + 2 VPlot	05hz	1.011
+Domino	20	8 + 2 VPlot	05hz	1.179
+Domino	20	8 + 2 VPlot	05hz	1.409
+Domino	20	8 + 2 VPlot	05hz	0.999
+Domino	20	8 + 2 VPlot	05hz	1.827
+Domino	20	8 + 2 VPlot	05hz	1.754
+Domino	20	8 + 2 VPlot	05hz	2.521
+Domino	20	8 + 2 VPlot	05hz	11.007
+Domino	20	8 + 2 VPlot	05hz	1.68
+Domino	20	8 + 2 VPlot	05hz	5.188
+Domino	20	8 + 2 VPlot	05hz	2.413
+Domino	20	8 + 2 VPlot	05hz	2.943
+Domino	20	8 + 2 VPlot	05hz	2.715
+Domino	20	8 + 2 VPlot	05hz	2.594
+Domino	20	8 + 2 VPlot	05hz	11.228
+Domino	20	8 + 2 VPlot	05hz	3.135
+Domino	20	8 + 2 VPlot	05hz	1.925
+Domino	20	8 + 2 VPlot	05hz	1.506
+Domino	20	8 + 2 VPlot	05hz	1.611
+Domino	20	8 + 2 VPlot	05hz	3.58
+Domino	20	8 + 2 VPlot	05hz	0.351
+Domino	20	8 + 2 VPlot	05hz	0.374
+Domino	20	8 + 2 VPlot	05hz	0.337
+Domino	20	8 + 2 VPlot	05hz	0.223
+Domino	20	8 + 2 VPlot	05hz	0.242
+Domino	20	8 + 2 VPlot	05hz	0.627
+Domino	20	8 + 2 VPlot	05hz	0.248
+Domino	20	8 + 2 VPlot	05hz	0.22
+Domino	20	8 + 2 VPlot	05hz	0.245
+Domino	20	8 + 2 VPlot	05hz	0.348
+Domino	20	8 + 2 VPlot	05hz	0.406
+Domino	20	8 + 2 VPlot	05hz	0.394
+Domino	20	8 + 2 VPlot	05hz	0.385
+Domino	20	8 + 2 VPlot	05hz	0.514
+Domino	20	8 + 2 VPlot	05hz	0.448
+Domino	20	8 + 2 VPlot	05hz	0.412
+Domino	20	8 + 2 VPlot	05hz	0.43
+Domino	20	8 + 2 VPlot	05hz	0.489
+Domino	20	8 + 2 VPlot	05hz	0.442
+Domino	20	8 + 2 VPlot	05hz	0.38
+Domino	20	8 + 2 VPlot	05hz	0.523
+Domino	20	8 + 2 VPlot	05hz	0.545
+Domino	20	8 + 2 VPlot	05hz	0.75
+Domino	20	8 + 2 VPlot	05hz	0.712
+Domino	20	8 + 2 VPlot	05hz	0.884
+Domino	20	8 + 2 VPlot	05hz	0.765
+Domino	20	8 + 2 VPlot	05hz	1.144
+Domino	20	8 + 2 VPlot	05hz	0.999
+Domino	20	8 + 2 VPlot	05hz	1.13
+Domino	20	8 + 2 VPlot	05hz	1.174
+Domino	20	8 + 2 VPlot	05hz	0.979
+Domino	20	8 + 2 VPlot	05hz	1.051
+Domino	20	8 + 2 VPlot	05hz	0.576
+Domino	20	8 + 2 VPlot	05hz	1.155
+Domino	20	8 + 2 VPlot	05hz	1.138
+Domino	20	8 + 2 VPlot	05hz	1.077
+Domino	20	8 + 2 VPlot	05hz	1.104
+Domino	20	8 + 2 VPlot	05hz	4.267
+Domino	20	8 + 2 VPlot	05hz	1.135
+Domino	20	8 + 2 VPlot	05hz	1.291
+Domino	20	8 + 2 VPlot	05hz	0.976
+Domino	20	8 + 2 VPlot	05hz	0.897
+Domino	20	8 + 2 VPlot	05hz	1.162
+Domino	20	8 + 2 VPlot	05hz	1.134
+Domino	20	8 + 2 VPlot	05hz	1.082
+Domino	20	8 + 2 VPlot	05hz	0.971
+Domino	20	8 + 2 VPlot	05hz	0.839
+Domino	20	8 + 2 VPlot	05hz	10.771
+Domino	20	8 + 2 VPlot	05hz	0.253
+Domino	20	8 + 2 VPlot	05hz	0.277
+Domino	20	8 + 2 VPlot	05hz	0.238
+Domino	20	8 + 2 VPlot	05hz	0.283
+Domino	20	8 + 2 VPlot	05hz	0.324
+Domino	20	8 + 2 VPlot	05hz	0.268
+Domino	20	8 + 2 VPlot	05hz	0.338
+Domino	20	8 + 2 VPlot	05hz	0.277
+Domino	20	8 + 2 VPlot	05hz	0.291
+Domino	20	8 + 2 VPlot	05hz	0.266
+Domino	20	8 + 2 VPlot	05hz	0.27
+Domino	20	8 + 2 VPlot	05hz	0.317
+Domino	20	8 + 2 VPlot	05hz	0.297
+Domino	20	8 + 2 VPlot	05hz	0.385
+Domino	20	8 + 2 VPlot	05hz	0.494
+Domino	20	8 + 2 VPlot	05hz	0.481
+Domino	20	8 + 2 VPlot	05hz	0.646
+Domino	20	8 + 2 VPlot	05hz	0.49
+Domino	20	8 + 2 VPlot	05hz	0.512
+Domino	20	8 + 2 VPlot	05hz	0.439
+Domino	20	8 + 2 VPlot	05hz	0.362
+Domino	20	8 + 2 VPlot	05hz	0.462
+Domino	20	8 + 2 VPlot	05hz	0.405
+Domino	20	8 + 2 VPlot	05hz	0.412
+Domino	20	8 + 2 VPlot	05hz	0.366
+Domino	20	8 + 2 VPlot	05hz	0.454
+Domino	20	8 + 2 VPlot	05hz	0.584
+Domino	20	8 + 2 VPlot	05hz	0.652
+Domino	20	8 + 2 VPlot	05hz	0.706
+Domino	20	8 + 2 VPlot	05hz	4.075
+Domino	20	8 + 2 VPlot	05hz	0.834
+Domino	20	8 + 2 VPlot	05hz	0.723
+Domino	20	8 + 2 VPlot	05hz	0.955
+Domino	20	8 + 2 VPlot	05hz	0.702
+Domino	20	8 + 2 VPlot	05hz	0.754
+Domino	20	8 + 2 VPlot	05hz	0.699
+Domino	20	8 + 2 VPlot	05hz	0.761
+Domino	20	8 + 2 VPlot	05hz	0.623
+Domino	20	8 + 2 VPlot	05hz	0.707
+Domino	20	8 + 2 VPlot	05hz	0.701
+Domino	20	8 + 2 VPlot	05hz	0.68
+Domino	20	8 + 2 VPlot	05hz	1.356
+Domino	20	8 + 2 VPlot	05hz	4.458
+Domino	20	8 + 2 VPlot	05hz	1.539
+Domino	20	8 + 2 VPlot	05hz	1.386
+Domino	20	8 + 2 VPlot	05hz	1.527
+Domino	20	8 + 2 VPlot	05hz	1.255
+Domino	20	8 + 2 VPlot	05hz	1.576
+Domino	20	8 + 2 VPlot	05hz	1.618
+Domino	20	8 + 2 VPlot	05hz	4.134
+Domino	20	8 + 2 VPlot	05hz	1.262
+Domino	20	8 + 2 VPlot	05hz	2.32
+Domino	20	8 + 2 VPlot	05hz	1.885
+Domino	20	8 + 2 VPlot	05hz	1.569
+Domino	20	8 + 2 VPlot	05hz	0.974
+Domino	20	8 + 2 VPlot	05hz	1.425
+Domino	20	8 + 2 VPlot	05hz	0.95
+Domino	20	8 + 2 VPlot	05hz	3.864
+Domino	20	8 + 2 VPlot	05hz	1.182
+Domino	20	8 + 2 VPlot	05hz	1.543
+Domino	20	8 + 2 VPlot	05hz	1.075
+Domino	20	8 + 2 VPlot	05hz	1.261
+Domino	20	8 + 2 VPlot	05hz	0.842
+Domino	20	8 + 2 VPlot	05hz	0.989
+Domino	20	8 + 2 VPlot	05hz	0.973
+Domino	20	8 + 2 VPlot	05hz	0.772
+Domino	20	8 + 2 VPlot	05hz	0.874
+Domino	20	8 + 2 VPlot	05hz	0.858
+Domino	20	8 + 2 VPlot	05hz	1.153
+Domino	20	8 + 2 VPlot	05hz	1.075
+Domino	20	8 + 2 VPlot	05hz	0.966
+Domino	20	8 + 2 VPlot	05hz	1.227
+Domino	20	8 + 2 VPlot	05hz	1.022
+Domino	20	8 + 2 VPlot	05hz	1.128
+Domino	20	8 + 2 VPlot	05hz	0.809
+Domino	20	8 + 2 VPlot	05hz	0.807
+Domino	20	8 + 2 VPlot	05hz	1.148
+Domino	20	8 + 2 VPlot	05hz	1.107
+Domino	20	8 + 2 VPlot	05hz	1.207
+Domino	20	8 + 2 VPlot	05hz	1.119
+Domino	20	8 + 2 VPlot	05hz	1.142
+Domino	20	8 + 2 VPlot	05hz	0.822
+Domino	20	8 + 2 VPlot	05hz	4.165
+Domino	20	8 + 2 VPlot	05hz	0.953
+Domino	20	8 + 2 VPlot	05hz	1.82
+Domino	20	8 + 2 VPlot	05hz	1.06
+Domino	20	8 + 2 VPlot	05hz	6.347
+Domino	20	8 + 2 VPlot	05hz	1.56
+Domino	20	8 + 2 VPlot	05hz	1.529
+Domino	20	8 + 2 VPlot	05hz	1.358
+Domino	20	8 + 2 VPlot	05hz	1.147
+Domino	20	8 + 2 VPlot	05hz	1.196
+Domino	20	8 + 2 VPlot	05hz	1.563
+Domino	20	10 + 2 VPlots	05hz	1.142
+Domino	20	10 + 2 VPlots	05hz	1.777
+Domino	20	10 + 2 VPlots	05hz	0.921
+Domino	20	10 + 2 VPlots	05hz	1.334
+Domino	20	10 + 2 VPlots	05hz	0.993
+Domino	20	10 + 2 VPlots	05hz	4.0
+Domino	20	10 + 2 VPlots	05hz	1.185
+Domino	20	10 + 2 VPlots	05hz	1.386
+Domino	20	10 + 2 VPlots	05hz	1.018
+Domino	20	10 + 2 VPlots	05hz	1.401
+Domino	20	10 + 2 VPlots	05hz	1.199
+Domino	20	10 + 2 VPlots	05hz	0.977
+Domino	20	10 + 2 VPlots	05hz	1.126
+Domino	20	10 + 2 VPlots	05hz	0.865
+Domino	20	10 + 2 VPlots	05hz	0.916
+Domino	20	10 + 2 VPlots	05hz	0.894
+Domino	20	10 + 2 VPlots	05hz	3.946
+Domino	20	10 + 2 VPlots	05hz	0.944
+Domino	20	10 + 2 VPlots	05hz	0.952
+Domino	20	10 + 2 VPlots	05hz	1.296
+Domino	20	10 + 2 VPlots	05hz	1.083
+Domino	20	10 + 2 VPlots	05hz	0.94
+Domino	20	10 + 2 VPlots	05hz	1.156
+Domino	20	10 + 2 VPlots	05hz	0.994
+Domino	20	10 + 2 VPlots	05hz	0.939
+Domino	20	10 + 2 VPlots	05hz	1.122
+Domino	20	10 + 2 VPlots	05hz	4.019
+Domino	20	10 + 2 VPlots	05hz	1.212
+Domino	20	10 + 2 VPlots	05hz	1.299
+Domino	20	10 + 2 VPlots	05hz	1.1
+Domino	20	10 + 2 VPlots	05hz	1.086
+Domino	20	10 + 2 VPlots	05hz	1.286
+Domino	20	10 + 2 VPlots	05hz	1.202
+Domino	20	10 + 2 VPlots	05hz	0.947
+Domino	20	10 + 2 VPlots	05hz	1.083
+Domino	20	10 + 2 VPlots	05hz	0.923
+Domino	20	10 + 2 VPlots	05hz	0.884
+Domino	20	10 + 2 VPlots	05hz	1.001
+Domino	20	10 + 2 VPlots	05hz	0.867
+Domino	20	10 + 2 VPlots	05hz	1.013
+Domino	20	10 + 2 VPlots	05hz	0.844
+Domino	20	10 + 2 VPlots	05hz	4.729
+Domino	20	10 + 2 VPlots	05hz	1.356
+Domino	20	10 + 2 VPlots	05hz	0.852
+Domino	20	10 + 2 VPlots	05hz	1.148
+Domino	20	10 + 2 VPlots	05hz	1.559
+Domino	20	10 + 2 VPlots	05hz	1.056
+Domino	20	10 + 2 VPlots	05hz	1.098
+Domino	20	10 + 2 VPlots	05hz	1.131
+Domino	20	10 + 2 VPlots	05hz	1.115
+Domino	20	10 + 2 VPlots	05hz	0.839
+Domino	20	10 + 2 VPlots	05hz	1.144
+Domino	20	10 + 2 VPlots	05hz	0.951
+Domino	20	10 + 2 VPlots	05hz	1.331
+Domino	20	10 + 2 VPlots	05hz	0.794
+Domino	20	10 + 2 VPlots	05hz	1.148
+Domino	20	10 + 2 VPlots	05hz	1.288
+Domino	20	10 + 2 VPlots	05hz	1.21
+Domino	20	10 + 2 VPlots	05hz	1.051
+Domino	20	10 + 2 VPlots	05hz	0.862
+Domino	20	10 + 2 VPlots	05hz	1.12
+Domino	20	10 + 2 VPlots	05hz	0.607
+Domino	20	10 + 2 VPlots	05hz	0.911
+Domino	20	10 + 2 VPlots	05hz	1.268
+Domino	20	10 + 2 VPlots	05hz	1.121
+Domino	20	10 + 2 VPlots	05hz	1.346
+Domino	20	10 + 2 VPlots	05hz	1.149
+Domino	20	10 + 2 VPlots	05hz	0.897
+Domino	20	10 + 2 VPlots	05hz	0.917
+Domino	20	10 + 2 VPlots	05hz	0.837
+Domino	20	10 + 2 VPlots	05hz	0.87
+Domino	20	10 + 2 VPlots	05hz	0.895
+Domino	20	10 + 2 VPlots	05hz	0.968
+Domino	20	10 + 2 VPlots	05hz	0.855
+Domino	20	10 + 2 VPlots	05hz	1.06
+Domino	20	10 + 2 VPlots	05hz	0.85
+Domino	20	10 + 2 VPlots	05hz	0.9
+Domino	20	10 + 2 VPlots	05hz	0.705
+Domino	20	10 + 2 VPlots	05hz	0.871
+Domino	20	10 + 2 VPlots	05hz	0.983
+Domino	20	10 + 2 VPlots	05hz	4.788
+Domino	20	10 + 2 VPlots	05hz	1.532
+Domino	20	10 + 2 VPlots	05hz	1.334
+Domino	20	10 + 2 VPlots	05hz	1.025
+Domino	20	10 + 2 VPlots	05hz	1.233
+Domino	20	10 + 2 VPlots	05hz	1.24
+Domino	20	10 + 2 VPlots	05hz	1.501
+Domino	20	10 + 2 VPlots	05hz	1.448
+Domino	20	10 + 2 VPlots	05hz	4.368
+Domino	20	10 + 2 VPlots	05hz	1.449
+Domino	20	10 + 2 VPlots	05hz	0.98
+Domino	20	10 + 2 VPlots	05hz	1.403
+Domino	20	10 + 2 VPlots	05hz	1.134
+Domino	20	10 + 2 VPlots	05hz	1.378
+Domino	20	10 + 2 VPlots	05hz	1.313
+Domino	20	10 + 2 VPlots	05hz	1.718
+Domino	20	10 + 2 VPlots	05hz	1.963
+Domino	20	10 + 2 VPlots	05hz	1.058
+Discrete	30	12 SPC Windows	05hz	0.868
+Discrete	30	12 SPC Windows	05hz	1.516
+Discrete	30	12 SPC Windows	05hz	1.609
+Discrete	30	12 SPC Windows	05hz	1.89
+Discrete	30	12 SPC Windows	05hz	1.932
+Discrete	30	12 SPC Windows	05hz	1.324
+Discrete	30	12 SPC Windows	05hz	1.8
+Discrete	30	12 SPC Windows	05hz	4.365
+Discrete	30	12 SPC Windows	05hz	6.502
+Discrete	30	12 SPC Windows	05hz	3.661
+Discrete	30	12 SPC Windows	05hz	1.171
+Discrete	30	12 SPC Windows	05hz	5.105
+Discrete	30	12 SPC Windows	05hz	1.926
+Discrete	30	12 SPC Windows	05hz	3.271
+Discrete	30	12 SPC Windows	05hz	3.91
+Discrete	30	12 SPC Windows	05hz	6.579
+Discrete	30	12 SPC Windows	05hz	2.337
+Discrete	30	12 SPC Windows	05hz	1.513
+Discrete	30	12 SPC Windows	05hz	1.843
+Discrete	30	12 SPC Windows	05hz	1.639
+Discrete	30	12 SPC Windows	05hz	10.698
+Discrete	30	12 SPC Windows	05hz	3.262
+Discrete	30	12 SPC Windows	05hz	2.576
+Discrete	30	12 SPC Windows	05hz	1.682
+Discrete	30	12 SPC Windows	05hz	1.82
+Discrete	30	12 SPC Windows	05hz	1.905
+Discrete	30	12 SPC Windows	05hz	4.771
+Discrete	30	12 SPC Windows	05hz	2.17
+Discrete	30	12 SPC Windows	05hz	0.969
+Discrete	30	12 SPC Windows	05hz	1.207
+Discrete	30	12 SPC Windows	05hz	0.78
+Discrete	30	12 SPC Windows	05hz	3.079
+Discrete	30	12 SPC Windows	05hz	2.476
+Discrete	30	12 SPC Windows	05hz	2.659
+Discrete	30	12 SPC Windows	05hz	2.705
+Discrete	30	12 SPC Windows	05hz	3.53
+Discrete	30	12 SPC Windows	05hz	4.192
+Discrete	30	12 SPC Windows	05hz	7.288
+Discrete	30	10 + 2 VPlots	05hz	1.088
+Discrete	30	10 + 2 VPlots	05hz	0.85
+Discrete	30	10 + 2 VPlots	05hz	3.993
+Discrete	30	10 + 2 VPlots	05hz	0.954
+Discrete	30	10 + 2 VPlots	05hz	0.787
+Discrete	30	10 + 2 VPlots	05hz	0.765
+Discrete	30	10 + 2 VPlots	05hz	0.777
+Discrete	30	10 + 2 VPlots	05hz	1.033
+Discrete	30	10 + 2 VPlots	05hz	1.287
+Discrete	30	10 + 2 VPlots	05hz	1.28
+Discrete	30	10 + 2 VPlots	05hz	0.985
+Discrete	30	10 + 2 VPlots	05hz	1.543
+Discrete	30	10 + 2 VPlots	05hz	5.351
+Discrete	30	10 + 2 VPlots	05hz	1.804
+Discrete	30	10 + 2 VPlots	05hz	1.465
+Discrete	30	10 + 2 VPlots	05hz	1.503
+Discrete	30	10 + 2 VPlots	05hz	1.595
+Discrete	30	10 + 2 VPlots	05hz	1.277
+Discrete	30	10 + 2 VPlots	05hz	1.337
+Discrete	30	10 + 2 VPlots	05hz	2.107
+Discrete	30	10 + 2 VPlots	05hz	2.961
+Discrete	30	10 + 2 VPlots	05hz	2.609
+Discrete	30	10 + 2 VPlots	05hz	2.351
+Discrete	30	10 + 2 VPlots	05hz	1.966
+Discrete	30	10 + 2 VPlots	05hz	8.047
+Discrete	30	10 + 2 VPlots	05hz	2.643
+Discrete	30	10 + 2 VPlots	05hz	2.098
+Discrete	30	10 + 2 VPlots	05hz	1.872
+Discrete	30	10 + 2 VPlots	05hz	2.457
+Discrete	30	10 + 2 VPlots	05hz	5.889
+Discrete	30	10 + 2 VPlots	05hz	2.835
+Discrete	30	10 + 2 VPlots	05hz	1.787
+Discrete	30	10 + 2 VPlots	05hz	2.108
+Discrete	30	10 + 2 VPlots	05hz	1.688
+Discrete	30	10 + 2 VPlots	05hz	7.055
+Discrete	30	10 + 2 VPlots	05hz	3.391
+Discrete	30	10 + 2 VPlots	05hz	3.843
+Discrete	30	10 + 2 VPlots	05hz	2.998
+Discrete	30	10 + 2 VPlots	05hz	7.966
+Discrete	30	10 + 2 VPlots	05hz	3.439
+Discrete	30	10 + 2 VPlots	05hz	3.622
+Discrete	30	10 + 2 VPlots	05hz	0.686
+Discrete	30	10 + 2 VPlots	05hz	0.386
+Discrete	30	10 + 2 VPlots	05hz	0.494
+Discrete	30	10 + 2 VPlots	05hz	0.695
+Discrete	30	10 + 2 VPlots	05hz	0.401
+Discrete	30	10 + 2 VPlots	05hz	0.527
+Discrete	30	10 + 2 VPlots	05hz	0.602
+Discrete	30	10 + 2 VPlots	05hz	0.409
+Discrete	30	10 + 2 VPlots	05hz	0.476
+Discrete	30	10 + 2 VPlots	05hz	0.524
+Discrete	30	10 + 2 VPlots	05hz	0.562
+Discrete	30	10 + 2 VPlots	05hz	0.715
+Discrete	30	10 + 2 VPlots	05hz	0.79
+Discrete	30	10 + 2 VPlots	05hz	0.837
+Discrete	30	10 + 2 VPlots	05hz	1.103
+Discrete	30	10 + 2 VPlots	05hz	1.08
+Discrete	30	10 + 2 VPlots	05hz	1.263
+Discrete	30	10 + 2 VPlots	05hz	1.094
+Discrete	30	10 + 2 VPlots	05hz	1.174
+Discrete	30	10 + 2 VPlots	05hz	1.205
+Discrete	30	10 + 2 VPlots	05hz	1.171
+Discrete	30	10 + 2 VPlots	05hz	1.393
+Discrete	30	10 + 2 VPlots	05hz	0.627
+Discrete	30	10 + 2 VPlots	05hz	1.555
+Discrete	30	10 + 2 VPlots	05hz	4.751
+Discrete	30	10 + 2 VPlots	05hz	1.485
+Discrete	30	10 + 2 VPlots	05hz	1.229
+Discrete	30	10 + 2 VPlots	05hz	1.913
+Discrete	30	10 + 2 VPlots	05hz	2.017
+Discrete	30	10 + 2 VPlots	05hz	2.883
+Discrete	30	10 + 2 VPlots	05hz	18.822
+Discrete	30	10 + 2 VPlots	05hz	2.381
+Discrete	30	10 + 2 VPlots	05hz	5.11
+Discrete	30	10 + 2 VPlots	05hz	2.863
+Discrete	30	10 + 2 VPlots	05hz	3.399
+Discrete	30	10 + 2 VPlots	05hz	3.152
+Discrete	30	10 + 2 VPlots	05hz	2.48
+Discrete	30	10 + 2 VPlots	05hz	2.882
+Discrete	30	10 + 2 VPlots	05hz	7.34
+Discrete	30	10 + 2 VPlots	05hz	5.982
+Discrete	30	10 + 2 VPlots	05hz	5.157
+Discrete	30	10 + 2 VPlots	05hz	0.86
+Discrete	30	10 + 2 VPlots	05hz	0.403
+Discrete	30	10 + 2 VPlots	05hz	0.426
+Discrete	30	10 + 2 VPlots	05hz	0.451
+Discrete	30	10 + 2 VPlots	05hz	0.52
+Discrete	30	10 + 2 VPlots	05hz	0.534
+Discrete	30	10 + 2 VPlots	05hz	0.584
+Discrete	30	10 + 2 VPlots	05hz	0.476
+Discrete	30	10 + 2 VPlots	05hz	0.437
+Discrete	30	10 + 2 VPlots	05hz	0.677
+Discrete	30	10 + 2 VPlots	05hz	0.797
+Discrete	30	10 + 2 VPlots	05hz	0.825
+Discrete	30	10 + 2 VPlots	05hz	0.725
+Discrete	30	10 + 2 VPlots	05hz	0.791
+Discrete	30	10 + 2 VPlots	05hz	1.072
+Discrete	30	10 + 2 VPlots	05hz	1.299
+Discrete	30	10 + 2 VPlots	05hz	1.239
+Discrete	30	10 + 2 VPlots	05hz	1.497
+Discrete	30	10 + 2 VPlots	05hz	1.373
+Discrete	30	10 + 2 VPlots	05hz	1.394
+Discrete	30	10 + 2 VPlots	05hz	1.467
+Discrete	30	10 + 2 VPlots	05hz	1.938
+Discrete	30	10 + 2 VPlots	05hz	1.314
+Discrete	30	10 + 2 VPlots	05hz	1.081
+Discrete	30	10 + 2 VPlots	05hz	1.157
+Discrete	30	10 + 2 VPlots	05hz	3.699
+Discrete	30	10 + 2 VPlots	05hz	0.807
+Discrete	30	10 + 2 VPlots	05hz	1.139
+Discrete	30	10 + 2 VPlots	05hz	1.594
+Discrete	30	10 + 2 VPlots	05hz	1.68
+Discrete	30	10 + 2 VPlots	05hz	1.367
+Discrete	30	10 + 2 VPlots	05hz	1.121
+Discrete	30	10 + 2 VPlots	05hz	1.081
+Discrete	30	10 + 2 VPlots	05hz	1.63
+Discrete	30	10 + 2 VPlots	05hz	4.67
+Discrete	30	10 + 2 VPlots	05hz	1.265
+Discrete	30	10 + 2 VPlots	05hz	1.741
+Discrete	30	10 + 2 VPlots	05hz	1.087
+Discrete	30	10 + 2 VPlots	05hz	1.361
+Discrete	30	10 + 2 VPlots	05hz	1.224
+Discrete	30	10 + 2 VPlots	05hz	1.353
+Discrete	30	10 + 2 VPlots	05hz	1.285
+Discrete	30	10 + 2 VPlots	05hz	1.387
+Discrete	30	10 + 2 VPlots	05hz	1.835
+Discrete	30	10 + 2 VPlots	05hz	2.465
+Discrete	30	10 + 2 VPlots	05hz	1.922
+Discrete	30	10 + 2 VPlots	05hz	4.673
+Discrete	30	10 + 2 VPlots	05hz	2.098
+Discrete	30	10 + 2 VPlots	05hz	1.661
+Discrete	30	10 + 2 VPlots	05hz	2.146
+Discrete	30	10 + 2 VPlots	05hz	2.395
+Discrete	30	10 + 2 VPlots	05hz	1.725
+Discrete	30	10 + 2 VPlots	05hz	2.525
+Discrete	30	10 + 2 VPlots	05hz	6.6
+Discrete	30	10 + 2 VPlots	05hz	4.017
+Discrete	30	10 + 2 VPlots	05hz	1.552
+Discrete	30	10 + 2 VPlots	05hz	4.396
+Discrete	30	10 + 2 VPlots	05hz	1.108
+Discrete	30	10 + 2 VPlots	05hz	2.412
+Discrete	30	10 + 2 VPlots	05hz	1.135
+Discrete	30	10 + 2 VPlots	05hz	1.39
+Discrete	30	10 + 2 VPlots	05hz	1.34
+Discrete	30	10 + 2 VPlots	05hz	1.862
+Discrete	30	10 + 2 VPlots	05hz	2.363
+Discrete	30	10 + 2 VPlots	05hz	2.603
+Discrete	30	10 + 2 VPlots	05hz	3.639
+Discrete	30	10 + 2 VPlots	05hz	2.554
+Discrete	30	10 + 2 VPlots	05hz	1.92
+Discrete	30	10 + 2 VPlots	05hz	2.217
+Discrete	30	10 + 2 VPlots	05hz	4.728
+Discrete	30	10 + 2 VPlots	05hz	7.495
+Discrete	30	10 + 2 VPlots	05hz	1.994
+Discrete	30	10 + 2 VPlots	05hz	2.521
+Discrete	30	10 + 2 VPlots	05hz	2.459
+Discrete	30	10 + 2 VPlots	05hz	3.227
+Discrete	30	10 + 2 VPlots	05hz	2.473
+Discrete	30	10 + 2 VPlots	05hz	2.831
+Discrete	30	10 + 2 VPlots	05hz	6.283
+Discrete	30	10 + 2 VPlots	05hz	3.788
+Discrete	30	10 + 2 VPlots	05hz	4.631
+Discrete	30	10 + 2 VPlots	05hz	0.927
+Discrete	30	10 + 2 VPlots	05hz	1.447
+Discrete	30	10 + 2 VPlots	05hz	6.381
+Discrete	30	10 + 2 VPlots	05hz	19.383
+Discrete	30	10 + 2 VPlots	05hz	1.977
+Discrete	30	10 + 2 VPlots	05hz	2.669
+Discrete	30	10 + 2 VPlots	05hz	2.83
+Discrete	30	10 + 2 VPlots	05hz	1.978
+Discrete	30	10 + 2 VPlots	05hz	8.359
+Discrete	30	10 + 2 VPlots	05hz	11.352
+Discrete	30	10 + 2 VPlots	05hz	6.473
+Discrete	30	10 + 2 VPlots	05hz	2.848
+Discrete	30	10 + 2 VPlots	05hz	3.428
+Discrete	30	10 + 2 VPlots	05hz	6.332
+Discrete	30	10 + 2 VPlots	05hz	3.189
+Discrete	30	10 + 2 VPlots	05hz	2.731
+Discrete	30	10 + 2 VPlots	05hz	5.544
+Discrete	30	10 + 2 VPlots	05hz	10.561
+Discrete	30	10 + 2 VPlots	05hz	5.517
+Discrete	30	10 + 2 VPlots	05hz	4.275
+Discrete	30	10 + 2 VPlots	05hz	1.688
+Discrete	30	10 + 2 VPlots	05hz	4.358
+Discrete	30	10 + 2 VPlots	05hz	5.195
+Discrete	30	10 + 2 VPlots	05hz	1.199
+Discrete	30	10 + 2 VPlots	05hz	1.747
+Discrete	30	10 + 2 VPlots	05hz	1.748
+Discrete	30	10 + 2 VPlots	05hz	1.473
+Discrete	30	10 + 2 VPlots	05hz	1.314
+Discrete	30	10 + 2 VPlots	05hz	1.388
+Discrete	30	10 + 2 VPlots	05hz	0.73
+Discrete	30	10 + 2 VPlots	05hz	1.203
+Discrete	30	10 + 2 VPlots	05hz	1.421
+Discrete	30	10 + 2 VPlots	05hz	0.957
+Discrete	30	10 + 2 VPlots	05hz	4.82
+Discrete	30	10 + 2 VPlots	05hz	2.045
+Discrete	30	10 + 2 VPlots	05hz	1.38
+Discrete	30	10 + 2 VPlots	05hz	1.472
+Discrete	30	10 + 2 VPlots	05hz	1.697
+Discrete	30	10 + 2 VPlots	05hz	1.369
+Discrete	30	10 + 2 VPlots	05hz	1.379
+Discrete	30	10 + 2 VPlots	05hz	1.445
+Discrete	30	10 + 2 VPlots	05hz	5.099
+Discrete	30	10 + 2 VPlots	05hz	1.654
+Discrete	30	10 + 2 VPlots	05hz	1.423
+Discrete	30	10 + 2 VPlots	05hz	0.29
+Discrete	30	10 + 2 VPlots	05hz	0.293
+Discrete	30	10 + 2 VPlots	05hz	0.451
+Discrete	30	10 + 2 VPlots	05hz	0.711
+Discrete	30	10 + 2 VPlots	05hz	0.684
+Discrete	30	10 + 2 VPlots	05hz	0.978
+Discrete	30	10 + 2 VPlots	05hz	1.414
+Discrete	30	10 + 2 VPlots	05hz	1.291
+Discrete	30	10 + 2 VPlots	05hz	4.067
+Discrete	30	10 + 2 VPlots	05hz	2.116
+Discrete	30	10 + 2 VPlots	05hz	1.86
+Discrete	30	10 + 2 VPlots	05hz	1.226
+Discrete	30	10 + 2 VPlots	05hz	1.875
+Discrete	30	10 + 2 VPlots	05hz	1.377
+Discrete	30	10 + 2 VPlots	05hz	1.517
+Discrete	30	10 + 2 VPlots	05hz	3.832
+Discrete	30	10 + 2 VPlots	05hz	1.757
+Discrete	30	10 + 2 VPlots	05hz	1.25
+Discrete	30	10 + 2 VPlots	05hz	1.976
+Discrete	30	10 + 2 VPlots	05hz	2.343
+Discrete	30	10 + 2 VPlots	05hz	2.614
+Discrete	30	10 + 2 VPlots	05hz	5.768
+Discrete	30	10 + 2 VPlots	05hz	0.74
+Discrete	30	10 + 2 VPlots	05hz	1.213
+Discrete	30	10 + 2 VPlots	05hz	1.339
+Discrete	30	10 + 2 VPlots	05hz	1.353
+Discrete	30	10 + 2 VPlots	05hz	5.391
+Discrete	30	10 + 2 VPlots	05hz	1.539
+Discrete	30	10 + 2 VPlots	05hz	2.299
+Discrete	30	10 + 2 VPlots	05hz	2.263
+Discrete	30	10 + 2 VPlots	05hz	1.339
+Discrete	30	10 + 2 VPlots	05hz	1.692
+Discrete	30	10 + 2 VPlots	05hz	5.292
+Discrete	30	10 + 2 VPlots	05hz	1.585
+Discrete	30	10 + 2 VPlots	05hz	2.248
+Discrete	30	10 + 2 VPlots	05hz	2.327
+Discrete	30	10 + 2 VPlots	05hz	1.908
+Discrete	30	10 + 2 VPlots	05hz	2.108
+Discrete	30	10 + 2 VPlots	05hz	1.96
+Discrete	30	10 + 2 VPlots	05hz	1.639
+Discrete	30	10 + 2 VPlots	05hz	1.784
+Discrete	30	12 SPC Windows	05hz	0.842
+Discrete	30	12 SPC Windows	05hz	1.186
+Discrete	30	12 SPC Windows	05hz	1.53
+Discrete	30	12 SPC Windows	05hz	1.205
+Discrete	30	12 SPC Windows	05hz	1.661
+Discrete	30	12 SPC Windows	05hz	2.064
+Discrete	30	12 SPC Windows	05hz	1.894
+Discrete	30	12 SPC Windows	05hz	4.774
+Discrete	30	12 SPC Windows	05hz	1.541
+Discrete	30	12 SPC Windows	05hz	2.729
+Discrete	30	12 SPC Windows	05hz	1.631
+Discrete	30	12 SPC Windows	05hz	3.46
+Discrete	30	12 SPC Windows	05hz	2.646
+Discrete	30	12 SPC Windows	05hz	2.46
+Discrete	30	12 SPC Windows	05hz	6.149
+Discrete	30	12 SPC Windows	05hz	4.583
+Discrete	30	12 SPC Windows	05hz	2.532
+Discrete	30	12 SPC Windows	05hz	2.248
+Discrete	30	12 SPC Windows	05hz	2.244
+Discrete	30	12 SPC Windows	05hz	6.153
+Discrete	30	12 SPC Windows	05hz	4.222
+Discrete	30	12 SPC Windows	05hz	2.628
+Discrete	30	12 SPC Windows	05hz	1.633
+Discrete	30	12 SPC Windows	05hz	3.042
+Discrete	30	12 SPC Windows	05hz	1.231
+Discrete	30	12 SPC Windows	05hz	1.082
+Discrete	30	12 SPC Windows	05hz	1.717
+Discrete	30	12 SPC Windows	05hz	1.209
+Discrete	30	12 SPC Windows	05hz	2.231
+Discrete	30	12 SPC Windows	05hz	4.88
+Discrete	30	12 SPC Windows	05hz	1.709
+Discrete	30	12 SPC Windows	05hz	2.807
+Discrete	30	12 SPC Windows	05hz	2.014
+Discrete	30	12 SPC Windows	05hz	1.178
+Discrete	30	12 SPC Windows	05hz	2.17
+Discrete	30	12 SPC Windows	05hz	5.176
+Discrete	30	12 SPC Windows	05hz	1.84
+Discrete	30	12 SPC Windows	05hz	2.515
+Discrete	30	12 SPC Windows	05hz	2.423
+Discrete	30	12 SPC Windows	05hz	2.08
+Discrete	30	12 SPC Windows	05hz	2.451
+Discrete	30	12 SPC Windows	05hz	11.491
+Discrete	30	12 SPC Windows	05hz	1.926
+Discrete	30	12 SPC Windows	05hz	2.292
+Discrete	30	12 SPC Windows	05hz	5.891
+Discrete	30	12 SPC Windows	05hz	2.557
+Discrete	30	12 SPC Windows	05hz	3.572
+Discrete	30	12 SPC Windows	05hz	1.959
+Discrete	30	12 SPC Windows	05hz	1.858
+Discrete	30	12 SPC Windows	05hz	0.924
+Discrete	30	12 SPC Windows	05hz	0.864
+Discrete	30	12 SPC Windows	05hz	5.141
+Discrete	30	12 SPC Windows	05hz	2.643
+Discrete	30	12 SPC Windows	05hz	1.355
+Discrete	30	12 SPC Windows	05hz	3.011
+Discrete	30	12 SPC Windows	05hz	2.653
+Discrete	30	12 SPC Windows	05hz	3.221
+Discrete	30	12 SPC Windows	05hz	5.276
+Discrete	30	12 SPC Windows	05hz	3.403
+Discrete	30	12 SPC Windows	05hz	3.603
+Discrete	30	12 SPC Windows	05hz	3.584
+Discrete	30	12 SPC Windows	05hz	0.595
+Discrete	30	12 SPC Windows	05hz	1.141
+Discrete	30	12 SPC Windows	05hz	9.928
+Discrete	30	12 SPC Windows	05hz	1.194
+Discrete	30	12 SPC Windows	05hz	1.628
+Discrete	30	12 SPC Windows	05hz	1.106
+Discrete	30	12 SPC Windows	05hz	0.845
+Discrete	30	12 SPC Windows	05hz	1.187
+Discrete	30	12 SPC Windows	05hz	1.474
+Discrete	30	12 SPC Windows	05hz	4.445
+Discrete	30	12 SPC Windows	05hz	2.442
+Discrete	30	12 SPC Windows	05hz	2.284
+Discrete	30	12 SPC Windows	05hz	1.952
+Discrete	30	12 SPC Windows	05hz	1.802
+Discrete	30	12 SPC Windows	05hz	1.846
+Discrete	30	12 SPC Windows	05hz	4.948
+Discrete	30	12 SPC Windows	05hz	2.133
+Discrete	30	12 SPC Windows	05hz	2.584
+Discrete	30	12 SPC Windows	05hz	2.288
+Discrete	30	12 SPC Windows	05hz	2.382
+Discrete	30	12 SPC Windows	05hz	4.983
+Discrete	30	12 SPC Windows	05hz	2.039
+Discrete	30	12 SPC Windows	05hz	2.124
+Discrete	30	12 SPC Windows	05hz	1.451
+Discrete	30	12 SPC Windows	05hz	3.7
+Discrete	30	12 SPC Windows	05hz	0.944
+Discrete	30	12 SPC Windows	05hz	1.245
+Discrete	30	12 SPC Windows	05hz	1.388
+Discrete	30	12 SPC Windows	05hz	1.066
+Discrete	30	12 SPC Windows	05hz	1.243
+Discrete	30	12 SPC Windows	05hz	1.03
+Discrete	30	12 SPC Windows	05hz	1.131
+Discrete	30	12 SPC Windows	05hz	1.397
+Discrete	30	12 SPC Windows	05hz	1.236
+Discrete	30	12 SPC Windows	05hz	1.326
+Discrete	30	12 SPC Windows	05hz	4.852
+Discrete	30	12 SPC Windows	05hz	1.689
+Discrete	30	12 SPC Windows	05hz	1.364
+Discrete	30	12 SPC Windows	05hz	1.349
+Discrete	30	12 SPC Windows	05hz	1.554
+Discrete	30	12 SPC Windows	05hz	1.346
+Discrete	30	12 SPC Windows	05hz	1.423
+Discrete	30	12 SPC Windows	05hz	4.458
+Discrete	30	12 SPC Windows	05hz	1.543
+Discrete	30	12 SPC Windows	05hz	1.524
+Discrete	30	12 SPC Windows	05hz	1.471
+Discrete	30	12 SPC Windows	05hz	2.312
+Discrete	30	12 SPC Windows	05hz	1.276
+Discrete	30	12 SPC Windows	05hz	0.719
+Discrete	30	12 SPC Windows	05hz	0.903
+Discrete	30	12 SPC Windows	05hz	0.809
+Discrete	30	12 SPC Windows	05hz	1.333
+Discrete	30	12 SPC Windows	05hz	1.306
+Discrete	30	12 SPC Windows	05hz	1.329
+Discrete	30	12 SPC Windows	05hz	4.353
+Discrete	30	12 SPC Windows	05hz	1.929
+Discrete	30	12 SPC Windows	05hz	2.092
+Discrete	30	12 SPC Windows	05hz	1.312
+Discrete	30	12 SPC Windows	05hz	2.801
+Discrete	30	12 SPC Windows	05hz	2.186
+Discrete	30	12 SPC Windows	05hz	5.199
+Discrete	30	12 SPC Windows	05hz	2.047
+Discrete	30	12 SPC Windows	05hz	3.216
+Discrete	30	12 SPC Windows	05hz	2.61
+Discrete	30	12 SPC Windows	05hz	1.347
+Discrete	30	12 SPC Windows	05hz	1.414
+Discrete	30	12 SPC Windows	05hz	2.594
+Discrete	30	12 SPC Windows	05hz	5.504
+Discrete	30	12 SPC Windows	05hz	0.298
+Discrete	30	12 SPC Windows	05hz	0.243
+Discrete	30	12 SPC Windows	05hz	0.26
+Discrete	30	12 SPC Windows	05hz	0.326
+Discrete	30	12 SPC Windows	05hz	0.393
+Discrete	30	12 SPC Windows	05hz	0.343
+Discrete	30	12 SPC Windows	05hz	0.366
+Discrete	30	12 SPC Windows	05hz	0.356
+Discrete	30	12 SPC Windows	05hz	0.481
+Discrete	30	12 SPC Windows	05hz	0.363
+Discrete	30	12 SPC Windows	05hz	0.366
+Discrete	30	12 SPC Windows	05hz	0.389
+Discrete	30	12 SPC Windows	05hz	0.338
+Discrete	30	12 SPC Windows	05hz	0.789
+Discrete	30	12 SPC Windows	05hz	0.735
+Discrete	30	12 SPC Windows	05hz	0.505
+Discrete	30	12 SPC Windows	05hz	0.52
+Discrete	30	12 SPC Windows	05hz	4.11
+Discrete	30	12 SPC Windows	05hz	0.591
+Discrete	30	12 SPC Windows	05hz	0.814
+Discrete	30	12 SPC Windows	05hz	0.481
+Discrete	30	12 SPC Windows	05hz	0.488
+Discrete	30	12 SPC Windows	05hz	0.725
+Discrete	30	12 SPC Windows	05hz	0.555
+Discrete	30	12 SPC Windows	05hz	0.547
+Discrete	30	12 SPC Windows	05hz	0.5
+Discrete	30	12 SPC Windows	05hz	0.524
+Discrete	30	12 SPC Windows	05hz	0.455
+Discrete	30	12 SPC Windows	05hz	0.434
+Discrete	30	12 SPC Windows	05hz	0.457
+Discrete	30	12 SPC Windows	05hz	0.412
+Discrete	30	12 SPC Windows	05hz	0.586
+Discrete	30	12 SPC Windows	05hz	0.508
+Discrete	30	12 SPC Windows	05hz	0.512
+Discrete	30	12 SPC Windows	05hz	10.243
+Discrete	30	12 SPC Windows	05hz	0.721
+Discrete	30	12 SPC Windows	05hz	0.848
+Discrete	30	12 SPC Windows	05hz	0.927
+Discrete	30	12 SPC Windows	05hz	0.945
+Discrete	30	12 SPC Windows	05hz	4.075
+Discrete	30	12 SPC Windows	05hz	1.266
+Discrete	30	12 SPC Windows	05hz	1.045
+Discrete	30	12 SPC Windows	05hz	1.037
+Discrete	30	12 SPC Windows	05hz	1.042
+Discrete	30	12 SPC Windows	05hz	0.964
+Discrete	30	12 SPC Windows	05hz	1.147
+Discrete	30	12 SPC Windows	05hz	0.983
+Discrete	30	12 SPC Windows	05hz	0.756
+Discrete	30	12 SPC Windows	05hz	0.987
+Discrete	30	12 SPC Windows	05hz	1.423
+Discrete	30	12 SPC Windows	05hz	1.507
+Discrete	30	12 SPC Windows	05hz	4.832
+Discrete	30	12 SPC Windows	05hz	1.837
+Discrete	30	12 SPC Windows	05hz	1.444
+Discrete	30	12 SPC Windows	05hz	1.585
+Discrete	30	12 SPC Windows	05hz	1.575
+Discrete	30	12 SPC Windows	05hz	1.461
+Discrete	30	12 SPC Windows	05hz	1.58
+Discrete	30	12 SPC Windows	05hz	1.724
+Discrete	30	12 SPC Windows	05hz	4.398
+Discrete	30	12 SPC Windows	05hz	1.864
+Discrete	30	12 SPC Windows	05hz	1.925
+Discrete	30	12 SPC Windows	05hz	1.798
+Discrete	30	12 SPC Windows	05hz	3.228
+Discrete	30	12 SPC Windows	05hz	0.252
+Discrete	30	12 SPC Windows	05hz	0.235
+Discrete	30	12 SPC Windows	05hz	0.274
+Discrete	30	12 SPC Windows	05hz	0.279
+Discrete	30	12 SPC Windows	05hz	0.268
+Discrete	30	12 SPC Windows	05hz	0.283
+Discrete	30	12 SPC Windows	05hz	0.738
+Discrete	30	12 SPC Windows	05hz	0.467
+Discrete	30	12 SPC Windows	05hz	0.39
+Discrete	30	12 SPC Windows	05hz	0.395
+Discrete	30	12 SPC Windows	05hz	0.409
+Discrete	30	12 SPC Windows	05hz	0.446
+Discrete	30	12 SPC Windows	05hz	0.418
+Discrete	30	12 SPC Windows	05hz	0.372
+Discrete	30	12 SPC Windows	05hz	0.301
+Discrete	30	12 SPC Windows	05hz	0.312
+Discrete	30	12 SPC Windows	05hz	0.411
+Discrete	30	12 SPC Windows	05hz	0.288
+Discrete	30	12 SPC Windows	05hz	0.328
+Discrete	30	12 SPC Windows	05hz	0.334
+Discrete	30	12 SPC Windows	05hz	0.383
+Discrete	30	12 SPC Windows	05hz	0.636
+Discrete	30	12 SPC Windows	05hz	0.523
+Discrete	30	12 SPC Windows	05hz	3.144
+Discrete	30	12 SPC Windows	05hz	0.669
+Discrete	30	12 SPC Windows	05hz	0.68
+Discrete	30	12 SPC Windows	05hz	0.738
+Discrete	30	12 SPC Windows	05hz	0.706
+Discrete	30	12 SPC Windows	05hz	0.58
+Discrete	30	12 SPC Windows	05hz	1.161
+Discrete	30	12 SPC Windows	05hz	1.169
+Discrete	30	12 SPC Windows	05hz	1.616
+Discrete	30	12 SPC Windows	05hz	1.379
+Discrete	30	12 SPC Windows	05hz	1.49
+Discrete	30	12 SPC Windows	05hz	1.274
+Discrete	30	12 SPC Windows	05hz	1.485
+Discrete	30	12 SPC Windows	05hz	4.992
+Discrete	30	12 SPC Windows	05hz	1.848
+Discrete	30	12 SPC Windows	05hz	1.523
+Discrete	30	12 SPC Windows	05hz	1.902
+Discrete	30	12 SPC Windows	05hz	1.859
+Discrete	30	12 SPC Windows	05hz	1.738
+Discrete	30	12 SPC Windows	05hz	3.452
+Discrete	30	12 SPC Windows	05hz	1.744
+Discrete	30	12 SPC Windows	05hz	1.474
+Discrete	30	12 SPC Windows	05hz	1.702
+Discrete	30	12 SPC Windows	05hz	1.522
+Discrete	30	12 SPC Windows	05hz	2.048
+Discrete	30	12 SPC Windows	05hz	1.362
+Discrete	30	12 SPC Windows	05hz	4.673
+Discrete	30	12 SPC Windows	05hz	2.825
+Discrete	30	12 SPC Windows	05hz	1.355
+Discrete	30	12 SPC Windows	05hz	1.249
+Discrete	30	12 SPC Windows	05hz	2.624
+Discrete	30	12 SPC Windows	05hz	2.204
+Discrete	30	12 SPC Windows	05hz	2.088
+Discrete	30	12 SPC Windows	05hz	7.093
+Discrete	30	12 SPC Windows	05hz	2.385
+Discrete	30	12 SPC Windows	05hz	1.674
+Discrete	30	12 SPC Windows	05hz	2.211
+Discrete	30	12 SPC Windows	05hz	2.257
+Discrete	30	12 SPC Windows	05hz	1.759
+Discrete	30	12 SPC Windows	05hz	0.703
+Discrete	30	12 SPC Windows	05hz	0.854
+Discrete	30	12 SPC Windows	05hz	0.789
+Discrete	30	12 SPC Windows	05hz	0.699
+Discrete	30	12 SPC Windows	05hz	0.663
+Discrete	30	12 SPC Windows	05hz	0.958
+Discrete	30	12 SPC Windows	05hz	0.893
+Discrete	30	12 SPC Windows	05hz	0.68
+Discrete	30	12 SPC Windows	05hz	0.852
+Discrete	30	12 SPC Windows	05hz	0.741
+Discrete	30	12 SPC Windows	05hz	1.002
+Discrete	30	12 SPC Windows	05hz	1.115
+Discrete	30	12 SPC Windows	05hz	4.861
+Discrete	30	12 SPC Windows	05hz	2.057
+Discrete	30	12 SPC Windows	05hz	1.461
+Discrete	30	12 SPC Windows	05hz	1.447
+Discrete	30	12 SPC Windows	05hz	1.332
+Discrete	30	12 SPC Windows	05hz	1.144
+Discrete	30	12 SPC Windows	05hz	1.452
+Discrete	30	12 SPC Windows	05hz	1.95
+Discrete	30	12 SPC Windows	05hz	4.719
+Discrete	30	12 SPC Windows	05hz	1.868
+Discrete	30	12 SPC Windows	05hz	1.648
+Discrete	30	12 SPC Windows	05hz	1.282
+Discrete	30	12 SPC Windows	05hz	1.994
+Discrete	30	12 SPC Windows	05hz	1.102
+Discrete	30	12 SPC Windows	05hz	1.132
+Discrete	30	12 SPC Windows	05hz	0.709
+Discrete	30	12 SPC Windows	05hz	0.619
+Discrete	30	12 SPC Windows	05hz	0.693
+Discrete	30	12 SPC Windows	05hz	0.953
+Discrete	30	12 SPC Windows	05hz	0.733
+Discrete	30	12 SPC Windows	05hz	0.756
+Discrete	30	12 SPC Windows	05hz	0.824
+Discrete	30	12 SPC Windows	05hz	0.983
+Discrete	30	12 SPC Windows	05hz	0.834
+Discrete	30	12 SPC Windows	05hz	0.648
+Discrete	30	12 SPC Windows	05hz	0.713
+Discrete	30	12 SPC Windows	05hz	0.719
+Discrete	30	12 SPC Windows	05hz	0.735
+Discrete	30	12 SPC Windows	05hz	0.801
+Discrete	30	12 SPC Windows	05hz	0.765
+Discrete	30	12 SPC Windows	05hz	0.883
+Discrete	30	12 SPC Windows	05hz	0.831
+Discrete	30	12 SPC Windows	05hz	4.103
+Discrete	30	12 SPC Windows	05hz	1.765
+Discrete	30	12 SPC Windows	05hz	1.483
+Discrete	30	12 SPC Windows	05hz	2.144
+Discrete	30	12 SPC Windows	05hz	2.114
+Discrete	30	12 SPC Windows	05hz	1.727
+Discrete	30	12 SPC Windows	05hz	4.508
+Discrete	30	12 SPC Windows	05hz	0.775
+Discrete	30	12 SPC Windows	05hz	0.576
+Discrete	30	12 SPC Windows	05hz	0.968
+Discrete	30	12 SPC Windows	05hz	0.958
+Discrete	30	12 SPC Windows	05hz	0.756
+Discrete	30	12 SPC Windows	05hz	0.927
+Discrete	30	12 SPC Windows	05hz	1.703
+Discrete	30	12 SPC Windows	05hz	2.009
+Discrete	30	12 SPC Windows	05hz	4.849
+Discrete	30	12 SPC Windows	05hz	1.462
+Discrete	30	12 SPC Windows	05hz	1.361
+Discrete	30	12 SPC Windows	05hz	1.491
+Discrete	30	12 SPC Windows	05hz	1.398
+Discrete	30	12 SPC Windows	05hz	1.265
+Discrete	30	12 SPC Windows	05hz	2.264
+Discrete	30	12 SPC Windows	05hz	1.78
+Discrete	30	12 SPC Windows	05hz	0.78
+Discrete	30	12 SPC Windows	05hz	1.008
+Discrete	30	12 SPC Windows	05hz	0.894
+Discrete	30	12 SPC Windows	05hz	1.062
+Discrete	30	12 SPC Windows	05hz	1.021
+Discrete	30	12 SPC Windows	05hz	0.85
+Discrete	30	12 SPC Windows	05hz	1.227
+Discrete	30	12 SPC Windows	05hz	1.127
+Discrete	30	12 SPC Windows	05hz	1.157
+Discrete	30	12 SPC Windows	05hz	1.32
+Discrete	30	12 SPC Windows	05hz	1.38
+Discrete	30	12 SPC Windows	05hz	0.91
+Discrete	30	12 SPC Windows	05hz	2.157
+Discrete	30	12 SPC Windows	05hz	1.612
+Discrete	30	12 SPC Windows	05hz	1.561
+Discrete	30	12 SPC Windows	05hz	1.31
+Discrete	30	12 SPC Windows	05hz	1.895
+Discrete	30	12 SPC Windows	05hz	6.715
+Discrete	30	12 SPC Windows	05hz	1.977
+Discrete	30	12 SPC Windows	05hz	1.516
+Discrete	30	12 SPC Windows	05hz	1.748
+Discrete	30	12 SPC Windows	05hz	1.409
+Discrete	30	12 SPC Windows	05hz	2.708
+Discrete	30	12 SPC Windows	05hz	4.421
+Discrete	30	12 SPC Windows	05hz	1.69
+Discrete	30	12 SPC Windows	05hz	1.364
+Discrete	30	12 SPC Windows	05hz	0.946
+Discrete	30	12 SPC Windows	05hz	0.965
+Discrete	30	12 SPC Windows	05hz	1.891
+Discrete	30	12 SPC Windows	05hz	2.584
+Discrete	30	12 SPC Windows	05hz	1.163
+Discrete	30	12 SPC Windows	05hz	1.595
+Discrete	30	12 SPC Windows	05hz	1.949
+Discrete	30	12 SPC Windows	05hz	4.923
+Discrete	30	12 SPC Windows	05hz	2.947
+Discrete	30	12 SPC Windows	05hz	1.875
+Discrete	30	12 SPC Windows	05hz	1.846
+Discrete	30	12 SPC Windows	05hz	2.838
+Discrete	30	12 SPC Windows	05hz	6.757
+Discrete	30	12 SPC Windows	05hz	2.522
+Discrete	30	12 SPC Windows	05hz	2.511
+Discrete	30	12 SPC Windows	05hz	1.848
+Discrete	30	12 SPC Windows	05hz	2.754
+Discrete	30	12 SPC Windows	05hz	5.712
+Discrete	30	12 SPC Windows	05hz	2.847
+Discrete	30	12 SPC Windows	05hz	1.773
+Discrete	30	12 SPC Windows	05hz	3.258
+Discrete	30	12 SPC Windows	05hz	6.792
+Discrete	30	12 SPC Windows	05hz	3.207
+Discrete	30	12 SPC Windows	05hz	1.935
+Discrete	30	12 SPC Windows	05hz	1.145
+Discrete	30	12 SPC Windows	05hz	1.236
+Discrete	30	12 SPC Windows	05hz	1.213
+Discrete	30	12 SPC Windows	05hz	5.359
+Discrete	30	12 SPC Windows	05hz	2.596
+Discrete	30	12 SPC Windows	05hz	0.777
+Discrete	30	12 SPC Windows	05hz	1.071
+Discrete	30	12 SPC Windows	05hz	1.041
+Discrete	30	12 SPC Windows	05hz	2.049
+Discrete	30	12 SPC Windows	05hz	1.803
+Discrete	30	12 SPC Windows	05hz	1.316
+Discrete	30	12 SPC Windows	05hz	8.992
+Discrete	30	12 SPC Windows	05hz	2.025
+Discrete	30	12 SPC Windows	05hz	1.924
+Discrete	30	12 SPC Windows	05hz	2.074
+Discrete	30	12 SPC Windows	05hz	10.667
+Discrete	30	12 SPC Windows	05hz	1.348
+Discrete	30	12 SPC Windows	05hz	2.269
+Discrete	30	12 SPC Windows	05hz	6.788
+Discrete	30	12 SPC Windows	05hz	2.735
+Discrete	30	12 SPC Windows	05hz	2.249
+Discrete	30	8 + 2 VPlot	05hz	0.762
+Discrete	30	8 + 2 VPlot	05hz	1.898
+Discrete	30	8 + 2 VPlot	05hz	1.379
+Discrete	30	8 + 2 VPlot	05hz	2.623
+Discrete	30	8 + 2 VPlot	05hz	1.795
+Discrete	30	8 + 2 VPlot	05hz	1.704
+Discrete	30	8 + 2 VPlot	05hz	4.387
+Discrete	30	8 + 2 VPlot	05hz	2.146
+Discrete	30	8 + 2 VPlot	05hz	2.943
+Discrete	30	8 + 2 VPlot	05hz	2.027
+Discrete	30	8 + 2 VPlot	05hz	6.486
+Discrete	30	8 + 2 VPlot	05hz	2.726
+Discrete	30	8 + 2 VPlot	05hz	2.94
+Discrete	30	8 + 2 VPlot	05hz	3.013
+Discrete	30	8 + 2 VPlot	05hz	7.103
+Discrete	30	8 + 2 VPlot	05hz	2.764
+Discrete	30	8 + 2 VPlot	05hz	3.295
+Discrete	30	8 + 2 VPlot	05hz	6.989
+Discrete	30	8 + 2 VPlot	05hz	1.982
+Discrete	30	8 + 2 VPlot	05hz	2.114
+Discrete	30	8 + 2 VPlot	05hz	2.692
+Discrete	30	8 + 2 VPlot	05hz	2.403
+Discrete	30	8 + 2 VPlot	05hz	6.086
+Discrete	30	8 + 2 VPlot	05hz	3.61
+Discrete	30	8 + 2 VPlot	05hz	1.634
+Discrete	30	8 + 2 VPlot	05hz	3.696
+Discrete	30	8 + 2 VPlot	05hz	2.817
+Discrete	30	8 + 2 VPlot	05hz	2.11
+Discrete	30	8 + 2 VPlot	05hz	2.196
+Discrete	30	8 + 2 VPlot	05hz	1.603
+Discrete	30	8 + 2 VPlot	05hz	1.754
+Discrete	30	8 + 2 VPlot	05hz	7.339
+Discrete	30	8 + 2 VPlot	05hz	3.437
+Discrete	30	8 + 2 VPlot	05hz	2.753
+Discrete	30	8 + 2 VPlot	05hz	8.477
+Discrete	30	8 + 2 VPlot	05hz	4.266
+Discrete	30	8 + 2 VPlot	05hz	6.95
+Discrete	30	8 + 2 VPlot	05hz	3.386
+Discrete	30	8 + 2 VPlot	05hz	3.243
+Discrete	30	8 + 2 VPlot	05hz	3.291
+Discrete	30	8 + 2 VPlot	05hz	3.981
+Discrete	30	8 + 2 VPlot	05hz	7.811
+Discrete	30	8 + 2 VPlot	05hz	3.862
+Discrete	30	8 + 2 VPlot	05hz	4.141
+Discrete	30	8 + 2 VPlot	05hz	12.788
+Discrete	30	8 + 2 VPlot	05hz	3.535
+Discrete	30	8 + 2 VPlot	05hz	5.908
+Discrete	30	8 + 2 VPlot	05hz	4.654
+Discrete	30	8 + 2 VPlot	05hz	4.389
+Discrete	30	8 + 2 VPlot	05hz	6.714
+Discrete	30	8 + 2 VPlot	05hz	4.713
+Discrete	30	8 + 2 VPlot	05hz	6.11
+Discrete	30	8 + 2 VPlot	05hz	3.615
+Discrete	30	8 + 2 VPlot	05hz	9.384
+Discrete	30	8 + 2 VPlot	05hz	5.692
+Discrete	30	8 + 2 VPlot	05hz	5.368
+Discrete	30	8 + 2 VPlot	05hz	4.535
+Discrete	30	8 + 2 VPlot	05hz	5.675
+Discrete	30	8 + 2 VPlot	05hz	3.821
+Discrete	30	8 + 2 VPlot	05hz	4.554
+Discrete	30	12 SPC Windows	05hz	0.944
+Discrete	30	12 SPC Windows	05hz	1.02
+Discrete	30	12 SPC Windows	05hz	3.194
+Discrete	30	12 SPC Windows	05hz	0.637
+Discrete	30	12 SPC Windows	05hz	0.82
+Discrete	30	12 SPC Windows	05hz	0.602
+Discrete	30	12 SPC Windows	05hz	0.773
+Discrete	30	12 SPC Windows	05hz	0.777
+Discrete	30	12 SPC Windows	05hz	0.906
+Discrete	30	12 SPC Windows	05hz	0.764
+Discrete	30	12 SPC Windows	05hz	1.153
+Discrete	30	12 SPC Windows	05hz	0.934
+Discrete	30	12 SPC Windows	05hz	1.344
+Discrete	30	12 SPC Windows	05hz	3.986
+Discrete	30	12 SPC Windows	05hz	0.967
+Discrete	30	12 SPC Windows	05hz	1.057
+Discrete	30	12 SPC Windows	05hz	1.223
+Discrete	30	12 SPC Windows	05hz	0.95
+Discrete	30	12 SPC Windows	05hz	1.172
+Discrete	30	12 SPC Windows	05hz	1.056
+Discrete	30	12 SPC Windows	05hz	10.964
+Discrete	30	12 SPC Windows	05hz	1.397
+Discrete	30	12 SPC Windows	05hz	1.052
+Discrete	30	12 SPC Windows	05hz	6.35
+Discrete	30	12 SPC Windows	05hz	0.872
+Discrete	30	12 SPC Windows	05hz	1.577
+Discrete	30	12 SPC Windows	05hz	1.409
+Discrete	30	12 SPC Windows	05hz	1.417
+Discrete	30	12 SPC Windows	05hz	3.743
+Discrete	30	12 SPC Windows	05hz	1.747
+Discrete	30	12 SPC Windows	05hz	2.867
+Discrete	30	12 SPC Windows	05hz	2.163
+Discrete	30	12 SPC Windows	05hz	6.846
+Discrete	30	12 SPC Windows	05hz	3.136
+Discrete	30	12 SPC Windows	05hz	3.009
+Discrete	30	12 SPC Windows	05hz	2.552
+Discrete	30	12 SPC Windows	05hz	2.88
+Discrete	30	12 SPC Windows	05hz	3.109
+Discrete	30	12 SPC Windows	05hz	6.131
+Discrete	30	12 SPC Windows	05hz	2.842
+Discrete	30	12 SPC Windows	05hz	3.388
+Discrete	30	12 SPC Windows	05hz	3.275
+Discrete	30	12 SPC Windows	05hz	3.209
+Discrete	30	12 SPC Windows	05hz	3.12
+Discrete	30	12 SPC Windows	05hz	3.64
+Discrete	30	12 SPC Windows	05hz	6.223
+Discrete	30	12 SPC Windows	05hz	3.499
+Discrete	30	12 SPC Windows	05hz	3.25
+Discrete	30	12 SPC Windows	05hz	3.273
+Discrete	30	12 SPC Windows	05hz	12.439
+Discrete	30	12 SPC Windows	05hz	2.491
+Discrete	30	12 SPC Windows	05hz	3.029
+Discrete	30	12 SPC Windows	05hz	17.339
+Discrete	30	12 SPC Windows	05hz	10.302
+Discrete	30	12 SPC Windows	05hz	0.959
+Discrete	30	12 SPC Windows	05hz	4.175
+Discrete	30	12 SPC Windows	05hz	1.102
+Discrete	30	12 SPC Windows	05hz	0.807
+Discrete	30	12 SPC Windows	05hz	1.06
+Discrete	30	12 SPC Windows	05hz	1.155
+Discrete	30	12 SPC Windows	05hz	1.381
+Discrete	30	12 SPC Windows	05hz	1.24
+Discrete	30	12 SPC Windows	05hz	1.034
+Discrete	30	12 SPC Windows	05hz	1.131
+Discrete	30	12 SPC Windows	05hz	0.982
+Discrete	30	12 SPC Windows	05hz	4.547
+Discrete	30	12 SPC Windows	05hz	1.671
+Discrete	30	12 SPC Windows	05hz	1.927
+Discrete	30	12 SPC Windows	05hz	1.776
+Discrete	30	12 SPC Windows	05hz	2.105
+Discrete	30	12 SPC Windows	05hz	2.696
+Discrete	30	12 SPC Windows	05hz	6.418
+Discrete	30	12 SPC Windows	05hz	2.96
+Discrete	30	12 SPC Windows	05hz	3.581
+Discrete	30	12 SPC Windows	05hz	8.445
+Discrete	30	12 SPC Windows	05hz	3.021
+Discrete	30	12 SPC Windows	05hz	2.535
+Discrete	30	12 SPC Windows	05hz	12.254
+Discrete	30	12 SPC Windows	05hz	2.133
+Discrete	30	12 SPC Windows	05hz	3.796
+Discrete	30	12 SPC Windows	05hz	3.307
+Discrete	30	12 SPC Windows	05hz	2.872
+Discrete	30	12 SPC Windows	05hz	6.102
+Discrete	30	12 SPC Windows	05hz	2.865
+Discrete	30	12 SPC Windows	05hz	3.037
+Discrete	30	12 SPC Windows	05hz	7.59
+Discrete	30	12 SPC Windows	05hz	4.345
+Discrete	30	12 SPC Windows	05hz	3.986
+Discrete	30	12 SPC Windows	05hz	6.831
+Discrete	30	12 SPC Windows	05hz	5.667
+Discrete	30	12 SPC Windows	05hz	3.481
+Discrete	30	12 SPC Windows	05hz	3.388
+Discrete	30	12 SPC Windows	05hz	4.701
+Discrete	30	12 SPC Windows	05hz	6.682
+Discrete	30	12 SPC Windows	05hz	5.44
+Discrete	30	12 SPC Windows	05hz	4.935
+Discrete	30	12 SPC Windows	05hz	2.862
+Discrete	30	12 SPC Windows	05hz	3.338
+Discrete	30	12 SPC Windows	05hz	8.926
+Discrete	30	12 SPC Windows	05hz	3.837
+Discrete	30	12 SPC Windows	05hz	4.313
+Discrete	30	12 SPC Windows	05hz	3.886
+Discrete	30	12 SPC Windows	05hz	4.286
+Discrete	30	12 SPC Windows	05hz	5.357
+Discrete	30	12 SPC Windows	05hz	3.558
+Discrete	30	12 SPC Windows	05hz	9.266
+Discrete	30	12 SPC Windows	05hz	7.224
+Discrete	30	12 SPC Windows	05hz	9.742
+Discrete	30	12 SPC Windows	05hz	5.726
+Discrete	30	12 SPC Windows	05hz	5.867
+Discrete	30	12 SPC Windows	05hz	9.66
+Discrete	30	12 SPC Windows	05hz	4.745
+Discrete	30	12 SPC Windows	05hz	4.487
+Discrete	30	12 SPC Windows	05hz	11.246
+Discrete	30	12 SPC Windows	05hz	6.634
+Discrete	30	12 SPC Windows	05hz	7.887
+Discrete	30	12 SPC Windows	05hz	5.963
+Discrete	30	12 SPC Windows	05hz	4.893
+Discrete	30	12 SPC Windows	05hz	16.396
+Discrete	30	12 SPC Windows	05hz	7.082
+Discrete	30	12 SPC Windows	05hz	4.169
+Discrete	30	12 SPC Windows	05hz	4.286
+Discrete	30	12 SPC Windows	05hz	8.813
+Discrete	30	12 SPC Windows	05hz	5.152
+Discrete	30	12 SPC Windows	05hz	4.553
+Discrete	30	12 SPC Windows	05hz	4.804
+Discrete	30	12 SPC Windows	05hz	13.134
+Discrete	30	12 SPC Windows	05hz	4.748
+Discrete	30	12 SPC Windows	05hz	12.859
+Discrete	30	12 SPC Windows	05hz	8.501
+Discrete	30	12 SPC Windows	05hz	4.954
+Discrete	30	12 SPC Windows	05hz	5.612
+Discrete	30	12 SPC Windows	05hz	4.929
+Discrete	30	12 SPC Windows	05hz	4.444
+Discrete	30	12 SPC Windows	05hz	5.666
+Discrete	30	8 + 2 VPlot	05hz	1.266
+Discrete	30	8 + 2 VPlot	05hz	1.658
+Discrete	30	8 + 2 VPlot	05hz	1.744
+Discrete	30	8 + 2 VPlot	05hz	1.672
+Discrete	30	8 + 2 VPlot	05hz	2.2
+Discrete	30	8 + 2 VPlot	05hz	1.55
+Discrete	30	8 + 2 VPlot	05hz	2.11
+Discrete	30	8 + 2 VPlot	05hz	2.089
+Discrete	30	8 + 2 VPlot	05hz	1.855
+Discrete	30	8 + 2 VPlot	05hz	6.074
+Discrete	30	8 + 2 VPlot	05hz	4.586
+Discrete	30	8 + 2 VPlot	05hz	3.164
+Discrete	30	8 + 2 VPlot	05hz	2.24
+Discrete	30	8 + 2 VPlot	05hz	2.668
+Discrete	30	8 + 2 VPlot	05hz	5.535
+Discrete	30	8 + 2 VPlot	05hz	3.275
+Discrete	30	8 + 2 VPlot	05hz	3.116
+Discrete	30	8 + 2 VPlot	05hz	2.237
+Discrete	30	8 + 2 VPlot	05hz	2.523
+Discrete	30	8 + 2 VPlot	05hz	2.122
+Discrete	30	8 + 2 VPlot	05hz	1.867
+Discrete	30	8 + 2 VPlot	05hz	2.574

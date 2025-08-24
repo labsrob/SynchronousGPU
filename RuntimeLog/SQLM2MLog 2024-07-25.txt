@@ -1,0 +1,15 @@
+2024-07-25 14:36.55 --- local variable 'conn' referenced before assignment
+2024-07-25 14:37.03 --- local variable 'conn' referenced before assignment
+2024-07-25 14:37.18 --- local variable 'conn' referenced before assignment
+2024-07-25 14:37.51 --- local variable 'conn' referenced before assignment
+2024-07-25 14:38.02 --- local variable 'conn' referenced before assignment
+2024-07-25 14:38.15 --- local variable 'conn' referenced before assignment
+2024-07-25 14:38.31 --- local variable 'conn' referenced before assignment
+2024-07-25 14:38.41 --- local variable 'conn' referenced before assignment
+2024-07-25 14:44.21 --- local variable 'conn' referenced before assignment
+2024-07-25 14:48.41 --- local variable 'conn' referenced before assignment
+2024-07-25 15:06.32 --- local variable 'conn' referenced before assignment
+2024-07-25 15:06.39 --- local variable 'conn' referenced before assignment
+2024-07-25 15:42.12 --- local variable 'conn' referenced before assignment
+2024-07-25 15:53.27 --- local variable 'conn' referenced before assignment
+2024-07-25 15:53.35 --- local variable 'conn' referenced before assignment

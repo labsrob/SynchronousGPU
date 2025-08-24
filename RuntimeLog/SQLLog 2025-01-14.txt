@@ -1,0 +1,2 @@
+2025-01-14 16:04.40 --- 'int' object has no attribute 'close'
+2025-01-14 16:04.53 --- 'int' object has no attribute 'close'

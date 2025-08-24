@@ -1,0 +1,1 @@
+2025-05-22 15:33.02 --- <class 'pyodbc.Error'> returned a result with an exception set
