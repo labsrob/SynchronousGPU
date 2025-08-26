@@ -3325,7 +3325,6 @@ class CommonPlot:
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-        threading.Thread(target=self._worker, daemon=True).start()
 
     def _worker(self):
         while True:
