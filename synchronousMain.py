@@ -1161,14 +1161,14 @@ def plotView(titleMean):
     # ----------------------------------------------------------[]
     # Define Plot area and axes -
     # ----------------------------------------------------------#
-    im10, = self.a1.plot([], [], 'o-', label='Roller Force - (R1H1)')
-    im11, = self.a1.plot([], [], 'o-', label='Roller Force - (R1H2)')
-    im12, = self.a1.plot([], [], 'o-', label='Roller Force - (R1H3)')
-    im13, = self.a1.plot([], [], 'o-', label='Roller Force - (R1H4)')
-    im14, = self.a2.plot([], [], 'o-', label='Roller Force')
-    im15, = self.a2.plot([], [], 'o-', label='Roller Force')
-    im16, = self.a2.plot([], [], 'o-', label='Roller Force')
-    im17, = self.a2.plot([], [], 'o-', label='Roller Force')
+    im10, = a1.plot([], [], 'o-', label='Roller Force - (R1H1)')
+    im11, = a1.plot([], [], 'o-', label='Roller Force - (R1H2)')
+    im12, = a1.plot([], [], 'o-', label='Roller Force - (R1H3)')
+    im13, = a1.plot([], [], 'o-', label='Roller Force - (R1H4)')
+    im14, = a2.plot([], [], 'o-', label='Roller Force')
+    im15, = a2.plot([], [], 'o-', label='Roller Force')
+    im16, = a2.plot([], [], 'o-', label='Roller Force')
+    im17, = a2.plot([], [], 'o-', label='Roller Force')
 
 
 def readEoP(text_widget, rptID):        # End of Pipe Report
@@ -1308,10 +1308,27 @@ class PDFViewer(ScrolledText):
 
 
 class collectiveEoL(ttk.Frame):
+    # ------ SmpleSize, GroupType, SEOLSpace, SEOPSpace, EnableDNV, EnableAUT, EnableMGM, size20, size18
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        # ------ SmpleSize, GroupType, SEOLSpace, SEOPSpace, EnableDNV, EnableAUT, EnableMGM, size20, size18
+        self.createWidgets()
+
+    def createWidgets(self):
+        global progressB, win_Xmin, win_Xmax, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, im10, im11, im12, \
+        im13, im14, im15, im16, im17, im18, im19, im20, im21, im22, im23, im24, im25, im26, im27, im28, im29, im30, \
+        im31, im32, im33, im34, im35, im36, im37, im38, im39, im40, im41, im42, im43, im44, im45, im46, im47, im48, \
+        im49, im50, im51, im52, im53, im54, im55, im56, im57, im58, im59, im60, im61, im62, im63, im64, im65, im66, \
+        im67, im68, im69, im70, im71, im72, im73, im74, im75, im76, im77, im78, im79, im80, im81, im82, im83, im84, \
+        im85, im86, im87, im88, im89, im90, im91, im92, im93, im94, im95, im96, im97, im98, im99, im100, im101, im102, \
+        im103, im104, im105, im106, im107, im108, im109, im110, im111, im112, im113, im114, im115, im116, im117, \
+        im118, im119, im120, im121, im122, im123, im124, im125, im126, im127, im128, im129, im130, im131, im132, im133, \
+        im134, im135, im136, im137, im138, im139, im140, im141, im142, im143, im144, im145, im146, im147, im148, im149, \
+        im150, im151, im152, im153, im154, im155, im156, im157, im158, im159, im160, im161, im162, im163, im164, im165, \
+        im166, im167, im168, im169, im170, im171, im172, im173, im174, im175, im176, im177, im178, im179, im180, im181,\
+        im182, im183, im184, im185, wsS, ttS, stS, tgS, rcS, vcS, lpS, laS, ttS, stS, tgS, waS, ttSoL, stSoL, tgSoL, \
+        wsSoL, lpSoL, laSoL, waSoL
+
         if pRecipe == 'DNV':
             import qParamsHL_DNV as dnv
             ttS, ttTy, ttSoL, ttSoP, ttHL, ttAL, ttFO, A, B, C, D, E = dnv.decryptpProcessLim(pWON, 'TT')
@@ -1330,10 +1347,6 @@ class collectiveEoL(ttk.Frame):
             tgS, tgTy, tgSoL, tgSoP, tgHL, tgAL, tgFO, A, B, C, D, E = mgm.decryptpProcessLim(pWON, 'TG')
             waS, waTy, waSoL, waSoP, waHL, waAL, waFO, A, B, C, D, E = mgm.decryptpProcessLim(pWON, 'WA')
         # ----------------------------------------------[]
-        self.createWidgets()
-
-    def createWidgets(self):
-        global progressB
         # Load metrics from config ------------[TG, TT, ST]
         label = ttk.Label(self, text='[End of Layer Summary - ' + str(pMode) + ' Mode]', font=LARGE_FONT)
         label.pack(padx=10, pady=5)
@@ -1447,7 +1460,7 @@ class collectiveEoL(ttk.Frame):
 
             # ----------------------------------------------------------#
             self.a2.set_ylim([YScale_minEOL, YScale_maxEOL], auto=True)
-            self.a2.set_xlim([self.win_Xself.min, win_Xmax])
+            self.a2.set_xlim([self.win_Xmin, self.win_Xmax])
 
             self.a6.set_ylim([0, 10], auto=True)
             self.a6.set_xlim([self.win_Xmin, self.win_Xmax])
@@ -1836,25 +1849,23 @@ class collectiveEoL(ttk.Frame):
             im184, = self.a12.plot([], [], 'o-', label='Winding Angle')  # Ring 3 value count per layer
             im185, = self.a12.plot([], [], 'o-', label='Winding Angle)')
 
-            # ------------------------------------------------------
-            self.canvas = FigureCanvasTkAgg(self.f, self)
-            self.canvas.get_tk_widget().pack(fill="both", expand=True)
+        # ------------------------------------------------------
+        self.canvas = FigureCanvasTkAgg(self.f, self)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-            # Activate Matplot tools ------------------[Uncomment to activate]
-            toolbar = NavigationToolbar2Tk(self.canvas, self)
-            toolbar.update()
-            self.canvas._tkcanvas.pack(expand=True)
+        # Activate Matplot tools ----------------[Uncomment to activate]
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
 
-            # --------- call data block -------------------------------------#
-            threading.Thread(target=self._dataControlEoL, daemon=True).start()
-            # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------------#
-
+        # --------- call data block -------------------------------------#
+        threading.Thread(target=self._dataControlEoL, daemon=True).start()
+        # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------------#
 
     def _dataControlEoL(self):
-        # Initialise SQL Data connection per listed Table --------------------[]
 
+        # Initialise SQL Data connection per listed Table --------------------[]
         if not inUseAlready:                # Load CommsPlc class once
-            import CommsSql as q
             ol_con = sq.DAQ_connect(1, 0)   # Load TG and VM data from PLC
         else:
             pass
@@ -1872,580 +1883,596 @@ class collectiveEoL(ttk.Frame):
         import sqlArrayRLmethodEoL as sel
 
         while True:
-            if layerN != 0:
-                print('EOL process is running......')
-                # -- Process data fetch sequences pData, Void Count + Ramp Count ---#
-                if pRecipe == 'DNV': # [+ RampCount & VoidCount]
-                    self.rpTT, self.rpST, self.rpTG, self.rpWS = sel.dnv_sqlExec(ol_con, layerN, T1, T2, T3, T4)
-                else:
-                    self.rpLP, self.rpLA, self.rpTT, sel.rpST, self.rpTG, self.rpWA = sel.mgm_sqlExec(ol_con, layerN, T1, T2, T3, T4, T5, T6)
+            if pMode == 1 or pMode == 0 or pMode == 2:    # pModes = (0 Manual), (1 Automatic), (2 from GUI)
+                if layerN != 0:
+                    print('EOL process is running......')
+                    # -- Process data fetch sequences pData, Void Count + Ramp Count ---#
+                    if pRecipe == 'DNV': # [+ RampCount & VoidCount]
+                        self.rpTT, self.rpST, self.rpTG, self.rpWS = sel.dnv_sqlExec(ol_con, layerN, ttSoL, stSoL,
+                                                                                     tgSoL, wsSoL, T1, T2, T3, T4)
 
-                # --- Conditional break when ----- Assuming all data were pooled at once ---
-                if self.rpTT > 0 and self.rpST > 0 and self.rpTG > 0 and self.rpLA > 0:
-                    break
-                else:
-                    if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        ol_con.close()
-                        print('SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        continue
+                    elif pRecipe == 'MGM':
+                        self.rpLP, self.rpLA, self.rpTT, sel.rpST, self.rpTG, self.rpWA = sel.mgm_sqlExec(ol_con,
+                                                                                                          layerN, lpSoL,
+                                                                                                          laSoL, ttSoL,
+                                                                                                          stSoL, tgSoL,
+                                                                                                          waSoL, T1, T2,
+                                                                                                          T3, T4, T5,
+                                                                                                          T6)
+
+                    # --- Conditional break when ----- Assuming all data were pooled at once ---
+                    if self.rpTT > 0 or self.rpTG > 0 or self.rpLA > 0:
+                        break
                     else:
-                        print('\nUpdating....')
-            else:
-                pass
+                        if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                            ol_con.close()
+                            print('SQL End of File, connection closes after 30 mins...')
+                            time.sleep(60)
+                            continue
+                        else:
+                            print('\nUpdating....')
+                else:
+                    errorNote()
+                    print('Sorry, I cant compute visualisation without Layer Number..')
+
             # -------------------------------------------------------------#
-            if EoL_reached > 0 or layerN > 0:
-                self.canvas.get_tk_widget().after(0, self._eolDataPlot)     # Regime = 0 static
             else:
                 print('Report is available after EoL run, please wait...')
+            self.canvas.get_tk_widget().after(15, self._eolDataPlot)
             time.sleep(0.5)
 
-
-    # ================== End of synchronous Method =======================================================[]
-
+    # ================== End of synchronous Method =========================================[]
     def _eolDataPlot(self):
-        global zTT, zST, zTG, zWS, zWA, r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC, rptID
-
         timei = time.time()  # start timing the entire loop
 
         # --------- Generate Unique ID for pdf report ------#
         rptID = random_with_N_digits(10)
         # --------------------------------------------------#
-        import VarSQL_EOLRPT as el                          # load SQL variables column names | rfVarSQL
-        if pRecipe == 'DNV':
-            g1 = ott.validCols(T1)                          # Construct Table Column (Tape Temp)
-            d1 = pd.DataFrame(self.zTT, columns=g1)
-            g2 = ost.validCols(T2)                          # Construct Table Column (Sub Temp)
-            d2 = pd.DataFrame(self.zST, columns=g2)
-            g3 = otg.validCols(T3)                          # Construct Table Column (Tape Gap)
-            d3 = pd.DataFrame(self.zTG, columns=g3)
-            g4 = ows.validCols(T4)                          # Construct Table Column (Tape Gap)
-            d4 = pd.DataFrame(self.zWS, columns=g4)         # EoL_reached > 0 or layerN
-            # Concatenate all columns ----------------------[]
-            df1 = pd.concat([d1, d2, d3, d4], axis=1)
+        # declare asynchronous variables ------------------[]
+        if UseSQL_DBS:
+            import VarSQL_EOLRPT as el                          # load SQL variables column names | rfVarSQL
+            if pRecipe == 'DNV':
+                g1 = ott.validCols(T1)                          # Construct Table Column (Tape Temp)
+                d1 = pd.DataFrame(self.zTT, columns=g1)
+                g2 = ost.validCols(T2)                          # Construct Table Column (Sub Temp)
+                d2 = pd.DataFrame(self.zST, columns=g2)
+                g3 = otg.validCols(T3)                          # Construct Table Column (Tape Gap)
+                d3 = pd.DataFrame(self.zTG, columns=g3)
+                g4 = ows.validCols(T4)                          # Construct Table Column (Tape Gap)
+                d4 = pd.DataFrame(self.zWS, columns=g4)         # EoL_reached > 0 or layerN
+                # Concatenate all columns ----------------------[]
+                df1 = pd.concat([d1, d2, d3, d4], axis=1)
 
-        elif pRecipe == 'MGM':
-            g1 = olp.validCols(T1)                          # Laser Power - Construct Table Column (Tape Temp)
-            d1 = pd.DataFrame(self.zLP, columns=g1)
-            g2 = ola.validCols(T2)                          # Laser Angle - Construct Table Column (Sub Temp)
-            d2 = pd.DataFrame(self.zLA, columns=g2)
-            g3 = olp.validCols(T3)                          # Construct Table Column (Tape Gap)
-            d3 = pd.DataFrame(self.zTT, columns=g3)
-            g4 = ott.validCols(T4)                          # Construct Table Column (Tape Temp)
-            d4 = pd.DataFrame(self.zST, columns=g4)
-            g5 = ost.validCols(T5)                          # Construct Table Column (Sub Temp)
-            d5 = pd.DataFrame(self.zTG, columns=g5)
-            g6 = otg.validCols(T6)                          # Construct Table Column (Tape Gap)
-            d6 = pd.DataFrame(self.zWA, columns=g6)
-            # Concatenate all columns ----------------------[]
-            df1 = pd.concat([d1, d2, d3, d4, d5, d6], axis=1)
+            elif pRecipe == 'MGM':
+                g1 = olp.validCols(T1)                          # Laser Power - Construct Table Column (Tape Temp)
+                d1 = pd.DataFrame(self.zLP, columns=g1)
+                g2 = ola.validCols(T2)                          # Laser Angle - Construct Table Column (Sub Temp)
+                d2 = pd.DataFrame(self.zLA, columns=g2)
+                g3 = olp.validCols(T3)                          # Construct Table Column (Tape Gap)
+                d3 = pd.DataFrame(self.zTT, columns=g3)
+                g4 = ott.validCols(T4)                          # Construct Table Column (Tape Temp)
+                d4 = pd.DataFrame(self.zST, columns=g4)
+                g5 = ost.validCols(T5)                          # Construct Table Column (Sub Temp)
+                d5 = pd.DataFrame(self.zTG, columns=g5)
+                g6 = otg.validCols(T6)                          # Construct Table Column (Tape Gap)
+                d6 = pd.DataFrame(self.zWA, columns=g6)
+                # Concatenate all columns ----------------------[]
+                df1 = pd.concat([d1, d2, d3, d4, d5, d6], axis=1)
 
-        else:
-            df1 = 0
-            pass
-        # ----- Access data element within the concatenated columns -----[A]
-        ZX = el.loadProcesValues(df1, EoLRep)
-        print('\nSQL Content', df1.head(10))
-        print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
-        # ---------------------------------------------------------------[]
-        # im10.set_xdata(np.arange(db_freq))
-        im10.set_xdata(range(0, pLength))
-        im11.set_xdata(range(0, pLength))
-        im12.set_xdata(range(0, pLength))
-        im13.set_xdata(range(0, pLength))
-        im14.set_xdata(range(0, pLength))
-        im15.set_xdata(range(0, pLength))
-        im16.set_xdata(range(0, pLength))
-        im17.set_xdata(range(0, pLength))
-        im18.set_xdata(range(0, pLength))
-        im19.set_xdata(range(0, pLength))
-        im20.set_xdata(range(0, pLength))
-        im21.set_xdata(range(0, pLength))
-        im22.set_xdata(range(0, pLength))
-        im23.set_xdata(range(0, pLength))
-        im24.set_xdata(range(0, pLength))
-        im25.set_xdata(range(0, pLength))
-        # ------------------------------- S Plot TT
-        im26.set_xdata(range(0, pLength))
-        im27.set_xdata(range(0, pLength))
-        im28.set_xdata(range(0, pLength))
-        im29.set_xdata(range(0, pLength))
-        im30.set_xdata(range(0, pLength))
-        im31.set_xdata(range(0, pLength))
-        im32.set_xdata(range(0, pLength))
-        im33.set_xdata(range(0, pLength))
-        im34.set_xdata(range(0, pLength))
-        im35.set_xdata(range(0, pLength))
-        im36.set_xdata(range(0, pLength))
-        im37.set_xdata(range(0, pLength))
-        im38.set_xdata(range(0, pLength))
-        im39.set_xdata(range(0, pLength))
-        im40.set_xdata(range(0, pLength))
-        im41.set_xdata(range(0, pLength))
-        # ------------------------------- X Plot ST
-        im42.set_xdata(range(0, pLength))
-        im43.set_xdata(range(0, pLength))
-        im44.set_xdata(range(0, pLength))
-        im45.set_xdata(range(0, pLength))
-        im46.set_xdata(range(0, pLength))
-        im47.set_xdata(range(0, pLength))
-        im49.set_xdata(range(0, pLength))
-        im50.set_xdata(range(0, pLength))
-        im51.set_xdata(range(0, pLength))
-        im52.set_xdata(range(0, pLength))
-        im53.set_xdata(range(0, pLength))
-        im54.set_xdata(range(0, pLength))
-        im55.set_xdata(range(0, pLength))
-        im56.set_xdata(range(0, pLength))
-        im56.set_xdata(range(0, pLength))
-        im57.set_xdata(range(0, pLength))
-        # ------------------------------- S Plot ST
-        im58.set_xdata(range(0, pLength))
-        im59.set_xdata(range(0, pLength))
-        im60.set_xdata(range(0, pLength))
-        im61.set_xdata(range(0, pLength))
-        im62.set_xdata(range(0, pLength))
-        im63.set_xdata(range(0, pLength))
-        im64.set_xdata(range(0, pLength))
-        im65.set_xdata(range(0, pLength))
-        im66.set_xdata(range(0, pLength))
-        im67.set_xdata(range(0, pLength))
-        im68.set_xdata(range(0, pLength))
-        im69.set_xdata(range(0, pLength))
-        im70.set_xdata(range(0, pLength))
-        im71.set_xdata(range(0, pLength))
-        im72.set_xdata(range(0, pLength))
-        im73.set_xdata(range(0, pLength))
-        # ------------------------------- X Plot TG
-        im74.set_xdata(range(0, pLength))
-        im75.set_xdata(range(0, pLength))
-        im76.set_xdata(range(0, pLength))
-        im77.set_xdata(range(0, pLength))
-        im78.set_xdata(range(0, pLength))
-        im79.set_xdata(range(0, pLength))
-        im80.set_xdata(range(0, pLength))
-        im81.set_xdata(range(0, pLength))
-        # --------------------------- S Plot TG
-        im82.set_xdata(range(0, pLength))
-        im83.set_xdata(range(0, pLength))
-        im84.set_xdata(range(0, pLength))
-        im85.set_xdata(range(0, pLength))
-        im86.set_xdata(range(0, pLength))
-        im87.set_xdata(range(0, pLength))
-        im88.set_xdata(range(0, pLength))
-        im89.set_xdata(range(0, pLength))
-        # ------------------------------ Value Plot RM, No X/S Plots -
-        im90.set_xdata(range(0, pLength))
-        im91.set_xdata(range(0, pLength))
-        im92.set_xdata(range(0, pLength))
-        im93.set_xdata(range(0, pLength))
-        im94.set_xdata(range(0, pLength))
-        im95.set_xdata(range(0, pLength))
-        im96.set_xdata(range(0, pLength))
-        im97.set_xdata(range(0, pLength))
-        # --------------------------- X Plot for LP
-        im98.set_xdata(range(0, pLength))
-        im99.set_xdata(range(0, pLength))
-        im100.set_xdata(range(0, pLength))
-        im101.set_xdata(range(0, pLength))
-        im102.set_xdata(range(0, pLength))
-        im103.set_xdata(range(0, pLength))
-        im104.set_xdata(range(0, pLength))
-        im105.set_xdata(range(0, pLength))
-        im106.set_xdata(range(0, pLength))
-        im107.set_xdata(range(0, pLength))
-        im108.set_xdata(range(0, pLength))
-        im109.set_xdata(range(0, pLength))
-        # ---------------------------- S Plot
-        im110.set_xdata(range(0, pLength))
-        im111.set_xdata(range(0, pLength))
-        im112.set_xdata(range(0, pLength))
-        im113.set_xdata(range(0, pLength))
-        im114.set_xdata(range(0, pLength))
-        im115.set_xdata(range(0, pLength))
-        im116.set_xdata(range(0, pLength))
-        im117.set_xdata(range(0, pLength))
-        im118.set_xdata(range(0, pLength))
-        im119.set_xdata(range(0, pLength))
-        im120.set_xdata(range(0, pLength))
-        im121.set_xdata(range(0, pLength))
-        im122.set_xdata(range(0, pLength))
-        im123.set_xdata(range(0, pLength))
-        im124.set_xdata(range(0, pLength))
-        im125.set_xdata(range(0, pLength))
-        # ---------------------------- S Plot
-        im126.set_xdata(range(0, pLength))
-        im127.set_xdata(range(0, pLength))
-        im128.set_xdata(range(0, pLength))
-        im129.set_xdata(range(0, pLength))
-        im130.set_xdata(range(0, pLength))
-        im131.set_xdata(range(0, pLength))
-        im132.set_xdata(range(0, pLength))
-        im133.set_xdata(range(0, pLength))
-        im134.set_xdata(range(0, pLength))
-        im135.set_xdata(range(0, pLength))
-        im136.set_xdata(range(0, pLength))
-        im137.set_xdata(range(0, pLength))
-        im138.set_xdata(range(0, pLength))
-        im139.set_xdata(range(0, pLength))
-        im140.set_xdata(range(0, pLength))
-        im141.set_xdata(range(0, pLength))
-        # ---------------------------- XS Plot
-        im142.set_xdata(range(0, pLength))
-        im143.set_xdata(range(0, pLength))
-        im144.set_xdata(range(0, pLength))
-        im145.set_xdata(range(0, pLength))
-        im146.set_xdata(range(0, pLength))
-        im147.set_xdata(range(0, pLength))
-        im148.set_xdata(range(0, pLength))
-        im149.set_xdata(range(0, pLength))
-        im150.set_xdata(range(0, pLength))
-        im151.set_xdata(range(0, pLength))
-        im152.set_xdata(range(0, pLength))
-        im153.set_xdata(range(0, pLength))
-        im154.set_xdata(range(0, pLength))
-        im155.set_xdata(range(0, pLength))
-        im156.set_xdata(range(0, pLength))
-        im157.set_xdata(range(0, pLength))
-        # ---------------------------- XS Plot
-        im158.set_xdata(range(0, pLength))
-        im159.set_xdata(range(0, pLength))
-        im160.set_xdata(range(0, pLength))
-        im161.set_xdata(range(0, pLength))
-        im162.set_xdata(range(0, pLength))
-        im163.set_xdata(range(0, pLength))
-        im164.set_xdata(range(0, pLength))
-        im165.set_xdata(range(0, pLength))
-        im166.set_xdata(range(0, pLength))
-        im167.set_xdata(range(0, pLength))
-        im168.set_xdata(range(0, pLength))
-        im169.set_xdata(range(0, pLength))
-        im170.set_xdata(range(0, pLength))
-        im171.set_xdata(range(0, pLength))
-        im172.set_xdata(range(0, pLength))
-        im173.set_xdata(range(0, pLength))
-        # ---------------------------- XS Plot
-        im174.set_xdata(range(0, pLength))
-        im175.set_xdata(range(0, pLength))
-        im176.set_xdata(range(0, pLength))
-        im177.set_xdata(range(0, pLength))
-        im178.set_xdata(range(0, pLength))
-        im179.set_xdata(range(0, pLength))
-        im180.set_xdata(range(0, pLength))
-        im181.set_xdata(range(0, pLength))
-        im182.set_xdata(range(0, pLength))
-        im183.set_xdata(range(0, pLength))
-        im184.set_xdata(range(0, pLength))
-        im185.set_xdata(range(0, pLength))
-        if pRecipe == 'DNV':
-            # X Plot Y-Axis data points for XBar ---------------------------[ Mean TT ]
-            im10.set_ydata((ZX[0]).rolling(window=ttS, min_periods=1).mean())  # head 1
-            im11.set_ydata((ZX[1]).rolling(window=ttS, min_periods=1).mean())  # head 2
-            im12.set_ydata((ZX[2]).rolling(window=ttS, min_periods=1).mean())  # head 3
-            im13.set_ydata((ZX[3]).rolling(window=ttS, min_periods=1).mean())  # head 4
-            im14.set_ydata((ZX[4]).rolling(window=ttS, min_periods=1).mean())  # head 1
-            im15.set_ydata((ZX[5]).rolling(window=ttS, min_periods=1).mean())  # head 2
-            im16.set_ydata((ZX[6]).rolling(window=ttS, min_periods=1).mean())  # head 3
-            im17.set_ydata((ZX[7]).rolling(window=ttS, min_periods=1).mean())  # head 4
-            im18.set_ydata((ZX[8]).rolling(window=ttS, min_periods=1).mean())  # head 1
-            im19.set_ydata((ZX[9]).rolling(window=ttS, min_periods=1).mean())  # head 2
-            im20.set_ydata((ZX[10]).rolling(window=ttS, min_periods=1).mean())  # head 3
-            im21.set_ydata((ZX[11]).rolling(window=ttS, min_periods=1).mean())  # head 4
-            im22.set_ydata((ZX[12]).rolling(window=ttS, min_periods=1).mean())  # head 1
-            im23.set_ydata((ZX[13]).rolling(window=ttS, min_periods=1).mean())  # head 2
-            im24.set_ydata((ZX[14]).rolling(window=ttS, min_periods=1).mean())  # head 3
-            im25.set_ydata((ZX[15]).rolling(window=ttS, min_periods=1).mean())  # head 4
-            # ---------------------------------------[T1 std Dev]
-            im26.set_ydata((ZX[0]).rolling(window=ttS, min_periods=1).std())
-            im27.set_ydata((ZX[1]).rolling(window=ttS, min_periods=1).std())
-            im28.set_ydata((ZX[2]).rolling(window=ttS, min_periods=1).std())
-            im29.set_ydata((ZX[3]).rolling(window=ttS, min_periods=1).std())
-            im30.set_ydata((ZX[4]).rolling(window=ttS, min_periods=1).std())
-            im31.set_ydata((ZX[5]).rolling(window=ttS, min_periods=1).std())
-            im32.set_ydata((ZX[6]).rolling(window=ttS, min_periods=1).std())
-            im33.set_ydata((ZX[7]).rolling(window=ttS, min_periods=1).std())
-            im34.set_ydata((ZX[8]).rolling(window=ttS, min_periods=1).std())
-            im35.set_ydata((ZX[9]).rolling(window=ttS, min_periods=1).std())
-            im36.set_ydata((ZX[10]).rolling(window=ttS, min_periods=1).std())
-            im37.set_ydata((ZX[11]).rolling(window=ttS, min_periods=1).std())
-            im38.set_ydata((ZX[12]).rolling(window=ttS, min_periods=1).std())
-            im39.set_ydata((ZX[13]).rolling(window=ttS, min_periods=1).std())
-            im40.set_ydata((ZX[14]).rolling(window=ttS, min_periods=1).std())
-            im41.set_ydata((ZX[15]).rolling(window=ttS, min_periods=1).std())
-            # ----------------------------------------------------------------------[Mean ST]
-            im42.set_ydata((ZX[16]).rolling(window=stS, min_periods=1).mean())
-            im43.set_ydata((ZX[17]).rolling(window=stS, min_periods=1).mean())
-            im44.set_ydata((ZX[18]).rolling(window=stS, min_periods=1).mean())
-            im45.set_ydata((ZX[19]).rolling(window=stS, min_periods=1).mean())
-            im46.set_ydata((ZX[20]).rolling(window=stS, min_periods=1).mean())
-            im47.set_ydata((ZX[21]).rolling(window=stS, min_periods=1).mean())
-            im48.set_ydata((ZX[22]).rolling(window=stS, min_periods=1).mean())
-            im49.set_ydata((ZX[23]).rolling(window=stS, min_periods=1).mean())
-            im50.set_ydata((ZX[24]).rolling(window=stS, min_periods=1).mean())
-            im51.set_ydata((ZX[25]).rolling(window=stS, min_periods=1).mean())
-            im52.set_ydata((ZX[26]).rolling(window=stS, min_periods=1).mean())
-            im53.set_ydata((ZX[27]).rolling(window=stS, min_periods=1).mean())
-            im54.set_ydata((ZX[28]).rolling(window=stS, min_periods=1).mean())
-            im55.set_ydata((ZX[29]).rolling(window=stS, min_periods=1).mean())
-            im56.set_ydata((ZX[30]).rolling(window=stS, min_periods=1).mean())
-            im57.set_ydata((ZX[31]).rolling(window=stS, min_periods=1).mean())
-            # ---------------------------------------[T2 std Dev]
-            im58.set_ydata((ZX[16]).rolling(window=stS, min_periods=1).std())
-            im59.set_ydata((ZX[17]).rolling(window=stS, min_periods=1).std())
-            im60.set_ydata((ZX[18]).rolling(window=stS, min_periods=1).std())
-            im61.set_ydata((ZX[19]).rolling(window=stS, min_periods=1).std())
-            im62.set_ydata((ZX[20]).rolling(window=stS, min_periods=1).std())
-            im63.set_ydata((ZX[21]).rolling(window=stS, min_periods=1).std())
-            im64.set_ydata((ZX[22]).rolling(window=stS, min_periods=1).std())
-            im65.set_ydata((ZX[23]).rolling(window=stS, min_periods=1).std())
-            im66.set_ydata((ZX[24]).rolling(window=stS, min_periods=1).std())
-            im67.set_ydata((ZX[25]).rolling(window=stS, min_periods=1).std())
-            im68.set_ydata((ZX[26]).rolling(window=stS, min_periods=1).std())
-            im69.set_ydata((ZX[27]).rolling(window=stS, min_periods=1).std())
-            im70.set_ydata((ZX[28]).rolling(window=stS, min_periods=1).std())
-            im71.set_ydata((ZX[29]).rolling(window=stS, min_periods=1).std())
-            im72.set_ydata((ZX[30]).rolling(window=stS, min_periods=1).std())
-            im73.set_ydata((ZX[31]).rolling(window=stS, min_periods=1).std())
-            # ------------------------------------------------------------------[Mean TG]
-            im74.set_ydata((ZX[32]).rolling(window=tgS, min_periods=1).mean())
-            im75.set_ydata((ZX[33]).rolling(window=tgS, min_periods=1).mean())
-            im76.set_ydata((ZX[34]).rolling(window=tgS, min_periods=1).mean())
-            im77.set_ydata((ZX[35]).rolling(window=tgS, min_periods=1).mean())
-            im78.set_ydata((ZX[36]).rolling(window=tgS, min_periods=1).mean())
-            im79.set_ydata((ZX[37]).rolling(window=tgS, min_periods=1).mean())
-            im80.set_ydata((ZX[38]).rolling(window=tgS, min_periods=1).mean())
-            im81.set_ydata((ZX[39]).rolling(window=tgS, min_periods=1).mean())
-            # ---------------------------------------[TG std Dev]
-            im82.set_ydata((ZX[32]).rolling(window=tgS, min_periods=1).std())
-            im83.set_ydata((ZX[33]).rolling(window=tgS, min_periods=1).std())
-            im84.set_ydata((ZX[34]).rolling(window=tgS, min_periods=1).std())
-            im85.set_ydata((ZX[35]).rolling(window=tgS, min_periods=1).std())
-            im86.set_ydata((ZX[36]).rolling(window=tgS, min_periods=1).std())
-            im87.set_ydata((ZX[37]).rolling(window=tgS, min_periods=1).std())
-            im88.set_ydata((ZX[38]).rolling(window=tgS, min_periods=1).std())
-            im89.set_ydata((ZX[39]).rolling(window=tgS, min_periods=1).std())
-            # --------------------------------------------------------------------------- [Mean WS]
-            im74.set_ydata((ZX[32]).rolling(window=wsS, min_periods=1).mean())
-            im75.set_ydata((ZX[33]).rolling(window=wsS, min_periods=1).mean())
-            im76.set_ydata((ZX[34]).rolling(window=wsS, min_periods=1).mean())
-            im77.set_ydata((ZX[35]).rolling(window=wsS, min_periods=1).mean())
-            # ---------------------------------------[Std Dev]
-            im78.set_ydata((ZX[36]).rolling(window=wsS, min_periods=1).std())
-            im79.set_ydata((ZX[37]).rolling(window=wsS, min_periods=1).std())
-            im80.set_ydata((ZX[38]).rolling(window=wsS, min_periods=1).std())
-            im81.set_ydata((ZX[39]).rolling(window=stS, min_periods=1).std())
-            # --------------------------------------[Void Count]
-            im90.set_ydata((ZX[41]).sum())              # Sum up the values for Ring 1
-            im91.set_ydata((ZX[42]).sum())              # Sum up the values for Ring 2
-            im92.set_ydata((ZX[43]).sum())              # Sum up the values for Ring 3
-            im93.set_ydata((ZX[44]).sum())              # Sum up the values for Ring 4
-            # Compute entire Process Capability -----[Ramp Count]
-            im94.set_ydata((ZX[41]).sum())              # Sum up the values for Ring 1
-            im95.set_ydata((ZX[42]).sum())              # Sum up the values for Ring 2
-            im96.set_ydata((ZX[43]).sum())
-            im97.set_ydata((ZX[44]).sum())
+            else:
+                df1 = 0
+                pass
+            # ----- Access data element within the concatenated columns -----[A]
+            ZX = el.loadProcesValues(df1, pRecipe)
+            print('\nSQL Content', df1.head(10))
+            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
-        elif pRecipe == 'MGM':
-            # X Plot Y-Axis data points for XBar ------------------------------[Laser Power]
-            im10.set_ydata((ZX[0]).rolling(window=lpS, min_periods=1).mean())  # head 1
-            im11.set_ydata((ZX[1]).rolling(window=lpS, min_periods=1).mean())  # head 2
-            im12.set_ydata((ZX[2]).rolling(window=lpS, min_periods=1).mean())  # head 3
-            im13.set_ydata((ZX[3]).rolling(window=lpS, min_periods=1).mean())  # head 4
-            im14.set_ydata((ZX[4]).rolling(window=lpS, min_periods=1).mean())  # head 1
-            im15.set_ydata((ZX[5]).rolling(window=lpS, min_periods=1).mean())  # head 2
-            im16.set_ydata((ZX[6]).rolling(window=lpS, min_periods=1).mean())  # head 3
-            im17.set_ydata((ZX[7]).rolling(window=lpS, min_periods=1).mean())  # head 4
-            im18.set_ydata((ZX[8]).rolling(window=lpS, min_periods=1).mean())  # head 1
-            im19.set_ydata((ZX[9]).rolling(window=lpS, min_periods=1).mean())  # head 2
-            im20.set_ydata((ZX[10]).rolling(window=lpS, min_periods=1).mean())  # head 3
-            im21.set_ydata((ZX[11]).rolling(window=lpS, min_periods=1).mean())  # head 4
-            im22.set_ydata((ZX[12]).rolling(window=lpS, min_periods=1).mean())  # head 1
-            im23.set_ydata((ZX[13]).rolling(window=lpS, min_periods=1).mean())  # head 2
-            im24.set_ydata((ZX[14]).rolling(window=lpS, min_periods=1).mean())  # head 3
-            im25.set_ydata((ZX[15]).rolling(window=lpS, min_periods=1).mean())  # head 4
-            # ---------------------------------------[T1 std Dev]
-            im26.set_ydata((ZX[0]).rolling(window=lpS, min_periods=1).std())
-            im27.set_ydata((ZX[1]).rolling(window=lpS, min_periods=1).std())
-            im28.set_ydata((ZX[2]).rolling(window=lpS, min_periods=1).std())
-            im29.set_ydata((ZX[3]).rolling(window=lpS, min_periods=1).std())
-            im30.set_ydata((ZX[4]).rolling(window=lpS, min_periods=1).std())
-            im31.set_ydata((ZX[5]).rolling(window=lpS, min_periods=1).std())
-            im32.set_ydata((ZX[6]).rolling(window=lpS, min_periods=1).std())
-            im33.set_ydata((ZX[7]).rolling(window=lpS, min_periods=1).std())
-            im34.set_ydata((ZX[8]).rolling(window=lpS, min_periods=1).std())
-            im35.set_ydata((ZX[9]).rolling(window=lpS, min_periods=1).std())
-            im36.set_ydata((ZX[10]).rolling(window=lpS, min_periods=1).std())
-            im37.set_ydata((ZX[11]).rolling(window=lpS, min_periods=1).std())
-            im38.set_ydata((ZX[12]).rolling(window=lpS, min_periods=1).std())
-            im39.set_ydata((ZX[13]).rolling(window=lpS, min_periods=1).std())
-            im40.set_ydata((ZX[14]).rolling(window=lpS, min_periods=1).std())
-            im41.set_ydata((ZX[15]).rolling(window=lpS, min_periods=1).std())
-            # ---------------------------------------------------------------[Laser Angle T2]
-            im42.set_ydata((ZX[16]).rolling(window=laS, min_periods=1).mean())
-            im43.set_ydata((ZX[17]).rolling(window=laS, min_periods=1).mean())
-            im44.set_ydata((ZX[18]).rolling(window=laS, min_periods=1).mean())
-            im45.set_ydata((ZX[19]).rolling(window=laS, min_periods=1).mean())
-            im46.set_ydata((ZX[20]).rolling(window=laS, min_periods=1).mean())
-            im47.set_ydata((ZX[21]).rolling(window=laS, min_periods=1).mean())
-            im48.set_ydata((ZX[22]).rolling(window=laS, min_periods=1).mean())
-            im49.set_ydata((ZX[23]).rolling(window=laS, min_periods=1).mean())
-            im50.set_ydata((ZX[24]).rolling(window=laS, min_periods=1).mean())
-            im51.set_ydata((ZX[25]).rolling(window=laS, min_periods=1).mean())
-            im52.set_ydata((ZX[26]).rolling(window=laS, min_periods=1).mean())
-            im53.set_ydata((ZX[27]).rolling(window=laS, min_periods=1).mean())
-            im54.set_ydata((ZX[28]).rolling(window=laS, min_periods=1).mean())
-            im55.set_ydata((ZX[29]).rolling(window=laS, min_periods=1).mean())
-            im56.set_ydata((ZX[30]).rolling(window=laS, min_periods=1).mean())
-            im57.set_ydata((ZX[31]).rolling(window=laS, min_periods=1).mean())
-            # ---------------------------------------[T2 std Dev]
-            im58.set_ydata((ZX[16]).rolling(window=laS, min_periods=1).std())
-            im59.set_ydata((ZX[17]).rolling(window=laS, min_periods=1).std())
-            im60.set_ydata((ZX[18]).rolling(window=laS, min_periods=1).std())
-            im61.set_ydata((ZX[19]).rolling(window=laS, min_periods=1).std())
-            im62.set_ydata((ZX[20]).rolling(window=laS, min_periods=1).std())
-            im63.set_ydata((ZX[21]).rolling(window=laS, min_periods=1).std())
-            im64.set_ydata((ZX[22]).rolling(window=laS, min_periods=1).std())
-            im65.set_ydata((ZX[23]).rolling(window=laS, min_periods=1).std())
-            im66.set_ydata((ZX[24]).rolling(window=laS, min_periods=1).std())
-            im67.set_ydata((ZX[25]).rolling(window=laS, min_periods=1).std())
-            im68.set_ydata((ZX[26]).rolling(window=laS, min_periods=1).std())
-            im69.set_ydata((ZX[27]).rolling(window=laS, min_periods=1).std())
-            im70.set_ydata((ZX[28]).rolling(window=laS, min_periods=1).std())
-            im71.set_ydata((ZX[29]).rolling(window=laS, min_periods=1).std())
-            im72.set_ydata((ZX[30]).rolling(window=laS, min_periods=1).std())
-            im73.set_ydata((ZX[31]).rolling(window=laS, min_periods=1).std())
-            # ----------------------------------------------------------------------[Tape Temp]
-            im74.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).mean())
-            im75.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).mean())
-            im76.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).mean())
-            im77.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).mean())
-            im78.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).mean())
-            im79.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).mean())
-            im80.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).mean())
-            im81.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).mean())
-            im82.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).mean())
-            im83.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).mean())
-            im84.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).mean())
-            im85.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).mean())
-            im86.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).mean())
-            im87.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).mean())
-            im88.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).mean())
-            im89.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).mean())
-            # ---------
-            im90.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).std())
-            im91.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).std())
-            im92.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).std())
-            im93.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).std())
-            im94.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).std())
-            im95.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).std())
-            im96.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).std())
-            im97.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).std())
-            im98.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).std())
-            im99.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).std())
-            im100.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).std())
-            im101.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).std())
-            im102.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).std())
-            im103.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).std())
-            im104.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).std())
-            im105.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).std())
-            # ----------------------------------------------------------------------- [Substrate Tape]
-            im106.set_ydata((ZX[47]).rolling(window=stS, min_periods=1).mean())  # head 1
-            im107.set_ydata((ZX[48]).rolling(window=stS, min_periods=1).mean())  # head 2
-            im108.set_ydata((ZX[49]).rolling(window=stS, min_periods=1).mean())  # head 3
-            im109.set_ydata((ZX[50]).rolling(window=stS, min_periods=1).mean())  # head 4
-            im110.set_ydata((ZX[51]).rolling(window=stS, min_periods=1).mean())  # head 1
-            im111.set_ydata((ZX[52]).rolling(window=stS, min_periods=1).mean())  # head 2
-            im112.set_ydata((ZX[53]).rolling(window=stS, min_periods=1).mean())  # head 3
-            im113.set_ydata((ZX[54]).rolling(window=stS, min_periods=1).mean())  # head 4
-            im114.set_ydata((ZX[55]).rolling(window=stS, min_periods=1).mean())  # head 1
-            im115.set_ydata((ZX[56]).rolling(window=stS, min_periods=1).mean())  # head 2
-            im116.set_ydata((ZX[57]).rolling(window=stS, min_periods=1).mean())  # head 3
-            im117.set_ydata((ZX[58]).rolling(window=stS, min_periods=1).mean())  # head 4
-            im118.set_ydata((ZX[59]).rolling(window=stS, min_periods=1).mean())
-            im119.set_ydata((ZX[60]).rolling(window=stS, min_periods=1).mean())
-            im120.set_ydata((ZX[61]).rolling(window=stS, min_periods=1).mean())
-            im121.set_ydata((ZX[62]).rolling(window=stS, min_periods=1).mean())
-            # ---------------------------------------#[Stddev]
-            im122.set_ydata((ZX[47]).rolling(window=stS, min_periods=1).std())
-            im123.set_ydata((ZX[48]).rolling(window=stS, min_periods=1).std())
-            im124.set_ydata((ZX[49]).rolling(window=stS, min_periods=1).std())
-            im125.set_ydata((ZX[50]).rolling(window=stS, min_periods=1).std())
-            im126.set_ydata((ZX[51]).rolling(window=stS, min_periods=1).std())
-            im127.set_ydata((ZX[52]).rolling(window=stS, min_periods=1).std())
-            im128.set_ydata((ZX[53]).rolling(window=stS, min_periods=1).std())
-            im129.set_ydata((ZX[54]).rolling(window=stS, min_periods=1).std())
-            im130.set_ydata((ZX[55]).rolling(window=stS, min_periods=1).std())
-            im131.set_ydata((ZX[56]).rolling(window=stS, min_periods=1).std())
-            im132.set_ydata((ZX[57]).rolling(window=stS, min_periods=1).std())
-            im133.set_ydata((ZX[58]).rolling(window=stS, min_periods=1).std())
-            im134.set_ydata((ZX[59]).rolling(window=stS, min_periods=1).std())
-            im135.set_ydata((ZX[60]).rolling(window=stS, min_periods=1).std())
-            im136.set_ydata((ZX[61]).rolling(window=stS, min_periods=1).std())
-            im137.set_ydata((ZX[62]).rolling(window=stS, min_periods=1).std())
-            # -----------------------------------------------------------------[Tape Gap T6]
-            im138.set_ydata((ZX[63]).rolling(window=tgS, min_periods=1).mean())
-            im139.set_ydata((ZX[64]).rolling(window=tgS, min_periods=1).mean())
-            im140.set_ydata((ZX[65]).rolling(window=tgS, min_periods=1).mean())
-            im141.set_ydata((ZX[66]).rolling(window=tgS, min_periods=1).mean())
-            im142.set_ydata((ZX[67]).rolling(window=tgS, min_periods=1).mean())
-            im143.set_ydata((ZX[68]).rolling(window=tgS, min_periods=1).mean())
-            im144.set_ydata((ZX[69]).rolling(window=tgS, min_periods=1).mean())
-            im145.set_ydata((ZX[70]).rolling(window=tgS, min_periods=1).mean())
-            # ----------- Std
-            im146.set_ydata((ZX[71]).rolling(window=tgS, min_periods=1).std())
-            im147.set_ydata((ZX[72]).rolling(window=tgS, min_periods=1).std())
-            im148.set_ydata((ZX[73]).rolling(window=tgS, min_periods=1).std())
-            im149.set_ydata((ZX[74]).rolling(window=tgS, min_periods=1).std())
-            im150.set_ydata((ZX[75]).rolling(window=tgS, min_periods=1).std())
-            im151.set_ydata((ZX[76]).rolling(window=tgS, min_periods=1).std())
-            im152.set_ydata((ZX[77]).rolling(window=tgS, min_periods=1).std())
-            im153.set_ydata((ZX[78]).rolling(window=tgS, min_periods=1).std())
-            # --------------------------------------------------------------[ Winding Angle]
-            im154.set_ydata((ZX[63]).rolling(window=waS, min_periods=1).mean())
-            im155.set_ydata((ZX[64]).rolling(window=waS, min_periods=1).mean())
-            im156.set_ydata((ZX[65]).rolling(window=waS, min_periods=1).mean())
-            im157.set_ydata((ZX[66]).rolling(window=waS, min_periods=1).mean())
-            im158.set_ydata((ZX[67]).rolling(window=waS, min_periods=1).mean())
-            im159.set_ydata((ZX[68]).rolling(window=waS, min_periods=1).mean())
-            im160.set_ydata((ZX[69]).rolling(window=waS, min_periods=1).mean())
-            im161.set_ydata((ZX[70]).rolling(window=waS, min_periods=1).mean())
-            im162.set_ydata((ZX[71]).rolling(window=waS, min_periods=1).mean())
-            im163.set_ydata((ZX[72]).rolling(window=waS, min_periods=1).mean())
-            im164.set_ydata((ZX[73]).rolling(window=waS, min_periods=1).mean())
-            im165.set_ydata((ZX[74]).rolling(window=waS, min_periods=1).mean())
-            im166.set_ydata((ZX[75]).rolling(window=waS, min_periods=1).mean())
-            im167.set_ydata((ZX[76]).rolling(window=waS, min_periods=1).mean())
-            im168.set_ydata((ZX[77]).rolling(window=waS, min_periods=1).mean())
-            im169.set_ydata((ZX[78]).rolling(window=waS, min_periods=1).mean())
-            # -----------------------------------------------------------------[Tape Placement Mean T7]
-            im170.set_ydata((ZX[79]).rolling(window=waS, min_periods=1).std())
-            im171.set_ydata((ZX[80]).rolling(window=waS, min_periods=1).std())
-            im172.set_ydata((ZX[81]).rolling(window=waS, min_periods=1).std())
-            im173.set_ydata((ZX[82]).rolling(window=waS, min_periods=1).std())
-            im174.set_ydata((ZX[83]).rolling(window=waS, min_periods=1).std())
-            im175.set_ydata((ZX[84]).rolling(window=waS, min_periods=1).std())
-            im176.set_ydata((ZX[85]).rolling(window=waS, min_periods=1).std())
-            im177.set_ydata((ZX[86]).rolling(window=waS, min_periods=1).std())
-            im178.set_ydata((ZX[79]).rolling(window=waS, min_periods=1).std())
-            im179.set_ydata((ZX[80]).rolling(window=waS, min_periods=1).std())
-            im180.set_ydata((ZX[81]).rolling(window=waS, min_periods=1).std())
-            im181.set_ydata((ZX[82]).rolling(window=waS, min_periods=1).std())
-            im182.set_ydata((ZX[83]).rolling(window=waS, min_periods=1).std())
-            im183.set_ydata((ZX[84]).rolling(window=waS, min_periods=1).std())
-            im184.set_ydata((ZX[85]).rolling(window=waS, min_periods=1).std())
-            im185.set_ydata((ZX[86]).rolling(window=waS, min_periods=1).std())
+            # ---------------------------------------------------------------[]
+            # im10.set_xdata(np.arange(db_freq))
+            im10.set_xdata(np.arange(self.win_Xmax))
+            im11.set_xdata(np.arange(self.win_Xmax))
+            im12.set_xdata(np.arange(self.win_Xmax))
+            im13.set_xdata(np.arange(self.win_Xmax))
+            im14.set_xdata(np.arange(self.win_Xmax))
+            im15.set_xdata(np.arange(self.win_Xmax))
+            im16.set_xdata(np.arange(self.win_Xmax))
+            im17.set_xdata(np.arange(self.win_Xmax))
+            im18.set_xdata(np.arange(self.win_Xmax))
+            im19.set_xdata(np.arange(self.win_Xmax))
+            im20.set_xdata(np.arange(self.win_Xmax))
+            im21.set_xdata(np.arange(self.win_Xmax))
+            im22.set_xdata(np.arange(self.win_Xmax))
+            im23.set_xdata(np.arange(self.win_Xmax))
+            im24.set_xdata(np.arange(self.win_Xmax))
+            im25.set_xdata(np.arange(self.win_Xmax))
+            # ------------------------------- S Plot TT
+            im26.set_xdata(np.arange(self.win_Xmax))
+            im27.set_xdata(np.arange(self.win_Xmax))
+            im28.set_xdata(np.arange(self.win_Xmax))
+            im29.set_xdata(np.arange(self.win_Xmax))
+            im30.set_xdata(np.arange(self.win_Xmax))
+            im31.set_xdata(np.arange(self.win_Xmax))
+            im32.set_xdata(np.arange(self.win_Xmax))
+            im33.set_xdata(np.arange(self.win_Xmax))
+            im34.set_xdata(np.arange(self.win_Xmax))
+            im35.set_xdata(np.arange(self.win_Xmax))
+            im36.set_xdata(np.arange(self.win_Xmax))
+            im37.set_xdata(np.arange(self.win_Xmax))
+            im38.set_xdata(np.arange(self.win_Xmax))
+            im39.set_xdata(np.arange(self.win_Xmax))
+            im40.set_xdata(np.arange(self.win_Xmax))
+            im41.set_xdata(np.arange(self.win_Xmax))
+            # ------------------------------- X Plot ST
+            im42.set_xdata(np.arange(self.win_Xmax))
+            im43.set_xdata(np.arange(self.win_Xmax))
+            im44.set_xdata(np.arange(self.win_Xmax))
+            im45.set_xdata(np.arange(self.win_Xmax))
+            im46.set_xdata(np.arange(self.win_Xmax))
+            im47.set_xdata(np.arange(self.win_Xmax))
+            im49.set_xdata(np.arange(self.win_Xmax))
+            im50.set_xdata(np.arange(self.win_Xmax))
+            im51.set_xdata(np.arange(self.win_Xmax))
+            im52.set_xdata(np.arange(self.win_Xmax))
+            im53.set_xdata(np.arange(self.win_Xmax))
+            im54.set_xdata(np.arange(self.win_Xmax))
+            im55.set_xdata(np.arange(self.win_Xmax))
+            im56.set_xdata(np.arange(self.win_Xmax))
+            im56.set_xdata(np.arange(self.win_Xmax))
+            im57.set_xdata(np.arange(self.win_Xmax))
+            # ------------------------------- S Plot ST
+            im58.set_xdata(np.arange(self.win_Xmax))
+            im59.set_xdata(np.arange(self.win_Xmax))
+            im60.set_xdata(np.arange(self.win_Xmax))
+            im61.set_xdata(np.arange(self.win_Xmax))
+            im62.set_xdata(np.arange(self.win_Xmax))
+            im63.set_xdata(np.arange(self.win_Xmax))
+            im64.set_xdata(np.arange(self.win_Xmax))
+            im65.set_xdata(np.arange(self.win_Xmax))
+            im66.set_xdata(np.arange(self.win_Xmax))
+            im67.set_xdata(np.arange(self.win_Xmax))
+            im68.set_xdata(np.arange(self.win_Xmax))
+            im69.set_xdata(np.arange(self.win_Xmax))
+            im70.set_xdata(np.arange(self.win_Xmax))
+            im71.set_xdata(np.arange(self.win_Xmax))
+            im72.set_xdata(np.arange(self.win_Xmax))
+            im73.set_xdata(np.arange(self.win_Xmax))
+            # ------------------------------- X Plot TG
+            im74.set_xdata(np.arange(self.win_Xmax))
+            im75.set_xdata(np.arange(self.win_Xmax))
+            im76.set_xdata(np.arange(self.win_Xmax))
+            im77.set_xdata(np.arange(self.win_Xmax))
+            im78.set_xdata(np.arange(self.win_Xmax))
+            im79.set_xdata(np.arange(self.win_Xmax))
+            im80.set_xdata(np.arange(self.win_Xmax))
+            im81.set_xdata(np.arange(self.win_Xmax))
+            # --------------------------- S Plot TG
+            im82.set_xdata(np.arange(self.win_Xmax))
+            im83.set_xdata(np.arange(self.win_Xmax))
+            im84.set_xdata(np.arange(self.win_Xmax))
+            im85.set_xdata(np.arange(self.win_Xmax))
+            im86.set_xdata(np.arange(self.win_Xmax))
+            im87.set_xdata(np.arange(self.win_Xmax))
+            im88.set_xdata(np.arange(self.win_Xmax))
+            im89.set_xdata(np.arange(self.win_Xmax))
+            # ------------------------------ Value Plot RM, No X/S Plots -
+            im90.set_xdata(np.arange(self.win_Xmax))
+            im91.set_xdata(np.arange(self.win_Xmax))
+            im92.set_xdata(np.arange(self.win_Xmax))
+            im93.set_xdata(np.arange(self.win_Xmax))
+            im94.set_xdata(np.arange(self.win_Xmax))
+            im95.set_xdata(np.arange(self.win_Xmax))
+            im96.set_xdata(np.arange(self.win_Xmax))
+            im97.set_xdata(np.arange(self.win_Xmax))
+            # --------------------------- X Plot for LP
+            im98.set_xdata(np.arange(self.win_Xmax))
+            im99.set_xdata(np.arange(self.win_Xmax))
+            im100.set_xdata(np.arange(self.win_Xmax))
+            im101.set_xdata(np.arange(self.win_Xmax))
+            im102.set_xdata(np.arange(self.win_Xmax))
+            im103.set_xdata(np.arange(self.win_Xmax))
+            im104.set_xdata(np.arange(self.win_Xmax))
+            im105.set_xdata(np.arange(self.win_Xmax))
+            im106.set_xdata(np.arange(self.win_Xmax))
+            im107.set_xdata(np.arange(self.win_Xmax))
+            im108.set_xdata(np.arange(self.win_Xmax))
+            im109.set_xdata(np.arange(self.win_Xmax))
+            # ---------------------------- S Plot
+            im110.set_xdata(np.arange(self.win_Xmax))
+            im111.set_xdata(np.arange(self.win_Xmax))
+            im112.set_xdata(np.arange(self.win_Xmax))
+            im113.set_xdata(np.arange(self.win_Xmax))
+            im114.set_xdata(np.arange(self.win_Xmax))
+            im115.set_xdata(np.arange(self.win_Xmax))
+            im116.set_xdata(np.arange(self.win_Xmax))
+            im117.set_xdata(np.arange(self.win_Xmax))
+            im118.set_xdata(np.arange(self.win_Xmax))
+            im119.set_xdata(np.arange(self.win_Xmax))
+            im120.set_xdata(np.arange(self.win_Xmax))
+            im121.set_xdata(np.arange(self.win_Xmax))
+            im122.set_xdata(np.arange(self.win_Xmax))
+            im123.set_xdata(np.arange(self.win_Xmax))
+            im124.set_xdata(np.arange(self.win_Xmax))
+            im125.set_xdata(np.arange(self.win_Xmax))
+            # ---------------------------- S Plot
+            im126.set_xdata(np.arange(self.win_Xmax))
+            im127.set_xdata(np.arange(self.win_Xmax))
+            im128.set_xdata(np.arange(self.win_Xmax))
+            im129.set_xdata(np.arange(self.win_Xmax))
+            im130.set_xdata(np.arange(self.win_Xmax))
+            im131.set_xdata(np.arange(self.win_Xmax))
+            im132.set_xdata(np.arange(self.win_Xmax))
+            im133.set_xdata(np.arange(self.win_Xmax))
+            im134.set_xdata(np.arange(self.win_Xmax))
+            im135.set_xdata(np.arange(self.win_Xmax))
+            im136.set_xdata(np.arange(self.win_Xmax))
+            im137.set_xdata(np.arange(self.win_Xmax))
+            im138.set_xdata(np.arange(self.win_Xmax))
+            im139.set_xdata(np.arange(self.win_Xmax))
+            im140.set_xdata(np.arange(self.win_Xmax))
+            im141.set_xdata(np.arange(self.win_Xmax))
+            # ---------------------------- XS Plot
+            im142.set_xdata(np.arange(self.win_Xmax))
+            im143.set_xdata(np.arange(self.win_Xmax))
+            im144.set_xdata(np.arange(self.win_Xmax))
+            im145.set_xdata(np.arange(self.win_Xmax))
+            im146.set_xdata(np.arange(self.win_Xmax))
+            im147.set_xdata(np.arange(self.win_Xmax))
+            im148.set_xdata(np.arange(self.win_Xmax))
+            im149.set_xdata(np.arange(self.win_Xmax))
+            im150.set_xdata(np.arange(self.win_Xmax))
+            im151.set_xdata(np.arange(self.win_Xmax))
+            im152.set_xdata(np.arange(self.win_Xmax))
+            im153.set_xdata(np.arange(self.win_Xmax))
+            im154.set_xdata(np.arange(self.win_Xmax))
+            im155.set_xdata(np.arange(self.win_Xmax))
+            im156.set_xdata(np.arange(self.win_Xmax))
+            im157.set_xdata(np.arange(self.win_Xmax))
+            # ---------------------------- XS Plot
+            im158.set_xdata(np.arange(self.win_Xmax))
+            im159.set_xdata(np.arange(self.win_Xmax))
+            im160.set_xdata(np.arange(self.win_Xmax))
+            im161.set_xdata(np.arange(self.win_Xmax))
+            im162.set_xdata(np.arange(self.win_Xmax))
+            im163.set_xdata(np.arange(self.win_Xmax))
+            im164.set_xdata(np.arange(self.win_Xmax))
+            im165.set_xdata(np.arange(self.win_Xmax))
+            im166.set_xdata(np.arange(self.win_Xmax))
+            im167.set_xdata(np.arange(self.win_Xmax))
+            im168.set_xdata(np.arange(self.win_Xmax))
+            im169.set_xdata(np.arange(self.win_Xmax))
+            im170.set_xdata(np.arange(self.win_Xmax))
+            im171.set_xdata(np.arange(self.win_Xmax))
+            im172.set_xdata(np.arange(self.win_Xmax))
+            im173.set_xdata(np.arange(self.win_Xmax))
+            # ---------------------------- XS Plot
+            im174.set_xdata(np.arange(self.win_Xmax))
+            im175.set_xdata(np.arange(self.win_Xmax))
+            im176.set_xdata(np.arange(self.win_Xmax))
+            im177.set_xdata(np.arange(self.win_Xmax))
+            im178.set_xdata(np.arange(self.win_Xmax))
+            im179.set_xdata(np.arange(self.win_Xmax))
+            im180.set_xdata(np.arange(self.win_Xmax))
+            im181.set_xdata(np.arange(self.win_Xmax))
+            im182.set_xdata(np.arange(self.win_Xmax))
+            im183.set_xdata(np.arange(self.win_Xmax))
+            im184.set_xdata(np.arange(self.win_Xmax))
+            im185.set_xdata(np.arange(self.win_Xmax))
+            if pRecipe == 'DNV':
+                # X Plot Y-Axis data points for XBar ---------------------------[ Mean TT ]
+                im10.set_ydata((ZX[0]).rolling(window=ttS, min_periods=1).mean())  # head 1
+                im11.set_ydata((ZX[1]).rolling(window=ttS, min_periods=1).mean())  # head 2
+                im12.set_ydata((ZX[2]).rolling(window=ttS, min_periods=1).mean())  # head 3
+                im13.set_ydata((ZX[3]).rolling(window=ttS, min_periods=1).mean())  # head 4
+                im14.set_ydata((ZX[4]).rolling(window=ttS, min_periods=1).mean())  # head 1
+                im15.set_ydata((ZX[5]).rolling(window=ttS, min_periods=1).mean())  # head 2
+                im16.set_ydata((ZX[6]).rolling(window=ttS, min_periods=1).mean())  # head 3
+                im17.set_ydata((ZX[7]).rolling(window=ttS, min_periods=1).mean())  # head 4
+                im18.set_ydata((ZX[8]).rolling(window=ttS, min_periods=1).mean())  # head 1
+                im19.set_ydata((ZX[9]).rolling(window=ttS, min_periods=1).mean())  # head 2
+                im20.set_ydata((ZX[10]).rolling(window=ttS, min_periods=1).mean())  # head 3
+                im21.set_ydata((ZX[11]).rolling(window=ttS, min_periods=1).mean())  # head 4
+                im22.set_ydata((ZX[12]).rolling(window=ttS, min_periods=1).mean())  # head 1
+                im23.set_ydata((ZX[13]).rolling(window=ttS, min_periods=1).mean())  # head 2
+                im24.set_ydata((ZX[14]).rolling(window=ttS, min_periods=1).mean())  # head 3
+                im25.set_ydata((ZX[15]).rolling(window=ttS, min_periods=1).mean())  # head 4
+                # ---------------------------------------[T1 std Dev]
+                im26.set_ydata((ZX[0]).rolling(window=ttS, min_periods=1).std())
+                im27.set_ydata((ZX[1]).rolling(window=ttS, min_periods=1).std())
+                im28.set_ydata((ZX[2]).rolling(window=ttS, min_periods=1).std())
+                im29.set_ydata((ZX[3]).rolling(window=ttS, min_periods=1).std())
+                im30.set_ydata((ZX[4]).rolling(window=ttS, min_periods=1).std())
+                im31.set_ydata((ZX[5]).rolling(window=ttS, min_periods=1).std())
+                im32.set_ydata((ZX[6]).rolling(window=ttS, min_periods=1).std())
+                im33.set_ydata((ZX[7]).rolling(window=ttS, min_periods=1).std())
+                im34.set_ydata((ZX[8]).rolling(window=ttS, min_periods=1).std())
+                im35.set_ydata((ZX[9]).rolling(window=ttS, min_periods=1).std())
+                im36.set_ydata((ZX[10]).rolling(window=ttS, min_periods=1).std())
+                im37.set_ydata((ZX[11]).rolling(window=ttS, min_periods=1).std())
+                im38.set_ydata((ZX[12]).rolling(window=ttS, min_periods=1).std())
+                im39.set_ydata((ZX[13]).rolling(window=ttS, min_periods=1).std())
+                im40.set_ydata((ZX[14]).rolling(window=ttS, min_periods=1).std())
+                im41.set_ydata((ZX[15]).rolling(window=ttS, min_periods=1).std())
+                # ----------------------------------------------------------------------[Mean ST]
+                im42.set_ydata((ZX[16]).rolling(window=stS, min_periods=1).mean())
+                im43.set_ydata((ZX[17]).rolling(window=stS, min_periods=1).mean())
+                im44.set_ydata((ZX[18]).rolling(window=stS, min_periods=1).mean())
+                im45.set_ydata((ZX[19]).rolling(window=stS, min_periods=1).mean())
+                im46.set_ydata((ZX[20]).rolling(window=stS, min_periods=1).mean())
+                im47.set_ydata((ZX[21]).rolling(window=stS, min_periods=1).mean())
+                im48.set_ydata((ZX[22]).rolling(window=stS, min_periods=1).mean())
+                im49.set_ydata((ZX[23]).rolling(window=stS, min_periods=1).mean())
+                im50.set_ydata((ZX[24]).rolling(window=stS, min_periods=1).mean())
+                im51.set_ydata((ZX[25]).rolling(window=stS, min_periods=1).mean())
+                im52.set_ydata((ZX[26]).rolling(window=stS, min_periods=1).mean())
+                im53.set_ydata((ZX[27]).rolling(window=stS, min_periods=1).mean())
+                im54.set_ydata((ZX[28]).rolling(window=stS, min_periods=1).mean())
+                im55.set_ydata((ZX[29]).rolling(window=stS, min_periods=1).mean())
+                im56.set_ydata((ZX[30]).rolling(window=stS, min_periods=1).mean())
+                im57.set_ydata((ZX[31]).rolling(window=stS, min_periods=1).mean())
+                # ---------------------------------------[T2 std Dev]
+                im58.set_ydata((ZX[16]).rolling(window=stS, min_periods=1).std())
+                im59.set_ydata((ZX[17]).rolling(window=stS, min_periods=1).std())
+                im60.set_ydata((ZX[18]).rolling(window=stS, min_periods=1).std())
+                im61.set_ydata((ZX[19]).rolling(window=stS, min_periods=1).std())
+                im62.set_ydata((ZX[20]).rolling(window=stS, min_periods=1).std())
+                im63.set_ydata((ZX[21]).rolling(window=stS, min_periods=1).std())
+                im64.set_ydata((ZX[22]).rolling(window=stS, min_periods=1).std())
+                im65.set_ydata((ZX[23]).rolling(window=stS, min_periods=1).std())
+                im66.set_ydata((ZX[24]).rolling(window=stS, min_periods=1).std())
+                im67.set_ydata((ZX[25]).rolling(window=stS, min_periods=1).std())
+                im68.set_ydata((ZX[26]).rolling(window=stS, min_periods=1).std())
+                im69.set_ydata((ZX[27]).rolling(window=stS, min_periods=1).std())
+                im70.set_ydata((ZX[28]).rolling(window=stS, min_periods=1).std())
+                im71.set_ydata((ZX[29]).rolling(window=stS, min_periods=1).std())
+                im72.set_ydata((ZX[30]).rolling(window=stS, min_periods=1).std())
+                im73.set_ydata((ZX[31]).rolling(window=stS, min_periods=1).std())
+                # ------------------------------------------------------------------[Mean TG]
+                im74.set_ydata((ZX[32]).rolling(window=tgS, min_periods=1).mean())
+                im75.set_ydata((ZX[33]).rolling(window=tgS, min_periods=1).mean())
+                im76.set_ydata((ZX[34]).rolling(window=tgS, min_periods=1).mean())
+                im77.set_ydata((ZX[35]).rolling(window=tgS, min_periods=1).mean())
+                im78.set_ydata((ZX[36]).rolling(window=tgS, min_periods=1).mean())
+                im79.set_ydata((ZX[37]).rolling(window=tgS, min_periods=1).mean())
+                im80.set_ydata((ZX[38]).rolling(window=tgS, min_periods=1).mean())
+                im81.set_ydata((ZX[39]).rolling(window=tgS, min_periods=1).mean())
+                # ---------------------------------------[TG std Dev]
+                im82.set_ydata((ZX[32]).rolling(window=tgS, min_periods=1).std())
+                im83.set_ydata((ZX[33]).rolling(window=tgS, min_periods=1).std())
+                im84.set_ydata((ZX[34]).rolling(window=tgS, min_periods=1).std())
+                im85.set_ydata((ZX[35]).rolling(window=tgS, min_periods=1).std())
+                im86.set_ydata((ZX[36]).rolling(window=tgS, min_periods=1).std())
+                im87.set_ydata((ZX[37]).rolling(window=tgS, min_periods=1).std())
+                im88.set_ydata((ZX[38]).rolling(window=tgS, min_periods=1).std())
+                im89.set_ydata((ZX[39]).rolling(window=tgS, min_periods=1).std())
+                # --------------------------------------------------------------------------- [Mean WS]
+                im74.set_ydata((ZX[32]).rolling(window=wsS, min_periods=1).mean())
+                im75.set_ydata((ZX[33]).rolling(window=wsS, min_periods=1).mean())
+                im76.set_ydata((ZX[34]).rolling(window=wsS, min_periods=1).mean())
+                im77.set_ydata((ZX[35]).rolling(window=wsS, min_periods=1).mean())
+                # ---------------------------------------[Std Dev]
+                im78.set_ydata((ZX[36]).rolling(window=wsS, min_periods=1).std())
+                im79.set_ydata((ZX[37]).rolling(window=wsS, min_periods=1).std())
+                im80.set_ydata((ZX[38]).rolling(window=wsS, min_periods=1).std())
+                im81.set_ydata((ZX[39]).rolling(window=stS, min_periods=1).std())
+                # --------------------------------------[Void Count]
+                im90.set_ydata((ZX[41]).sum())              # Sum up the values for Ring 1
+                im91.set_ydata((ZX[42]).sum())              # Sum up the values for Ring 2
+                im92.set_ydata((ZX[43]).sum())              # Sum up the values for Ring 3
+                im93.set_ydata((ZX[44]).sum())              # Sum up the values for Ring 4
+                # Compute entire Process Capability -----[Ramp Count]
+                im94.set_ydata((ZX[41]).sum())              # Sum up the values for Ring 1
+                im95.set_ydata((ZX[42]).sum())              # Sum up the values for Ring 2
+                im96.set_ydata((ZX[43]).sum())
+                im97.set_ydata((ZX[44]).sum())
+
+            elif pRecipe == 'MGM':
+                # X Plot Y-Axis data points for XBar ------------------------------[Laser Power]
+                im10.set_ydata((ZX[0]).rolling(window=lpS, min_periods=1).mean())  # head 1
+                im11.set_ydata((ZX[1]).rolling(window=lpS, min_periods=1).mean())  # head 2
+                im12.set_ydata((ZX[2]).rolling(window=lpS, min_periods=1).mean())  # head 3
+                im13.set_ydata((ZX[3]).rolling(window=lpS, min_periods=1).mean())  # head 4
+                im14.set_ydata((ZX[4]).rolling(window=lpS, min_periods=1).mean())  # head 1
+                im15.set_ydata((ZX[5]).rolling(window=lpS, min_periods=1).mean())  # head 2
+                im16.set_ydata((ZX[6]).rolling(window=lpS, min_periods=1).mean())  # head 3
+                im17.set_ydata((ZX[7]).rolling(window=lpS, min_periods=1).mean())  # head 4
+                im18.set_ydata((ZX[8]).rolling(window=lpS, min_periods=1).mean())  # head 1
+                im19.set_ydata((ZX[9]).rolling(window=lpS, min_periods=1).mean())  # head 2
+                im20.set_ydata((ZX[10]).rolling(window=lpS, min_periods=1).mean())  # head 3
+                im21.set_ydata((ZX[11]).rolling(window=lpS, min_periods=1).mean())  # head 4
+                im22.set_ydata((ZX[12]).rolling(window=lpS, min_periods=1).mean())  # head 1
+                im23.set_ydata((ZX[13]).rolling(window=lpS, min_periods=1).mean())  # head 2
+                im24.set_ydata((ZX[14]).rolling(window=lpS, min_periods=1).mean())  # head 3
+                im25.set_ydata((ZX[15]).rolling(window=lpS, min_periods=1).mean())  # head 4
+                # ---------------------------------------[T1 std Dev]
+                im26.set_ydata((ZX[0]).rolling(window=lpS, min_periods=1).std())
+                im27.set_ydata((ZX[1]).rolling(window=lpS, min_periods=1).std())
+                im28.set_ydata((ZX[2]).rolling(window=lpS, min_periods=1).std())
+                im29.set_ydata((ZX[3]).rolling(window=lpS, min_periods=1).std())
+                im30.set_ydata((ZX[4]).rolling(window=lpS, min_periods=1).std())
+                im31.set_ydata((ZX[5]).rolling(window=lpS, min_periods=1).std())
+                im32.set_ydata((ZX[6]).rolling(window=lpS, min_periods=1).std())
+                im33.set_ydata((ZX[7]).rolling(window=lpS, min_periods=1).std())
+                im34.set_ydata((ZX[8]).rolling(window=lpS, min_periods=1).std())
+                im35.set_ydata((ZX[9]).rolling(window=lpS, min_periods=1).std())
+                im36.set_ydata((ZX[10]).rolling(window=lpS, min_periods=1).std())
+                im37.set_ydata((ZX[11]).rolling(window=lpS, min_periods=1).std())
+                im38.set_ydata((ZX[12]).rolling(window=lpS, min_periods=1).std())
+                im39.set_ydata((ZX[13]).rolling(window=lpS, min_periods=1).std())
+                im40.set_ydata((ZX[14]).rolling(window=lpS, min_periods=1).std())
+                im41.set_ydata((ZX[15]).rolling(window=lpS, min_periods=1).std())
+                # ---------------------------------------------------------------[Laser Angle T2]
+                im42.set_ydata((ZX[16]).rolling(window=laS, min_periods=1).mean())
+                im43.set_ydata((ZX[17]).rolling(window=laS, min_periods=1).mean())
+                im44.set_ydata((ZX[18]).rolling(window=laS, min_periods=1).mean())
+                im45.set_ydata((ZX[19]).rolling(window=laS, min_periods=1).mean())
+                im46.set_ydata((ZX[20]).rolling(window=laS, min_periods=1).mean())
+                im47.set_ydata((ZX[21]).rolling(window=laS, min_periods=1).mean())
+                im48.set_ydata((ZX[22]).rolling(window=laS, min_periods=1).mean())
+                im49.set_ydata((ZX[23]).rolling(window=laS, min_periods=1).mean())
+                im50.set_ydata((ZX[24]).rolling(window=laS, min_periods=1).mean())
+                im51.set_ydata((ZX[25]).rolling(window=laS, min_periods=1).mean())
+                im52.set_ydata((ZX[26]).rolling(window=laS, min_periods=1).mean())
+                im53.set_ydata((ZX[27]).rolling(window=laS, min_periods=1).mean())
+                im54.set_ydata((ZX[28]).rolling(window=laS, min_periods=1).mean())
+                im55.set_ydata((ZX[29]).rolling(window=laS, min_periods=1).mean())
+                im56.set_ydata((ZX[30]).rolling(window=laS, min_periods=1).mean())
+                im57.set_ydata((ZX[31]).rolling(window=laS, min_periods=1).mean())
+                # ---------------------------------------[T2 std Dev]
+                im58.set_ydata((ZX[16]).rolling(window=laS, min_periods=1).std())
+                im59.set_ydata((ZX[17]).rolling(window=laS, min_periods=1).std())
+                im60.set_ydata((ZX[18]).rolling(window=laS, min_periods=1).std())
+                im61.set_ydata((ZX[19]).rolling(window=laS, min_periods=1).std())
+                im62.set_ydata((ZX[20]).rolling(window=laS, min_periods=1).std())
+                im63.set_ydata((ZX[21]).rolling(window=laS, min_periods=1).std())
+                im64.set_ydata((ZX[22]).rolling(window=laS, min_periods=1).std())
+                im65.set_ydata((ZX[23]).rolling(window=laS, min_periods=1).std())
+                im66.set_ydata((ZX[24]).rolling(window=laS, min_periods=1).std())
+                im67.set_ydata((ZX[25]).rolling(window=laS, min_periods=1).std())
+                im68.set_ydata((ZX[26]).rolling(window=laS, min_periods=1).std())
+                im69.set_ydata((ZX[27]).rolling(window=laS, min_periods=1).std())
+                im70.set_ydata((ZX[28]).rolling(window=laS, min_periods=1).std())
+                im71.set_ydata((ZX[29]).rolling(window=laS, min_periods=1).std())
+                im72.set_ydata((ZX[30]).rolling(window=laS, min_periods=1).std())
+                im73.set_ydata((ZX[31]).rolling(window=laS, min_periods=1).std())
+                # ----------------------------------------------------------------------[Tape Temp]
+                im74.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).mean())
+                im75.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).mean())
+                im76.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).mean())
+                im77.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).mean())
+                im78.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).mean())
+                im79.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).mean())
+                im80.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).mean())
+                im81.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).mean())
+                im82.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).mean())
+                im83.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).mean())
+                im84.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).mean())
+                im85.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).mean())
+                im86.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).mean())
+                im87.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).mean())
+                im88.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).mean())
+                im89.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).mean())
+                # ---------
+                im90.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).std())
+                im91.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).std())
+                im92.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).std())
+                im93.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).std())
+                im94.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).std())
+                im95.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).std())
+                im96.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).std())
+                im97.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).std())
+                im98.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).std())
+                im99.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).std())
+                im100.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).std())
+                im101.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).std())
+                im102.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).std())
+                im103.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).std())
+                im104.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).std())
+                im105.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).std())
+                # ----------------------------------------------------------------------- [Substrate Tape]
+                im106.set_ydata((ZX[47]).rolling(window=stS, min_periods=1).mean())  # head 1
+                im107.set_ydata((ZX[48]).rolling(window=stS, min_periods=1).mean())  # head 2
+                im108.set_ydata((ZX[49]).rolling(window=stS, min_periods=1).mean())  # head 3
+                im109.set_ydata((ZX[50]).rolling(window=stS, min_periods=1).mean())  # head 4
+                im110.set_ydata((ZX[51]).rolling(window=stS, min_periods=1).mean())  # head 1
+                im111.set_ydata((ZX[52]).rolling(window=stS, min_periods=1).mean())  # head 2
+                im112.set_ydata((ZX[53]).rolling(window=stS, min_periods=1).mean())  # head 3
+                im113.set_ydata((ZX[54]).rolling(window=stS, min_periods=1).mean())  # head 4
+                im114.set_ydata((ZX[55]).rolling(window=stS, min_periods=1).mean())  # head 1
+                im115.set_ydata((ZX[56]).rolling(window=stS, min_periods=1).mean())  # head 2
+                im116.set_ydata((ZX[57]).rolling(window=stS, min_periods=1).mean())  # head 3
+                im117.set_ydata((ZX[58]).rolling(window=stS, min_periods=1).mean())  # head 4
+                im118.set_ydata((ZX[59]).rolling(window=stS, min_periods=1).mean())
+                im119.set_ydata((ZX[60]).rolling(window=stS, min_periods=1).mean())
+                im120.set_ydata((ZX[61]).rolling(window=stS, min_periods=1).mean())
+                im121.set_ydata((ZX[62]).rolling(window=stS, min_periods=1).mean())
+                # ---------------------------------------#[Stddev]
+                im122.set_ydata((ZX[47]).rolling(window=stS, min_periods=1).std())
+                im123.set_ydata((ZX[48]).rolling(window=stS, min_periods=1).std())
+                im124.set_ydata((ZX[49]).rolling(window=stS, min_periods=1).std())
+                im125.set_ydata((ZX[50]).rolling(window=stS, min_periods=1).std())
+                im126.set_ydata((ZX[51]).rolling(window=stS, min_periods=1).std())
+                im127.set_ydata((ZX[52]).rolling(window=stS, min_periods=1).std())
+                im128.set_ydata((ZX[53]).rolling(window=stS, min_periods=1).std())
+                im129.set_ydata((ZX[54]).rolling(window=stS, min_periods=1).std())
+                im130.set_ydata((ZX[55]).rolling(window=stS, min_periods=1).std())
+                im131.set_ydata((ZX[56]).rolling(window=stS, min_periods=1).std())
+                im132.set_ydata((ZX[57]).rolling(window=stS, min_periods=1).std())
+                im133.set_ydata((ZX[58]).rolling(window=stS, min_periods=1).std())
+                im134.set_ydata((ZX[59]).rolling(window=stS, min_periods=1).std())
+                im135.set_ydata((ZX[60]).rolling(window=stS, min_periods=1).std())
+                im136.set_ydata((ZX[61]).rolling(window=stS, min_periods=1).std())
+                im137.set_ydata((ZX[62]).rolling(window=stS, min_periods=1).std())
+                # -----------------------------------------------------------------[Tape Gap T6]
+                im138.set_ydata((ZX[63]).rolling(window=tgS, min_periods=1).mean())
+                im139.set_ydata((ZX[64]).rolling(window=tgS, min_periods=1).mean())
+                im140.set_ydata((ZX[65]).rolling(window=tgS, min_periods=1).mean())
+                im141.set_ydata((ZX[66]).rolling(window=tgS, min_periods=1).mean())
+                im142.set_ydata((ZX[67]).rolling(window=tgS, min_periods=1).mean())
+                im143.set_ydata((ZX[68]).rolling(window=tgS, min_periods=1).mean())
+                im144.set_ydata((ZX[69]).rolling(window=tgS, min_periods=1).mean())
+                im145.set_ydata((ZX[70]).rolling(window=tgS, min_periods=1).mean())
+                # ----------- Std
+                im146.set_ydata((ZX[71]).rolling(window=tgS, min_periods=1).std())
+                im147.set_ydata((ZX[72]).rolling(window=tgS, min_periods=1).std())
+                im148.set_ydata((ZX[73]).rolling(window=tgS, min_periods=1).std())
+                im149.set_ydata((ZX[74]).rolling(window=tgS, min_periods=1).std())
+                im150.set_ydata((ZX[75]).rolling(window=tgS, min_periods=1).std())
+                im151.set_ydata((ZX[76]).rolling(window=tgS, min_periods=1).std())
+                im152.set_ydata((ZX[77]).rolling(window=tgS, min_periods=1).std())
+                im153.set_ydata((ZX[78]).rolling(window=tgS, min_periods=1).std())
+                # --------------------------------------------------------------[ Winding Angle]
+                im154.set_ydata((ZX[63]).rolling(window=waS, min_periods=1).mean())
+                im155.set_ydata((ZX[64]).rolling(window=waS, min_periods=1).mean())
+                im156.set_ydata((ZX[65]).rolling(window=waS, min_periods=1).mean())
+                im157.set_ydata((ZX[66]).rolling(window=waS, min_periods=1).mean())
+                im158.set_ydata((ZX[67]).rolling(window=waS, min_periods=1).mean())
+                im159.set_ydata((ZX[68]).rolling(window=waS, min_periods=1).mean())
+                im160.set_ydata((ZX[69]).rolling(window=waS, min_periods=1).mean())
+                im161.set_ydata((ZX[70]).rolling(window=waS, min_periods=1).mean())
+                im162.set_ydata((ZX[71]).rolling(window=waS, min_periods=1).mean())
+                im163.set_ydata((ZX[72]).rolling(window=waS, min_periods=1).mean())
+                im164.set_ydata((ZX[73]).rolling(window=waS, min_periods=1).mean())
+                im165.set_ydata((ZX[74]).rolling(window=waS, min_periods=1).mean())
+                im166.set_ydata((ZX[75]).rolling(window=waS, min_periods=1).mean())
+                im167.set_ydata((ZX[76]).rolling(window=waS, min_periods=1).mean())
+                im168.set_ydata((ZX[77]).rolling(window=waS, min_periods=1).mean())
+                im169.set_ydata((ZX[78]).rolling(window=waS, min_periods=1).mean())
+                # -----------------------------------------------------------------[Tape Placement Mean T7]
+                im170.set_ydata((ZX[79]).rolling(window=waS, min_periods=1).std())
+                im171.set_ydata((ZX[80]).rolling(window=waS, min_periods=1).std())
+                im172.set_ydata((ZX[81]).rolling(window=waS, min_periods=1).std())
+                im173.set_ydata((ZX[82]).rolling(window=waS, min_periods=1).std())
+                im174.set_ydata((ZX[83]).rolling(window=waS, min_periods=1).std())
+                im175.set_ydata((ZX[84]).rolling(window=waS, min_periods=1).std())
+                im176.set_ydata((ZX[85]).rolling(window=waS, min_periods=1).std())
+                im177.set_ydata((ZX[86]).rolling(window=waS, min_periods=1).std())
+                im178.set_ydata((ZX[79]).rolling(window=waS, min_periods=1).std())
+                im179.set_ydata((ZX[80]).rolling(window=waS, min_periods=1).std())
+                im180.set_ydata((ZX[81]).rolling(window=waS, min_periods=1).std())
+                im181.set_ydata((ZX[82]).rolling(window=waS, min_periods=1).std())
+                im182.set_ydata((ZX[83]).rolling(window=waS, min_periods=1).std())
+                im183.set_ydata((ZX[84]).rolling(window=waS, min_periods=1).std())
+                im184.set_ydata((ZX[85]).rolling(window=waS, min_periods=1).std())
+                im185.set_ydata((ZX[86]).rolling(window=waS, min_periods=1).std())
 
             # ------------------------------------------------------ Std Dev
-            if len(ZTX) > win_Xmax:
-                ZTX.pop(0)
+            if len(ZX) > win_Xmax:
+                ZX.pop(0)
             self.canvas.draw_idle()
 
         else:
-            print('Ramp standby mode, no active session...')
+            print('End of Layer standby mode, no active session...')
             self.a1.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a1.transAxes)
+            self.a2.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a2.transAxes)
+            self.a3.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a3.transAxes)
+            self.a4.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a4.transAxes)
+            self.a5.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a5.transAxes)
+            self.a6.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a6.transAxes)
+            self.a7.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a7.transAxes)
+            self.a8.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a8.transAxes)
         timef = time.time()
         lapsedT = timef - timei
-        print(f"Process Interval RM: {lapsedT} sec\n")
+        print(f"Process Interval EoL: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
 
@@ -2461,11 +2488,11 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         label.place(x=400, y=10)
 
         # Define Axes ----------------------------------#
-        fig = Figure(figsize=(pMtX - 9.5, 7.21), dpi=100)        # 12.5, 7.22, 18
-        fig.subplots_adjust(left=0.04, bottom=0.033, right=0.983, top=0.957, hspace=0.14, wspace=0.033)
+        self.fig = Figure(figsize=(pMtX - 9.5, 7.21), dpi=100)        # 12.5, 7.22, 18
+        self.fig.subplots_adjust(left=0.04, bottom=0.033, right=0.983, top=0.957, hspace=0.14, wspace=0.033)
         # ---------------------------------[]
-        a1 = fig.add_subplot(2, 3, (1, 3))              # X Bar Plot
-        a2 = fig.add_subplot(2, 3, (4, 6))              # S Bar Plot
+        self.a1 = self.fig.add_subplot(2, 3, (1, 3))              # X Bar Plot
+        self.a2 = self.fig.add_subplot(2, 3, (4, 6))              # S Bar Plot
 
         # Declare Plots attributes ---------------------[]
         plt.rcParams.update({'font.size': 7})           # Reduce font size to 7pt for all legends
@@ -2473,26 +2500,26 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         # Calibrate limits for X-moving Axis -----------#
         YScale_minRF, YScale_maxRF = 10, 500
         sBar_minRF, sBar_maxRF = 10, 250                # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, 30                # windows view = visible data points
+        self.win_Xmin, self.win_Xmax = 0, 30                # windows view = visible data points
 
         # Common properties ------------------------#
-        a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-        a2.set_ylabel("Sample Deviation [" + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
-        a1.set_title('[XBar Plot]', fontsize=12, fontweight='bold')
-        a2.set_title('[SDev Plot]', fontsize=12, fontweight='bold')
+        self.a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
+        self.a2.set_ylabel("Sample Deviation [" + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+        self.a1.set_title('[XBar Plot]', fontsize=12, fontweight='bold')
+        self.a2.set_title('[SDev Plot]', fontsize=12, fontweight='bold')
 
         # Apply grid lines ------------------------------
-        a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a1.legend(loc='upper right', title='Mean curve')
-        a2.legend(loc='upper right', title='Sigma curve')
+        self.a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a2.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a1.legend(loc='upper right', title='Mean curve')
+        self.a2.legend(loc='upper right', title='Sigma curve')
 
         # ----------------------------------------------------------#
-        a1.set_ylim([YScale_minRF, YScale_maxRF], auto=True)
-        a1.set_xlim([window_Xmin, window_Xmax])
+        self.a1.set_ylim([YScale_minRF, YScale_maxRF], auto=True)
+        self.a1.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------#
-        a2.set_ylim([sBar_minRF, sBar_maxRF], auto=True)
-        a2.set_xlim([window_Xmin, window_Xmax])
+        self.a2.set_ylim([sBar_minRF, sBar_maxRF], auto=True)
+        self.a2.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------[]
         # Define Plot area and axes -
         # ----------------------------------------------------------#
@@ -2514,8 +2541,8 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
         combo.current(0)
 
         # Create empty Text Space -----------------------------------
-        text_widget = tk.Text(self, wrap='word', width=110, height=47)  # 110 | 70
-        text_widget.pack(padx=10, pady=50, side=tk.LEFT)
+        self.text_widget = tk.Text(self, wrap='word', width=110, height=47)  # 110 | 70
+        self.text_widget.pack(padx=10, pady=50, side=tk.LEFT)
         # text_widget.place(x=10, y=10)
 
         # ---------------------------------------------------------[]
@@ -2526,68 +2553,68 @@ class collectiveEoP(ttk.Frame):                                # End of Layer Pr
                 label.place(x=1540, y=54)
 
                 rpt = "RPT_RF_" + str(pWON)
-                readEoP(text_widget, rpt)                              # Open txt file from FMEA folder
+                readEoP(self.text_widget, rpt)                              # Open txt file from FMEA folder
 
             elif selected_option == "Tape Temperature":
                 label = ttk.Label(self, text='Tape Temperature', width=16, background='#fff', font=14)
                 label.place(x=1540, y=54)
 
                 rpt = "RPT_TT_" + str(pWON)
-                readEoP(text_widget, rpt)                              # Open txt file from FMEA folder
+                readEoP(self.text_widget, rpt)                              # Open txt file from FMEA folder
 
             elif selected_option == "Subs Temperature":
                 label = ttk.Label(self, text='Subs Temperature', width=16, background='#fff', font=14)
                 label.place(x=1540, y=54)
 
                 rpt = "RPT_ST_" + str(pWON)
-                readEoP(text_widget, rpt)                               # Open txt file from FMEA folder
+                readEoP(self.text_widget, rpt)                               # Open txt file from FMEA folder
 
             elif selected_option == "Laser Power":
                 label = ttk.Label(self, text='Laser Power', width=16, background='#fff', font=14)
                 label.place(x=1540, y=54)
 
                 rpt = "RPT_LP_" + str(pWON)
-                readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
+                readEoP(self.text_widget, rpt)                                 # Open txt file from FMEA folder
 
             elif selected_option == "Laser Angle":
                 label = ttk.Label(self, text='Laser Angle', width=16, background='#fff', font=14)
                 label.place(x=1540, y=54)
 
                 rpt = "RPT_LA_" + str(pWON)
-                readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
+                readEoP(self.text_widget, rpt)                                 # Open txt file from FMEA folder
 
             elif selected_option == "Tape Placement Error":
                 label = ttk.Label(self, text='Tape Placement', width=16, background='#fff', font=14)
                 label.place(x=1540, y=54)
 
                 rpt = "RPT_TP_" + str(pWON)
-                readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
+                readEoP(self.text_widget, rpt)                                 # Open txt file from FMEA folder
 
             elif selected_option == "Tape Gap Polarisation":
                 label = ttk.Label(self, text='Gap Measurement', width=16, background='#fff', font=14)
                 label.place(x=1540, y=54)
 
                 rpt = "RPT_TG_" + str(pWON)
-                readEoP(text_widget, rpt)                                 # Open txt file from FMEA folder
+                readEoP(self.text_widget, rpt)                                 # Open txt file from FMEA folder
 
             else:
                 label = ttk.Label(self, text=' ')
                 label.place(x=1540, y=54)
 
                 rpt = "VOID_REPORT"
-                readEoP(text_widget, rpt)
+                readEoP(self.text_widget, rpt)
 
             print("You selected:", selected_option)
         combo.bind("<<ComboboxSelected>>", option_selected)
 
         # Update Canvas -----------------------------------------------------[NO FIGURE YET]
-        canvas = FigureCanvasTkAgg(fig, self)
-        canvas.get_tk_widget().pack(expand=True)    #01
+        self.canvas = FigureCanvasTkAgg(self.fig, self)
+        self.canvas.get_tk_widget().pack(expand=True)    #01
 
         # Activate Matplot tools ------------------[Uncomment to activate]
-        toolbar = NavigationToolbar2Tk(canvas, self)
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
         toolbar.update()
-        canvas._tkcanvas.pack(expand=True)
+        self.canvas._tkcanvas.pack(expand=True)
 
 # ---------------------------- End of Collective Reporting Functions ----------------------------[]
 
@@ -3205,7 +3232,6 @@ class common_gapCount(ttk.Frame):
 
 # ------------------------- Additional Tabb for Monitoring Parameters -------------[Monitoring Tabs]
 class MonitorTabb(ttk.Frame):
-
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=20)
@@ -3419,16 +3445,16 @@ class MonitorTabb(ttk.Frame):
             im65, = self.a6.plot([], [], 'o-', label='Winding Speed - (Ring 3)')
             im66, = self.a6.plot([], [], 'o-', label='Winding Speed - (Ring 4)')
 
-            # self.canvas = FigureCanvasTkAgg(self.f, master=root)
-            self.canvas = FigureCanvasTkAgg(self.f, self)
-            self.canvas.get_tk_widget().pack(fill="both", expand=True)
-            # Activate Matplot tools ------------------[Uncomment to activate]
-            toolbar = NavigationToolbar2Tk(self.canvas, self)
-            toolbar.update()
-            self.canvas._tkcanvas.pack(expand=True)
-            # --------- call data block --------------
-            threading.Thread(target=self._dataControl, daemon=True).start()
-            # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
+        # self.canvas = FigureCanvasTkAgg(self.f, master=root)
+        self.canvas = FigureCanvasTkAgg(self.f, self)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
+        # --------- call data block --------------
+        threading.Thread(target=self._dataControl, daemon=True).start()
+        # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
 
     def _dataControl(self):
         s_fetch, stp_Sz = str(cSS), 1        # entry value in string sql syntax
@@ -3452,12 +3478,11 @@ class MonitorTabb(ttk.Frame):
         # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
         sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
         # Define PLC/SMC error state -------------------------------------------#
+        import sqlArrayRLmethodPM as spm  # Process Monitoring method
 
         while True:
             # print('Indefinite looping...')
             if UseSQL_DBS:
-                import sqlArrayRLmethodPM as spm                             # Process Monitoring method
-
                 inProgress = True                                            # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
                 print('DrLabs' + "' Runtime Optimisation is Enabled!")
@@ -3517,7 +3542,7 @@ class MonitorTabb(ttk.Frame):
 
         # declare asynchronous variables ------------------[]
         if UseSQL_DBS:
-            import VarSQL_PM as pm
+            import VarSQL_PM as mt
             # ----------------------------------------------#
             if pRecipe == 'DNV':
                 g1 = qpm.validCols(T1)                          # General Table (OT/CT)
@@ -3550,174 +3575,173 @@ class MonitorTabb(ttk.Frame):
 
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2, d3, d4, d5, d6, d7], axis=1)
-        else:
-            df1 = 0
-            pass                                        # Reserve for process scaling -- RBL.
+            else:
+                df1 = 0
+                pass                                        # Reserve for process scaling -- RBL.
 
-        # ----- Access data element within the concatenated columns -------------------------[A]
-        PM = pm.loadProcesValues(df1)                       # Join data values under dataframe
-        print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
-        print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+            # ----- Access data element within the concatenated columns -------------------------[A]
+            PM = mt.loadProcesValues(df1, pRecipe)              # Join data values under dataframe
+            print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
+            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
-        # Declare Plots attributes ------------------------------------------------------------[]
-        im10.set_xdata(np.arange(self.win_Xmax))
-        im11.set_xdata(np.arange(self.win_Xmax))
-        im12.set_xdata(np.arange(self.win_Xmax))
-        im13.set_xdata(np.arange(self.win_Xmax))
-        im14.set_xdata(np.arange(self.win_Xmax))
-        im15.set_xdata(np.arange(self.win_Xmax))
-        im16.set_xdata(np.arange(self.win_Xmax))
-        im17.set_xdata(np.arange(self.win_Xmax))
-        im18.set_xdata(np.arange(self.win_Xmax))
-        im19.set_xdata(np.arange(self.win_Xmax))
-        im20.set_xdata(np.arange(self.win_Xmax))
-        im21.set_xdata(np.arange(self.win_Xmax))
-        im22.set_xdata(np.arange(self.win_Xmax))
-        im23.set_xdata(np.arange(self.win_Xmax))
-        im24.set_xdata(np.arange(self.win_Xmax))
-        im25.set_xdata(np.arange(self.win_Xmax))
+            # Declare Plots attributes ------------------------------------------------------------[]
+            im10.set_xdata(np.arange(self.win_Xmax))
+            im11.set_xdata(np.arange(self.win_Xmax))
+            im12.set_xdata(np.arange(self.win_Xmax))
+            im13.set_xdata(np.arange(self.win_Xmax))
+            im14.set_xdata(np.arange(self.win_Xmax))
+            im15.set_xdata(np.arange(self.win_Xmax))
+            im16.set_xdata(np.arange(self.win_Xmax))
+            im17.set_xdata(np.arange(self.win_Xmax))
+            im18.set_xdata(np.arange(self.win_Xmax))
+            im19.set_xdata(np.arange(self.win_Xmax))
+            im20.set_xdata(np.arange(self.win_Xmax))
+            im21.set_xdata(np.arange(self.win_Xmax))
+            im22.set_xdata(np.arange(self.win_Xmax))
+            im23.set_xdata(np.arange(self.win_Xmax))
+            im24.set_xdata(np.arange(self.win_Xmax))
+            im25.set_xdata(np.arange(self.win_Xmax))
 
-        im26.set_xdata(np.arange(self.win_Xmax))
-        im27.set_xdata(np.arange(self.win_Xmax))
-        im28.set_xdata(np.arange(self.win_Xmax))
-        im29.set_xdata(np.arange(self.win_Xmax))
-        im30.set_xdata(np.arange(self.win_Xmax))
-        im31.set_xdata(np.arange(self.win_Xmax))
-        im32.set_xdata(np.arange(self.win_Xmax))
-        im33.set_xdata(np.arange(self.win_Xmax))
-        im34.set_xdata(np.arange(self.win_Xmax))
-        im35.set_xdata(np.arange(self.win_Xmax))
-        im36.set_xdata(np.arange(self.win_Xmax))
-        im37.set_xdata(np.arange(self.win_Xmax))
-        im38.set_xdata(np.arange(self.win_Xmax))
-        im39.set_xdata(np.arange(self.win_Xmax))
-        im40.set_xdata(np.arange(self.win_Xmax))
-        im41.set_xdata(np.arange(self.win_Xmax))
+            im26.set_xdata(np.arange(self.win_Xmax))
+            im27.set_xdata(np.arange(self.win_Xmax))
+            im28.set_xdata(np.arange(self.win_Xmax))
+            im29.set_xdata(np.arange(self.win_Xmax))
+            im30.set_xdata(np.arange(self.win_Xmax))
+            im31.set_xdata(np.arange(self.win_Xmax))
+            im32.set_xdata(np.arange(self.win_Xmax))
+            im33.set_xdata(np.arange(self.win_Xmax))
+            im34.set_xdata(np.arange(self.win_Xmax))
+            im35.set_xdata(np.arange(self.win_Xmax))
+            im36.set_xdata(np.arange(self.win_Xmax))
+            im37.set_xdata(np.arange(self.win_Xmax))
+            im38.set_xdata(np.arange(self.win_Xmax))
+            im39.set_xdata(np.arange(self.win_Xmax))
+            im40.set_xdata(np.arange(self.win_Xmax))
+            im41.set_xdata(np.arange(self.win_Xmax))
 
-        im42.set_xdata(np.arange(self.win_Xmax))
-        im43.set_xdata(np.arange(self.win_Xmax))
-        im44.set_xdata(np.arange(self.win_Xmax))
-        im45.set_xdata(np.arange(self.win_Xmax))
+            im42.set_xdata(np.arange(self.win_Xmax))
+            im43.set_xdata(np.arange(self.win_Xmax))
+            im44.set_xdata(np.arange(self.win_Xmax))
+            im45.set_xdata(np.arange(self.win_Xmax))
 
-        im46.set_xdata(np.arange(self.win_Xmax))
-        im47.set_xdata(np.arange(self.win_Xmax))
-        im48.set_xdata(np.arange(self.win_Xmax))
-        im49.set_xdata(np.arange(self.win_Xmax))
-        im50.set_xdata(np.arange(self.win_Xmax))
-        im51.set_xdata(np.arange(self.win_Xmax))
-        im52.set_xdata(np.arange(self.win_Xmax))
-        im53.set_xdata(np.arange(self.win_Xmax))
-        im54.set_xdata(np.arange(self.win_Xmax))
-        im55.set_xdata(np.arange(self.win_Xmax))
-        im56.set_xdata(np.arange(self.win_Xmax))
-        im57.set_xdata(np.arange(self.win_Xmax))
-        im58.set_xdata(np.arange(self.win_Xmax))
-        im59.set_xdata(np.arange(self.win_Xmax))
-        im60.set_xdata(np.arange(self.win_Xmax))
-        im61.set_xdata(np.arange(self.win_Xmax))
+            im46.set_xdata(np.arange(self.win_Xmax))
+            im47.set_xdata(np.arange(self.win_Xmax))
+            im48.set_xdata(np.arange(self.win_Xmax))
+            im49.set_xdata(np.arange(self.win_Xmax))
+            im50.set_xdata(np.arange(self.win_Xmax))
+            im51.set_xdata(np.arange(self.win_Xmax))
+            im52.set_xdata(np.arange(self.win_Xmax))
+            im53.set_xdata(np.arange(self.win_Xmax))
+            im54.set_xdata(np.arange(self.win_Xmax))
+            im55.set_xdata(np.arange(self.win_Xmax))
+            im56.set_xdata(np.arange(self.win_Xmax))
+            im57.set_xdata(np.arange(self.win_Xmax))
+            im58.set_xdata(np.arange(self.win_Xmax))
+            im59.set_xdata(np.arange(self.win_Xmax))
+            im60.set_xdata(np.arange(self.win_Xmax))
+            im61.set_xdata(np.arange(self.win_Xmax))
 
-        im62.set_xdata(np.arange(self.win_Xmax))
-        im63.set_xdata(np.arange(self.win_Xmax))
-        im64.set_xdata(np.arange(self.win_Xmax))
-        im65.set_xdata(np.arange(self.win_Xmax))
-        im66.set_xdata(np.arange(self.win_Xmax))
+            im62.set_xdata(np.arange(self.win_Xmax))
+            im63.set_xdata(np.arange(self.win_Xmax))
+            im64.set_xdata(np.arange(self.win_Xmax))
+            im65.set_xdata(np.arange(self.win_Xmax))
+            im66.set_xdata(np.arange(self.win_Xmax))
 
-        if pRecipe == 'DNV':
-            # X Plot Y-Axis data points for XBar ----------[Roller Pressure x16, A1]
-            im10.set_ydata((PM[13]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H1
-            im11.set_ydata((PM[14]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H2
-            im12.set_ydata((PM[15]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H3
-            im13.set_ydata((PM[16]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H4
-            im14.set_ydata((PM[17]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H1
-            im15.set_ydata((PM[18]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H2
-            im16.set_ydata((PM[19]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H3
-            im17.set_ydata((PM[20]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H4
-            im18.set_ydata((PM[21]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im19.set_ydata((PM[22]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im20.set_ydata((PM[23]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im21.set_ydata((PM[24]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im22.set_ydata((PM[25]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im23.set_ydata((PM[26]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im24.set_ydata((PM[27]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im25.set_ydata((PM[28]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            # ------------------------------------- Tape Winding Speed x16, A2
-            im26.set_ydata((PM[6]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im27.set_ydata((PM[7]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im28.set_ydata((PM[8]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im29.set_ydata((PM[9]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            # --------------------------------------Active Cell Tension x1
-            im30.set_ydata((PM[1]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            # ----------------------------------------Oven Temperature x4 (RTD & IR Temp)
-            im31.set_ydata((PM[2]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im32.set_ydata((PM[3]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im33.set_ydata((PM[4]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im34.set_ydata((PM[5]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+            if pRecipe == 'DNV':
+                # X Plot Y-Axis data points for XBar ----------[Roller Pressure x16, A1]
+                im10.set_ydata((PM[13]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H1
+                im11.set_ydata((PM[14]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H2
+                im12.set_ydata((PM[15]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H3
+                im13.set_ydata((PM[16]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H4
+                im14.set_ydata((PM[17]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H1
+                im15.set_ydata((PM[18]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H2
+                im16.set_ydata((PM[19]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H3
+                im17.set_ydata((PM[20]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H4
+                im18.set_ydata((PM[21]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im19.set_ydata((PM[22]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im20.set_ydata((PM[23]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im21.set_ydata((PM[24]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im22.set_ydata((PM[25]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im23.set_ydata((PM[26]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im24.set_ydata((PM[27]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im25.set_ydata((PM[28]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                # ------------------------------------- Tape Winding Speed x16, A2
+                im26.set_ydata((PM[6]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im27.set_ydata((PM[7]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im28.set_ydata((PM[8]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im29.set_ydata((PM[9]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                # --------------------------------------Active Cell Tension x1
+                im30.set_ydata((PM[1]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                # ----------------------------------------Oven Temperature x4 (RTD & IR Temp)
+                im31.set_ydata((PM[2]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im32.set_ydata((PM[3]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im33.set_ydata((PM[4]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im34.set_ydata((PM[5]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
 
-        elif pRecipe == 'MGM':
-            # -------------------------------------------------------------------------------[Laser Power]
-            im10.set_ydata((PM[30]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im11.set_ydata((PM[31]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im12.set_ydata((PM[32]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im13.set_ydata((PM[33]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im14.set_ydata((PM[34]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im15.set_ydata((PM[35]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im16.set_ydata((PM[36]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im17.set_ydata((PM[37]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im18.set_ydata((PM[38]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im19.set_ydata((PM[39]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im20.set_ydata((PM[40]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im21.set_ydata((PM[41]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im22.set_ydata((PM[42]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im23.set_ydata((PM[43]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im24.set_ydata((PM[44]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im25.set_ydata((PM[45]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            # -----------------------------------------------------[Cell Tension]
-            im26.set_ydata((PM[1]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])   # Segment 1
-            # --------------------------------------------------[Roller Pressure]
-            im27.set_ydata((PM[13]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im28.set_ydata((PM[14]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im29.set_ydata((PM[15]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im30.set_ydata((PM[16]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im31.set_ydata((PM[17]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im32.set_ydata((PM[18]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im33.set_ydata((PM[19]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im34.set_ydata((PM[20]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im35.set_ydata((PM[21]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im36.set_ydata((PM[22]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im37.set_ydata((PM[23]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im38.set_ydata((PM[24]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im39.set_ydata((PM[25]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im40.set_ydata((PM[26]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im41.set_ydata((PM[27]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im42.set_ydata((PM[28]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            # -------------------------------------------------------[Laser Angle]
-            im43.set_ydata((PM[47]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im44.set_ydata((PM[48]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im45.set_ydata((PM[49]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im46.set_ydata((PM[50]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im47.set_ydata((PM[51]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im48.set_ydata((PM[52]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im49.set_ydata((PM[53]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im50.set_ydata((PM[54]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im51.set_ydata((PM[55]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im52.set_ydata((PM[56]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im53.set_ydata((PM[57]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im54.set_ydata((PM[58]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im55.set_ydata((PM[59]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im56.set_ydata((PM[60]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im57.set_ydata((PM[61]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im58.set_ydata((PM[62]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            # -------------------------------------------------[Oven Temperature]
-            im59.set_ydata((PM[2]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im60.set_ydata((PM[3]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im61.set_ydata((PM[4]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im62.set_ydata((PM[5]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            # ----------------------------------------------[Winding Speed x16]
-            im63.set_ydata((PM[6]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im64.set_ydata((PM[7]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im65.set_ydata((PM[8]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-            im66.set_ydata((PM[9]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-
+            elif pRecipe == 'MGM':
+                # -------------------------------------------------------------------------------[Laser Power]
+                im10.set_ydata((PM[30]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im11.set_ydata((PM[31]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im12.set_ydata((PM[32]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im13.set_ydata((PM[33]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im14.set_ydata((PM[34]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im15.set_ydata((PM[35]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im16.set_ydata((PM[36]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im17.set_ydata((PM[37]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im18.set_ydata((PM[38]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im19.set_ydata((PM[39]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im20.set_ydata((PM[40]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im21.set_ydata((PM[41]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im22.set_ydata((PM[42]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im23.set_ydata((PM[43]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im24.set_ydata((PM[44]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im25.set_ydata((PM[45]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                # -----------------------------------------------------[Cell Tension]
+                im26.set_ydata((PM[1]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])   # Segment 1
+                # --------------------------------------------------[Roller Pressure]
+                im27.set_ydata((PM[13]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im28.set_ydata((PM[14]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im29.set_ydata((PM[15]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im30.set_ydata((PM[16]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im31.set_ydata((PM[17]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im32.set_ydata((PM[18]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im33.set_ydata((PM[19]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im34.set_ydata((PM[20]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im35.set_ydata((PM[21]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im36.set_ydata((PM[22]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im37.set_ydata((PM[23]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im38.set_ydata((PM[24]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im39.set_ydata((PM[25]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im40.set_ydata((PM[26]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im41.set_ydata((PM[27]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im42.set_ydata((PM[28]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                # -------------------------------------------------------[Laser Angle]
+                im43.set_ydata((PM[47]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im44.set_ydata((PM[48]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im45.set_ydata((PM[49]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im46.set_ydata((PM[50]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im47.set_ydata((PM[51]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im48.set_ydata((PM[52]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im49.set_ydata((PM[53]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im50.set_ydata((PM[54]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im51.set_ydata((PM[55]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im52.set_ydata((PM[56]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im53.set_ydata((PM[57]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im54.set_ydata((PM[58]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im55.set_ydata((PM[59]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im56.set_ydata((PM[60]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im57.set_ydata((PM[61]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im58.set_ydata((PM[62]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                # -------------------------------------------------[Oven Temperature]
+                im59.set_ydata((PM[2]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im60.set_ydata((PM[3]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im61.set_ydata((PM[4]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im62.set_ydata((PM[5]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                # ----------------------------------------------[Winding Speed x16]
+                im63.set_ydata((PM[6]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+                im64.set_ydata((PM[7]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+                im65.set_ydata((PM[8]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im66.set_ydata((PM[9]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
 
             # Setting up the parameters for moving windows Axes ---[]
             if len(PM) > win_Xmax:

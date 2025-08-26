@@ -18,84 +18,38 @@ st_id  = 0                                               # SQL start index unles
 eol_sr = 0.5
 
 
-def dnv_sqlExec(daq1, T1, T2, T3, T4, layerNo):
+def dnv_sqlExec(sq_con, layerNo, ttSoL, stSoL, tgSoL, wsSoL, T1, T2, T3, T4):
     """
     NOTE:
     """
+    t1, t2, t3, t4 = sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor()
 
-    # Procedure to determine EOL sampling regime ---------------------------------------------------------------[X]
+    # Determine EOL sampling regime ---------------------------------------------------------------[X]
     # -- Find out total number of column record per Ring -----[]
-    ttSR = daq1.execute(
-        'Select count([R1H1TT]) AS ValidTotal from ' + "'" '%' + str(T1) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    # close sel link -------
-    daq1.close()
+    ttSR = t1.execute('Select count([R1SPa]) AS ValidTotal from ' + str(T1) + ' where [LyIDa] = ' + str(layerNo)).fetchone()
+    # close sel link -------[ZTT_]
+    t1.close()
 
-    stSR = daq1.execute(
-        'Select count([R1H1ST]) AS ValidTotal from ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    # close sel link -------
-    daq1.close()
+    stSR = t2.execute('Select count([R1SPb]) AS ValidTotal from ' + str(T2) + ' where [LyIDb] = ' + str(layerNo)).fetchone()
+    # close sel link -------[ZST_]
+    t2.close()
 
-    tgSR = daq1.execute(
-        'Select count([R1H1TG]) AS ValidTotal from ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    # close sel link -------
-    daq1.close()
+    tgSR = t3.execute('Select count([R1SPc]) AS ValidTotal from ' + str(T3) + ' where [LyIDc] = ' + str(layerNo)).fetchone()
+    # close sel link -------[ZTG_]
+    t3.close()
 
-    wsSR = daq1.execute(
-        'Select count([R1H1WS]) AS ValidTotal from ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    # close sel link -------
-    daq1.close()
+    wsSR = t4.execute('Select count([R1SPd]) AS ValidTotal from ' + str(T4) + ' where [LyIDd] = ' + str(layerNo)).fetchone()
+    # close sel link -------[ZWS_]
+    t4.close()
 
-    # --- Compute sampling regime based on data volume -------[]
-    regm1 = ttSR * eol_sr
-    regm2 = stSR * eol_sr
-    regm3 = tgSR * eol_sr       # % 60  # Modulo evaluation TG?
-    regm4 = wsSR * eol_sr
-
-    ############## RAMP COUNT ---------------------------------[]
-    R1RC = daq1.execute(
-        'Select count([RAMPosA]) AS ValidTotal from ' + "'" '%' + str(T1) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R2RC = daq1.execute(
-        'Select count([RAMPosB]) AS ValidTotal from ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R3RC = daq1.execute(
-        'Select count([RAMPosC]) AS ValidTotal from ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R4RC = daq1.execute(
-        'Select count([RAMPosD]) AS ValidTotal from ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    # close sel link -------
-    daq1.close()
-
-    ############## GAP COUNT ---------------------------------[]
-    R1VC = daq6.execute(
-        'Select count([VODPosA]) AS ValidTotal from ' + "'" '%' + str(
-            T6) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R2VC = daq6.execute(
-        'Select count([VODPosB]) AS ValidTotal from ' + "'" '%' + str(
-            T6) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R3VC = daq6.execute(
-        'Select count([VODPosC]) AS ValidTotal from ' + "'" '%' + str(
-            T6) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R4VC = daq6.execute(
-        'Select count([VODPosD]) AS ValidTotal from ' + "'" '%' + str(
-            T6) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-
-    # close sel link ----------------------[]
-    daq6.close()
+    # --- Compute random sampling regime based on data volume -------[TODO: recheck the sampler method]
+    regm1 = ttSR * ttSoL
+    regm2 = stSR * stSoL
+    regm3 = tgSR * tgSoL      # % 60  # Modulo evaluation TG?
+    regm4 = wsSR * wsSoL
 
     # ------------------ Load randomised samples --------------------------------------------------------------[A]
-    dataTT = daq1.execute(
-        'Select TOP ' + "'" '%' + str(regm1) + '%' "'" '* FROM ' + "'" '%' + str(T1) + '%' "'" ' where [cLayer] = '
-                   + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+    dataTT = t1.execute('Select TOP ' + str(regm1) + ' * FROM ' + str(T1) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
     if len(dataTT) != 0:
         for result in dataTT:
             result = list(result)
@@ -111,12 +65,10 @@ def dnv_sqlExec(daq1, T1, T2, T3, T4, layerNo):
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    daq1.close()
+    t1.close()
 
     # Substrate Temperature --------------------------------------------------------------------------------[B]
-    dataST = daq2.execute(
-        'Select TOP ' + "'" '%' + str(regm2) + '%' "'" '* FROM ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = '
-        + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+    dataST = t2.execute('Select TOP ' + str(regm2) + ' * FROM ' + str(T2) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
 
     if len(dataST) != 0:
         for result in dataST:
@@ -133,12 +85,10 @@ def dnv_sqlExec(daq1, T1, T2, T3, T4, layerNo):
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq2.close()
+    t2.close()
 
     # Tape Gap Procedure ------------------------------------------------------------------------------------[C]
-    dataTG = daq3.execute(
-        'Select TOP ' + "'" '%' + str(regm3) + '%' "'" '* FROM ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = '
-        + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+    dataTG = t3.execute('Select TOP ' + str(regm3) + ' * FROM ' + str(T3) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
     if len(dataTG) != 0:
         for result in dataTG:
             result = list(result)
@@ -153,12 +103,10 @@ def dnv_sqlExec(daq1, T1, T2, T3, T4, layerNo):
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    daq3.close()
+    t3.close()
 
     # Ramp Profile ------------------------------------------------------------------------------------------[D]
-    dataWS = daq4.execute(
-        'Select TOP ' + "'" '%' + str(regm4) + '%' "'" '* FROM ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = '
-        + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
+    dataWS = t4.execute('Select TOP ' + str(regm4) + ' * FROM ' + str(T4) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
     if len(dataWS) != 0:
         for result in dataWS:
             result = list(result)
@@ -176,106 +124,93 @@ def dnv_sqlExec(daq1, T1, T2, T3, T4, layerNo):
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq4.close()
+    t4.close()
 
-    return rTT, rST, rTG, rWS, R1RC, R2RC, R3RC, R4RC, R1VC, R2VC, R3VC, R4VC
+    return rTT, rST, rTG, rWS
 # -------------------------------------------------------------------------------------------------------[XXXXXXX]
 
 
-def mgm_sqlExec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, T5, T6, T7, T8, layerNo):
+def mgm_sqlExec(sq_con, lpSoL, laSoL, ttSoL, stSoL, tgSoL, waSoL, T1, T2, T3, T4, T5, T6, layerNo):
     """
     NOTE:
     """
+    t1, t2, t3, t4, t5, t6 = sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor()
 
     # Procedure -----------------------------------------------------------------------------------------------[X]
     # -- Find out total number of column record per Ring -----[]
-    lpR = daq1.execute(
-        'Select count([R1H1LP]) AS ValidTotal from ' + "'" '%' + str(T1) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
+    lpR = t1.execute(
+        'Select count([R1H1LP]) AS ValidTotal from '+ str(T1) + '%' "'" ' where [cLayer] = ' + str(layerNo)).fetchone()
     # close sel link -------[]
-    daq1.close()
+    t1.close()
 
-    laR = daq2.execute(
-        'Select count([R1H1LA]) AS ValidTotal from ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
+    laR = t2.execute(
+        'Select count([R1H1LA]) AS ValidTotal from ' + str(T2) + ' where [cLayer] = ' + str(layerNo)).fetchone()
     # close sel link -------[]
-    daq2.close()
+    t2.close()
 
-    ttR = daq3.execute(
-        'Select count([R4H1TT]) AS ValidTotal from ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
+    ttR = t3.execute(
+        'Select count([R4H1TT]) AS ValidTotal from ' + str(T3) + ' where [cLayer] = ' + str(layerNo)).fetchone()
     # close sel link -------[]
-    daq3.close()
+    t3.close()
 
-    stR = daq4.execute(
-        'Select count([R4H1ST]) AS ValidTotal from ' + "'" '%' + str(T5) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
+    stR = t4.execute(
+        'Select count([R4H1ST]) AS ValidTotal from ' + str(T4) + ' where [cLayer] = ' + str(layerNo)).fetchone()
     # close sel link -------[]
-    daq4.close()
+    t4.close()
 
-    tgR = daq5.execute(
-        'Select count([R4H1TG]) AS ValidTotal from ' + "'" '%' + str(T6) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
+    tgR = t5.execute(
+        'Select count([R4H1TG]) AS ValidTotal from ' + str(T5) + ' where [cLayer] = ' + str(layerNo)).fetchone()
     # close sel link -------[]
-    daq5.close()
+    t5.close()
 
-    waR = daq6.execute(
-        'Select count([R4H1WA]) AS ValidTotal from ' + "'" '%' + str(T7) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
+    waR = t6.execute(
+        'Select count([R4H1WA]) AS ValidTotal from ' + str(T6) +  ' where [cLayer] = ' + str(layerNo)).fetchone()
     # close sel link -------[]
-    daq6.close()
+    t6.close()
 
     # --- Compute sampling regime based on data volume -------[]
-    sp1 = lpR * eol_sr       # LP
-    sp2 = laR * eol_sr       # LA
-    sp3 = ttR * eol_sr       # TT
-    sp4 = stR * eol_sr       # ST
-    sp5 = tgR * eol_sr       # TG
-    sp6 = waR * eol_sr       # WS
+    sp1 = lpR * lpSoL       # LP
+    sp2 = laR * laSoL       # LA
+    sp3 = ttR * ttSoL       # TT
+    sp4 = stR * stSoL       # ST
+    sp5 = tgR * tgSoL       # TG
+    sp6 = waR * waSoL       # WS
 
     ############## RAMP COUNT ---------------------------------[]
-    R1RC = daq7.execute(
-        'Select count([RAMPosA]) AS ValidTotal from ' + "'" '%' + str(
-            T7) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R2RC = daq8.execute(
-        'Select count([RAMPosB]) AS ValidTotal from ' + "'" '%' + str(
-            T7) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R3RC = daq7.execute(
-        'Select count([RAMPosC]) AS ValidTotal from ' + "'" '%' + str(
-            T7) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R4RC = daq7.execute(
-        'Select count([RAMPosD]) AS ValidTotal from ' + "'" '%' + str(
-            T7) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    # close sel link -------
-    daq7.close()
-
-    ############## GAP COUNT ---------------------------------[]
-    R1VC = daq8.execute(
-        'Select count([VODPosA]) AS ValidTotal from ' + "'" '%' + str(
-            T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R2VC = daq8.execute(
-        'Select count([VODPosB]) AS ValidTotal from ' + "'" '%' + str(
-            T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R3VC = daq8.execute(
-        'Select count([VODPosC]) AS ValidTotal from ' + "'" '%' + str(
-            T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-    R4VC = daq8.execute(
-        'Select count([VODPosD]) AS ValidTotal from ' + "'" '%' + str(
-            T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
-            layerNo) + '%' "'").fetchone()
-
-    # close sel link ----------------------[]
-    daq8.close()
+    # R1RC = daq7.execute(
+    #     'Select count([RAMPosA]) AS ValidTotal from ' + str(T7) + ' where [cLayer] = ' + str(layerNo)).fetchone()
+    # R2RC = daq8.execute(
+    #     'Select count([RAMPosB]) AS ValidTotal from ' + str(T7) + ' where [cLayer] = ' + str(layerNo)).fetchone()
+    # R3RC = daq7.execute(
+    #     'Select count([RAMPosC]) AS ValidTotal from ' + str(T7) + ' where [cLayer] = ' + str(layerNo)).fetchone()
+    # R4RC = daq7.execute(
+    #     'Select count([RAMPosD]) AS ValidTotal from ' + str(T7) + ' where [cLayer] = ' + str(layerNo)).fetchone()
+    # # close sel link -------
+    # daq7.close()
+    #
+    # ############## GAP COUNT ---------------------------------[]
+    # R1VC = daq8.execute(
+    #     'Select count([VODPosA]) AS ValidTotal from ' + "'" '%' + str(
+    #         T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+    #         layerNo) + '%' "'").fetchone()
+    # R2VC = daq8.execute(
+    #     'Select count([VODPosB]) AS ValidTotal from ' + "'" '%' + str(
+    #         T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+    #         layerNo) + '%' "'").fetchone()
+    # R3VC = daq8.execute(
+    #     'Select count([VODPosC]) AS ValidTotal from ' + "'" '%' + str(
+    #         T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+    #         layerNo) + '%' "'").fetchone()
+    # R4VC = daq8.execute(
+    #     'Select count([VODPosD]) AS ValidTotal from ' + "'" '%' + str(
+    #         T8) + '%' "'" ' where [cLayer] = ' + "'" '%' + str(
+    #         layerNo) + '%' "'").fetchone()
+    #
+    # # close sel link ----------------------[]
+    # daq8.close()
 
     # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataLP = daq1.execute(
+    dataLP = t1.execute(
         'Select TOP ' + "'" '%' + str(sp1) + '%' "'" '* FROM ' + "'" '%' + str(T1) + '%' "'" ' where [cLayer] = '
         + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
     # ------------------------------------------------------------------------------------------------------[]
@@ -295,11 +230,11 @@ def mgm_sqlExec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq1.close()
+    t1.close()
 
     # Tape Winding procedure ----------------------------------[B]
     # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataLA = daq2.execute(
+    dataLA = t2.execute(
         'Select TOP ' + "'" '%' + str(sp2) + '%' "'" '* FROM ' + "'" '%' + str(T2) + '%' "'" ' where [cLayer] = '
         + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
     # ------------------------------------------------------------------------------------------------------[]
@@ -318,10 +253,10 @@ def mgm_sqlExec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq2.close()
+    t2.close()
 
     # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataTT = daq3.execute(
+    dataTT = t3.execute(
         'Select TOP ' + "'" '%' + str(sp3) + '%' "'" '* FROM ' + "'" '%' + str(T3) + '%' "'" ' where [cLayer] = '
         + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
     # ------------------------------------------------------------------------------------------------------[]
@@ -341,10 +276,10 @@ def mgm_sqlExec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq3.close()
+    t3.close()
 
     # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataST = daq4.execute(
+    dataST = t4.execute(
         'Select TOP ' + "'" '%' + str(sp4) + '%' "'" '* FROM ' + "'" '%' + str(T4) + '%' "'" ' where [cLayer] = '
         + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
     # ------------------------------------------------------------------------------------------------------[]
@@ -363,10 +298,10 @@ def mgm_sqlExec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq4.close()
+    t4.close()
 
     # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataTG = daq5.execute(
+    dataTG = t5.execute(
         'Select TOP ' + "'" '%' + str(sp5) + '%' "'" '* FROM ' + "'" '%' + str(T5) + '%' "'" ' where [cLayer] = '
         + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
     # ------------------------------------------------------------------------------------------------------[]
@@ -385,10 +320,10 @@ def mgm_sqlExec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq5.close()
+    t5.close()
 
     # ------------------ Load randomised samples ----------------------------------------------------------[A]
-    dataWA = daq6.execute(
+    dataWA = t6.execute(
         'Select TOP ' + "'" '%' + str(sp6) + '%' "'" '* FROM ' + "'" '%' + str(T6) + '%' "'" ' where [cLayer] = '
         + "'" '%' + str(layerNo) + '%' "'" + 'order by NEWID()').fetchone()
     # ------------------------------------------------------------------------------------------------------[]
@@ -407,6 +342,6 @@ def mgm_sqlExec(daq1, daq2, daq3, daq4, daq5, daq6, daq7, daq8, T1, T2, T3, T4, 
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    daq6.close()
+    t6.close()
 
-    return rLP, rLA, rRP, rTT, rST, rTG, rWA, R1RC, R2RC, R3RC, R4RC, R1VC, R2VC, R3VC, R4VC
+    return rLP, rLA, rTT, rST, rTG, rWA
