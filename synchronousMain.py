@@ -1327,7 +1327,7 @@ class collectiveEoL(ttk.Frame):
         im150, im151, im152, im153, im154, im155, im156, im157, im158, im159, im160, im161, im162, im163, im164, im165, \
         im166, im167, im168, im169, im170, im171, im172, im173, im174, im175, im176, im177, im178, im179, im180, im181,\
         im182, im183, im184, im185, wsS, ttS, stS, tgS, rcS, vcS, lpS, laS, ttS, stS, tgS, waS, ttSoL, stSoL, tgSoL, \
-        wsSoL, lpSoL, laSoL, waSoL
+        wsSoL, lpSoL, laSoL, waSoL, T1, T2, T3, T4, T5, T6
 
         if pRecipe == 'DNV':
             import qParamsHL_DNV as dnv
@@ -1918,7 +1918,7 @@ class collectiveEoL(ttk.Frame):
             # -------------------------------------------------------------#
             else:
                 print('Report is available after EoL run, please wait...')
-            self.canvas.get_tk_widget().after(15, self._eolDataPlot)
+            self.canvas.get_tk_widget().after(30, self._eolDataPlot)
             time.sleep(0.5)
 
     # ================== End of synchronous Method =========================================[]
@@ -1927,35 +1927,35 @@ class collectiveEoL(ttk.Frame):
 
         # --------- Generate Unique ID for pdf report ------#
         rptID = random_with_N_digits(10)
-        # --------------------------------------------------#
+        # --------------------------------------------------# , , ,
         # declare asynchronous variables ------------------[]
         if UseSQL_DBS:
             import VarSQL_EOLRPT as el                          # load SQL variables column names | rfVarSQL
             if pRecipe == 'DNV':
                 g1 = ott.validCols(T1)                          # Construct Table Column (Tape Temp)
-                d1 = pd.DataFrame(self.zTT, columns=g1)
+                d1 = pd.DataFrame(self.rpTT, columns=g1)
                 g2 = ost.validCols(T2)                          # Construct Table Column (Sub Temp)
-                d2 = pd.DataFrame(self.zST, columns=g2)
+                d2 = pd.DataFrame(self.rpST, columns=g2)
                 g3 = otg.validCols(T3)                          # Construct Table Column (Tape Gap)
-                d3 = pd.DataFrame(self.zTG, columns=g3)
+                d3 = pd.DataFrame(self.rpTG, columns=g3)
                 g4 = ows.validCols(T4)                          # Construct Table Column (Tape Gap)
-                d4 = pd.DataFrame(self.zWS, columns=g4)         # EoL_reached > 0 or layerN
+                d4 = pd.DataFrame(self.rpW, columns=g4)         # EoL_reached > 0 or layerN
                 # Concatenate all columns ----------------------[]
                 df1 = pd.concat([d1, d2, d3, d4], axis=1)
 
             elif pRecipe == 'MGM':
                 g1 = olp.validCols(T1)                          # Laser Power - Construct Table Column (Tape Temp)
-                d1 = pd.DataFrame(self.zLP, columns=g1)
+                d1 = pd.DataFrame(self.rpLP, columns=g1)
                 g2 = ola.validCols(T2)                          # Laser Angle - Construct Table Column (Sub Temp)
-                d2 = pd.DataFrame(self.zLA, columns=g2)
+                d2 = pd.DataFrame(self.rpLA, columns=g2)
                 g3 = olp.validCols(T3)                          # Construct Table Column (Tape Gap)
-                d3 = pd.DataFrame(self.zTT, columns=g3)
+                d3 = pd.DataFrame(self.rpTT, columns=g3)
                 g4 = ott.validCols(T4)                          # Construct Table Column (Tape Temp)
-                d4 = pd.DataFrame(self.zST, columns=g4)
+                d4 = pd.DataFrame(self.rpST, columns=g4)
                 g5 = ost.validCols(T5)                          # Construct Table Column (Sub Temp)
-                d5 = pd.DataFrame(self.zTG, columns=g5)
+                d5 = pd.DataFrame(self.rpTG, columns=g5)
                 g6 = otg.validCols(T6)                          # Construct Table Column (Tape Gap)
-                d6 = pd.DataFrame(self.zWA, columns=g6)
+                d6 = pd.DataFrame(self.rpWA, columns=g6)
                 # Concatenate all columns ----------------------[]
                 df1 = pd.concat([d1, d2, d3, d4, d5, d6], axis=1)
 

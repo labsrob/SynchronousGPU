@@ -48,8 +48,9 @@ def dnv_sqlExec(sq_con, layerNo, ttSoL, stSoL, tgSoL, wsSoL, T1, T2, T3, T4):
     regm3 = tgSR * tgSoL      # % 60  # Modulo evaluation TG?
     regm4 = wsSR * wsSoL
 
-    # ------------------ Load randomised samples --------------------------------------------------------------[A]
-    dataTT = t1.execute('Select TOP ' + str(regm1) + ' * FROM ' + str(T1) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
+    # ------------------ Load randomised samples --------[TODO: Evaluate the impact oA]f these two methods on sys perf
+    # dataTT = t1.execute('Select TOP ' + str(regm1) + ' * FROM ' + str(T1) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
+    dataTT = t1.execute('Select * FROM  ' + str(T1) + ' where [cLayer] = ' + str(layerNo) + ' tablesample('+ str(regm1)+ 'percent)')
     if len(dataTT) != 0:
         for result in dataTT:
             result = list(result)
@@ -68,8 +69,9 @@ def dnv_sqlExec(sq_con, layerNo, ttSoL, stSoL, tgSoL, wsSoL, T1, T2, T3, T4):
     t1.close()
 
     # Substrate Temperature --------------------------------------------------------------------------------[B]
-    dataST = t2.execute('Select TOP ' + str(regm2) + ' * FROM ' + str(T2) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
-
+    # dataST = t2.execute('Select TOP ' + str(regm2) + ' * FROM ' + str(T2) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
+    dataST = t2.execute(
+        'Select * FROM  ' + str(T2) + ' where [cLayer] = ' + str(layerNo) + ' tablesample(' + str(regm2) + 'percent)')
     if len(dataST) != 0:
         for result in dataST:
             result = list(result)
@@ -88,7 +90,9 @@ def dnv_sqlExec(sq_con, layerNo, ttSoL, stSoL, tgSoL, wsSoL, T1, T2, T3, T4):
     t2.close()
 
     # Tape Gap Procedure ------------------------------------------------------------------------------------[C]
-    dataTG = t3.execute('Select TOP ' + str(regm3) + ' * FROM ' + str(T3) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
+    # dataTG = t3.execute('Select TOP ' + str(regm3) + ' * FROM ' + str(T3) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
+    dataTG = t3.execute(
+        'Select * FROM  ' + str(T3) + ' where [cLayer] = ' + str(layerNo) + ' tablesample(' + str(regm3) + 'percent)')
     if len(dataTG) != 0:
         for result in dataTG:
             result = list(result)
@@ -106,7 +110,9 @@ def dnv_sqlExec(sq_con, layerNo, ttSoL, stSoL, tgSoL, wsSoL, T1, T2, T3, T4):
     t3.close()
 
     # Ramp Profile ------------------------------------------------------------------------------------------[D]
-    dataWS = t4.execute('Select TOP ' + str(regm4) + ' * FROM ' + str(T4) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
+    # dataWS = t4.execute('Select TOP ' + str(regm4) + ' * FROM ' + str(T4) + ' where [cLayer] = '+ str(layerNo) + ' order by NEWID()').fetchall()
+    dataWS = t4.execute(
+        'Select * FROM  ' + str(T4) + ' where [cLayer] = ' + str(layerNo) + ' tablesample(' + str(regm4) + 'percent)')
     if len(dataWS) != 0:
         for result in dataWS:
             result = list(result)
