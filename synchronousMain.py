@@ -908,16 +908,16 @@ def menuExit():
     # print('ExitBit H/L:', exit_bit)
     inUse = os.getpid()
 
-    if not exit_bit and inUse == 1:                                # Check exit_bit for unitary value
+    if not exit_bit and inUse == 1:                         # Check exit_bit for unitary value
         print('\nExiting Local GUI, bye for now...')
-        root.quit()                                 # Exit Apps if exit_bit is empty
-        os._exit(0)                                 # Close out all process
+        root.quit()                                         # Exit Apps if exit_bit is empty
+        os._exit(0)                                         # Close out all process
 
     elif len(exit_bit) >= 4 and inUse > 1:
         print('\nExiting Local GUI, bye for now...')
 
         # Evaluate active process before exiting -------#
-        proc_list = [p1.pid, p2.pid, p3.pid, p4.pid]  # Evaluate exit_bit as true if all active
+        proc_list = [p1.pid, p2.pid, p3.pid, p4.pid]        # Evaluate exit_bit as true if all active
         for p in proc_list:
             try:
                 os.kill(p, signal.SIGTERM)
@@ -969,7 +969,7 @@ def tabbed_cascadeMode(cMode, cType):
 
     # Load class object from Cascade Switcher Method -----------[x]
     import CascadeSwitcher as cs
-    p1, p2, p3, p4, p5, p6, p7, p8 = cs.myMain(pMode, pRecipe)      # runtimeType, process RecipeType
+    p1, p2, p3, p4, p5, p6, p7, p8 = cs.myMain(pMode, pRecipe)   # runtimeType, process RecipeType
     # ----------------------------------------------------------[]
 
     # Set up embedding notebook (tabs) ------------------------[B]
@@ -994,11 +994,6 @@ def tabbed_cascadeMode(cMode, cType):
     root.mainloop()
 
 # -------- Controls --------
-
-# -------------------------
-
- # -------- GUI Update --------
-
 
 def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[TABBED ]
     global hostConn, pRecipe, pMode, actTabb
@@ -2462,14 +2457,29 @@ class collectiveEoL(ttk.Frame):
 
         else:
             print('End of Layer standby mode, no active session...')
-            self.a1.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a1.transAxes)
-            self.a2.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a2.transAxes)
-            self.a3.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a3.transAxes)
-            self.a4.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a4.transAxes)
-            self.a5.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a5.transAxes)
-            self.a6.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a6.transAxes)
-            self.a7.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a7.transAxes)
-            self.a8.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a8.transAxes)
+            if pRecipe == 'MGM':
+                self.a1.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a1.transAxes)
+                self.a2.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a2.transAxes)
+                self.a3.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a3.transAxes)
+                self.a4.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a4.transAxes)
+                self.a5.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a5.transAxes)
+                self.a6.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a6.transAxes)
+                self.a7.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a7.transAxes)
+                self.a8.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a8.transAxes)
+                # ---------
+                self.a9.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a9.transAxes)
+                self.a10.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a10.transAxes)
+                self.a11.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a11.transAxes)
+                self.a12.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a12.transAxes)
+            else:
+                self.a1.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a1.transAxes)
+                self.a2.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a2.transAxes)
+                self.a3.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a3.transAxes)
+                self.a4.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a4.transAxes)
+                self.a5.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a5.transAxes)
+                self.a6.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a6.transAxes)
+                self.a7.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a7.transAxes)
+                self.a8.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a8.transAxes)
         timef = time.time()
         lapsedT = timef - timei
         print(f"Process Interval EoL: {lapsedT} sec\n")
@@ -3750,14 +3760,20 @@ class MonitorTabb(ttk.Frame):
 
         else:
             print('Ramp standby mode, no active session...')
-            self.a1.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            self.a1.text(0.400, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a1.transAxes)
-            self.a2.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            self.a2.text(0.400, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a2.transAxes)
-            self.a3.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            self.a3.text(0.400, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a3.transAxes)
-            self.a4.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            self.a4.text(0.400, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a4.transAxes)
+            if pRecipe == 'MGM':
+                self.a5.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                             transform=self.a5.transAxes)
+                self.a6.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                             transform=self.a6.transAxes)
+
 
         timef = time.time()
         lapsedT = timef - timei
@@ -3776,6 +3792,10 @@ class laserPowerTabb(ttk.Frame):
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
+        global lpS, lpTy, olS, opS, pHL, pAL, pFO, win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, im16, im17, \
+            im18, im19, im20, im21, im22, im23, im24, im25, im26, im27, im28, im29, im30, im31, im32, im33, im34, im35, \
+            im36, im37, im38, im39, im40, im41, T1, T2
+
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
             import qParamsHL_DNV as dnv
@@ -3881,12 +3901,12 @@ class laserPowerTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(pMtX, 8), dpi=100)  #[25 on 1920 x 1200 resolution screen, 27 on 4096 x2160]
-        f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
+        self.f = Figure(figsize=(pMtX, 8), dpi=100)  #[25 on 1920 x 1200 resolution screen, 27 on 4096 x2160]
+        self.f.subplots_adjust(left=0.022, bottom=0.05, right=0.983, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
-        a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
-        a2 = f.add_subplot(2, 4, (5, 7))   # S Bar Plo
-        a3 = f.add_subplot(2, 4, (4, 8))   # Performance Feeed
+        self.a1 = self.f.add_subplot(2, 4, (1, 3))   # X Bar Plot
+        self.a2 = self.f.add_subplot(2, 4, (5, 7))   # S Bar Plo
+        self.a3 = self.f.add_subplot(2, 4, (4, 8))   # Performance Feeed
         # --------------- Former format -------------
 
         # Declare Plots attributes --------------------------------[H]
@@ -3894,10 +3914,10 @@ class laserPowerTabb(ttk.Frame):
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minLP, YScale_maxLP = lpLSL - 8.5, lpUSL + 8.5       # Roller Force
         sBar_minLP, sBar_maxLP = sLCLlp - 80, sUCLlp + 80           # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (int(lpS) + 3)                # windows view = visible data points
+        self.win_Xmin, self.win_Xmax = 0, (int(lpS) + 3)            # windows view = visible data points
 
         # Select betweeen straem -----------------------------------#
-        if pRecipe == 1:                  # PLC Data
+        if pRecipe == 'DNV':                  # PLC Data
             T1 = SPC_LP
         else:
             T1 = 'LP1_' + pWON            # SQL Data                # Laser Power
@@ -3905,27 +3925,27 @@ class laserPowerTabb(ttk.Frame):
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
-        a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-        a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
-        a1.set_title('Laser Power [XBar]', fontsize=12, fontweight='bold')
-        a2.set_title('Laser Power [StDev]', fontsize=12, fontweight='bold')
+        self.a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
+        self.a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+        self.a1.set_title('Laser Power [XBar]', fontsize=12, fontweight='bold')
+        self.a2.set_title('Laser Power [StDev]', fontsize=12, fontweight='bold')
 
-        a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a1.legend(loc='upper right', title='Laser Power (Watt)')
-        a2.legend(loc='upper right', title='Sigma curve')
+        self.a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a2.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a1.legend(loc='upper right', title='Laser Power (Watt)')
+        self.a2.legend(loc='upper right', title='Sigma curve')
 
         # ----------------------------------------------------------#
-        a1.set_ylim([YScale_minLP, YScale_maxLP], auto=True)
-        a1.set_xlim([window_Xmin, window_Xmax])
+        self.a1.set_ylim([YScale_minLP, YScale_maxLP], auto=True)
+        self.a1.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------#
-        a2.set_ylim([sBar_minLP, sBar_maxLP], auto=True)
-        a2.set_xlim([window_Xmin, window_Xmax])
+        self.a2.set_ylim([sBar_minLP, sBar_maxLP], auto=True)
+        self.a2.set_xlim([self.win_Xmin, self.win_Xmax])
 
         # ---------------------------------------------------------[]
-        a3.cla()
-        a3.get_yaxis().set_visible(False)
-        a3.get_xaxis().set_visible(False)
+        self.a3.cla()
+        self.a3.get_yaxis().set_visible(False)
+        self.a3.get_xaxis().set_visible(False)
 
         # ---------------------------------------------------------[]
         # Define Plot area and axes -
@@ -3967,245 +3987,254 @@ class laserPowerTabb(ttk.Frame):
         im41, = self.a2.plot([], [], 'o-', label='Laser Power')
 
         # Statistical Feed -----------------------------------------[]
-        a3.text(0.466, 0.945, 'Performance Feed - LP', fontsize=16, fontweight='bold', ha='center', va='center',
-                transform=a3.transAxes)
+        self.a3.text(0.466, 0.945, 'Performance Feed - LP', fontsize=16, fontweight='bold', ha='center', va='center',
+                transform=self.a3.transAxes)
         # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
-        rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
-        rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
-        a3.add_patch(rect1)
-        a3.add_patch(rect2)
+        self.rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
+        self.rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
+        self.a3.add_patch(self.rect1)
+        self.a3.add_patch(self.rect2)
         # ------- Process Performance Pp (the spread)---------------------
-        a3.text(0.145, 0.804, lplabel, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.658, '#Pp Value', fontsize=24, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.650, 0.820, 'Ring ' + lplabel + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
-        a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
+        self.a3.text(0.145, 0.804, lplabel, fontsize=12, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.328, 0.658, '#Pp Value', fontsize=24, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.650, 0.820, 'Ring ' + lplabel + ' Data', fontsize=14, ha='left', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=self.a3.transAxes)
         # ------- Process Performance Ppk (Performance)---------------------
-        a3.text(0.145, 0.403, lpPerf, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.640, 0.420, 'Ring ' + lpPerf + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
+        self.a3.text(0.145, 0.403, lpPerf, fontsize=12, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.640, 0.420, 'Ring ' + lpPerf + ' Data', fontsize=14, ha='left', transform=self.a3.transAxes)
         # -------------------------------------
-        a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
+        self.a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=self.a3.transAxes)
         # ----- Pipe Position and SMC Status -----
-        a3.text(0.080, 0.090, 'Pipe Position: ' + str(piPos) + '    Processing Layer #' + str(cLayerN), fontsize=12, ha='left',
-                transform=a3.transAxes)
-        a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=a3.transAxes)
+        self.a3.text(0.080, 0.090, 'Pipe Position: ' + str(piPos) + '    Processing Layer #' + str(cLayerN), fontsize=12, ha='left',
+                transform=self.a3.transAxes)
+        self.a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=self.a3.transAxes)
 
-        # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousLP(lpS, lpTy, fetchT):
-            fetch_no = str(fetchT)                  # entry value in string sql syntax
+        # self.canvas = FigureCanvasTkAgg(self.f, master=root) -----------#
+        self.canvas = FigureCanvasTkAgg(self.f, self)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-            # Obtain Volatile Data from PLC Host Server ---------------------------[]
-            if not inUseAlready:                    # Load CommsPlc class once
-                import CommsSql as q
-                q.DAQ_connect(1, 0)
-            else:
-                con_a, con_b = conn.cursor(), conn.cursor()
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
+        # --------- call data block -------------------------------------#
+        threading.Thread(target=self._dataControlLP, daemon=True).start()
 
-            # Evaluate conditions for SQL Data Fetch ------------------------------[A]
-            """
-            Load watchdog function with synchronous function every seconds
-            """
-            # Initialise RT variables ---[]
-            autoSpcRun = True
-            autoSpcPause = False
-            import keyboard                         # for temporary use
+    # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------#
 
-            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-            # Define PLC/SMC error state -------------------------------------------#
 
-            while True:
-                if UsePLC_DBS:                               # Not Using PLC Data
-                    import plcArrayRLmethodLP as slp         # DrLabs optimization method
+    def _dataControlLP(self):
+        s_fetch, stp_Sz, s_regm = str(lpS), lpTy, olS
 
-                    inProgress = False                       # False for Real-time mode
-                    print('\nSynchronous controller activated...')
+        # Obtain Volatile Data from PLC Host Server ---------------------------[]
+        if not inUseAlready:                          # Load Comm Plc class once
+            lp_con = sq.DAQ_connect(1, 0)             # Connect PLC for real-time data
+        else:
+            pass
 
-                    if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
-                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+        # Evaluate conditions for SQL Data Fetch ------------------------------[A]
+        """
+        Load watchdog function with synchronous function every seconds
+        """
+        # Initialise RT variables ---[]
+        autoSpcRun = True
+        autoSpcPause = False
+        import keyboard                         # for temporary use
 
-                    # Either of the 2 combo variables are assigned to trigger routine pause
-                    if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
-                        print('\nProduction is pausing...')
-                        if not autoSpcPause:
-                            autoSpcRun = not autoSpcRun
-                            autoSpcPause = True
-                            # play(error)                            # Pause mode with audible Alert
-                            print("\nVisualization in Paused Mode...")
+        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+        sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+        # Define PLC/SMC error state -------------------------------------------#
+        if UsePLC_DBS:
+            import plcArrayRLmethodLP as slp                    # DrLabs optimization method
+        elif UseSQL_DBS:
+            import sqlArrayRLmethodLP as slp                    # DrLabs optimization method
 
-                    else:
-                        autoSpcPause = False
+        while True:
+            if UsePLC_DBS:                                      # Not Using PLC Data
+                inProgress = False                              # False for Real-time mode
+                print('\nSynchronous controller activated...')
 
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                # Either of the 2 combo variables are assigned to trigger routine pause
+                if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        # play(error)                            # Pause mode with audible Alert
+                        print("\nVisualization in Paused Mode...")
+
+                else:
+                    autoSpcPause = False
                     # Play visualization ----------------------------------------------[]
                     print("Visualization in Play Mode...")
                     # -----------------------------------------------------------------[]
-                    lpDta = slp.plcExec(T1, lpS, lpTy, fetch_no)
-                    lpDtb = 0
+                    self.lpDta = slp.plcExec(T1, s_fetch, stp_Sz, s_regm)
+                    self.lpDtb = 0
+
+            elif UseSQL_DBS:
+                inProgress = True       # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                if keyboard.is_pressed("Alt+Q") and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        print("\nVisualization in Paused Mode...")
+                    else:
+                        autoSpcPause = False
+                    print("Visualization in Real-time Mode...")
 
                 else:
-                    import sqlArrayRLmethodLP as slp        # DrLabs optimization method
-
-                    inProgress = True                       # True for RetroPlay mode
-                    print('\nAsynchronous controller activated...')
-                    print('DrLabs' + "' Runtime Optimisation is Enabled!")
-
-                    if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
-                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
-
-                    if keyboard.is_pressed("Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:
-                        print('\nProduction is pausing...')
-                        if not autoSpcPause:
-                            autoSpcRun = not autoSpcRun
-                            autoSpcPause = True
-                            print("\nVisualization in Paused Mode...")
-                        else:
-                            autoSpcPause = False
-                            print("Visualization in Real-time Mode...")
-                    else:
-                        # Get list of relevant SQL Tables using conn() --------------------[]
-                        lpDta, lpDtb = slp.sqlExec(lpS, lpTy, con_a, con_b, T1, T2, fetchT)
-
-                    # ------ Inhibit iteration ----------------------------------------------------------[]
-                    """
-                    # Set condition for halting real-time plots in watchdog class ---------------------
-                    """
-                    # TODO --- values for inhibiting the SQL processing
-                    if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        con_a.close()
-                        con_b.close()
-                        print('SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        continue
-                    else:
-                        print('\nUpdating....')
-
-            return lpDta, lpDtb
-
-        # ================== End of synchronous Method ==========================
-        def asynchronousLP(db_freq):
-            timei = time.time()                                 # start timing the entire loop
-
-            # Bistream Data Pooling Method ---------------------#
-            lpDta, lpDtb = synchronousLP(lpS, lpTy, db_freq)                     # data loading functions
-            # --------------------------------------------------#
-
-            if UsePLC_DBS == 1:
-                import VarPLC_LP as lp
-
-                viz_cycle = 10
-                # Call synchronous data function ---------------[]
-                columns = qlp.validCols(T1)                     # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(lpDta, columns=columns)      # Include table data into python Dataframe
-                LP = lp.loadProcesValues(df1)                   # Join data values under dataframe
-
+                    # Get list of relevant SQL Tables using conn() --------------------[]
+                    self.lpDta, self.lpDtb = slp.sqlExec(lp_con, s_fetch, stp_Sz, s_regm, T1, T2)
+                    print("Visualization in Play Mode...")
+                print('\nUpdating....')
+                # ------ Inhibit iteration ----------------------------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class ---------------------
+                """
+                # TODO --- values for inhibiting the SQL processing
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    lp_con.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
             else:
-                import VarSQL_LP as lp                        # load SQL variables column names | rfVarSQL
+                pass
+            self.canvas.get_tk_widget().after(2, self._lpDataPlot)  # Regime = every 10nseconds
+            time.sleep(0.5)
 
-                viz_cycle = 150
-                g1 = qlp.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
-                d1 = pd.DataFrame(lpDta, columns=g1)
-                g2 = qlp.validCols(T2)
-                d2 = pd.DataFrame(lpDtb, columns=g2)          # Import into python Dataframe
+    # ================== End of synchronous Method ==========================
 
-                # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2], axis=1)          # Join data values under dataframe
-                LP = lp.loadProcesValues(df1)
+
+    def _lpDataPlot(self):
+        timei = time.time()                                 # start timing the entire loop
+
+        if UsePLC_DBS == 1:
+            import VarPLC_LP as lp
+
+            # Call synchronous data function ---------------[]
+            columns = qlp.validCols(T1)                     # Load defined valid columns for PLC Data
+            df1 = pd.DataFrame(self.lpDta, columns=columns) # Include table data into python Dataframe
+            LP = lp.loadProcesValues(df1)                   # Join data values under dataframe
+
+        elif UseSQL_DBS:
+            import VarSQL_LP as lp                          # load SQL variables column names | rfVarSQL
+            g1 = qlp.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
+            d1 = pd.DataFrame(self.lpDta, columns=g1)
+            g2 = qlp.validCols(T2)
+            d2 = pd.DataFrame(self.lpDtb, columns=g2)       # Import into python Dataframe
+
+            # Concatenate all columns -----------[]
+            df1 = pd.concat([d1, d2], axis=1)          # Join data values under dataframe
+            LP = lp.loadProcesValues(df1)
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+        else:
+            print('Unknown Process Protocol...')
 
-            # -------------------------------------------------------------------------------------[]
-            # Plot X-Axis data points -------- X Plot
-            im10.set_xdata(np.arange(db_freq))
-            im11.set_xdata(np.arange(db_freq))
-            im12.set_xdata(np.arange(db_freq))
-            im13.set_xdata(np.arange(db_freq))
-            im14.set_xdata(np.arange(db_freq))
-            im15.set_xdata(np.arange(db_freq))
-            im16.set_xdata(np.arange(db_freq))
-            im17.set_xdata(np.arange(db_freq))
-            im18.set_xdata(np.arange(db_freq))
-            im19.set_xdata(np.arange(db_freq))
-            im20.set_xdata(np.arange(db_freq))
-            im21.set_xdata(np.arange(db_freq))
-            im22.set_xdata(np.arange(db_freq))
-            im23.set_xdata(np.arange(db_freq))
-            im24.set_xdata(np.arange(db_freq))
-            im25.set_xdata(np.arange(db_freq))
+        # -------------------------------------------------------------------------------------[]
+        if UsePLC_DBS or UseSQL_DBS:
+            im10.set_xdata(np.arange(self.win_Xmax))
+            im11.set_xdata(np.arange(self.win_Xmax))
+            im12.set_xdata(np.arange(self.win_Xmax))
+            im13.set_xdata(np.arange(self.win_Xmax))
+            im14.set_xdata(np.arange(self.win_Xmax))
+            im15.set_xdata(np.arange(self.win_Xmax))
+            im16.set_xdata(np.arange(self.win_Xmax))
+            im17.set_xdata(np.arange(self.win_Xmax))
+            im18.set_xdata(np.arange(self.win_Xmax))
+            im19.set_xdata(np.arange(self.win_Xmax))
+            im20.set_xdata(np.arange(self.win_Xmax))
+            im21.set_xdata(np.arange(self.win_Xmax))
+            im22.set_xdata(np.arange(self.win_Xmax))
+            im23.set_xdata(np.arange(self.win_Xmax))
+            im24.set_xdata(np.arange(self.win_Xmax))
+            im25.set_xdata(np.arange(self.win_Xmax))
             # ------------------------------- S Plot
-            im26.set_xdata(np.arange(db_freq))
-            im27.set_xdata(np.arange(db_freq))
-            im28.set_xdata(np.arange(db_freq))
-            im29.set_xdata(np.arange(db_freq))
-            im30.set_xdata(np.arange(db_freq))
-            im31.set_xdata(np.arange(db_freq))
-            im32.set_xdata(np.arange(db_freq))
-            im33.set_xdata(np.arange(db_freq))
-            im34.set_xdata(np.arange(db_freq))
-            im35.set_xdata(np.arange(db_freq))
-            im36.set_xdata(np.arange(db_freq))
-            im37.set_xdata(np.arange(db_freq))
-            im38.set_xdata(np.arange(db_freq))
-            im39.set_xdata(np.arange(db_freq))
-            im40.set_xdata(np.arange(db_freq))
-            im41.set_xdata(np.arange(db_freq))      # lpS, lTy
+            im26.set_xdata(np.arange(self.win_Xmax))
+            im27.set_xdata(np.arange(self.win_Xmax))
+            im28.set_xdata(np.arange(self.win_Xmax))
+            im29.set_xdata(np.arange(self.win_Xmax))
+            im30.set_xdata(np.arange(self.win_Xmax))
+            im31.set_xdata(np.arange(self.win_Xmax))
+            im32.set_xdata(np.arange(self.win_Xmax))
+            im33.set_xdata(np.arange(self.win_Xmax))
+            im34.set_xdata(np.arange(self.win_Xmax))
+            im35.set_xdata(np.arange(self.win_Xmax))
+            im36.set_xdata(np.arange(self.win_Xmax))
+            im37.set_xdata(np.arange(self.win_Xmax))
+            im38.set_xdata(np.arange(self.win_Xmax))
+            im39.set_xdata(np.arange(self.win_Xmax))
+            im40.set_xdata(np.arange(self.win_Xmax))
+            im41.set_xdata(np.arange(self.win_Xmax))      # lpS, lTy
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((LP[1]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im11.set_ydata((LP[1]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im12.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im13.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(pAL, lpS, 'LP')
             # ---------------------------------------#
-            im14.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im15.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im16.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im17.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(pAL, lpS, 'LP')
             # ---------------------------------------#
-            im18.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im19.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im20.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im21.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(pAL, lpS, 'LP')
             # ---------------------------------------#
-            im22.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im23.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im24.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im25.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(pAL, lpS, 'LP')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((LP[1]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im27.set_ydata((LP[1]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im28.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im29.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
 
-            im30.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im31.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im32.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im33.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
 
-            im34.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im35.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im36.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im37.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
 
-            im38.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im39.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im40.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im41.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
 
             # Compute entire Process Capability -----------#
             if not pAL:
@@ -4233,37 +4262,25 @@ class laserPowerTabb(ttk.Frame):
             a2.axhspan(sBar_minLP, sLCLlp, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
-            if db_freq > window_Xmax:
-                a1.set_xlim(db_freq - window_Xmax, db_freq)
-                a2.set_xlim(db_freq - window_Xmax, db_freq)
-            else:
-                a1.set_xlim(0, window_Xmax)
-                a2.set_xlim(0, window_Xmax)
+            if len(LP) > win_Xmax:
+                LP.pop(0)
+            self.canvas.draw_idle()
 
-            # Set trip line for individual time-series plot -----------------------------------[R1]
-            import triggerModule as sigma
-            sigma.trigViolations(a1, UsePLC_DBS, 'LP', YScale_minLP, YScale_maxLP, xucT, xlcT, xusT, xlsT, mnT, sdT)
+        else:
+            print('Laser Power standby mode, no active session...')
+            self.a2.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a2.transAxes)
+            self.a1.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a1.transAxes)
 
-            timef = time.time()
-            lapsedT = timef - timei
-            print(f"\nProcess Interval: {lapsedT} sec\n")
-
-            ani = FuncAnimation(f, asynchronousLP, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
-                                blit=False)
-            plt.tight_layout()
-            plt.show()
-
-        # -----Canvas update --------------------------------------------[]
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.get_tk_widget().pack(expand=True)
-
-        # Activate Matplot tools ------------------[Uncomment to activate]
-        toolbar = NavigationToolbar2Tk(canvas, self)
-        toolbar.update()
-        canvas._tkcanvas.pack(expand=True)
+        timef = time.time()
+        lapsedT = timef - timei
+        print(f"Process Interval LP: {lapsedT} sec\n")
 
 # ------------------------------------------------------------------------------------------[Laser Angle Tab]
-class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA param - Tape Temperature --[]
+
+
+class laserAngleTabb(ttk.Frame):
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -4272,6 +4289,8 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
+        global win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, a1, a2, a3, laS, laTy, eolS, eopS, T1, T2
+
         import qParamsHL_MGM as mgm
         # Load Quality Historical Values -----------[]
         laS, laTy, eolS, eopS, laHL, laAL, laFO, laP1, laP2, laP3, laP4, laP5 = mgm.decryptpProcessLim(pWON, 'LA')
@@ -4374,12 +4393,12 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(pMtX, 8), dpi=100)
-        f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
+        self.f = Figure(figsize=(pMtX, 8), dpi=100)
+        self.f.subplots_adjust(left=0.022, bottom=0.05, right=0.983, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
-        a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
-        a2 = f.add_subplot(2, 4, (5, 7))   # S Bar Plo
-        a3 = f.add_subplot(2, 4, (4, 8))   # Performance Feeed
+        self.a1 = self.f.add_subplot(2, 4, (1, 3))   # X Bar Plot
+        self.a2 = self.f.add_subplot(2, 4, (5, 7))   # S Bar Plo
+        self.a3 = self.f.add_subplot(2, 4, (4, 8))   # Performance Feeed
         # --------------- Former format -------------
 
         # Declare Plots attributes --------------------------------[H]
@@ -4387,7 +4406,7 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minLA, YScale_maxLA = laLSL - 8.5, laUSL + 8.5       # Roller Force
         sBar_minLA, sBar_maxLA = sLCLla - 80, sUCLla + 80           # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (int(laS) + 3)             # windows view = visible data points
+        self.win_Xmin, self.win_Xmax = 0, (int(laS) + 3)             # windows view = visible data points
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
@@ -4400,27 +4419,27 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
-        a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-        a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
-        a1.set_title('Laser Angle [XBar Plot]', fontsize=12, fontweight='bold')
-        a2.set_title('Laser Angle [S Plot]', fontsize=12, fontweight='bold')
+        self.a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
+        self.a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+        self.a1.set_title('Laser Angle [XBar Plot]', fontsize=12, fontweight='bold')
+        self.a2.set_title('Laser Angle [S Plot]', fontsize=12, fontweight='bold')
 
-        a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a1.legend(loc='upper right', title='Laser Angle (Deg)')
-        a2.legend(loc='upper right', title='Sigma curve')
+        self.a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a2.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a1.legend(loc='upper right', title='Laser Angle (Deg)')
+        self.a2.legend(loc='upper right', title='Sigma curve')
 
         # ----------------------------------------------------------#
-        a1.set_ylim([YScale_minLA, YScale_maxLA], auto=True)
-        a1.set_xlim([window_Xmin, window_Xmax])
+        self.a1.set_ylim([YScale_minLA, YScale_maxLA], auto=True)
+        self.a1.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------#
-        a2.set_ylim([sBar_minLA, sBar_maxLA], auto=True)
-        a2.set_xlim([window_Xmin, window_Xmax])
+        self.a2.set_ylim([sBar_minLA, sBar_maxLA], auto=True)
+        self.a2.set_xlim([self.win_Xmin, self.win_Xmax])
 
         # ---------------------------------------------------------[]
-        a3.cla()
-        a3.get_yaxis().set_visible(False)
-        a3.get_xaxis().set_visible(False)
+        self.a3.cla()
+        self.a3.get_yaxis().set_visible(False)
+        self.a3.get_xaxis().set_visible(False)
 
         # ---------------------------------------------------------[]
         # Define Plot area and axes -
@@ -4462,161 +4481,173 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
         im41, = self.a2.plot([], [], 'o-', label='Laser Angle')
 
         # Statistical Feed -----------------------------------------[]
-        a3.text(0.466, 0.945, 'Performance Feed - LA', fontsize=16, fontweight='bold', ha='center', va='center',
-                transform=a3.transAxes)
+        self.a3.text(0.466, 0.945, 'Performance Feed - LA', fontsize=16, fontweight='bold', ha='center', va='center',
+                transform=self.a3.transAxes)
         # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
-        rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
-        rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
-        a3.add_patch(rect1)
-        a3.add_patch(rect2)
+        self.rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
+        self.rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
+        self.a3.add_patch(self.rect1)
+        self.a3.add_patch(self.rect2)
         # ------- Process Performance Pp (the spread)---------------------
-        a3.text(0.145, 0.804, lalabel, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.658, '#Pp Value', fontsize=24, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.650, 0.820, 'Ring ' + lalabel + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
-        a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
+        self.a3.text(0.145, 0.804, lalabel, fontsize=12, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.328, 0.658, '#Pp Value', fontsize=24, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.650, 0.820, 'Ring ' + lalabel + ' Data', fontsize=14, ha='left', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=self.a3.transAxes)
         # ------- Process Performance Ppk (Performance)---------------------
-        a3.text(0.145, 0.403, laPerf, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.640, 0.420, 'Ring ' + laPerf + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
+        self.a3.text(0.145, 0.403, laPerf, fontsize=12, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.640, 0.420, 'Ring ' + laPerf + ' Data', fontsize=14, ha='left', transform=self.a3.transAxes)
         # -------------------------------------
-        a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
+        self.a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=self.a3.transAxes)
         # ----- Pipe Position and SMC Status -----
-        a3.text(0.080, 0.090, 'Pipe Position: ' + str(piPos) + '    Processing Layer #' + str(cLayerN), fontsize=12, ha='left',
-                transform=a3.transAxes)
-        a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=a3.transAxes)
+        self.a3.text(0.080, 0.090, 'Pipe Position: ' + str(piPos) + '    Processing Layer #' + str(cLayerN), fontsize=12, ha='left',
+                transform=self.a3.transAxes)
+        self.a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=self.a3.transAxes)
 
-        # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousLA(laS, laTy, fetchT):
-            fetch_no = str(fetchT)  # entry value in string sql syntax
+        # self.canvas = FigureCanvasTkAgg(self.f, master=root)
+        self.canvas = FigureCanvasTkAgg(self.f, self)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-            # Obtain Volatile Data from PLC Host Server ---------------------------[]
-            if not inUseAlready:  # Load CommsPlc class once
-                import CommsSql as q
-                q.DAQ_connect(1, 0)
-            else:
-                con_a, con_b = conn.cursor(), conn.cursor()
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
+        # --------- call data block -------------------------------------#
+        threading.Thread(target=self._dataControlLA, daemon=True).start()
+        # ------------ EXECUTE SYNCHRONOUS METHOD -----------------------#
 
-            # Evaluate conditions for SQL Data Fetch ------------------------------[A]
-            """
-            Load watchdog function with synchronous function every seconds
-            """
-            # Initialise RT variables ---[]
-            autoSpcRun = True
-            autoSpcPause = False
-            import keyboard  # for temporary use
 
-            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-            # Define PLC/SMC error state -------------------------------------------#
+    def _dataControlLA(self):
+        s_fetch, stp_Sz, s_regm = str(laS), laTy, eolS
 
-            while True:
-                if UsePLC_DBS:                               # Not Using PLC Data
-                    import plcArrayRLmethodLA as sla         # DrLabs optimization method
+        # Obtain Volatile Data from PLC Host Server ---------------------------[]
+        if not inUseAlready:                        # Load ComsPlc class once
+            la_con = sq.DAQ_connect(1, 0)
+        else:
+            pass
 
-                    inProgress = True                        # True for RetroPlay mode
-                    print('\nAsynchronous controller activated...')
+        # Evaluate conditions for SQL Data Fetch ------------------------------[A]
+        """
+        Load watchdog function with synchronous function every seconds
+        """
+        # Initialise RT variables ---[]
+        autoSpcRun = True
+        autoSpcPause = False
+        import keyboard  # for temporary use
 
-                    if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
-                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+        sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+        # Define PLC/SMC error state -------------------------------------------#
 
-                    # Either of the 2 combo variables are assigned to trigger routine pause
-                    if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
-                        print('\nProduction is pausing...')
-                        if not autoSpcPause:
-                            autoSpcRun = not autoSpcRun
-                            autoSpcPause = True
-                            # play(error)                            # Pause mode with audible Alert
-                            print("\nVisualization in Paused Mode...")
+        if UsePLC_DBS:
+            import plcArrayRLmethodLA as sla                # DrLabs optimization method
+        elif UseSQL_DBS:
+            import sqlArrayRLmethodLA as sla                # DrLabs optimization method
 
-                    else:
-                        autoSpcPause = False
-                        print("Visualization in Real-time Mode...")
-                        # Allow selective runtime parameter selection on production critical process
-                        laDta = sla.plcExec(T1, laS, laTy, fetch_no)
-                        laDtb = 0
+        while True:
+            if UsePLC_DBS:                                  # Not Using PLC Data
+                inProgress = True                           # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                # Either of the 2 combo variables are assigned to trigger routine pause
+                if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        # play(error)                            # Pause mode with audible Alert
+                        print("\nVisualization in Paused Mode...")
 
                 else:
-                    import sqlArrayRLmethodLA as sla
+                    autoSpcPause = False
+                    print("Visualization in Real-time Mode...")
+                    # Allow selective runtime parameter selection on production critical process
+                    self.laDta = sla.plcExec(T1, laS, s_fetch, stp_Sz, s_regm)
+                    self.laDtb = 0
 
-                    inProgress = False  # False for Real-time mode
-                    print('\nSynchronous controller activated...')
 
-                    if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
-                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+            elif UseSQL_DBS:
+                inProgress = False  # False for Real-time mode
+                print('\nSynchronous controller activated...')
 
-                    # Either of the 2 combo variables are assigned to trigger routine pause
-                    if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
-                        print('\nProduction is pausing...')
-                        if not autoSpcPause:
-                            autoSpcRun = not autoSpcRun
-                            autoSpcPause = True
-                            # play(error)                            # Pause mode with audible Alert
-                            print("\nVisualization in Paused Mode...")
-                        else:
-                            autoSpcPause = False
-                            print("Visualization in Real-time Mode...")
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                # Either of the 2 combo variables are assigned to trigger routine pause
+                if keyboard.is_pressed("ctrl") and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        # play(error)                            # Pause mode with audible Alert
+                        print("\nVisualization in Paused Mode...")
                     else:
-                        # Get list of relevant SQL Tables using conn() ----------------[]
-                        laDta, laDtb = sla.sqlExec(laS, laTy, con_a, con_b, T1, T2, fetchT)
+                        autoSpcPause = False
+                    print("Visualization in Real-time Mode...")
+                else:
+                    # Get list of relevant SQL Tables using conn() ----------------[]
+                    self.laDta, self.laDtb = sla.sqlExec(la_con, s_fetch, stp_Sz, s_regm, T1, T2)
+                    print("Visualization in Real-time Mode...")
+                print('\nUpdating....')
 
-                    # ------ Inhibit iteration ----------------------------------------------------------[]
-                    """
-                    # Set condition for halting real-time plots in watchdog class ---------------------
-                    """
-                    # TODO --- values for inhibiting the SQL processing
-                    if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        con_a.close()
-                        con_b.close()
-                        print('SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        continue
-                    else:
-                        print('\nUpdating....')
-
-            return laDta, laDtb
-
-        # ================== End of synchronous Method ==========================
-        def asynchronousLA(db_freq):
-            timei = time.time()                                 # start timing the entire loop
-
-            # Bistream Data Pooling Method ---------------------#
-            laDta, laDtb = synchronousLA(laS, laTy, db_freq)    # data loading functions
-            # --------------------------------------------------#
-
-            if UsePLC_DBS == 1:
-                import VarPLC_LA as la
-
-                viz_cycle = 10
-                # Call synchronous data function ---------------[]
-                columns = qla.validCols(T1)                         # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(laDta, columns=columns)          # Include table data into python Dataframe
-                LA = la.loadProcesValues(df1)                       # Join data values under dataframe
-
+                # ------ Inhibit iteration ----------------------------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class ---------------------
+                """
+                # TODO --- values for inhibiting the SQL processing
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    la_con.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
             else:
-                import VarSQL_LA as la                              # load SQL variables column names | rfVarSQL
+                pass
+            self.canvas.get_tk_widget().after(s_regm, self._laDataPlot)  # Regime = every 10nseconds
+            time.sleep(0.5)
+    # ================== End of synchronous Method ==========================
 
-                viz_cycle = 150
-                g1 = qla.validCols(T1)                              # Construct Data Column selSqlColumnsTFM.py
-                d1 = pd.DataFrame(laDta, columns=g1)                # Import into python Dataframe
+    def _laDataPlot(self):
+        timei = time.time()                                 # start timing the entire loop
 
-                g2 = qla.validCols(T2)
-                d2 = pd.DataFrame(laDtb, columns=g2)
+        # Bistream Data Pooling Method ---------------------#
 
-                # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2], axis=1)
-                LA = la.loadProcesValues(df1)                       # Join data values under dataframe
+        if UsePLC_DBS == 1:
+            import VarPLC_LA as la
+            # Call synchronous data function ---------------[]
+            columns = qla.validCols(T1)                         # Load defined valid columns for PLC Data
+            df1 = pd.DataFrame(self.laDta, columns=columns)     # Include table data into python Dataframe
+            LA = la.loadProcesValues(df1)                       # Join data values under dataframe
+
+        elif UseSQL_DBS:
+            import VarSQL_LA as la                              # load SQL variables column names | rfVarSQL
+            # -----------------------------------------#
+            g1 = qla.validCols(T1)                              # Construct Data Column selSqlColumnsTFM.py
+            d1 = pd.DataFrame(self.laDta, columns=g1)           # Import into python Dataframe
+            g2 = qla.validCols(T2)
+            d2 = pd.DataFrame(self.laDtb, columns=g2)
+
+            # Concatenate all columns -----------[]
+            df1 = pd.concat([d1, d2], axis=1)
+            LA = la.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
-            print("Memory Usage:", df1.info(verbose=False))         # Check memory utilization
-
-            # -------------------------------------------------------------------------------------[]
+            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+        else:
+            print('Unknown Process Protocol...')
+        # -------------------------------------------#
+        if UsePLC_DBS or UseSQL_DBS:
             # Plot X-Axis data points -------- X Plot
             im10.set_xdata(np.arange(db_freq))
             im11.set_xdata(np.arange(db_freq))
@@ -4728,34 +4759,21 @@ class laserAngleTabb(ttk.Frame):      # -- Defines the tabbed region for QA para
             a2.axhspan(sBar_minLA, sLCLla, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
-            if db_freq > window_Xmax:
-                a1.set_xlim(db_freq - window_Xmax, db_freq)
-                a2.set_xlim(db_freq - window_Xmax, db_freq)
-            else:
-                a1.set_xlim(0, window_Xmax)
-                a2.set_xlim(0, window_Xmax)
+            if len(LA) > win_Xmax:
+                LA.pop(0)
+            self.canvas.draw_idle()
 
-            # Set trip line for individual time-series plot -----------------------------------[R1]
-            import triggerModule as sigma
-            sigma.trigViolations(a1, UsePLC_DBS, 'LA', YScale_minLA, YScale_maxLA, xucT, xlcT, xusT, xlsT, mnT, sdT)
+        else:
+            print('Laser Angle standby mode, no active session...')
+            self.a2.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a2.transAxes)
+            self.a1.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a1.transAxes)
 
-            timef = time.time()
-            lapsedT = timef - timei
-            print(f"\nProcess Interval: {lapsedT} sec\n")
-
-            ani = FuncAnimation(f, asynchronousLA, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
-                                blit=False)
-            plt.tight_layout()
-            plt.show()
-
+        timef = time.time()
+        lapsedT = timef - timei
+        print(f"Process Interval LA: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.get_tk_widget().pack(expand=True)
-        # Activate Matplot tools ------------------[Uncomment to activate]
-        toolbar = NavigationToolbar2Tk(canvas, self)
-        toolbar.update()
-        canvas._tkcanvas.pack(expand=True)
-
 # ---------------------------------------------------------------------------------------------[Roller Force]
 class rollerForceTabb(ttk.Frame):
     """ Application to convert feet to meters or vice versa. """
@@ -4766,6 +4784,8 @@ class rollerForceTabb(ttk.Frame):
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
+        global win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, a1, a2, a3, rfS, rfTy, eolS, eopS, T1, T2
+
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
             import qParamsHL_DNV as dnv
@@ -4872,19 +4892,19 @@ class rollerForceTabb(ttk.Frame):
         label.pack(padx=10, pady=5)
 
         # Define Axes ---------------------#
-        f = Figure(figsize=(pMtX, 8), dpi=100)
-        f.subplots_adjust(left=0.022, bottom=0.05, right=0.993, top=0.967, wspace=0.18, hspace=0.174)
+        self.f = Figure(figsize=(pMtX, 8), dpi=100)
+        self.f.subplots_adjust(left=0.022, bottom=0.05, right=0.983, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
-        a1 = f.add_subplot(2, 4, (1, 3))   # X Bar Plot
-        a2 = f.add_subplot(2, 4, (5, 7))   # S Bar Plo
-        a3 = f.add_subplot(2, 4, (4, 8))   # Performance Feeed
+        self.a1 = self.f.add_subplot(2, 4, (1, 3))   # X Bar Plot
+        self.a2 = self.f.add_subplot(2, 4, (5, 7))   # S Bar Plo
+        self.a3 = self.f.add_subplot(2, 4, (4, 8))   # Performance Feeed
 
         # Declare Plots attributes --------------------------------[H]
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minRF, YScale_maxRF = 10, 500                        # Roller Force
         sBar_minRF, sBar_maxRF = 10, 250                            # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (int(rfS) + 3)             # windows view = visible data points
+        self.win_Xmin, self.win_Xmax = 0, (int(rfS) + 3)            # windows view = visible data points
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 28/Feb/2025
@@ -4896,26 +4916,26 @@ class rollerForceTabb(ttk.Frame):
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
-        a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-        a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
-        a1.set_title('Roller Force [XBar Plot]', fontsize=12, fontweight='bold')
-        a2.set_title('Roller Force [S Plot]', fontsize=12, fontweight='bold')
-        a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a1.legend(loc='upper right', title='Roller Force (N.m)')
-        a2.legend(loc='upper right', title='Sigma curve')
+        self.a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
+        self.a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+        self.a1.set_title('Roller Force [XBar Plot]', fontsize=12, fontweight='bold')
+        self.a2.set_title('Roller Force [S Plot]', fontsize=12, fontweight='bold')
+        self.a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a2.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a1.legend(loc='upper right', title='Roller Force (N.m)')
+        self.a2.legend(loc='upper right', title='Sigma curve')
 
         # ----------------------------------------------------------#
-        a1.set_ylim([YScale_minRF, YScale_maxRF], auto=True)
-        a1.set_xlim([window_Xmin, window_Xmax])
+        self.a1.set_ylim([YScale_minRF, YScale_maxRF], auto=True)
+        self.a1.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------#
-        a2.set_ylim([sBar_minRF, sBar_maxRF], auto=True)
-        a2.set_xlim([window_Xmin, window_Xmax])
+        self.a2.set_ylim([sBar_minRF, sBar_maxRF], auto=True)
+        self.a2.set_xlim([self.win_Xmin, self.win_Xmax])
 
         # ---------------------------------------------------------[]
-        a3.cla()
-        a3.get_yaxis().set_visible(False)
-        a3.get_xaxis().set_visible(False)
+        self.a3.cla()
+        self.a3.get_yaxis().set_visible(False)
+        self.a3.get_xaxis().set_visible(False)
 
         # ---------------------------------------------------------[]
         # Define Plot area and axes -
@@ -4960,245 +4980,250 @@ class rollerForceTabb(ttk.Frame):
         # im43, = self.a2.plot([], [], 'o-', label='Nominal Ramp')
 
         # Statistical Feed -----------------------------------------[]
-        a3.text(0.466, 0.945, 'Performance Feed - RF', fontsize=16, fontweight='bold', ha='center', va='center',
-                transform=a3.transAxes)
+        self.a3.text(0.466, 0.945, 'Performance Feed - RF', fontsize=16, fontweight='bold', ha='center', va='center',
+                transform=self.a3.transAxes)
         # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
-        rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
-        rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
-        a3.add_patch(rect1)
-        a3.add_patch(rect2)
+        self.rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
+        self.rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
+        self.a3.add_patch(self.rect1)
+        self.a3.add_patch(self.rect2)
         # ------- Process Performance Pp (the spread)---------------------
-        a3.text(0.145, 0.804, rflabel, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.658, '#Pp Value', fontsize=24, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.650, 0.820, 'Ring ' + rflabel + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
-        a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
+        self.a3.text(0.145, 0.804, rflabel, fontsize=12, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.328, 0.658, '#Pp Value', fontsize=24, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.650, 0.820, 'Ring ' + rflabel + ' Data', fontsize=14, ha='left', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=self.a3.transAxes)
         # ------- Process Performance Ppk (Performance)---------------------
-        a3.text(0.145, 0.403, rfPerf, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.640, 0.420, 'Ring ' + rfPerf + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
+        self.a3.text(0.145, 0.403, rfPerf, fontsize=12, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.328, 0.282, '#Ppk Value', fontsize=22, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.640, 0.420, 'Ring ' + rfPerf + ' Data', fontsize=14, ha='left', transform=self.a3.transAxes)
         # -------------------------------------
-        a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
+        self.a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=self.a3.transAxes)
         # ----- Pipe Position and SMC Status -----
-        a3.text(0.080, 0.090, 'Pipe Position: ' + str(piPos) + '    Processing Layer #' + str(cLayerN), fontsize=12, ha='left',
-                transform=a3.transAxes)
-        a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=a3.transAxes)
+        self.a3.text(0.080, 0.090, 'Pipe Position: ' + str(piPos) + '    Processing Layer #' + str(cLayerN), fontsize=12, ha='left',
+                transform=self.a3.transAxes)
+        self.a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=self.a3.transAxes)
 
-        # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousRF(rfS, rfTy, fetchT):
-            fetch_no = str(fetchT)  # entry value in string sql syntax
+        # self.canvas = FigureCanvasTkAgg(self.f, master=root)------------#
+        self.canvas = FigureCanvasTkAgg(self.f, self)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-            # Obtain Volatile Data from PLC Host Server ---------------------------[]
-            if not inUseAlready:  # Load CommsPlc class once
-                import CommsPlc as q
-                q.DAQ_connect(1, 0)
-            else:
-                con_a, con_b = conn.cursor(), conn.cursor()
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
+        # --------- call data block -------------------------------------#
+        threading.Thread(target=self._dataControlRF, daemon=True).start()
+        # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------#
 
-            # Evaluate conditions for SQL Data Fetch ------------------------------[A]
-            """
-            Load watchdog function with synchronous function every seconds
-            """
-            # Initialise RT variables ---[]
-            autoSpcRun = True
-            autoSpcPause = False
-            import keyboard                                 # for temporary use
 
-            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-            # Define PLC/SMC error state -------------------------------------------#
+    def _dataControlRF(self):
+        s_fetch, stp_Sz, s_regm = str(rfS), rfTy, eolS
 
-            while True:
-                if UsePLC_DBS:                              # Not Using PLC Data
-                    import plcArrayRLmethodRF as srf         # DrLabs optimization method
+        # Obtain Volatile Data from PLC Host Server ---------------------------[]
+        if not inUseAlready:  # Load Coms Plc class once
+            rf_con = sq.DAQ_connect(1, 0)
+        else:
+            pass
+        # Evaluate conditions for SQL Data Fetch ------------------------------[A]
+        """
+        Load watchdog function with synchronous function every seconds
+        """
+        # Initialise RT variables ---[]
+        autoSpcRun = True
+        autoSpcPause = False
+        import keyboard                                 # for temporary use
 
-                    inProgress = True                       # True for RetroPlay mode
-                    print('\nSynchronous controller activated...')
+        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+        sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+        # Define PLC/SMC error state -------------------------------------------#
+        if UsePLC_DBS:
+            import plcArrayRLmethodRF as srf           # DrLabs optimization method
+        elif UseSQL_DBS:
+            import sqlArrayRLmethodRF as srf            # DrLabs optimization method
 
-                    if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
-                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+        while True:
+            if UsePLC_DBS:                              # Not Using PLC Data
+                inProgress = True                       # True for RetroPlay mode
+                print('\nSynchronous controller activated...')
 
-                    # Either of the 2 combo variables are assigned to trigger routine pause
-                    if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
-                        print('\nProduction is pausing...')
-                        if not autoSpcPause:
-                            autoSpcRun = not autoSpcRun
-                            autoSpcPause = True
-                            # play(error)                            # Pause mode with audible Alert
-                            print("\nVisualization in Paused Mode...")
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                # Either of the 2 combo variables are assigned to trigger routine pause
+                if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        # play(error)                            # Pause mode with audible Alert
+                        print("\nVisualization in Paused Mode...")
+                else:
+                    autoSpcPause = False
+                    print("Visualization in Play Mode...")
+                    self.rfDta = srf.plcExec(T1, s_fetch, stp_Sz, s_regm)
+                    self.rfDtb = 0
+
+            elif UseSQL_DBS:
+                inProgress = True  # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                if keyboard.is_pressed("Alt+Q") and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        print("\nVisualization in Paused Mode...")
                     else:
                         autoSpcPause = False
-                        procID = 'RF'
-                        print("Visualization in Play Mode...")
-                        rfDta = srf.plcExec(procID, rfS, rfTy, fetch_no)
-                        rfDtb = 0
+                    print("Visualization in Real-time Mode...")
 
                 else:
-                    import sqlArrayRLmethodRF as srf  # DrLabs optimization method
-
-                    inProgress = True  # True for RetroPlay mode
-                    print('\nAsynchronous controller activated...')
-                    print('DrLabs' + "' Runtime Optimisation is Enabled!")
-
-                    if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
-                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
-
-                    if keyboard.is_pressed("Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:
-                        print('\nProduction is pausing...')
-                        if not autoSpcPause:
-                            autoSpcRun = not autoSpcRun
-                            autoSpcPause = True
-                            print("\nVisualization in Paused Mode...")
-                        else:
-                            autoSpcPause = False
-                            print("Visualization in Real-time Mode...")
-                    else:
-                        # Get list of relevant SQL Tables using conn() --------------------[]
-                        rfDta, rfDtb = srf.sqlExec(rfS, rfTy, con_a, con_b, T1, T2, fetchT)
-
-                    # ------ Inhibit iteration ----------------------------------------------------------[]
-                    """
-                    # Set condition for halting real-time plots in watchdog class ---------------------
-                    """
-                    # TODO --- values for inhibiting the SQL processing
-                    if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        con_a.close()
-                        con_b.close()
-
-                        print('SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        continue
-                    else:
-                        print('\nUpdating....')
-
-            return rfDta, rfDtb
-
-        # -------------------------------------[A]
-
-        # ================== End of synchronous Method ==========================
-        def asynchronousRF(db_freq):
-            timei = time.time()         # start timing the entire loop
-
-            # Bistream Data Pooling Method ---------------------#
-            rfDta, rfDtb = synchronousRF(rfS, rfTy, db_freq)    # data loading functions
-            # --------------------------------------------------#
-
-            if UsePLC_DBS == 1:
-                import VarPLCrf as rf
-
-                viz_cycle = 10
-                # Call synchronous data function ---------------[]
-                columns = qrf.validCols(T1)                     # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(rfDta, columns=columns)      # Include table data into python Dataframe
-                RF = rf.loadProcesValues(df1)                   # Join data values under dataframe
-
+                    # Get list of relevant SQL Tables using conn() --------------------[]
+                    self.rfDta, self.rfDtb = srf.sqlExec(rf_con, s_fetch, stp_Sz, s_regm, T1, T2)
+                    print("Visualization in Play Mode...")
+                print('\nUpdating....')
+                # ------ Inhibit iteration ----------------------------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class ---------------------
+                """
+                # TODO --- values for inhibiting the SQL processing
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    rf_con.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
             else:
-                import VarSQL_RF as rf                           # load SQL variables column names | rfVarSQL
+                pass
+            self.canvas.get_tk_widget().after(s_regm, self._rfDataPlot)  # Regime = every 10nseconds
+            time.sleep(0.5)
+    # ================== End of synchronous Method ==========================
 
-                viz_cycle = 150
-                g1 = qrf.validCols(T1)                           # Construct Data Column selSqlColumnsTFM.py
-                d1 = pd.DataFrame(rfDta, columns=g1)             # Import into python Dataframe
-                g2 = qrf.validCols(T1)                           # Construct Data Column selSqlColumnsTFM.py
-                d2 = pd.DataFrame(rfDtb, columns=g2)
 
-                # Concatenate all columns -----------------------[]
-                df1 = pd.concat([d1, d2], axis=1)
-                RF = rf.loadProcesValues(df1)                       # Join data values under dataframe
+    def _rfDataPlot(self):
+        timei = time.time()         # start timing the entire loop
+
+        if UsePLC_DBS == 1:
+            import VarPLCrf as rf
+            # Call synchronous data function ---------------[]
+            columns = qrf.validCols(T1)                     # Load defined valid columns for PLC Data
+            df1 = pd.DataFrame(self.rfDta, columns=columns) # Include table data into python Dataframe
+            RF = rf.loadProcesValues(df1)                   # Join data values under dataframe
+
+        elif UseSQL_DBS:
+            import VarSQL_RF as rf                           # load SQL variables column names | rfVarSQL
+            # -----------------------------------------#
+            g1 = qrf.validCols(T1)                           # Construct Data Column selSqlColumnsTFM.py
+            d1 = pd.DataFrame(self.rfDta, columns=g1)        # Import into python Dataframe
+            g2 = qrf.validCols(T1)                           # Construct Data Column selSqlColumnsTFM.py
+            d2 = pd.DataFrame(self.rfDtb, columns=g2)
+
+            # Concatenate all columns -----------------------[]
+            df1 = pd.concat([d1, d2], axis=1)
+            RF = rf.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))         # Check memory utilization
+        else:
+            print('Unknown Process Protocol...')
 
-            # -------------------------------------------------------------------------------------[]
-            # Plot X-Axis data points -------- X Plot
-            im10.set_xdata(np.arange(db_freq))
-            im11.set_xdata(np.arange(db_freq))
-            im12.set_xdata(np.arange(db_freq))
-            im13.set_xdata(np.arange(db_freq))
-            im14.set_xdata(np.arange(db_freq))
-            im15.set_xdata(np.arange(db_freq))
-            im16.set_xdata(np.arange(db_freq))
-            im17.set_xdata(np.arange(db_freq))
-            im18.set_xdata(np.arange(db_freq))
-            im19.set_xdata(np.arange(db_freq))
-            im20.set_xdata(np.arange(db_freq))
-            im21.set_xdata(np.arange(db_freq))
-            im22.set_xdata(np.arange(db_freq))
-            im23.set_xdata(np.arange(db_freq))
-            im24.set_xdata(np.arange(db_freq))
-            im25.set_xdata(np.arange(db_freq))
+        # -------------------------------------------------------------------------------------[]
+        if UsePLC_DBS or UseSQL_DBS:
+            im10.set_xdata(np.arange(self.win_Xmax))
+            im11.set_xdata(np.arange(self.win_Xmax))
+            im12.set_xdata(np.arange(self.win_Xmax))
+            im13.set_xdata(np.arange(self.win_Xmax))
+            im14.set_xdata(np.arange(self.win_Xmax))
+            im15.set_xdata(np.arange(self.win_Xmax))
+            im16.set_xdata(np.arange(self.win_Xmax))
+            im17.set_xdata(np.arange(self.win_Xmax))
+            im18.set_xdata(np.arange(self.win_Xmax))
+            im19.set_xdata(np.arange(self.win_Xmax))
+            im20.set_xdata(np.arange(self.win_Xmax))
+            im21.set_xdata(np.arange(self.win_Xmax))
+            im22.set_xdata(np.arange(self.win_Xmax))
+            im23.set_xdata(np.arange(self.win_Xmax))
+            im24.set_xdata(np.arange(self.win_Xmax))
+            im25.set_xdata(np.arange(self.win_Xmax))
             # ------------------------------- S Plot
-            im26.set_xdata(np.arange(db_freq))
-            im27.set_xdata(np.arange(db_freq))
-            im28.set_xdata(np.arange(db_freq))
-            im29.set_xdata(np.arange(db_freq))
-            im30.set_xdata(np.arange(db_freq))
-            im31.set_xdata(np.arange(db_freq))
-            im32.set_xdata(np.arange(db_freq))
-            im33.set_xdata(np.arange(db_freq))
-            im34.set_xdata(np.arange(db_freq))
-            im35.set_xdata(np.arange(db_freq))
-            im36.set_xdata(np.arange(db_freq))
-            im37.set_xdata(np.arange(db_freq))
-            im38.set_xdata(np.arange(db_freq))
-            im39.set_xdata(np.arange(db_freq))
-            im40.set_xdata(np.arange(db_freq))
-            im41.set_xdata(np.arange(db_freq))
+            im26.set_xdata(np.arange(self.win_Xmax))
+            im27.set_xdata(np.arange(self.win_Xmax))
+            im28.set_xdata(np.arange(self.win_Xmax))
+            im29.set_xdata(np.arange(self.win_Xmax))
+            im30.set_xdata(np.arange(self.win_Xmax))
+            im31.set_xdata(np.arange(self.win_Xmax))
+            im32.set_xdata(np.arange(self.win_Xmax))
+            im33.set_xdata(np.arange(self.win_Xmax))
+            im34.set_xdata(np.arange(self.win_Xmax))
+            im35.set_xdata(np.arange(self.win_Xmax))
+            im36.set_xdata(np.arange(self.win_Xmax))
+            im37.set_xdata(np.arange(self.win_Xmax))
+            im38.set_xdata(np.arange(self.win_Xmax))
+            im39.set_xdata(np.arange(self.win_Xmax))
+            im40.set_xdata(np.arange(self.win_Xmax))
+            im41.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((RF[0]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((RF[1]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((RF[2]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((RF[3]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((RF[0]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im11.set_ydata((RF[1]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im12.set_ydata((RF[2]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im13.set_ydata((RF[3]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im14.set_ydata((RF[4]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((RF[5]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((RF[6]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((RF[7]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((RF[4]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im15.set_ydata((RF[5]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im16.set_ydata((RF[6]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im17.set_ydata((RF[7]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im18.set_ydata((RF[8]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((RF[9]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((RF[10]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((RF[11]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((RF[8]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im19.set_ydata((RF[9]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im20.set_ydata((RF[10]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im21.set_ydata((RF[11]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im22.set_ydata((RF[12]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((RF[13]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((RF[14]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((RF[15]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((RF[12]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im23.set_ydata((RF[13]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im24.set_ydata((RF[14]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im25.set_ydata((RF[15]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(rfHL, rfS, 'RF')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((RF[0]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((RF[1]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((RF[2]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((RF[3]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((RF[0]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im27.set_ydata((RF[1]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im28.set_ydata((RF[2]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im29.set_ydata((RF[3]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
 
-            im30.set_ydata((RF[4]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((RF[5]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((RF[6]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((RF[7]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((RF[4]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im31.set_ydata((RF[5]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im32.set_ydata((RF[6]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im33.set_ydata((RF[7]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
 
-            im34.set_ydata((RF[8]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((RF[9]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((RF[10]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((RF[11]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((RF[8]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im35.set_ydata((RF[9]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im36.set_ydata((RF[10]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im37.set_ydata((RF[11]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
 
-            im38.set_ydata((RF[12]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((RF[13]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((RF[14]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((RF[15]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((RF[12]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im39.set_ydata((RF[13]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im40.set_ydata((RF[14]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im41.set_ydata((RF[15]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
 
             # Compute entire Process Capability -----------#
             if not rfHL:
@@ -5226,33 +5251,21 @@ class rollerForceTabb(ttk.Frame):
             a2.axhspan(sBar_minRF, sLCLrf, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
-            if db_freq > window_Xmax:
-                a1.set_xlim(db_freq - window_Xmax, db_freq)
-                a2.set_xlim(db_freq - window_Xmax, db_freq)
-            else:
-                a1.set_xlim(0, window_Xmax)
-                a2.set_xlim(0, window_Xmax)
+            if len(RF) > win_Xmax:
+                RF.pop(0)
+            self.canvas.draw_idle()
+        else:
+            print('Roller Force standby mode, no active session...')
+            self.a2.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a2.transAxes)
+            self.a1.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a1.transAxes)
 
-            # Set trip line for individual time-series plot -----------------------------------[R1]
-            import triggerModule as sigma
-            sigma.trigViolations(a1, UsePLC_DBS, 'RF', YScale_minRF, YScale_maxRF, xucT, xlcT, xusT, xlsT, mnT, sdT)
-
-            timef = time.time()
-            lapsedT = timef - timei
-            print(f"\nProcess Interval: {lapsedT} sec\n")
-
-            ani = FuncAnimation(f, asynchronousRF, frames=None, save_count=100, repeat_delay=None, interval=viz_cycle,
-                                blit=False)
-            plt.tight_layout()
-            plt.show()
-
+        timef = time.time()
+        lapsedT = timef - timei
+        print(f"Process Interval RF: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.get_tk_widget().pack(expand=True)
-        # Activate Matplot tools ------------------[Uncomment to activate]
-        toolbar = NavigationToolbar2Tk(canvas, self)
-        toolbar.update()
-        canvas._tkcanvas.pack(expand=True)
+
 
 # -----------------------------------------------------------------------------------------[Tape Temperature]
 class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Tape Temperature --[]
@@ -5264,7 +5277,9 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
-        global win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, a1, a2, a3, ttS, ttTy, T1, T2, T3, SrgA
+        global win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, im16, im17, a1, a2, a3, ttS, ttTy, T1, T2, T3, \
+            SrgA, im18, im19, im20, im21, im22, im23, im24, im25, im26, im27, im28, im29, im30, im31, im32, im33, im34, \
+            im35, im36, im37, im38, im39, im40, im41, im42, im43, im44, im45
 
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
@@ -5474,7 +5489,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         im44 = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 3 Ramp')
         im45 = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 4 Ramp')
 
-        # self.canvas = FigureCanvasTkAgg(self.f, master=root)
+        # self.canvas = FigureCanvasTkAgg(self.f, master=root) ----------#
         self.canvas = FigureCanvasTkAgg(self.f, self)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
@@ -5521,7 +5536,6 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             if UsePLC_DBS:
                 inProgress = True                               # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
-                print('DrLabs' + "' Runtime Optimisation is Enabled!")
 
                 if not sysRun:
                     sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
@@ -5537,7 +5551,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     autoSpcPause = False
                     print("Visualization in Real-time Mode...")
                     # Get list of relevant PLC Tables using conn() --------------------[]
-                    self.ttDta = pdA.plcExec(T1, s_fetch, stp_Sz)
+                    self.ttDta = pdA.plcExec(T1, s_fetch, stp_Sz, s_regm)
                     self.ttDtb = 0
                     self.rmDta = srm.sqlExec(tt_con, s_fetch, stp_Sz, T3)  # load only for RM
 
@@ -5559,11 +5573,11 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                         print("\nVisualization in Paused Mode...")
                     else:
                         autoSpcPause = False
-                    print("Visualization in Play Mode...")
+                    print("Visualization in Real-time Mode...")
 
                 else:
-                    self.ttDta, self.ttDtb = ptt.sqlExec(tt_con, s_fetch, ttTy, T1, T2)
-                    self.rmDta = srm.sqlExec(tt_con, s_fetch, ttTy, T3)
+                    self.ttDta, self.ttDtb = ptt.sqlExec(tt_con, s_fetch, stp_Sz, s_regm, T1, T2)
+                    self.rmDta = srm.sqlExec(tt_con, s_fetch, stp_Sz, s_regm, T3)
                     print("Visualization in Play Mode...")
                 print('\nUpdating....')
 
@@ -5753,9 +5767,9 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         else:
             print('Tape Temp standby mode, no active session...')
-            self.a2.text(0.3628, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            self.a2.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a2.transAxes)
-            self.a1.text(0.368, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            self.a1.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a1.transAxes)
 
         timef = time.time()
@@ -5994,7 +6008,7 @@ class substTempTabb(ttk.Frame):
                 transform=self.a3.transAxes)
         self.a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=self.a3.transAxes)
 
-        # self.canvas = FigureCanvasTkAgg(self.f, master=root)
+        # self.canvas = FigureCanvasTkAgg(self.f, master=root)------------#
         self.canvas = FigureCanvasTkAgg(self.f, self)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
@@ -6002,10 +6016,9 @@ class substTempTabb(ttk.Frame):
         toolbar = NavigationToolbar2Tk(self.canvas, self)
         toolbar.update()
         self.canvas._tkcanvas.pack(expand=True)
-
         # --------- call data block -------------------------------------#
         threading.Thread(target=self._dataControlST, daemon=True).start()
-        # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
+        # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------#
 
 
     def _dataControlST(self):
@@ -6041,7 +6054,6 @@ class substTempTabb(ttk.Frame):
             if UsePLC_DBS:                                      # Using PLC Data
                 inProgress = True                                   # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
-                print('DrLabs' + "' Runtime Optimisation is Enabled!")
 
                 if not sysRun:
                     sysRun, msctcp, msc_rt = wd.autoPausePlay()     # Retrieve M.State from Watchdog
@@ -6058,7 +6070,7 @@ class substTempTabb(ttk.Frame):
                     autoSpcPause = False
                     print("Visualization in Real-time Mode...")
                     # -----------------------------------------------------------------[]
-                    self.stDta = pst.plcExec(T1, s_fetch, stTy)
+                    self.stDta = pst.plcExec(T1, s_fetch, stp_Sz, s_regm)
 
             elif UseSQL_DBS:
                 inProgress = False  # False for Real-time mode
@@ -6077,10 +6089,10 @@ class substTempTabb(ttk.Frame):
                         print("\nVisualization in Paused Mode...")
                     else:
                         autoSpcPause = False
-                    print("Visualization in Play Mode...")
+                    print("Visualization in Real-time Mode...")
 
                 else:
-                    self.stDta, self.stDtb = pst.sqlExec(st_con, s_fetch, stTy, T1, T2)
+                    self.stDta, self.stDtb = pst.sqlExec(st_con, s_fetch, stp_Sz, s_regm, T1, T2)
                     print("Visualization in Play Mode...")
                 print('\nUpdating....')
 
@@ -6101,9 +6113,9 @@ class substTempTabb(ttk.Frame):
                 pass
             self.canvas.get_tk_widget().after(s_regm, self._stDataPlot)  # Regime = every 10nseconds
             time.sleep(0.5)
-
-
     # ================== End of synchronous Method ==========================
+
+
     def _stDataPlot(self):
         timei = time.time()                                 # start timing the entire loop
 
@@ -6114,6 +6126,7 @@ class substTempTabb(ttk.Frame):
             g1 = qst.validCols(T1)                          # Load defined valid columns for PLC Data
             df1 = pd.DataFrame(self.stDta, columns=g1)      # Include table data into python Dataframe
             ST = st.loadProcesValues(df1)                   # Join data values under dataframe
+
         elif UseSQL_DBS:
             import VarSQL_ST as st
             # -----------------------------------------#
@@ -6641,9 +6654,9 @@ class tapeGapPolTabb(ttk.Frame):
 
         else:
             print('Tape Gap standby mode, no active session...')
-            self.a3.text(0.3628, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            self.a3.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a3.transAxes)
-            self.a1.text(0.368, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            self.a1.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a1.transAxes)
 
         timef = time.time()
@@ -6662,6 +6675,8 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
+        global tpS, tpTy, eolS, eopS
+
         # --------------------------------------------------------------------[]
         if pRecipe == 'DNV':
             import qParamsHL_DNV as qp
@@ -6711,19 +6726,19 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         label.pack(padx=10, pady=5)
 
         # Set subplot embedded properties ----------------------------------[]
-        f = Figure(figsize=(pMtX, 8), dpi=100)      # 25, 27
-        f.subplots_adjust(left=0.029, bottom=0.05, right=0.983, top=0.955, wspace=0.117, hspace=0.157)
+        self.f = Figure(figsize=(pMtX, 8), dpi=100)      # 25, 27
+        self.f.subplots_adjust(left=0.029, bottom=0.05, right=0.983, top=0.955, wspace=0.117, hspace=0.157)
         # ---------------------------------[]
-        a1 = f.add_subplot(2, 4, (1, 3))        # xbar plot
-        a2 = f.add_subplot(2, 4, (5, 7))        # s bar plot
-        a3 = f.add_subplot(2, 4, (4, 8))        # CPk/PPk Feed
+        self.a1 = self.f.add_subplot(2, 4, (1, 3))        # xbar plot
+        self.a2 = self.f.add_subplot(2, 4, (5, 7))        # s bar plot
+        self.a3 = self.f.add_subplot(2, 4, (4, 8))        # CPk/PPk Feed
 
         # Declare Plots attributes ---------------------------------[]
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minTP, YScale_maxTP = tpLSL - 8.5, tpUSL + 8.5       # Roller Force
         sBar_minTP, sBar_maxTP = sLCLtp - 80, sUCLtp + 80           # Calibrate Y-axis for S-Plot
-        window_Xmin, window_Xmax = 0, (int(tpS) + 3)             # windows view = visible data points
+        self.win_Xmin, self.win_Xmax = 0, (int(tpS) + 3)             # windows view = visible data points
 
         # ----------------------------------------------------------#
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
@@ -6735,27 +6750,27 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
-        a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
-        a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
-        a1.set_title('Tape Placement [XBar]', fontsize=12, fontweight='bold')
-        a2.set_title('Tape Placement [StDev]', fontsize=12, fontweight='bold')
+        self.a1.set_ylabel("Sample Mean [ " + "$ \\bar{x}_{t} = \\frac{1}{n-1} * \\Sigma_{x_{i}} $ ]")
+        self.a2.set_ylabel("Sample Deviation [ " + "$ \\sigma_{t} = \\frac{\\Sigma(x_{i} - \\bar{x})^2}{N-1}$ ]")
+        self.a1.set_title('Tape Placement [XBar]', fontsize=12, fontweight='bold')
+        self.a2.set_title('Tape Placement [StDev]', fontsize=12, fontweight='bold')
 
-        a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a2.grid(color="0.5", linestyle='-', linewidth=0.5)
-        a1.legend(loc='upper right', title='Tape Placement')
-        a2.legend(loc='upper right', title='Sigma curve')
+        self.a1.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a2.grid(color="0.5", linestyle='-', linewidth=0.5)
+        self.a1.legend(loc='upper right', title='Tape Placement')
+        self.a2.legend(loc='upper right', title='Sigma curve')
 
         # Initialise runtime limits -------------------------------#
-        a1.set_ylim([YScale_minTP, YScale_maxTP], auto=True)
-        a1.set_xlim([window_Xmin, window_Xmax])
+        self.a1.set_ylim([YScale_minTP, YScale_maxTP], auto=True)
+        self.a1.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------#
-        a3.set_ylim([sBar_minTP, sBar_maxTP], auto=True)
-        a3.set_xlim([window_Xmin, window_Xmax])
+        self.a3.set_ylim([sBar_minTP, sBar_maxTP], auto=True)
+        self.a3.set_xlim([self.win_Xmin, self.win_Xmax])
 
         # ----------------------------------------------------------[]
-        a3.cla()
-        a3.get_yaxis().set_visible(False)
-        a3.get_xaxis().set_visible(False)
+        self.a3.cla()
+        self.a3.get_yaxis().set_visible(False)
+        self.a3.get_xaxis().set_visible(False)
 
         # ----------------------------------------------------------[]
         # Define Plot area and axes -
@@ -6779,203 +6794,214 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         im25, = self.a2.plot([], [], 'o-', label='Tape Placement')
 
         # Statistical Feed -----------------------------------------[]
-        a3.text(0.466, 0.945, 'Performance Feed - WP', fontsize=16, fontweight='bold', ha='center', va='center',
-                transform=a3.transAxes)
+        self.a3.text(0.466, 0.945, 'Performance Feed - WP', fontsize=16, fontweight='bold', ha='center', va='center',
+                transform=self.a3.transAxes)
         # class matplotlib.patches.Rectangle(xy, width, height, angle=0.0)
         rect1 = patches.Rectangle((0.076, 0.538), 0.5, 0.3, linewidth=1, edgecolor='g', facecolor='#ebb0e9')
         rect2 = patches.Rectangle((0.076, 0.138), 0.5, 0.3, linewidth=1, edgecolor='b', facecolor='#b0e9eb')
-        a3.add_patch(rect1)
-        a3.add_patch(rect2)
+        self.a3.add_patch(rect1)
+        self.a3.add_patch(rect2)
         # ------- Process Performance Pp (the spread)---------------------
-        a3.text(0.145, 0.804, tplabel, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.658, '#Pp Value', fontsize=28, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.650, 0.820, 'Ring ' + tplabel + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
-        a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
+        self.a3.text(0.145, 0.804, tplabel, fontsize=12, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.328, 0.658, '#Pp Value', fontsize=28, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.650, 0.820, 'Ring ' + tplabel + ' Data', fontsize=14, ha='left', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.745, '#Value1', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.685, '#Value2', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.625, '#Value3', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.565, '#Value4', fontsize=12, ha='center', transform=self.a3.transAxes)
         # ------- Process Performance Ppk (Performance)---------------------
-        a3.text(0.145, 0.403, tpPerf, fontsize=12, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.328, 0.282, '#Ppk Value', fontsize=28, fontweight='bold', ha='center', transform=a3.transAxes)
-        a3.text(0.640, 0.420, 'Ring ' + tpPerf + ' Data', fontsize=14, ha='left', transform=a3.transAxes)
+        self.a3.text(0.145, 0.403, tpPerf, fontsize=12, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.328, 0.282, '#Ppk Value', fontsize=28, fontweight='bold', ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.640, 0.420, 'Ring ' + tpPerf + ' Data', fontsize=14, ha='left', transform=self.a3.transAxes)
         # -------------------------------------
-        a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=a3.transAxes)
-        a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=a3.transAxes)
+        self.a3.text(0.755, 0.360, '#Value1', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.300, '#Value2', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.240, '#Value3', fontsize=12, ha='center', transform=self.a3.transAxes)
+        self.a3.text(0.755, 0.180, '#Value4', fontsize=12, ha='center', transform=self.a3.transAxes)
         # ----- Pipe Position and SMC Status -----
-        a3.text(0.080, 0.090, 'Pipe Position: ' + str(piPos) + '    Processing Layer #' + str(cLayerN), fontsize=12, ha='left',
-                transform=a3.transAxes)
-        a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=a3.transAxes)
+        self.a3.text(0.080, 0.090, 'Pipe Position: ' + str(piPos) + '    Processing Layer #' + str(cLayerN), fontsize=12, ha='left',
+                transform=self.a3.transAxes)
+        self.a3.text(0.080, 0.036, 'SMC Status: ' + msc_rt, fontsize=12, ha='left', transform=self.a3.transAxes)
 
-        # ---------------- EXECUTE SYNCHRONOUS METHOD -----------------------------#
-        def synchronousTP(tpS, tpTy, fetchT):
-            fetch_no = str(fetchT)                  # entry value in string sql syntax
+        # self.canvas = FigureCanvasTkAgg(self.f, master=root) ----------#
+        self.canvas = FigureCanvasTkAgg(self.f, self)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-            # Obtain Volatile Data from PLC Host Server ---------------------------[]
-            if not inUseAlready:  # Load CommsPlc class once
-                import CommsSql as q
-                q.DAQ_connect(1, 0)
-            else:
-                con_a, con_b = conn.cursor(), conn.cursor()
-            # Evaluate conditions for SQL Data Fetch ------------------------------[A]
-            """
-            Load watchdog function with synchronous function every seconds
-            """
-            # Initialise RT variables ---[]
-            autoSpcRun = True
-            autoSpcPause = False
-            import keyboard  # for temporary use
+        # Activate Matplot tools ------------------[Uncomment to activate]
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
 
-            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-            # Define PLC/SMC error state -------------------------------------------#
+        # --------- call data block -------------------------------------#
+        threading.Thread(target=self._dataControlTP, daemon=True).start()
+        # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------#
 
-            while True:
-                # print('Indefinite looping...')
-                if UsePLC_DBS:                                          # Not Using PLC Data
-                    import plcArrayRLmethodTP as stp                    # DrLabs optimization method
 
-                    inProgress = True                                   # True for RetroPlay mode
-                    print('\nAsynchronous controller activated...')
-                    print('DrLabs' + "' Runtime Optimisation is Enabled!")
+    def _dataControlTP(self):
+        s_fetch, stp_Sz, s_regm = str(ttS), ttTy, SrgA
 
-                    if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
-                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+        # Obtain Volatile Data from PLC Host Server ---------------------------[]
+        if not inUseAlready:
+            tp_con = sq.DAQ_connect(1, 0)
+        else:
+            pass
 
-                    if keyboard.is_pressed(
-                            "Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:  # Terminate file-fetch
-                        print('\nProduction is pausing...')
-                        if not autoSpcPause:
-                            autoSpcRun = not autoSpcRun
-                            autoSpcPause = True
-                            print("\nVisualization in Paused Mode...")
+        # Evaluate conditions for SQL Data Fetch ------------------------------[A]
+        """
+        Load watchdog function with synchronous function every seconds
+        """
+        # Initialise RT variables ---[]
+        autoSpcRun = True
+        autoSpcPause = False
+        import keyboard  # for temporary use
 
-                    else:
-                        autoSpcPause = False
-                        print("Visualization in Real-time Mode...")
-                        # Get list of relevant SQL Tables using conn() --------------------[]
-                        tpDta = stp.plcExec(T1, tpS, tpTy, fetch_no)
-                        tpDtb = 0
+        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+        sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+        # Define PLC/SMC error state -------------------------------------------#
+        if UsePLC_DBS:
+            import plcArrayRLmethodTP as stp
+        elif UseSQL_DBS:
+            import sqlArrayRLmethodTP as stp
+
+        while True:
+            # print('Indefinite looping...')
+            if UsePLC_DBS:                                          # Not Using PLC Data
+                inProgress = True                                   # True for RetroPlay mode
+                print('\nAsynchronous controller activated...')
+
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+
+                if keyboard.is_pressed(
+                        "Alt+Q") or not msctcp == 315 and not sysRun and not inProgress:  # Terminate file-fetch
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        print("\nVisualization in Paused Mode...")
 
                 else:
-                    import sqlArrayRLmethodTP as stp
+                    autoSpcPause = False
+                    print("Visualization in Real-time Mode...")
+                    # Get list of relevant SQL Tables using conn() --------------------[]
+                    self.tpDta = stp.plcExec(T1, s_fetch, stp_Sz, s_regm)
+                    self.tpDtb = 0
 
-                    inProgress = False  # False for Real-time mode
-                    print('\nSynchronous controller activated...')
-                    if not sysRun:
-                        sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
-                    print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
+            elif UseSQL_DBS:
+                inProgress = False  # False for Real-time mode
+                print('\nSynchronous controller activated...')
+                if not sysRun:
+                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
+                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
-                    # Either of the 2 combo variables are assigned to trigger routine pause
-                    if keyboard.is_pressed("ctrl") or not msctcp == 315 and not sysRun and not inProgress:
-                        print('\nProduction is pausing...')
-                        if not autoSpcPause:
-                            autoSpcRun = not autoSpcRun
-                            autoSpcPause = True
-                            # play(error)                                               # Pause mode with audible Alert
-                            print("\nVisualization in Paused Mode...")
-                        else:
-                            autoSpcPause = False
-                        print("Visualization in Play Mode...")
+                # Either of the 2 combo variables are assigned to trigger routine pause
+                if keyboard.is_pressed("ctrl") and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        # play(error)                                               # Pause mode with audible Alert
+                        print("\nVisualization in Paused Mode...")
                     else:
-                        tpDta, tpDtb = stp.sqlExec(tpS, tpTy, con_a, con_b, T1, T2, fetchT)
-                        print("Visualization in Play Mode...")
+                        autoSpcPause = False
+                    print("Visualization in Real-time Mode...")
+
+                else:
+                    self.tpDta, self.tpDtb = stp.sqlExec(tp_con, s_fetch, stp_Sz, s_regm, T1, T2)
+                    print("Visualization in Play Mode...")
+                print('\nUpdating....')
+                # ------ Inhibit iteration ----------------------------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class -----------------------[]
+                """
+                # TODO --- values for inhibiting the SQL processing
+                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                    tp_con.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
                     print('\nUpdating....')
-                    # ------ Inhibit iteration ----------------------------------------------------------[]
-                    """
-                    # Set condition for halting real-time plots in watchdog class -----------------------[]
-                    """
-                    # TODO --- values for inhibiting the SQL processing
-                    if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                        con_a.close()
-                        con_b.close()
-                        print('SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        continue
-                    else:
-                        print('\nUpdating....')
-
-            return tpDta, tpDtb
-
-        # ================== End of synchronous Method ==========================
-        def asynchronousTP(db_freq):
-            timei = time.time()                                 # start timing the entire loop
-
-            # Call data loader Method---------------------------#
-            tpDta, tpDtb = synchronousTP(tpS, tpTy, db_freq)    # data loading functions
-            # --------------------------------------------------#
-
-            if UsePLC_DBS == 1:
-                import VarPLCtp as tp
-
-                viz_cycle = 10
-                # Call synchronous data function ---------------[]
-                columns = qtp.validCols(T1)                    # Load defined valid columns for PLC Data
-                df1 = pd.DataFrame(tpDta, columns=columns)    # Include table data into python Dataframe
-                TP = tp.loadProcesValues(df1)                  # Join data values under dataframe
-
             else:
-                import VarSQLtp as tp                          # load SQL variables column names | rfVarSQL
+                pass
+            self.canvas.get_tk_widget().after(s_regm, self._tpDataPlot)  # Regime = every 10nseconds
+            time.sleep(0.5)
 
-                viz_cycle = 150
-                g1 = qtp.validCols(T1)                         # Construct Data Column selSqlColumnsTFM.py
-                d1 = pd.DataFrame(tpDta, columns=g1)         # Import into python Dataframe
 
-                g2 = qla.validCols(T2)
-                d2 = pd.DataFrame(tpDtb, columns=g2)
+    # ================== End of synchronous Method ==========================
+    def _tpDataPlot(self):
+        timei = time.time()                                 # start timing the entire loop
 
-                # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2], axis=1)
-                TP = tp.loadProcesValues(df1)                  # Join data values under dataframe
+        # Call data loader Method---------------------------#
+
+        if UsePLC_DBS == 1:
+            import VarPLCtp as tp
+            # Call synchronous data function ---------------[]
+            columns = qtp.validCols(T1)                         # Load defined valid columns for PLC Data
+            df1 = pd.DataFrame(self.tpDta, columns=columns)     # Include table data into python Dataframe
+            TP = tp.loadProcesValues(df1)                       # Join data values under dataframe
+            print('\nSQL Content', df1.head(10))
+            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+
+        elif UseSQL_DBS:
+            import VarSQLtp as tp                               # load SQL variables column names | rfVarSQL
+            g1 = qtp.validCols(T1)                              # Construct Data Column selSqlColumnsTFM.py
+            d1 = pd.DataFrame(self.tpDta, columns=g1)           # Import into python Dataframe
+            g2 = qla.validCols(T2)
+            d2 = pd.DataFrame(self.tpDtb, columns=g2)
+
+            # Concatenate all columns -----------[]
+            df1 = pd.concat([d1, d2], axis=1)
+            TP = tp.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nSQL Content', df1.head(10))
             print("Memory Usage:", df1.info(verbose=False))    # Check memory utilization
-
-            # -------------------------------------------------------------------------------------[]
-            # Plot X-Axis data points -------- X Plot
-            im10.set_xdata(np.arange(db_freq))
-            im11.set_xdata(np.arange(db_freq))
-            im12.set_xdata(np.arange(db_freq))
-            im13.set_xdata(np.arange(db_freq))
-            im14.set_xdata(np.arange(db_freq))
-            im15.set_xdata(np.arange(db_freq))
-            im16.set_xdata(np.arange(db_freq))
-            im17.set_xdata(np.arange(db_freq))
-            im18.set_xdata(np.arange(db_freq))
-            im19.set_xdata(np.arange(db_freq))
-            im20.set_xdata(np.arange(db_freq))
-            im21.set_xdata(np.arange(db_freq))
-            im22.set_xdata(np.arange(db_freq))
-            im23.set_xdata(np.arange(db_freq))
-            im24.set_xdata(np.arange(db_freq))
-            im25.set_xdata(np.arange(db_freq))
+        else:
+            print('Unknown Process Protocol...')
+        # -------------------------------------------------------------------------------------[]
+        if UsePLC_DBS or UseSQL_DBS:
+            im10.set_xdata(np.arange(self.win_Xmax))
+            im11.set_xdata(np.arange(self.win_Xmax))
+            im12.set_xdata(np.arange(self.win_Xmax))
+            im13.set_xdata(np.arange(self.win_Xmax))
+            im14.set_xdata(np.arange(self.win_Xmax))
+            im15.set_xdata(np.arange(self.win_Xmax))
+            im16.set_xdata(np.arange(self.win_Xmax))
+            im17.set_xdata(np.arange(self.win_Xmax))
+            im18.set_xdata(np.arange(self.win_Xmax))
+            im19.set_xdata(np.arange(self.win_Xmax))
+            im20.set_xdata(np.arange(self.win_Xmax))
+            im21.set_xdata(np.arange(self.win_Xmax))
+            im22.set_xdata(np.arange(self.win_Xmax))
+            im23.set_xdata(np.arange(self.win_Xmax))
+            im24.set_xdata(np.arange(self.win_Xmax))
+            im25.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
-            im10.set_ydata((TP[0]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # Segment 1
-            im11.set_ydata((TP[1]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # Segment 2
-            im12.set_ydata((TP[2]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # Segment 3
-            im13.set_ydata((TP[3]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # Segment 4
+            im10.set_ydata((TP[0]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+            im11.set_ydata((TP[1]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+            im12.set_ydata((TP[2]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+            im13.set_ydata((TP[3]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
             # ------ Evaluate Pp for Segments ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(tpHL, tpS, 'TP')
             # ---------------------------------------#
-            im14.set_ydata((TP[4]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # Segment 1
-            im15.set_ydata((TP[5]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # Segment 2
-            im16.set_ydata((TP[6]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # Segment 3
-            im17.set_ydata((TP[7]).rolling(window=tpS, min_periods=1).mean()[0:db_freq])  # Segment 4
+            im14.set_ydata((TP[4]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+            im15.set_ydata((TP[5]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+            im16.set_ydata((TP[6]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
+            im17.set_ydata((TP[7]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(tpHL, tpS, 'TP')
 
             # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
-            im18.set_ydata((TP[0]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
-            im19.set_ydata((TP[1]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
-            im20.set_ydata((TP[2]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
-            im21.set_ydata((TP[3]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im18.set_ydata((TP[0]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
+            im19.set_ydata((TP[1]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
+            im20.set_ydata((TP[2]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
+            im21.set_ydata((TP[3]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
 
-            im22.set_ydata((TP[4]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
-            im23.set_ydata((TP[5]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
-            im24.set_ydata((TP[6]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
-            im25.set_ydata((TP[7]).rolling(window=tpS, min_periods=1).std()[0:db_freq])
+            im22.set_ydata((TP[4]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
+            im23.set_ydata((TP[5]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
+            im24.set_ydata((TP[6]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
+            im25.set_ydata((TP[7]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
 
 
             # Compute entire Process Capability -----------#
@@ -7003,34 +7029,21 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
             a2.axhspan(sBar_minTP, sLCLtp, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
-            if db_freq > window_Xmax:
-                a1.set_xlim(db_freq - window_Xmax, db_freq)
-                a2.set_xlim(db_freq - window_Xmax, db_freq)
-            else:
-                a1.set_xlim(0, window_Xmax)
-                a2.set_xlim(0, window_Xmax)
+            if len(TP) > win_Xmax:
+                TP.pop(0)
+            self.canvas.draw_idle()
 
-            # Set trip line for individual time-series plot -----------------------------------[R1]
-            import triggerModule as sigma
-            sigma.trigViolations(a1, UsePLC_DBS, 'TP', YScale_minTP, YScale_maxTP, xucT, xlcT, xusT, xlsT, mnT, sdT)
+        else:
+            print('Tape Placement standby mode, no active session...')
+            self.a2.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a2.transAxes)
+            self.a1.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a1.transAxes)
 
-            timef = time.time()
-            lapsedT = timef - timei
-            print(f"\nProcess Interval: {lapsedT} sec\n")
-
-            ani = FuncAnimation(f, asynchronousTP, frames=None, save_count=100, repeat_delay=None,
-                                interval=viz_cycle,
-                                blit=False)
-            plt.tight_layout()
-            plt.show()
-
+        timef = time.time()
+        lapsedT = timef - timei
+        print(f"Process Interval TP: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.get_tk_widget().pack(expand=True)
-        # Activate Matplot tools ------------------[Uncomment to activate]
-        toolbar = NavigationToolbar2Tk(canvas, self)
-        toolbar.update()
-        canvas._tkcanvas.pack(expand=True)
 
 # ============================================= CASCADE CLASS METHODS ===============================================#
 # This class procedure allows SCADA operator to split the screen into respective runtime process                     #
@@ -7361,7 +7374,7 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
 
         # ================== End of synchronous Method ==========================
 
-        def asynchronousRF(db_freq):
+        def asynchronousRF(self):
             timei = time.time()  # start timing the entire loop
 
             # Bistream Data Pooling Method ---------------------#
@@ -7396,90 +7409,90 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
 
             # -------------------------------------------------------------------------------------[]
             # Plot X-Axis data points -------- X Plot
-            im10.set_xdata(np.arange(db_freq))
-            im11.set_xdata(np.arange(db_freq))
-            im12.set_xdata(np.arange(db_freq))
-            im13.set_xdata(np.arange(db_freq))
-            im14.set_xdata(np.arange(db_freq))
-            im15.set_xdata(np.arange(db_freq))
-            im16.set_xdata(np.arange(db_freq))
-            im17.set_xdata(np.arange(db_freq))
-            im18.set_xdata(np.arange(db_freq))
-            im19.set_xdata(np.arange(db_freq))
-            im20.set_xdata(np.arange(db_freq))
-            im21.set_xdata(np.arange(db_freq))
-            im22.set_xdata(np.arange(db_freq))
-            im23.set_xdata(np.arange(db_freq))
-            im24.set_xdata(np.arange(db_freq))
-            im25.set_xdata(np.arange(db_freq))
+            im10.set_xdata(np.arange(self.win_Xmax))
+            im11.set_xdata(np.arange(self.win_Xmax))
+            im12.set_xdata(np.arange(self.win_Xmax))
+            im13.set_xdata(np.arange(self.win_Xmax))
+            im14.set_xdata(np.arange(self.win_Xmax))
+            im15.set_xdata(np.arange(self.win_Xmax))
+            im16.set_xdata(np.arange(self.win_Xmax))
+            im17.set_xdata(np.arange(self.win_Xmax))
+            im18.set_xdata(np.arange(self.win_Xmax))
+            im19.set_xdata(np.arange(self.win_Xmax))
+            im20.set_xdata(np.arange(self.win_Xmax))
+            im21.set_xdata(np.arange(self.win_Xmax))
+            im22.set_xdata(np.arange(self.win_Xmax))
+            im23.set_xdata(np.arange(self.win_Xmax))
+            im24.set_xdata(np.arange(self.win_Xmax))
+            im25.set_xdata(np.arange(self.win_Xmax))
             # ------------------------------- S Plot
             # ------------------------------- S Plot
-            im26.set_xdata(np.arange(db_freq))
-            im27.set_xdata(np.arange(db_freq))
-            im28.set_xdata(np.arange(db_freq))
-            im29.set_xdata(np.arange(db_freq))
-            im30.set_xdata(np.arange(db_freq))
-            im31.set_xdata(np.arange(db_freq))
-            im32.set_xdata(np.arange(db_freq))
-            im33.set_xdata(np.arange(db_freq))
-            im34.set_xdata(np.arange(db_freq))
-            im35.set_xdata(np.arange(db_freq))
-            im36.set_xdata(np.arange(db_freq))
-            im37.set_xdata(np.arange(db_freq))
-            im38.set_xdata(np.arange(db_freq))
-            im39.set_xdata(np.arange(db_freq))
-            im40.set_xdata(np.arange(db_freq))
-            im41.set_xdata(np.arange(db_freq))
+            im26.set_xdata(np.arange(self.win_Xmax))
+            im27.set_xdata(np.arange(self.win_Xmax))
+            im28.set_xdata(np.arange(self.win_Xmax))
+            im29.set_xdata(np.arange(self.win_Xmax))
+            im30.set_xdata(np.arange(self.win_Xmax))
+            im31.set_xdata(np.arange(self.win_Xmax))
+            im32.set_xdata(np.arange(self.win_Xmax))
+            im33.set_xdata(np.arange(self.win_Xmax))
+            im34.set_xdata(np.arange(self.win_Xmax))
+            im35.set_xdata(np.arange(self.win_Xmax))
+            im36.set_xdata(np.arange(self.win_Xmax))
+            im37.set_xdata(np.arange(self.win_Xmax))
+            im38.set_xdata(np.arange(self.win_Xmax))
+            im39.set_xdata(np.arange(self.win_Xmax))
+            im40.set_xdata(np.arange(self.win_Xmax))
+            im41.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((cRF[0]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((cRF[1]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((cRF[2]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((cRF[3]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((cRF[0]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im11.set_ydata((cRF[1]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im12.set_ydata((cRF[2]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im13.set_ydata((cRF[3]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im14.set_ydata((cRF[4]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((cRF[5]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((cRF[6]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((cRF[7]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((cRF[4]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im15.set_ydata((cRF[5]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im16.set_ydata((cRF[6]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im17.set_ydata((cRF[7]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im18.set_ydata((cRF[8]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((cRF[9]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((cRF[10]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((cRF[11]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((cRF[8]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im19.set_ydata((cRF[9]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im20.set_ydata((cRF[10]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im21.set_ydata((cRF[11]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im22.set_ydata((cRF[12]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((cRF[13]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((cRF[14]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((cRF[15]).rolling(window=rfS, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((cRF[12]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            im23.set_ydata((cRF[13]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            im24.set_ydata((cRF[14]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            im25.set_ydata((cRF[15]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(rfHL, rfS, 'RF')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((cRF[0]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((cRF[1]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((cRF[2]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((cRF[3]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((cRF[0]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im27.set_ydata((cRF[1]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im28.set_ydata((cRF[2]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im29.set_ydata((cRF[3]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
 
-            im30.set_ydata((cRF[4]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((cRF[5]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((cRF[6]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((cRF[7]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((cRF[4]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im31.set_ydata((cRF[5]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im32.set_ydata((cRF[6]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im33.set_ydata((cRF[7]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
 
-            im34.set_ydata((cRF[8]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((cRF[9]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((cRF[10]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((cRF[11]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((cRF[8]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im35.set_ydata((cRF[9]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im36.set_ydata((cRF[10]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im37.set_ydata((cRF[11]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
 
-            im38.set_ydata((cRF[12]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((cRF[13]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((cRF[14]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((cRF[15]).rolling(window=rfS, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((cRF[12]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im39.set_ydata((cRF[13]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im40.set_ydata((cRF[14]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im41.set_ydata((cRF[15]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
 
             # Compute entire Process Capability -----------#
             if not rfHL:
@@ -7507,9 +7520,9 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
             a2.axhspan(sBar_minRF, sLCLrf, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
-            if db_freq > window_Xmax:
-                a1.set_xlim(db_freq - window_Xmax, db_freq)
-                a2.set_xlim(db_freq - window_Xmax, db_freq)
+            if self.win_Xmax > window_Xmax:
+                a1.set_xlim(self.win_Xmax - window_Xmax, self.win_Xmax)
+                a2.set_xlim(self.win_Xmax - window_Xmax, self.win_Xmax)
             else:
                 a1.set_xlim(0, window_Xmax)
                 a2.set_xlim(0, window_Xmax)
@@ -7772,12 +7785,12 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
 
         # ================== End of synchronous Method ==========================
 
-        def asynchronousEoL(db_freq):
+        def asynchronousEoL(self):
 
             timei = time.time()  # start timing the entire loop
 
             # Call data loader Method---------------------------#
-            ctSQL = synchronousEoL(smp_Sz, stp_Sz, db_freq)      # data loading functions
+            ctSQL = synchronousEoL(smp_Sz, stp_Sz, self.win_Xmax)      # data loading functions
 
             import VarSQLct as qct                              # load SQL variables column names | rfVarSQL
             viz_cycle = 150
@@ -7792,11 +7805,11 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
             a1.legend(loc='upper left', title='XBar Plot')
             # -------------------------------------------------------------------------------------[]
             # Plot X-Axis data points -------- X Plot
-            im10.set_xdata(np.arange(db_freq))
-            im11.set_xdata(np.arange(db_freq))
+            im10.set_xdata(np.arange(self.win_Xmax))
+            im11.set_xdata(np.arange(self.win_Xmax))
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
-            im10.set_ydata((RF[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 1
-            im11.set_ydata((RF[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # Segment 2
+            im10.set_ydata((RF[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+            im11.set_ydata((RF[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
             if not useHL and not pMinMax:  # switch to control plot on shewhart model
                 mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(smp_Sz, mnA,
                                                                                                       mnB,
@@ -7813,8 +7826,8 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
             a1.axhspan(xlcT, xlsT, facecolor='#8d8794', edgecolor='#8d8794')
             # ---------------------- sBar_minTG, sBar_maxTG -------[]
             # Setting up the parameters for moving windows Axes ---[]
-            if db_freq > window_Xmax:
-                a1.set_xlim(db_freq - window_Xmax, db_freq)
+            if self.win_Xmax > window_Xmax:
+                a1.set_xlim(self.win_Xmax - window_Xmax, self.win_Xmax)
             else:
                 a1.set_xlim(0, window_Xmax)
 
@@ -7981,7 +7994,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
         # -----------------------------------
         if len(pWON) == 8 and pMode == 0:
             print('\nRequesting for DNV Procedure...')
-        elif len(pWON) >= 8 and pMode == 1:
+        elif len(pWON) >= 8 and pMode == 0:
             print('\nRequesting for MGM Procedure...')
         else:
             print('Invalid command sequence')
