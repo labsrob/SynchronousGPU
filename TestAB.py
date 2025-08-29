@@ -3376,6 +3376,24 @@ def main():
 
     root.mainloop()
 
+#
+# if __name__ == "__main__":
+#     main()
 
-if __name__ == "__main__":
-    main()
+# -----------------------------------
+import requests
+import cfscrape
+from bs4 import BeautifulSoup as bs
+
+header = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"}
+s = requests.session()
+scraper=cfscrape.create_scraper(sess=s) #i use cfscrape because the page uses cloudflare anti ddos page
+scraper.get("https://www.bstn.com/einloggen", headers=header)
+myacc={"login[email]": "labsrob@gmail.com", #obviously change
+"login[password]": "password123"}
+entry=scraper.post("https://www.bstn.com/einloggen", headers=header, data=myacc)
+soup=bs(entry.text, 'lxml')
+accnm=soup.find('meta',{'property':'og:title'})['content']
+print("Logged in as: " + accnm)
+aaaa=scraper.get("https://www.bstn.com/kundenkonto", headers=header)
+print(aaaa.cookies)
