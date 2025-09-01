@@ -265,7 +265,7 @@ def load_Stats_Params(pWON):
 
 def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3, ring4, SetPt, Value, Stdev, Tvalu, pgiD):
     # --------------------------------------[]
-    from pylab import title, figure, xlabel, ylabel, xticks, bar, legend, axis, savefig
+    from pylab import title, xlabel, ylabel, xticks, bar, legend, axis, figure,  savefig
 
     # Initialise dataframe from Tables -[]
     if rptID == 'EoL':
@@ -443,7 +443,7 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
         data4 = ringD4
         data = [data1, data2, data3, data4]
         plt.boxplot(data, tick_labels=['Ring 1', 'Ring 2', 'Ring 3', 'Ring 4'])
-        savefig(EoL_Doc+'barchart_L'+ str(lID) + '_' + str(pgiD[x]) +'.png', dpi=300)
+        savefig(EoL_Doc+'chart_L'+ str(lID) + '_' + str(pgiD[x]) +'.png', dpi=300)
         # ------ refresh data --------------------------------
         plt.close()
         time.sleep(5)
@@ -473,8 +473,8 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
         pdf.cell(-40)
         pdf.cell(5, 10, (str(proID)), 0, 2, 'L')
         pdf.cell(35, 8, 'RingID', 1, 0, 'C')
-        pdf.cell(25, 8, 'Actual', 1, 0, 'C')
-        pdf.cell(25, 8, 'Nominal', 1, 0, 'C')
+        pdf.cell(25, 8, 'SetPoint', 1, 0, 'C')
+        pdf.cell(25, 8, 'Mean', 1, 0, 'C')
         pdf.cell(25, 8, "StdDev", 1, 0, 'C')
         pdf.cell(20, 8, "Tol(±)", 1, 0, 'C')
         pdf.cell(20, 8, "Status", 1, 2, 'C')
@@ -499,7 +499,7 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
         pdf.cell(90, 20, " ", 0, 2, 'C')  # 2: place new line below
 
         pdf.cell(-30)
-        pdf.image(EoL_Doc+'barchart_L' + str(lID) + '_' + str(pgiD[x]) + '.png', x=10, y=145, w=0, h=130, type='', link='')
+        pdf.image(EoL_Doc+'chart_L' + str(lID) + '_' + str(pgiD[x]) + '.png', x=10, y=145, w=0, h=130, type='', link='')
 
         # pdf.set_font('arial', '', 8)
         pdf.set_font('helvetica', '', 7)
@@ -511,7 +511,12 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
         pdf.output(EoL_Doc+'L' + str(layrN) + '_' + str(pgiD[x]) +'_' + str(rID) + '.pdf')
         time.sleep(5)
     progressB.stop()
-    print('End of Layer (EoL) Report successfully generated!')
+    rept = [r1Data, r2Data, r3Data, r4Data, sptDat, valuDat, stdDat, tolDat]
+    # Clean up unsued variables
+    for i in range(0, 8):
+        if len(rept[i]) > 0:
+            del rept[i][:]
+    print('End of Layer (EoL) Report successfully generated!\n')
     successPDF()
 
 # -------------------------------------------------------------------------------------------------[B]
@@ -548,7 +553,7 @@ def layerProcess():     # Generate Enf of Layer Report ---------[]
 
     elif uCalling == 2:
         layerN = simpledialog.askstring("EoL", "Specify Layer Number#:")
-        if layerN:
+        if layerN and len(layerN) < 2:
             Process(target=lambda: get_data(layerN), name='Progress_Bar', daemon=True).start()
         else:
             errorNote()
@@ -556,7 +561,7 @@ def layerProcess():     # Generate Enf of Layer Report ---------[]
     else:
         layerN = simpledialog.askstring("EoL", "Specify Layer Number#:")
         # print('TP001', layerN)
-        if layerN:
+        if layerN and len(layerN) < 2:
             xxt = Thread(target=lambda: get_data(layerN), name='Progress_Bar', daemon=True)
             xxt.start()
         else:
@@ -566,7 +571,12 @@ def layerProcess():     # Generate Enf of Layer Report ---------[]
 # -------------------------------------------------------------------------------------------------[]
 
 def get_data(layerN):
+    global df1, df2, df3, df4, rpData
+
     import sqlArray_EoLReport as sel
+    rept = [r1Data, r2Data, r3Data, r4Data, sptDat, valuDat, stdDat, tolDat]
+    print('TP01-Before:', rept)
+
     layrN = layerN
     # ---------- Based on Group's URS ------------------#
     if pRecipe == 'DNV':
@@ -643,60 +653,71 @@ def get_data(layerN):
         layrNO = layrN                          # Layer ID
         # --------------------------------------#
         for i in range(len(rpData)):
-            # print('\nTP01', rpData[i])
-            if i == 0:
+            print('\nTP03-Buffer Length', len(rpData[i]))
+            if i == 0 and rpData[i].loc[df['LyIDa'] == layrNO]:
                 cProc = 'Tape Temperature'          # Process ID
                 rPage = '1of4'
                 Tvalu = [0.05, 0.05, 0.05, 0.05]    # Tolerance
-                ring1A = rpData[i]['R1SPa']         # Actual value (SP)
-                ring1B = rpData[i]['R1NVa']         # Measured values = Real value  = (NV)
-                ring2A = rpData[i]['R2SPa']         #
-                ring2B = rpData[i]['R2NVa']         #
-                ring3A = rpData[i]['R3SPa']         #
-                ring3B = rpData[i]['R3NVa']         #
-                ring4A = rpData[i]['R4SPa']         #
-                ring4B = rpData[i]['R4NVa']
+                ring1A = rpData[i]['R1SPa'].query('B==3')['A']         # Actual value (SP)
+                ring1B = rpData[i]['R1NVa'].filter(like=layrNO, axis=1)         # Measured values = Real value  = (NV)
+                ring2A = rpData[i]['R2SPa'].filter(like=layrNO, axis=1)         #
+                ring2B = rpData[i]['R2NVa'].filter(like=layrNO, axis=1)         #
+                ring3A = rpData[i]['R3SPa'].filter(like=layrNO, axis=1)         #
+                ring3B = rpData[i]['R3NVa'].filter(like=layrNO, axis=1)         #
+                ring4A = rpData[i]['R4SPa'].filter(like=layrNO, axis=1)         #
+                ring4B = rpData[i]['R4NVa'].filter(like=layrNO, axis=1)
             elif i == 1:
                 cProc = 'Substrate Temperature'     # Process ID
                 rPage = '2of4'
                 Tvalu = [0.02, 0.02, 0.02, 0.02]    # Tolerance
-                ring1A = rpData[i]['R1SPb']         # Actual value (SP)
-                ring1B = rpData[i]['R1NVb']         # Measured values = Real value  = (NV)
-                ring2A = rpData[i]['R2SPb']         #
-                ring2B = rpData[i]['R2NVb']         #
-                ring3A = rpData[i]['R3SPb']         #
-                ring3B = rpData[i]['R3NVb']         #
-                ring4A = rpData[i]['R4SPb']         #
-                ring4B = rpData[i]['R4NVb']
+                ring1A = rpData[i]['R1SPb'].filter(like=layrNO, axis=1)         # Actual value (SP)
+                ring1B = rpData[i]['R1NVb'].filter(like=layrNO, axis=1)         # Measured values = Real value  = (NV)
+                ring2A = rpData[i]['R2SPb'].filter(like=layrNO, axis=1)         #
+                ring2B = rpData[i]['R2NVb'].filter(like=layrNO, axis=1)         #
+                ring3A = rpData[i]['R3SPb'].filter(like=layrNO, axis=1)         #
+                ring3B = rpData[i]['R3NVb'].filter(like=layrNO, axis=1)         #
+                ring4A = rpData[i]['R4SPb'].filter(like=layrNO, axis=1)        #
+                ring4B = rpData[i]['R4NVb'].filter(like=layrNO, axis=1)
             elif i == 2:
                 cProc = 'Gap Measurement'           # Process ID
                 rPage = '3of4'
                 Tvalu = [0.03, 0.03, 0.03, 0.03]    # Tolerance
-                ring1A = rpData[i]['R1SPc']         # Actual value (SP)
-                ring1B = rpData[i]['R1NVc']         # Measured values = Real value  = (NV)
-                ring2A = rpData[i]['R2SPc']         #
-                ring2B = rpData[i]['R2NVc']         #
-                ring3A = rpData[i]['R3SPc']         #
-                ring3B = rpData[i]['R3NVc']         #
-                ring4A = rpData[i]['R4SPc']         #
-                ring4B = rpData[i]['R4NVc']
-            else:
+                ring1A = rpData[i]['R1SPc'].filter(like=layrNO, axis=1)         # Actual value (SP)
+                ring1B = rpData[i]['R1NVc'].filter(like=layrNO, axis=1)         # Measured values = Real value  = (NV)
+                ring2A = rpData[i]['R2SPc'].filter(like=layrNO, axis=1)         #
+                ring2B = rpData[i]['R2NVc'].filter(like=layrNO, axis=1)         #
+                ring3A = rpData[i]['R3SPc'].filter(like=layrNO, axis=1)         #
+                ring3B = rpData[i]['R3NVc'].filter(like=layrNO, axis=1)         #
+                ring4A = rpData[i]['R4SPc'].filter(like=layrNO, axis=1)         #
+                ring4B = rpData[i]['R4NVc'].filter(like=layrNO, axis=1)
+                # rpData[i] = df3.drop(axis=0)
+                # print('TP03-C', rpData[i])
+            elif i == 3:
                 cProc = 'Winding Speed'             # Process ID
                 rPage = '4of4'
-                Tvalu = [0.04, 0.04, 0.04, 0.04]    # Set Tolerance
-                ring1A = rpData[i]['R1SPd']         # Actual value (SP)
-                ring1B = rpData[i]['R1NVd']         # Measured values = Real value  = (NV)
-                ring2A = rpData[i]['R2SPd']         #
-                ring2B = rpData[i]['R2NVd']         #
-                ring3A = rpData[i]['R3SPd']         #
-                ring3B = rpData[i]['R3NVd']         #
-                ring4A = rpData[i]['R4SPd']         #
-                ring4B = rpData[i]['R4NVd']
+                Tvalu = [0.04, 0.04, 0.04, 0.04]    # Set Tolerance (axis=1 columns)
+                ring1A = rpData[i]['R1SPd'].filter(like=layrNO, axis=1)         # Actual value (SP)
+                ring1B = rpData[i]['R1NVd'].filter(like=layrNO, axis=1)         # Measured values = Real value  = (NV)
+                ring2A = rpData[i]['R2SPd'].filter(like=layrNO, axis=1)         #
+                ring2B = rpData[i]['R2NVd'].filter(like=layrNO, axis=1)         #
+                ring3A = rpData[i]['R3SPd'].filter(like=layrNO, axis=1)         #
+                ring3B = rpData[i]['R3NVd'].filter(like=layrNO, axis=1)         #
+                ring4A = rpData[i]['R4SPd'].filter(like=layrNO, axis=1)         #
+                ring4B = rpData[i]['R4NVd'].filter(like=layrNO, axis=1)
+                # rpData.pop(4)                       # clear buffers ---
+                # rpData[i] = df4.drop(axis=0)
+                # print('TP03-D', rpData[i])
+            else:
+                if pRecipe == 'MGM':
+                    cProc = 'Winding Speed'  # Process ID
+                    rPage = '4of4'
+                    Tvalu = [0.04, 0.04, 0.04, 0.04]  # Set Tolerance
+
             # --------------------------#
             psData.append(cProc)
             pgeDat.append(rPage)
             # --------------------------#
-            print('TP01', len(ring1A), ring1A)
+            # print('TP01', len(ring1A), ring1A)
             # Process Set Point values (Average all the values per ring) ---[]
             if (sum(ring1A)) != 0 or (sum(ring1A)) != 0 or (sum(ring1A)) != 0 or (sum(ring1A)) != 0:
                 dataL1 = len(ring1A)
@@ -716,29 +737,29 @@ def get_data(layerN):
                 dataX2 = 1
                 dataX3 = 1
                 dataX4 = 1
-
-            SetAvgSPa = (sum(ring1A)) / dataL1
+            # ----- Set points per Ring ----
+            SetAvgSPa = (sum(ring1A)) / dataL1      # Mean values for per Ring Setpoint values
             SetAvgSPb = (sum(ring2A)) / dataL2
             SetAvgSPc = (sum(ring3A)) / dataL3
             SetAvgSPd = (sum(ring4A)) / dataL4
-            # Process Measured values (Average total values per ring -------[]
-            SetAvgMVa = (sum(ring1B)) / dataX1
+            # ---- Mean values per Ring -----
+            SetAvgMVa = (sum(ring1B)) / dataX1      # Mean values for per Ring Measured Values
             SetAvgMVb = (sum(ring2B)) / dataX2
             SetAvgMVc = (sum(ring3B)) / dataX3
             SetAvgMVd = (sum(ring4B)) / dataX4
-
-            Stdev1 = round(((SetAvgSPa - SetAvgMVa) / math.sqrt(2)), 2)  # Standard Deviation
-            Stdev2 = round(((SetAvgSPb - SetAvgMVb) / math.sqrt(2)), 2)
-            Stdev3 = round(((SetAvgSPc - SetAvgMVc) / math.sqrt(2)), 2)
-            Stdev4 = round(((SetAvgSPd - SetAvgMVd) / math.sqrt(2)), 2)
-            # ---------------------------#
-            r1Data.append(ring1B)
-            r2Data.append(ring2B)
-            r3Data.append(ring3B)
-            r4Data.append(ring4B)
+            # -----------------------------
+            Stdev1 = round(np.std(ring1B), 2)       # Standard Deviation on Measured Values to 2 precision
+            Stdev2 = round(np.std(ring2B), 2)
+            Stdev3 = round(np.std(ring3B), 2)
+            Stdev4 = round(np.std(ring4B), 2)
+            # ------------------------------
+            r1Data.append(ring1B)                   # Box Plot Values for Ring 1
+            r2Data.append(ring2B)                   # Box Plot Values for Ring 2
+            r3Data.append(ring3B)                   # Box Plot Values for Ring 3
+            r4Data.append(ring4B)                   # Box Plot Values for Ring 4
             # ----------------------
             sptDat.append(SetAvgSPa)
-            sptDat.append(SetAvgSPa)
+            sptDat.append(SetAvgSPb)
             sptDat.append(SetAvgSPc)
             sptDat.append(SetAvgSPd)
 
@@ -746,23 +767,20 @@ def get_data(layerN):
             valuDat.append(SetAvgMVb)
             valuDat.append(SetAvgMVc)
             valuDat.append(SetAvgMVd)
-
+            # ---- Stad Deviation ----
             stdDat.append(Stdev1)
             stdDat.append(Stdev2)
             stdDat.append(Stdev3)
             stdDat.append(Stdev4)
 
             tolDat.append(Tvalu)
-        # Send values to PDG generator and repeat until last process --------------------[]
-        generate_pdf(rptID, cPipe, psData, cstID, usrID, layrNO, r1Data, r2Data, r3Data, r4Data, sptDat, valuDat,
-                     stdDat, tolDat, pgeDat)
+        # Send values to PDG generator and repeat until last process ----------------[]
+        generate_pdf(rptID, cPipe, psData, cstID, usrID, layrNO, r1Data, r2Data, r3Data, r4Data, sptDat, valuDat, stdDat, tolDat, pgeDat)
     else:
         progressB.stop()
         print('Report Generation Failed! Post Production Data is not reachable...')
         errorConnect()
-
     # Send values to PDG generator and repeat until last process --------------------[]
-    # generate_pdf(rptID, cPipe, psData, cstID, usrID, layrNO, r1Data, r2Data, r3Data, r4Data, sptDat, valuDat, stdDat, tolDat, pgeDat)
     # -------------------------------------------------------------------------------[]
 
 class autoResizableCanvas(tk.Canvas):
