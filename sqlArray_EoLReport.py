@@ -36,7 +36,7 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, layerNo):
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
             rTT.append(result)
-        print("\nStep List1 @"+str(layerNo)+':', len(rTT), rTT, '\n')  # FIXME:
+        # print("\nStep List1 @"+str(layerNo)+':', len(rTT), rTT, '\n')  # FIXME:
 
     else:
         print('Process EOF reached...')
