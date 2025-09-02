@@ -23,7 +23,9 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, layerNo):
     t1, t2, t3, t4 = sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor()
 
     # ------------------ Load randomised samples --------------------------------------------------------------[A]
-    dataTT = t1.execute('Select * FROM ' + str(T1) + ' where [LyIDa] = ' + str(layerNo) + 'order by NEWID()').fetchall()
+    if len(rTT) > 0:    # clean up accumulator
+        del rTT[:]
+    dataTT = t1.execute('Select * FROM ' + str(T1) + ' where [LyIDa] = ' + str(layerNo)).fetchall()
     # print('TP00', dataTT)
     if len(dataTT) != 0:
         for result in dataTT:
@@ -34,7 +36,7 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, layerNo):
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
             rTT.append(result)
-        # print("Step List1:", len(rTT), rTT)  #      FIXME:
+        print("\nStep List1 @"+str(layerNo)+':', len(rTT), rTT, '\n')  # FIXME:
 
     else:
         print('Process EOF reached...')
@@ -43,8 +45,9 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, layerNo):
     t1.close()
 
     # Substrate Temperature --------------------------------------------------------------------------------[B]
-    dataST = t2.execute('Select * FROM ' + str(T2) + ' where [LyIDb] = ' + str(layerNo) + 'order by NEWID()').fetchall()
-
+    if len(rST) > 0:    # clean up accumulator
+        del rST[:]
+    dataST = t2.execute('Select * FROM ' + str(T2) + ' where [LyIDb] = ' + str(layerNo)).fetchall()
     if len(dataST) != 0:
         for result in dataST:
             result = list(result)
@@ -62,7 +65,9 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, layerNo):
     t2.close()
 
     # Tape Gap Procedure ------------------------------------------------------------------------------------[C]
-    dataTG = t3.execute('Select * FROM ' + str(T3) + ' where [LyIDc] = ' + str(layerNo) + 'order by NEWID()').fetchall()
+    if len(rTG) > 0:    # clean up accumulator
+        del rTG[:]
+    dataTG = t3.execute('Select * FROM ' + str(T3) + ' where [LyIDc] = ' + str(layerNo)).fetchall()
     if len(dataTG) != 0:
         for result in dataTG:
             result = list(result)
@@ -80,8 +85,10 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, layerNo):
     t3.close()
 
     # Ramp Profile ------------------------------------------------------------------------------------------[D]
+    if len(rWS) > 0:    # clean up accumulator
+        del rWS[:]
     if T4[0:4] == 'WS_':
-        dataWS = t4.execute('Select * FROM ' + str(T4) + ' where [LyIDd] = ' + str(layerNo) + 'order by NEWID()').fetchall()
+        dataWS = t4.execute('Select * FROM ' + str(T4) + ' where [LyIDd] = ' + str(layerNo)).fetchall()
         if len(dataWS) != 0:
             for result in dataWS:
                 result = list(result)
@@ -111,7 +118,9 @@ def mgm_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     t1, t2, t3, t4, t5, t6 = sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor()
 
     # ------------------ Load randomised samples --------------------------------------------------------------[A]
-    dataLP = t1.execute('Select * FROM ' + str(T1) + ' where [LyID] = ' + str(layerNo) + 'order by NEWID()').fetchall()
+    if len(rLP) > 0:  # clean up accumulator
+        del rLP[:]
+    dataLP = t1.execute('Select * FROM ' + str(T1) + ' where [LyID] = ' + str(layerNo)).fetchall()
     # print('TP00', dataTT)
     if len(dataLP) != 0:
         for result in dataLP:
@@ -131,7 +140,9 @@ def mgm_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     t1.close()
 
     # Laser Angle  --------------------------------------------------------------------------------[B]
-    dataLA = t2.execute('Select * FROM ' + str(T2) + ' where [LyID] = ' + str(layerNo) + 'order by NEWID()').fetchall()
+    if len(rLA) > 0:  # clean up accumulator
+        del rLA[:]
+    dataLA = t2.execute('Select * FROM ' + str(T2) + ' where [LyID] = ' + str(layerNo)).fetchall()
     if len(dataLA) != 0:
         for result in dataLA:
             result = list(result)
@@ -151,8 +162,9 @@ def mgm_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     t2.close()
 
     # Tape Temperature --------------------------------------------------------------------------------[B]
-    dataTT = t3.execute('Select * FROM ' + str(T3) + ' where [LyID] = ' + str(layerNo) + 'order by NEWID()').fetchall()
-
+    if len(rTT) > 0:  # clean up accumulator
+        del rTT[:]
+    dataTT = t3.execute('Select * FROM ' + str(T3) + ' where [LyID] = ' + str(layerNo)).fetchall()
     if len(dataTT) != 0:
         for result in dataTT:
             result = list(result)
@@ -170,8 +182,9 @@ def mgm_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     t3.close()
 
     # Substrate Temperature --------------------------------------------------------------------------[D]
-    dataST = t4.execute('Select * FROM ' + str(T4) + ' where [LyID] = ' + str(layerNo) + 'order by NEWID()').fetchall()
-
+    if len(rST) > 0:  # clean up accumulator
+        del rST[:]
+    dataST = t4.execute('Select * FROM ' + str(T4) + ' where [LyID] = ' + str(layerNo)).fetchall()
     if len(dataST) != 0:
         for result in dataST:
             result = list(result)
@@ -189,7 +202,9 @@ def mgm_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     t4.close()
 
     # Tape Gap Procedure ------------------------------------------------------------------------------------[C]
-    dataTG = t5.execute('Select * FROM ' + str(T5) + ' where [LyID] = ' + str(layerNo) + 'order by NEWID()').fetchall()
+    if len(rTG) > 0:  # clean up accumulator
+        del rTG[:]
+    dataTG = t5.execute('Select * FROM ' + str(T5) + ' where [LyID] = ' + str(layerNo)).fetchall()
     if len(dataTG) != 0:
         for result in dataTG:
             result = list(result)
@@ -207,8 +222,10 @@ def mgm_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     t5.close()
 
     # Ramp Profile ------------------------------------------------------------------------------------------[D]
+    if len(rWA) > 0:  # clean up accumulator
+        del rWA[:]
     if T4[0:4] == 'ZWA_':
-        dataWA = t6.execute('Select * FROM ' + str(T6) + ' where [LyID] = ' + str(layerNo) + 'order by NEWID()').fetchall()
+        dataWA = t6.execute('Select * FROM ' + str(T6) + ' where [LyID] = ' + str(layerNo)).fetchall()
         if len(dataWA) != 0:
             for result in dataWA:
                 result = list(result)

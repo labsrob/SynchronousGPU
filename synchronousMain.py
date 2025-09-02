@@ -35,7 +35,7 @@ import selDataColsEoLST as ost  # EoL Substrate Temperature (on DNV)
 import selDataColsEoLTG as otg  # EoL Tape Gape (on DNV)
 import selDataColsEoLWS as ows  # EoL Winding Speed (on DNV)
 import selDataColsEoLWA as owa  # EoL Winding Angle (on MGM)
-
+import sqlArray_EoLReport as sel
 # ----- DNV/MGM Params ---#
 import selDataColsPM as qpm        # Production Monitors
 import selDataColsWA as qwa        # winding angle
@@ -262,10 +262,20 @@ def load_Stats_Params(pWON):
     # ----------------------------------------------[]
     return
 
+def clear_DF():
+    print('\nEmpty Dataframe:', rpData)
+    # ----- Empty Data frame
+    for i in range(0, len(rpData)):
+        if len(rpData[i]) > 0:
+            rpData[i].pop(0)
+        else:
+            pass
+
+
 
 def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3, ring4, SetPt, Value, Stdev, Tvalu, pgiD):
     # --------------------------------------[]
-    from pylab import title, xlabel, ylabel, xticks, bar, legend, axis, figure,  savefig
+    from pylab import title, xlabel, ylabel, savefig
 
     # Initialise dataframe from Tables -[]
     if rptID == 'EoL':
@@ -281,151 +291,280 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
     # ----------------------------------[]
     proID = psData                       # Process ID
     # ----------------------------------[]
-
+    print('Page Id is #', pgiD)
     for x in range(len(pgiD)):
         # ------------------------------[]
-        if x == 0:
-            proID = 'Tape Temperature'
-            rID = 'TT'  # report ID
-            ringD1 = ring1[0]
-            ringD2 = ring2[0]
-            ringD3 = ring3[0]
-            ringD4 = ring4[0]
-            sPoint1 = SetPt[0]
-            sPoint2 = SetPt[1]
-            sPoint3 = SetPt[2]
-            sPoint4 = SetPt[3]
-            sValue1 = Value[0]
-            sValue2 = Value[1]
-            sValue3 = Value[2]
-            sValue4 = Value[3]
-            sStdev1 = Stdev[0]
-            sStdev2 = Stdev[1]
-            sStdev3 = Stdev[2]
-            sStdev4 = Stdev[3]
-            tolDat1 = Tvalu[0][0]
-            tolDat2 = Tvalu[0][1]
-            tolDat3 = Tvalu[0][2]
-            tolDat4 = Tvalu[0][3]
+        if pRecipe == 'MGM':
+            if x == 0:
+                proID = 'Laser Power'
+                rID = 'TT'  # report ID
+                ringD1 = ring1[0]
+                ringD2 = ring2[0]
+                ringD3 = ring3[0]
+                ringD4 = ring4[0]
+                sPoint1 = SetPt[0]
+                sPoint2 = SetPt[1]
+                sPoint3 = SetPt[2]
+                sPoint4 = SetPt[3]
+                sValue1 = Value[0]
+                sValue2 = Value[1]
+                sValue3 = Value[2]
+                sValue4 = Value[3]
+                sStdev1 = Stdev[0]
+                sStdev2 = Stdev[1]
+                sStdev3 = Stdev[2]
+                sStdev4 = Stdev[3]
+                tolDat1 = Tvalu[0][0]
+                tolDat2 = Tvalu[0][1]
+                tolDat3 = Tvalu[0][2]
+                tolDat4 = Tvalu[0][3]
+            elif x == 1:
+                proID = 'Laser Angle'
+                rID = 'TT'  # report ID
+                ringD1 = ring1[0]
+                ringD2 = ring2[0]
+                ringD3 = ring3[0]
+                ringD4 = ring4[0]
+                sPoint1 = SetPt[0]
+                sPoint2 = SetPt[1]
+                sPoint3 = SetPt[2]
+                sPoint4 = SetPt[3]
+                sValue1 = Value[0]
+                sValue2 = Value[1]
+                sValue3 = Value[2]
+                sValue4 = Value[3]
+                sStdev1 = Stdev[0]
+                sStdev2 = Stdev[1]
+                sStdev3 = Stdev[2]
+                sStdev4 = Stdev[3]
+                tolDat1 = Tvalu[0][0]
+                tolDat2 = Tvalu[0][1]
+                tolDat3 = Tvalu[0][2]
+                tolDat4 = Tvalu[0][3]
+            elif x == 2:
+                proID = 'Tape Temperature'
+                rID = 'TT'  # report ID
+                ringD1 = ring1[0]
+                ringD2 = ring2[0]
+                ringD3 = ring3[0]
+                ringD4 = ring4[0]
+                sPoint1 = SetPt[0]
+                sPoint2 = SetPt[1]
+                sPoint3 = SetPt[2]
+                sPoint4 = SetPt[3]
+                sValue1 = Value[0]
+                sValue2 = Value[1]
+                sValue3 = Value[2]
+                sValue4 = Value[3]
+                sStdev1 = Stdev[0]
+                sStdev2 = Stdev[1]
+                sStdev3 = Stdev[2]
+                sStdev4 = Stdev[3]
+                tolDat1 = Tvalu[0][0]
+                tolDat2 = Tvalu[0][1]
+                tolDat3 = Tvalu[0][2]
+                tolDat4 = Tvalu[0][3]
+            elif x == 3:
+                proID = 'Substrate Temperature'
+                rID = 'ST'  # report ID
+                ringD1 = ring1[1]
+                ringD2 = ring2[1]
+                ringD3 = ring3[1]
+                ringD4 = ring4[1]
+                sPoint1 = SetPt[4]
+                sPoint2 = SetPt[5]
+                sPoint3 = SetPt[6]
+                sPoint4 = SetPt[7]
+                sValue1 = Value[4]
+                sValue2 = Value[5]
+                sValue3 = Value[6]
+                sValue4 = Value[7]
+                sStdev1 = Stdev[4]
+                sStdev2 = Stdev[5]
+                sStdev3 = Stdev[6]
+                sStdev4 = Stdev[7]
+                tolDat1 = Tvalu[1][0]
+                tolDat2 = Tvalu[1][1]
+                tolDat3 = Tvalu[1][2]
+                tolDat4 = Tvalu[1][3]
+            elif x == 4:
+                proID = 'Gap Measurement'
+                rID = 'TG'
+                ringD1 = ring1[2]
+                ringD2 = ring2[2]
+                ringD3 = ring3[2]
+                ringD4 = ring4[2]
+                sPoint1 = SetPt[8]
+                sPoint2 = SetPt[9]
+                sPoint3 = SetPt[10]
+                sPoint4 = SetPt[11]
+                sValue1 = Value[8]
+                sValue2 = Value[9]
+                sValue3 = Value[10]
+                sValue4 = Value[11]
+                sStdev1 = Stdev[8]
+                sStdev2 = Stdev[9]
+                sStdev3 = Stdev[10]
+                sStdev4 = Stdev[11]
+                tolDat1 = Tvalu[2][0]
+                tolDat2 = Tvalu[2][1]
+                tolDat3 = Tvalu[2][2]
+                tolDat4 = Tvalu[2][3]
+            elif x == 5:
+                proID = 'Winding Angle'
+                rID = 'WA'
+                ringD1 = ring1[3]
+                ringD2 = ring2[3]
+                ringD3 = ring3[3]
+                ringD4 = ring4[3]
+                sPoint1 = SetPt[12]
+                sPoint2 = SetPt[13]
+                sPoint3 = SetPt[14]
+                sPoint4 = SetPt[15]
+                sValue1 = Value[12]
+                sValue2 = Value[13]
+                sValue3 = Value[14]
+                sValue4 = Value[15]
+                sStdev1 = Stdev[12]
+                sStdev2 = Stdev[13]
+                sStdev3 = Stdev[14]
+                sStdev4 = Stdev[15]
+                tolDat1 = Tvalu[3][0]
+                tolDat2 = Tvalu[3][1]
+                tolDat3 = Tvalu[3][2]
+                tolDat4 = Tvalu[3][3]
 
-        elif x == 1:
-            proID = 'Substrate Temperature'
-            rID = 'ST'  # report ID
-            ringD1 = ring1[1]
-            ringD2 = ring2[1]
-            ringD3 = ring3[1]
-            ringD4 = ring4[1]
-            sPoint1 = SetPt[4]
-            sPoint2 = SetPt[5]
-            sPoint3 = SetPt[6]
-            sPoint4 = SetPt[7]
-            sValue1 = Value[4]
-            sValue2 = Value[5]
-            sValue3 = Value[6]
-            sValue4 = Value[7]
-            sStdev1 = Stdev[4]
-            sStdev2 = Stdev[5]
-            sStdev3 = Stdev[6]
-            sStdev4 = Stdev[7]
-            tolDat1 = Tvalu[1][0]
-            tolDat2 = Tvalu[1][1]
-            tolDat3 = Tvalu[1][2]
-            tolDat4 = Tvalu[1][3]
-        elif x == 2:
-            proID = 'Gap Measurement'
-            rID = 'TG'
-            ringD1 = ring1[2]
-            ringD2 = ring2[2]
-            ringD3 = ring3[2]
-            ringD4 = ring4[2]
-            sPoint1 = SetPt[8]
-            sPoint2 = SetPt[9]
-            sPoint3 = SetPt[10]
-            sPoint4 = SetPt[11]
-            sValue1 = Value[8]
-            sValue2 = Value[9]
-            sValue3 = Value[10]
-            sValue4 = Value[11]
-            sStdev1 = Stdev[8]
-            sStdev2 = Stdev[9]
-            sStdev3 = Stdev[10]
-            sStdev4 = Stdev[11]
-            tolDat1 = Tvalu[2][0]
-            tolDat2 = Tvalu[2][1]
-            tolDat3 = Tvalu[2][2]
-            tolDat4 = Tvalu[2][3]
-        elif x == 3 and pRecipe == 'MGM':
-            proID = 'Winding Angle'
-            rID = 'WA'
-            ringD1 = ring1[3]
-            ringD2 = ring2[3]
-            ringD3 = ring3[3]
-            ringD4 = ring4[3]
-            sPoint1 = SetPt[12]
-            sPoint2 = SetPt[13]
-            sPoint3 = SetPt[14]
-            sPoint4 = SetPt[15]
-            sValue1 = Value[12]
-            sValue2 = Value[13]
-            sValue3 = Value[14]
-            sValue4 = Value[15]
-            sStdev1 = Stdev[12]
-            sStdev2 = Stdev[13]
-            sStdev3 = Stdev[14]
-            sStdev4 = Stdev[15]
-            tolDat1 = Tvalu[3][0]
-            tolDat2 = Tvalu[3][1]
-            tolDat3 = Tvalu[3][2]
-            tolDat4 = Tvalu[3][3]
+        elif pRecipe == 'DNV':
+            if x == 0:
+                proID = 'Tape Temperature'
+                rID = 'TT'  # report ID
+                ringD1 = ring1[0]
+                ringD2 = ring2[0]
+                ringD3 = ring3[0]
+                ringD4 = ring4[0]
+                sPoint1 = SetPt[0]
+                sPoint2 = SetPt[1]
+                sPoint3 = SetPt[2]
+                sPoint4 = SetPt[3]
+                sValue1 = Value[0]
+                sValue2 = Value[1]
+                sValue3 = Value[2]
+                sValue4 = Value[3]
+                sStdev1 = Stdev[0]
+                sStdev2 = Stdev[1]
+                sStdev3 = Stdev[2]
+                sStdev4 = Stdev[3]
+                tolDat1 = Tvalu[0][0]
+                tolDat2 = Tvalu[0][1]
+                tolDat3 = Tvalu[0][2]
+                tolDat4 = Tvalu[0][3]
+
+            elif x == 1:
+                proID = 'Substrate Temperature'
+                rID = 'ST'  # report ID
+                ringD1 = ring1[1]
+                ringD2 = ring2[1]
+                ringD3 = ring3[1]
+                ringD4 = ring4[1]
+                sPoint1 = SetPt[4]
+                sPoint2 = SetPt[5]
+                sPoint3 = SetPt[6]
+                sPoint4 = SetPt[7]
+                sValue1 = Value[4]
+                sValue2 = Value[5]
+                sValue3 = Value[6]
+                sValue4 = Value[7]
+                sStdev1 = Stdev[4]
+                sStdev2 = Stdev[5]
+                sStdev3 = Stdev[6]
+                sStdev4 = Stdev[7]
+                tolDat1 = Tvalu[1][0]
+                tolDat2 = Tvalu[1][1]
+                tolDat3 = Tvalu[1][2]
+                tolDat4 = Tvalu[1][3]
+
+            elif x == 2:
+                proID = 'Gap Measurement'
+                rID = 'TG'
+                ringD1 = ring1[2]
+                ringD2 = ring2[2]
+                ringD3 = ring3[2]
+                ringD4 = ring4[2]
+                sPoint1 = SetPt[8]
+                sPoint2 = SetPt[9]
+                sPoint3 = SetPt[10]
+                sPoint4 = SetPt[11]
+                sValue1 = Value[8]
+                sValue2 = Value[9]
+                sValue3 = Value[10]
+                sValue4 = Value[11]
+                sStdev1 = Stdev[8]
+                sStdev2 = Stdev[9]
+                sStdev3 = Stdev[10]
+                sStdev4 = Stdev[11]
+                tolDat1 = Tvalu[2][0]
+                tolDat2 = Tvalu[2][1]
+                tolDat3 = Tvalu[2][2]
+                tolDat4 = Tvalu[2][3]
+
+            elif x == 3:
+                proID = 'Winding Speed'
+                rID = 'WS'
+                ringD1 = ring1[3]
+                ringD2 = ring2[3]
+                ringD3 = ring3[3]
+                ringD4 = ring4[3]
+                sPoint1 = SetPt[12]
+                sPoint2 = SetPt[13]
+                sPoint3 = SetPt[14]
+                sPoint4 = SetPt[15]
+                sValue1 = Value[12]
+                sValue2 = Value[13]
+                sValue3 = Value[14]
+                sValue4 = Value[15]
+                sStdev1 = Stdev[12]
+                sStdev2 = Stdev[13]
+                sStdev3 = Stdev[14]
+                sStdev4 = Stdev[15]
+                tolDat1 = Tvalu[3][0]
+                tolDat2 = Tvalu[3][1]
+                tolDat3 = Tvalu[3][2]
+                tolDat4 = Tvalu[3][3]
+            else:
+                print('End of Layer (EoL) Report successfully generated!\n')
+                progressB.stop()
+                successPDF()  # indicate success using a popup
+                exit()
         else:
-            proID = 'Winding Speed'
-            rID = 'WS'
-            ringD1 = ring1[3]
-            ringD2 = ring2[3]
-            ringD3 = ring3[3]
-            ringD4 = ring4[3]
-            sPoint1 = SetPt[12]
-            sPoint2 = SetPt[13]
-            sPoint3 = SetPt[14]
-            sPoint4 = SetPt[15]
-            sValue1 = Value[12]
-            sValue2 = Value[13]
-            sValue3 = Value[14]
-            sValue4 = Value[15]
-            sStdev1 = Stdev[12]
-            sStdev2 = Stdev[13]
-            sStdev3 = Stdev[14]
-            sStdev4 = Stdev[15]
-            tolDat1 = Tvalu[3][0]
-            tolDat2 = Tvalu[3][1]
-            tolDat3 = Tvalu[3][2]
-            tolDat4 = Tvalu[3][3]
+            print('End of Layer (EoL) Report successfully generated!\n')
+            progressB.stop()
+            successPDF()  # indicate success using a popup
+            exit()
         # ------------------------------------
-
         df = pd.DataFrame()
         df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4'] #[ringA, ringB, ringC, ringD]
-        df["Actual"] = [round(sPoint1,2), round(sPoint2,2), round(sPoint3,2), round(sPoint4,2)]
+        df["SetPoint"] = [round(sPoint1,2), round(sPoint2,2), round(sPoint3,2), round(sPoint4,2)]
         df["Nominal"] = [round(sValue1,2), round(sValue2, 2), round(sValue3, 2), round(sValue4,2)]
         df["StdDev"] = [round(sStdev1,2), round(sStdev2,2), round(sStdev3,2), round(sStdev4,2)]
         df["Tolerance"] = [round(tolDat1,2), round(tolDat2,2), round(tolDat3,2), round(tolDat4,2)]
         # -------------------------------------------[]
 
-        if ((df["Actual"][0] * df['Tolerance'][0]) - df["Actual"][0])  <= df['Nominal'][0] <= ((df["Actual"][0] * df['Tolerance'][0]) + df["Actual"][0]):
+        if ((df["SetPoint"][0] * df['Tolerance'][0]) - df["SetPoint"][0])  <= df['Nominal'][0] <= ((df["SetPoint"][0] * df['Tolerance'][0]) + df["SetPoint"][0]):
             A = 'OK'
         else:
             A = 'CHECK'
         # -----------------
-        if ((df["Actual"][1] * df['Tolerance'][1]) - df["Actual"][1])  <= df['Nominal'][1] <= ((df["Actual"][1] * df['Tolerance'][1]) + df["Actual"][1]):
+        if ((df["SetPoint"][1] * df['Tolerance'][1]) - df["SetPoint"][1])  <= df['Nominal'][1] <= ((df["SetPoint"][1] * df['Tolerance'][1]) + df["SetPoint"][1]):
             B = 'OK'
         else:
             B = 'CHECK'
         # -----------------
-        if ((df["Actual"][2] * df['Tolerance'][2]) - df["Actual"][2])  <= df['Nominal'][2] <= ((df["Actual"][2] * df['Tolerance'][2]) + df["Actual"][2]):
+        if ((df["SetPoint"][2] * df['Tolerance'][2]) - df["SetPoint"][2])  <= df['Nominal'][2] <= ((df["SetPoint"][2] * df['Tolerance'][2]) + df["SetPoint"][2]):
             C = 'OK'
         else:
             C = 'CHECK'
         # -----------------
-        if ((df["Actual"][3] * df['Tolerance'][3]) - df["Actual"][3])  <= df['Nominal'][3] <= ((df["Actual"][3] * df['Tolerance'][3]) + df["Actual"][3]):
+        if ((df["SetPoint"][3] * df['Tolerance'][3]) - df["SetPoint"][3])  <= df['Nominal'][3] <= ((df["SetPoint"][3] * df['Tolerance'][3]) + df["SetPoint"][3]):
             D = 'OK'
         else:
             D = 'CHECK'
@@ -473,9 +612,9 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
         pdf.cell(-40)
         pdf.cell(5, 10, (str(proID)), 0, 2, 'L')
         pdf.cell(35, 8, 'RingID', 1, 0, 'C')
-        pdf.cell(25, 8, 'SetPoint', 1, 0, 'C')
-        pdf.cell(25, 8, 'Mean', 1, 0, 'C')
-        pdf.cell(25, 8, "StdDev", 1, 0, 'C')
+        pdf.cell(25, 8, 'pValue', 1, 0, 'C')   # Process set Value
+        pdf.cell(25, 8, 'mValue', 1, 0, 'C')    # Mean of measured Value
+        pdf.cell(25, 8, "cValue", 1, 0, 'C')
         pdf.cell(20, 8, "Tol(±)", 1, 0, 'C')
         pdf.cell(20, 8, "Status", 1, 2, 'C')
         pdf.set_font('helvetica', '', 12)
@@ -510,15 +649,19 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
         # Encode EoL report as <LayerNumber_PageDescription_Process Short Name>.pdf --------------[]
         pdf.output(EoL_Doc+'L' + str(layrN) + '_' + str(pgiD[x]) +'_' + str(rID) + '.pdf')
         time.sleep(5)
-    progressB.stop()
     rept = [r1Data, r2Data, r3Data, r4Data, sptDat, valuDat, stdDat, tolDat]
-    # Clean up unsued variables
-    for i in range(0, 8):
+    print('TBP-01', rept)
+
+    # Clean up unsued variables --------------------------------------------
+    for i in range(len(rept)):
         if len(rept[i]) > 0:
             del rept[i][:]
+    print('\nTBP-02', rept)
     print('End of Layer (EoL) Report successfully generated!\n')
-    successPDF()
+    progressB.stop()
+    successPDF()    # indicate success using a popup
 
+    return
 # -------------------------------------------------------------------------------------------------[B]
 def errorNote():
     messagebox.showerror('Error!', 'Specified an Invalid layer #')
@@ -571,13 +714,12 @@ def layerProcess():     # Generate Enf of Layer Report ---------[]
 # -------------------------------------------------------------------------------------------------[]
 
 def get_data(layerN):
-    global df1, df2, df3, df4, rpData
+    global rpData
 
-    import sqlArray_EoLReport as sel
+    layrN = layerN
     rept = [r1Data, r2Data, r3Data, r4Data, sptDat, valuDat, stdDat, tolDat]
     print('TP01-Before:', rept)
 
-    layrN = layerN
     # ---------- Based on Group's URS ------------------#
     if pRecipe == 'DNV':
         T1 = 'ZTT_' + pWON      # Identify EOL_TT Table
@@ -620,12 +762,15 @@ def get_data(layerN):
             coluF = ['LyID', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # WA
         else:                   # Winding Speed Parameter
             print('\nProcessing DNV Reports.....')
+            # ----------------------------------------
             zTT, zST, zTG, zWS = sel.dnv_sqlExec(sq_con, T1, T2, T3, T4, layrN)
             coluA = ['LyIDa', 'R1SPa', 'R1NVa', 'R2SPa', 'R2NVa', 'R3SPa', 'R3NVa', 'R4SPa', 'R4NVa']  # TT
             coluB = ['LyIDb', 'R1SPb', 'R1NVb', 'R2SPb', 'R2NVb', 'R3SPb', 'R3NVb', 'R4SPb', 'R4NVb']  # ST
             coluC = ['LyIDc', 'R1SPc', 'R1NVc', 'R2SPc', 'R2NVc', 'R3SPc', 'R3NVc', 'R4SPc', 'R4NVc']  # TG
             coluD = ['LyIDd', 'R1SPd', 'R1NVd', 'R2SPd', 'R2NVd', 'R3SPd', 'R3NVd', 'R4SPd', 'R4NVd']  # WS
         # ------------------------------------
+        szA, szB, szC, szD = len(zTT), len(zST), len(zTG), len(zWS)
+        print('\nAccumulator Length:', szA, szB, szC, szD)
 
         if pRecipe == 'MGM':
             df1 = pd.DataFrame(zLP, columns=coluA)  # Inherited from global variable EoL/EoP Process
@@ -635,15 +780,19 @@ def get_data(layerN):
             df5 = pd.DataFrame(zTG, columns=coluD)
             df6 = pd.DataFrame(zWA, columns=coluE)
             rpData = [df1, df2, df3, df4, df5, df6]
-        else:
+        elif pRecipe == 'DNV':
+            rpData = 0
             df1 = pd.DataFrame(zTT, columns=coluA)              # Inherited from global variable EoL/EoP Process
             df2 = pd.DataFrame(zST, columns=coluB)
             df3 = pd.DataFrame(zTG, columns=coluC)
             df4 = pd.DataFrame(zWS, columns=coluD)
             # ---------------------------------------
             rpData = [df1, df2, df3, df4]                           # Dynamic aggregated List
-
+            print('\nTP @ '+layerN+':', len(rpData))
+        else:
+            print('Unknown Process not defined...')
         # ---------------------------------------
+        print('\nTPA:', df1.head())
         autoProp = random_with_N_digits(16)
         # Constants per Pipe -------------------#
         rptID = 'EoL'
@@ -652,72 +801,67 @@ def get_data(layerN):
         usrID = 'Operator ID'                   # User ID
         layrNO = layrN                          # Layer ID
         # --------------------------------------#
+        counT = 0
         for i in range(len(rpData)):
-            print('\nTP03-Buffer Length', len(rpData[i]))
-            if i == 0 and rpData[i].loc[df['LyIDa'] == layrNO]:
+            print('\nTP03-Buffer Length', i, '\t', len(rpData[i]))
+            if i == 0:
                 cProc = 'Tape Temperature'          # Process ID
                 rPage = '1of4'
                 Tvalu = [0.05, 0.05, 0.05, 0.05]    # Tolerance
-                ring1A = rpData[i]['R1SPa'].query('B==3')['A']         # Actual value (SP)
-                ring1B = rpData[i]['R1NVa'].filter(like=layrNO, axis=1)         # Measured values = Real value  = (NV)
-                ring2A = rpData[i]['R2SPa'].filter(like=layrNO, axis=1)         #
-                ring2B = rpData[i]['R2NVa'].filter(like=layrNO, axis=1)         #
-                ring3A = rpData[i]['R3SPa'].filter(like=layrNO, axis=1)         #
-                ring3B = rpData[i]['R3NVa'].filter(like=layrNO, axis=1)         #
-                ring4A = rpData[i]['R4SPa'].filter(like=layrNO, axis=1)         #
-                ring4B = rpData[i]['R4NVa'].filter(like=layrNO, axis=1)
+                ring1A = rpData[i]['R1SPa']         # Actual value (SP)
+                ring1B = rpData[i]['R1NVa']         # Measured values = Real value  = (NV)
+                ring2A = rpData[i]['R2SPa']         #
+                ring2B = rpData[i]['R2NVa']         #
+                ring3A = rpData[i]['R3SPa']         #
+                ring3B = rpData[i]['R3NVa']         #
+                ring4A = rpData[i]['R4SPa']         #
+                ring4B = rpData[i]['R4NVa']
             elif i == 1:
                 cProc = 'Substrate Temperature'     # Process ID
                 rPage = '2of4'
-                Tvalu = [0.02, 0.02, 0.02, 0.02]    # Tolerance
-                ring1A = rpData[i]['R1SPb'].filter(like=layrNO, axis=1)         # Actual value (SP)
-                ring1B = rpData[i]['R1NVb'].filter(like=layrNO, axis=1)         # Measured values = Real value  = (NV)
-                ring2A = rpData[i]['R2SPb'].filter(like=layrNO, axis=1)         #
-                ring2B = rpData[i]['R2NVb'].filter(like=layrNO, axis=1)         #
-                ring3A = rpData[i]['R3SPb'].filter(like=layrNO, axis=1)         #
-                ring3B = rpData[i]['R3NVb'].filter(like=layrNO, axis=1)         #
-                ring4A = rpData[i]['R4SPb'].filter(like=layrNO, axis=1)        #
-                ring4B = rpData[i]['R4NVb'].filter(like=layrNO, axis=1)
+                Tvalu = [0.02, 0.02, 0.02, 0.02]     # Tolerance
+                ring1A = rpData[i]['R1SPb']          # Actual value (SP)
+                ring1B = rpData[i]['R1NVb']          # Measured values = Real value  = (NV)
+                ring2A = rpData[i]['R2SPb']          #
+                ring2B = rpData[i]['R2NVb']          #
+                ring3A = rpData[i]['R3SPb']          #
+                ring3B = rpData[i]['R3NVb']          #
+                ring4A = rpData[i]['R4SPb']          #
+                ring4B = rpData[i]['R4NVb']
             elif i == 2:
                 cProc = 'Gap Measurement'           # Process ID
                 rPage = '3of4'
                 Tvalu = [0.03, 0.03, 0.03, 0.03]    # Tolerance
-                ring1A = rpData[i]['R1SPc'].filter(like=layrNO, axis=1)         # Actual value (SP)
-                ring1B = rpData[i]['R1NVc'].filter(like=layrNO, axis=1)         # Measured values = Real value  = (NV)
-                ring2A = rpData[i]['R2SPc'].filter(like=layrNO, axis=1)         #
-                ring2B = rpData[i]['R2NVc'].filter(like=layrNO, axis=1)         #
-                ring3A = rpData[i]['R3SPc'].filter(like=layrNO, axis=1)         #
-                ring3B = rpData[i]['R3NVc'].filter(like=layrNO, axis=1)         #
-                ring4A = rpData[i]['R4SPc'].filter(like=layrNO, axis=1)         #
-                ring4B = rpData[i]['R4NVc'].filter(like=layrNO, axis=1)
-                # rpData[i] = df3.drop(axis=0)
-                # print('TP03-C', rpData[i])
+                ring1A = rpData[i]['R1SPc']          # Actual value (SP)
+                ring1B = rpData[i]['R1NVc']          # Measured values = Real value  = (NV)
+                ring2A = rpData[i]['R2SPc']          #
+                ring2B = rpData[i]['R2NVc']          #
+                ring3A = rpData[i]['R3SPc']          #
+                ring3B = rpData[i]['R3NVc']          #
+                ring4A = rpData[i]['R4SPc']          #
+                ring4B = rpData[i]['R4NVc']
             elif i == 3:
                 cProc = 'Winding Speed'             # Process ID
                 rPage = '4of4'
                 Tvalu = [0.04, 0.04, 0.04, 0.04]    # Set Tolerance (axis=1 columns)
-                ring1A = rpData[i]['R1SPd'].filter(like=layrNO, axis=1)         # Actual value (SP)
-                ring1B = rpData[i]['R1NVd'].filter(like=layrNO, axis=1)         # Measured values = Real value  = (NV)
-                ring2A = rpData[i]['R2SPd'].filter(like=layrNO, axis=1)         #
-                ring2B = rpData[i]['R2NVd'].filter(like=layrNO, axis=1)         #
-                ring3A = rpData[i]['R3SPd'].filter(like=layrNO, axis=1)         #
-                ring3B = rpData[i]['R3NVd'].filter(like=layrNO, axis=1)         #
-                ring4A = rpData[i]['R4SPd'].filter(like=layrNO, axis=1)         #
-                ring4B = rpData[i]['R4NVd'].filter(like=layrNO, axis=1)
-                # rpData.pop(4)                       # clear buffers ---
-                # rpData[i] = df4.drop(axis=0)
-                # print('TP03-D', rpData[i])
-            else:
-                if pRecipe == 'MGM':
-                    cProc = 'Winding Speed'  # Process ID
-                    rPage = '4of4'
-                    Tvalu = [0.04, 0.04, 0.04, 0.04]  # Set Tolerance
-
+                ring1A = rpData[i]['R1SPd']          # Actual value (SP)
+                ring1B = rpData[i]['R1NVd']          # Measured values = Real value  = (NV)
+                ring2A = rpData[i]['R2SPd']          #
+                ring2B = rpData[i]['R2NVd']          #
+                ring3A = rpData[i]['R3SPd']          #
+                ring3B = rpData[i]['R3NVd']          #
+                ring4A = rpData[i]['R4SPd']          #
+                ring4B = rpData[i]['R4NVd']          #
+            # else:
+            #     if pRecipe == 'MGM':
+            #         cProc = 'Winding Angle'           # Process ID
+            #         rPage = '4of4'
+            #         Tvalu = [0.04, 0.04, 0.04, 0.04]  # Set Tolerance
             # --------------------------#
             psData.append(cProc)
             pgeDat.append(rPage)
             # --------------------------#
-            # print('TP01', len(ring1A), ring1A)
+            # --------------------------#
             # Process Set Point values (Average all the values per ring) ---[]
             if (sum(ring1A)) != 0 or (sum(ring1A)) != 0 or (sum(ring1A)) != 0 or (sum(ring1A)) != 0:
                 dataL1 = len(ring1A)
@@ -772,8 +916,10 @@ def get_data(layerN):
             stdDat.append(Stdev2)
             stdDat.append(Stdev3)
             stdDat.append(Stdev4)
-
+            # -------------------
             tolDat.append(Tvalu)
+            counT += 1
+            print('\nLoop time #:', counT)
         # Send values to PDG generator and repeat until last process ----------------[]
         generate_pdf(rptID, cPipe, psData, cstID, usrID, layrNO, r1Data, r2Data, r3Data, r4Data, sptDat, valuDat, stdDat, tolDat, pgeDat)
     else:
@@ -781,6 +927,7 @@ def get_data(layerN):
         print('Report Generation Failed! Post Production Data is not reachable...')
         errorConnect()
     # Send values to PDG generator and repeat until last process --------------------[]
+    return
     # -------------------------------------------------------------------------------[]
 
 class autoResizableCanvas(tk.Canvas):
