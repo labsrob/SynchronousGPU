@@ -902,7 +902,8 @@ import matplotlib.pyplot as plt
 from fpdf import FPDF
 from random import randint
 
-sptDat, valuDat, stdDat, tolDat, pgeDat, psData, r1Data, r2Data, r3Data, r4Data = [], [], [], [], [], [], [], [], [], []
+spDat, vDat, sdDat, tDat, pgeDat, psData, rD1, rD2, rD3, rD4 = [], [], [], [], [], [], [], [], [], []
+
 docs = 'C:\\synchronousDOCS\\'
 media = 'C:\\synchronousDOCS\\BrandS\\'
 # ---------------------------
@@ -922,13 +923,9 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
     dID = datetime.now()                # Date ID
     lID = layrN                         # Layer ID
     # ----------------------------------[]
-    proID = psData                       # Process ID
+    proID = psData                      # Process ID
     # -------------------------------------------[]
-
     for x in range(len(pgiD)):
-        # print(pgiD[x])
-        # print('\nPage ID Array:', pgiD[x])
-        # print('TP9', SetPt)
         # ---------------------------------------[]
         if x == 0:
             proID = 'Tape Temperature'
@@ -977,6 +974,7 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
             tolDat2 = Tvalu[1][1]
             tolDat3 = Tvalu[1][2]
             tolDat4 = Tvalu[1][3]
+
         elif x == 2:
             proID = 'Gap Measurement'
             rID = 'TG'
@@ -1000,7 +998,8 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
             tolDat2 = Tvalu[2][1]
             tolDat3 = Tvalu[2][2]
             tolDat4 = Tvalu[2][3]
-        else:
+
+        elif x == 3:
             proID = 'Winding Speed'
             rID = 'WS'
             ringD1 = ring1[3]
@@ -1023,20 +1022,42 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
             tolDat2 = Tvalu[3][1]
             tolDat3 = Tvalu[3][2]
             tolDat4 = Tvalu[3][3]
-        # ------------------------------------
+
+        elif x == 4:
+            print('TP03', ring1[4], ring2[4], ring3[4])
+            proID = 'OD Properties'
+            rID = 'PP'
+            ringD1 = ring1[4]
+            ringD2 = ring2[4]
+            ringD3 = ring3[4]
+            ringD4 = 0
+            sPoint1 = 0
+            sPoint2 = 0
+            sPoint3 = 0
+            sPoint4 = 0
+            sValue1 = 0
+            sValue2 = 0
+            sValue3 = 0
+            sValue4 = 0
+            sStdev1 = 0
+            sStdev2 = 0
+            sStdev3 = 0
+            sStdev4 = 0
+            tolDat1 = 0
+            tolDat2 = 0
+            tolDat3 = 0
+            tolDat4 = 0
+        else:
+            print('Protocol is missing...')
+        # ------------------------------------ ring1, ring2, ring3, ring4
 
         df = pd.DataFrame()
-        df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4'] #[ringA, ringB, ringC, ringD]
+        df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']         # [ringA, ringB, ringC, ringD]
         df["Actual"] = [round(sPoint1,2), round(sPoint2,2), round(sPoint3,2), round(sPoint4,2)]
         df["Nominal"] = [round(sValue1,2), round(sValue2, 2), round(sValue3, 2), round(sValue4,2)]
         df["StdDev"] = [round(sStdev1,2), round(sStdev2,2), round(sStdev3,2), round(sStdev4,2)]
         df["Tolerance"] = [round(tolDat1,2), round(tolDat2,2), round(tolDat3,2), round(tolDat4,2)]
         # -------------------------------------------[]
-
-        # minV = ((df["Actual"][1] * df['Tolerance'][1]) - df["Actual"][1])
-        # maxV = ((df["Actual"][1] * df['Tolerance'][1]) + df["Actual"][1])
-        # AVal = df['Nominal'][1]
-        # print('\nTP100', minV, maxV, AVal)
 
         if ((df["Actual"][0] * df['Tolerance'][0]) - df["Actual"][0])  <= df['Nominal'][0] <= ((df["Actual"][0] * df['Tolerance'][0]) + df["Actual"][0]):
             A = 'OK'
@@ -1059,21 +1080,44 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
             D = 'CHECK'
         df["Status"] = [A, B, C, D]
 
-        # -- Construct new validation method ------------
-        title('Layer # ' + str(lID) + " Summary")     # Report ID + 'Report'
-        xlabel('Performance Analytics')
-        ylabel('Rated Quality')
+        if x <= 3:
+            # -- Construct new validation method ------------------[A]
+            title('Layer # ' + str(lID) + " Summary")     # Report ID + 'Report'
+            xlabel('Performance Analytics')
+            ylabel('Rated Quality')
+            # -- Plot Ring Data --[]
+            data1 = ringD1
+            data2 = ringD2
+            data3 = ringD3
+            data4 = ringD4
+            data = [data1, data2, data3, data4]
+            plt.boxplot(data, tick_labels=['Ring 1', 'Ring 2', 'Ring 3', 'Ring 4'])
+            # ----------------------------------------------------#
+        else:
+            # -- Construct new validation method ------------------[A]
+            plt.title('Layer # ' + str(lID) + " Summary")  # Report ID + 'Report'
+            plt.xlabel('Sample Distance')
+            plt.ylabel('Quality Properties')
+            # ------------------------ Compute running average for Pipe Diameter
+            numbers_series = pd.Series(ringD1)
+            moving_averages = round(numbers_series.ewm(alpha=0.5, adjust=False).mean(), 2)
+            m_avg = moving_averages.tolist()
 
-        # ------------------- Plot Ring Data -----------------[]
-        data1 = ringD1
-        data2 = ringD2
-        data3 = ringD3
-        data4 = ringD4
-        data = [data1, data2, data3, data4]
-        plt.boxplot(data, tick_labels=['Ring 1', 'Ring 2', 'Ring 3', 'Ring 4'])
+            y_nDiam = np.array(ringD1)
+            y_nOval = np.array(ringD2)
+            x_ppPos = np.array(ringD3)
+            # ------------------------
+            m_nDiam = np.array(m_avg)
+            # print('Rolling averages1:', m_avg)
+            plt.plot(x_ppPos, y_nDiam, label ='OD (nominal)', linestyle="-")
+            plt.plot(x_ppPos, m_nDiam, label='OD (Mean)', linestyle=":")
+            plt.plot(x_ppPos, y_nOval, label='Ovality %', linestyle="-.")
+            plt.legend()
+            # ---------------------------------------------------------------------------#
+
         savefig(docs+'barchart_L'+ str(lID) + '_' + str(pgiD[x]) +'.png', dpi = 300)
         # ------ refresh data --------------------------------[]
-        plt.close()         # plt.clf()
+        plt.close()
         time.sleep(5)
 
         pdf = FPDF()
@@ -1091,13 +1135,12 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
         pdf.cell(5, 10, "Date Time                : " + (str(dID)), 0, 2, 'L')
         pdf.cell(5, 10, "Layer Number         : " + (str(lID)), 0, 2, 'L')
         pdf.cell(5, 10, "Process Name         : " + (str(proID)), 0, 2, 'L')
-
         pdf.cell(40)
         pdf.cell(90, 10, " ", 0, 2, 'C')
 
         # draw a rectangle over the text area for Report header ----
         pdf.rect(x=20.0, y=20.5, w=150.0, h=50, style='')
-        # construct report header r1RC, r2RC, r3RC, r4RC, rR1VC, r2VC, r3VC, r4VC,
+        # construct report header ----------------------------------
         pdf.cell(-40)
         pdf.cell(5, 10, (str(proID)), 0, 2, 'L')
         pdf.cell(35, 8, 'RingID', 1, 0, 'C')
@@ -1151,14 +1194,14 @@ def get_data():
     LyID = 2
     # --------
     zTT = {
-        "R1SP": [120, 200, 130],
-        "R1NV": [125, 305, 118],
-        "R2SP": [125, 215, 154],
+        'R1SP': [120, 200, 130],
+        'R1NV': [125, 305, 118],
+        'R2SP': [125, 215, 154],
         "R2NV": [125, 225, 125],
         "R3SP": [225, 115, 225],
         "R3NV": [215, 225, 156],
         "R4SP": [235, 336, 125],
-        "R4NV": [254, 129, 135] }
+        "R4NV": [254, 129, 135]}
 
     zST = {
         "R1SP": [140, 210, 245],
@@ -1190,18 +1233,24 @@ def get_data():
         "R4SP": [125, 163, 221],
         "R4NV": [140, 129, 115]}
 
+    zPP = {
+        "Diam": [55, 28, 52, 34, 33, 44, 53, 23, 13, 22, 55, 23],
+        "Oval": [29, 37, 45, 52, 69, 69, 72, 74, 80, 85, 99, 95],
+        "PPos": [19, 29, 39, 49, 59, 69, 79, 89, 99, 98, 100, 110]}
+
     # Split Process & Map SQL data columns into Dataframe -------------------------------------------[]
     # coluA = ['tStamp', 'LyIDa', 'R1SPa', 'R1NVa', 'R2SPa', 'R2NVa', 'R3SPa', 'R3NVa', 'R4SPa', 'R4NVa']
     # coluB = ['tStamp', 'LyIDb', 'R1SPb', 'R1NVb', 'R2SPb', 'R2NVb', 'R3SPb', 'R3NVb', 'R4SPb', 'R4NVb']
     # coluC = ['tStamp', 'LyIDc', 'R1SPc', 'R1NVc', 'R2SPc', 'R2NVc', 'R3SPc', 'R3NVc', 'R4SPc', 'R4NVc']
 
     # ------------------------------------
-    df1 = pd.DataFrame(zTT) #, columns=coluA)                  # Inherited from global variable EoL/EoP Process
-    df2 = pd.DataFrame(zST) #, columns=coluB)
-    df3 = pd.DataFrame(zTG) #, columns=coluC)
+    df1 = pd.DataFrame(zTT)     # columns=coluA)
+    df2 = pd.DataFrame(zST)     # columns=coluB)
+    df3 = pd.DataFrame(zTG)     # columns=coluC)
     df4 = pd.DataFrame(zWS)
+    df5 = pd.DataFrame(zPP)
     # ------------------------------
-    rpData = [df1, df2, df3, df4]                                   # Dynamic aggregated List
+    rpData = [df1, df2, df3, df4, df5]                                   # Dynamic aggregated List
     # ------------------------------
     autoProp = random_with_N_digits(16)
     # Constants per Pipe -----------
@@ -1229,61 +1278,93 @@ def get_data():
             cProc = 'Winding Speed'             # Process ID
             rPage = '4of4'
             Tvalu = [0.04, 0.04, 0.04, 0.04]    # Tolerance
+        elif i == 4:
+            cProc = 'Quantitative Properties'   # Process ID
+            rPage = '4of4'
+            Tvalu = 0                           # Tolerance
+
         # -------------------
         psData.append(cProc)
-        pgeDat.append(rPage)
-
-        # ------------------------#              # From SQL Data
-        ring1A = rpData[i]['R1SP']               # Actual value (SP)
-        ring1B = rpData[i]['R1NV']               # Measured values = Real value  = (NV)
-        ring2A = rpData[i]['R2SP']               #
-        ring2B = rpData[i]['R2NV']               #
-        ring3A = rpData[i]['R3SP']               #
-        ring3B = rpData[i]['R3NV']               #
-        ring4A = rpData[i]['R4SP']               #
-        ring4B = rpData[i]['R4NV']               #
-        # --------------------------#
+        pgeDat.append(rPage)                    # psData, pgeDat
+        # -------------------
+        if i == 4:
+            ring1A = 0
+            ring1B = rpData[i]["Diam"]
+            ring2A = 0
+            ring2B = rpData[i]["Oval"]
+            ring3A = 0
+            ring3B = rpData[i]["PPos"]
+            ring4A = 0
+            ring4B = 0
+        else:
+            # ------------------------#              # From SQL Data
+            ring1A = rpData[i]['R1SP']               # Actual value (SP)
+            ring1B = rpData[i]['R1NV']               # Measured values = Real value  = (NV)
+            ring2A = rpData[i]['R2SP']               #
+            ring2B = rpData[i]['R2NV']               #
+            ring3A = rpData[i]['R3SP']               #
+            ring3B = rpData[i]['R3NV']               #
+            ring4A = rpData[i]['R4SP']               #
+            ring4B = rpData[i]['R4NV']               #
+            # ------------------------#
         # Process Set Point values (Average all the values per ring) ---[]
-        SetAvgSPa = (sum(ring1A))/ len(ring1A)
-        SetAvgSPb = (sum(ring2A))/ len(ring2A)
-        SetAvgSPc = (sum(ring3A))/ len(ring3A)
-        SetAvgSPd = (sum(ring4A))/ len(ring4A)
-        # Process Measured values (Average total values per ring -------[]
-        SetAvgMVa = (sum(ring1B))/ len(ring1B)
-        SetAvgMVb = (sum(ring2B))/ len(ring2B)
-        SetAvgMVc = (sum(ring3B))/ len(ring3B)
-        SetAvgMVd = (sum(ring4B))/ len(ring4B)
+        if i == 0 or i == 2 or i == 3:
+            SetAvgSPa = (sum(ring1A)) / len(ring1A)
+            SetAvgSPb = (sum(ring2A)) / len(ring2A)
+            SetAvgSPc = (sum(ring3A)) / len(ring3A)
+            SetAvgSPd = (sum(ring4A)) / len(ring4A)
+            # Process Measured values (Average total values per ring -------[]
+            SetAvgMVa = (sum(ring1B)) / len(ring1B)
+            SetAvgMVb = (sum(ring2B)) / len(ring2B)
+            SetAvgMVc = (sum(ring3B)) / len(ring3B)
+            SetAvgMVd = (sum(ring4B)) / len(ring4B)
 
-        Stdev1 = round(((SetAvgSPa  - SetAvgMVa ) / math.sqrt(2)), 2)             # Standard Deviation
-        Stdev2 = round(((SetAvgSPb  - SetAvgMVb ) / math.sqrt(2)), 2)
-        Stdev3 = round(((SetAvgSPc  - SetAvgMVc ) / math.sqrt(2)), 2)
-        Stdev4 = round(((SetAvgSPd  - SetAvgMVd ) / math.sqrt(2)), 2)
+            Stdev1 = round(np.std(ring1B), 2)       # Standard Deviation on Measured Values to 2 precision
+            Stdev2 = round(np.std(ring2B), 2)
+            Stdev3 = round(np.std(ring3B), 2)
+            Stdev4 = round(np.std(ring4B), 2)
+        else:
+            SetAvgSPa = 0
+            SetAvgSPb = 0
+            SetAvgSPc = 0
+            SetAvgSPd = 0
+
+            SetAvgMVa = (sum(ring1B)) / len(ring1B)
+            SetAvgMVb = (sum(ring2B)) / len(ring2B)
+            SetAvgMVc = (sum(ring3B)) / len(ring3B)
+            SetAvgMVd = 0
+
+            Stdev1 = round(np.std(ring1B), 2)
+            Stdev2 = round(np.std(ring2B), 2)
+            Stdev3 = round(np.std(ring3B), 2)
+            Stdev4 = 0
+
         # ---------------------------#
-        r1Data.append(ring1B)
-        r2Data.append(ring2B)
-        r3Data.append(ring3B)
-        r4Data.append(ring4B)
+        rD1.append(ring1B)
+        rD2.append(ring2B)
+        rD3.append(ring3B)
+        rD4.append(ring4B)
         # ----------------------
-        sptDat.append(SetAvgSPa)
-        sptDat.append(SetAvgSPa)
-        sptDat.append(SetAvgSPc)
-        sptDat.append(SetAvgSPd)
+        spDat.append(SetAvgSPa)
+        spDat.append(SetAvgSPb)
+        spDat.append(SetAvgSPc)
+        spDat.append(SetAvgSPd)
 
-        valuDat.append(SetAvgMVa)
-        valuDat.append(SetAvgMVb)
-        valuDat.append(SetAvgMVc)
-        valuDat.append(SetAvgMVd)
+        vDat.append(SetAvgMVa)
+        vDat.append(SetAvgMVb)
+        vDat.append(SetAvgMVc)
+        vDat.append(SetAvgMVd)
 
-        stdDat.append(Stdev1)
-        stdDat.append(Stdev2)
-        stdDat.append(Stdev3)
-        stdDat.append(Stdev4)
+        sdDat.append(Stdev1)
+        sdDat.append(Stdev2)
+        sdDat.append(Stdev3)
+        sdDat.append(Stdev4)
 
-        tolDat.append(Tvalu)
+        tDat.append(Tvalu)
     # Send values to PDG generator and repeat until last process --------------------[]
-    generate_pdf(rptID, cPipe, psData, cstID, usrID, layrNO, r1Data, r2Data, r3Data, r4Data, sptDat, valuDat, stdDat, tolDat, pgeDat)
+    generate_pdf(rptID, cPipe, psData, cstID, usrID, layrNO, rD1, rD2, rD3, rD4, spDat, vDat, sdDat, tDat, pgeDat)
 
-# get_data()
+get_data()
 # ----------------------------------------------------------------------[]
 # ----------------------------------------------------------------------[]
 # root = Tk()
@@ -1347,6 +1428,8 @@ class PDFViewer(ScrolledText):
         qawin.resizable(False, False)
         if len(images) == 1:
             w, h = 600, 850
+        elif len(images) == 5:
+            w, h = 1800, 850
         else:
             w, h = 1200, 850
         screen_w = qawin.winfo_screenwidth()
@@ -1386,6 +1469,23 @@ class PDFViewer(ScrolledText):
             pdf3.grid(row=1, column=0, sticky='nsew')
             pdf3.show(images[2])
 
+        elif len(images) == 4:
+            pdf1 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf1.grid(row=0, column=0, sticky='nsew')
+            pdf1.show(images[0])
+
+            pdf2 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf2.grid(row=0, column=1, sticky='nsew')
+            pdf2.show(images[1])
+
+            pdf3 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf3.grid(row=1, column=0, sticky='nsew')
+            pdf3.show(images[2])
+
+            pdf4 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf4.grid(row=1, column=1, sticky='nsew')
+            pdf4.show(images[3])
+
         else:
             pdf1 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
             pdf1.grid(row=0, column=0, sticky='nsew')
@@ -1403,20 +1503,23 @@ class PDFViewer(ScrolledText):
             pdf4.grid(row=1, column=1, sticky='nsew')
             pdf4.show(images[3])
 
-# -------------------------------------------------------------
-root = tk.Tk()
-# root = Tk()
-root.geometry("1000x700+200+100")
-root.title("PDF Viewer")
-root.configure(bg="light blue")
+            pdf5 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf5.grid(row=0, column=2, columnspan=1, rowspan=2, sticky='nsew')
+            pdf5.show(images[4])
 
-# view frame
-view_frame = Frame(root, bg="light blue", bd=5, width=400)
-view_frame.pack(side=LEFT)
-
-# set buttons
-button = Button(view_frame, text='View EoL Report', command=lambda: PDFViewer.viewReport(self=None), width=15, bd=5)
-button.pack()
-
-root.mainloop()
+# ----------------------------------------------------------------------------
+# root = tk.Tk()
+# root.geometry("1000x700+200+100")
+# root.title("PDF Viewer")
+# root.configure(bg="light blue")
+#
+# # view frame
+# view_frame = Frame(root, bg="light blue", bd=5, width=400)
+# view_frame.pack(side=LEFT)
+#
+# # set buttons
+# button = Button(view_frame, text='View EoL Report', command=lambda: PDFViewer.viewReport(self=None), width=15, bd=5)
+# button.pack()
+#
+# root.mainloop()
 
