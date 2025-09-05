@@ -1162,7 +1162,7 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
             pdf.cell(25, 8, 'R-Count', 1, 0, 'C')
             pdf.cell(25, 8, 'V-Count', 1, 0, 'C')
             pdf.cell(25, 8, 'TapeChg', 1, 0, 'C')
-            pdf.cell(25, 8, 'CumTChg', 1, 0, 'C')
+            pdf.cell(25, 8, 'T-Width', 1, 0, 'C')
             pdf.cell(20, 8, "Status", 1, 2, 'C')
             pdf.set_font('helvetica', '', 12)
             pdf.cell(-130)

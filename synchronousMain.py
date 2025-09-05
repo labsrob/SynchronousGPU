@@ -440,14 +440,14 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
             elif x == 6:
                 proID = 'OD Properties'
                 rID = 'PP'
-                ringD1 = ring1[6]       # ring1B
-                ringD2 = ring2[6]       # ring2B
-                ringD3 = ring3[6]       # ring3B
-                ringD4 = ring4[6]       # ring4B
-                sPoint1 = SetPt[24]     # ring1A
-                sPoint2 = SetPt[25]     # ring2A
-                sPoint3 = SetPt[26]     # ring3A
-                sPoint4 = SetPt[27]     # ring4A
+                ringD1 = ring1[6]       # Pipe Diameter
+                ringD2 = ring2[6]       # Ramp Count
+                ringD3 = ring3[6]       # Hafner Tape Change
+                ringD4 = ring4[6]       # Cell Tension
+                sPoint1 = SetPt[24]     # Pipe Position
+                sPoint2 = SetPt[25]     # Pipe Ovality
+                sPoint3 = SetPt[26]     # Void COunt
+                sPoint4 = SetPt[27]     # Tape Width
                 sValue1 = 0
                 sValue2 = 0
                 sValue3 = 0
@@ -456,10 +456,10 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
                 sStdev2 = 0
                 sStdev3 = 0
                 sStdev4 = 0
-                tolDat1 = Tvalu[6][0]
-                tolDat2 = 0 # Tvalu[6][1]
-                tolDat3 = 0 # Tvalu[6][2]
-                tolDat4 = 0 # Tvalu[6][3]
+                tolDat1 = Tvalu[6][0]   # Tape Width
+                tolDat2 = Tvalu[6][1]
+                tolDat3 = Tvalu[6][2]
+                tolDat4 = Tvalu[6][3]
             else:
                 print('Protocol is missing...')
 
@@ -563,14 +563,14 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
             elif x == 4:
                 proID = 'OD Properties'
                 rID = 'PP'
-                ringD1 = ring1[4]       # ring1B
-                ringD2 = ring2[4]       # ring2B
-                ringD3 = ring3[4]       # ring3B
-                ringD4 = ring4[4]       # ring4B
-                sPoint1 = SetPt[16]     # ring1A
-                sPoint2 = SetPt[17]     # ring2A
-                sPoint3 = SetPt[18]     # ring3A
-                sPoint4 = SetPt[19]     # ring4A
+                ringD1 = ring1[4]       # Pipe Diameter
+                ringD2 = ring2[4]       # Ramp Count
+                ringD3 = ring3[4]       # Hafner Tape Change
+                ringD4 = ring4[4]       # Cell ension
+                sPoint1 = SetPt[16]     # Pipe Position
+                sPoint2 = SetPt[17]     # Pipe Ovality
+                sPoint3 = SetPt[18]     # Void Count
+                sPoint4 = SetPt[19]     # Tape Width
                 sValue1 = 0
                 sValue2 = 0
                 sValue3 = 0
@@ -579,10 +579,10 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
                 sStdev2 = 0
                 sStdev3 = 0
                 sStdev4 = 0
-                tolDat1 = Tvalu[4][0]
-                tolDat2 = 0 # Tvalu[4][1]
-                tolDat3 = 0 # Tvalu[4][2]
-                tolDat4 = 0 # Tvalu[4][3]
+                tolDat1 = Tvalu[4][0]   # Tape Width
+                tolDat2 = Tvalu[4][1]
+                tolDat3 = Tvalu[4][2]
+                tolDat4 = Tvalu[4][3]
             else:
                 print('End of Layer (EoL) Report successfully generated!\n')
                 progressB.stop()
@@ -593,13 +593,21 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
             progressB.stop()
             successPDF()  # indicate success using a popup
             exit()
-        # ------------------------------------
+
+        # ----------------------------------------------
         df = pd.DataFrame()
-        df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4'] #[ringA, ringB, ringC, ringD]
-        df["SetPoint"] = [round(sPoint1,2), round(sPoint2,2), round(sPoint3,2), round(sPoint4,2)]
-        df["Nominal"] = [round(sValue1,2), round(sValue2, 2), round(sValue3, 2), round(sValue4,2)]
-        df["StdDev"] = [round(sStdev1,2), round(sStdev2,2), round(sStdev3,2), round(sStdev4,2)]
-        df["Tolerance"] = [round(tolDat1,2), round(tolDat2,2), round(tolDat3,2), round(tolDat4,2)]
+        if x == 4 or x == 6:
+            df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']  # [ringA, ringB, ringC, ringD]
+            df["SetPoint"] = [round(sum(ringD2), 2), round(sum(ringD2), 2), round(sum(ringD2), 2), round(sum(ringD2), 2)]
+            df["Nominal"] = [round(sum(sPoint3), 2), round(sum(sPoint3), 2), round(sum(sPoint3), 2), round(sum(sPoint3), 2)]
+            df["StdDev"] = [round(ringD3, 2), round(ringD3, 2), round(ringD3, 2), round(ringD3, 2)]
+            df["Tolerance"] = [round(sPoint4, 2), round(sPoint4, 2), round(sPoint4, 2), round(sPoint4, 2)]
+        else:
+            df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4'] #[ringA, ringB, ringC, ringD]
+            df["SetPoint"] = [round(sPoint1,2), round(sPoint2,2), round(sPoint3,2), round(sPoint4,2)]
+            df["Nominal"] = [round(sValue1,2), round(sValue2, 2), round(sValue3, 2), round(sValue4,2)]
+            df["StdDev"] = [round(sStdev1,2), round(sStdev2,2), round(sStdev3,2), round(sStdev4,2)]
+            df["Tolerance"] = [round(tolDat1,2), round(tolDat2,2), round(tolDat3,2), round(tolDat4,2)]
         # -------------------------------------------[]
 
         if ((df["SetPoint"][0] * df['Tolerance'][0]) - df["SetPoint"][0])  <= df['Nominal'][0] <= ((df["SetPoint"][0] * df['Tolerance'][0]) + df["SetPoint"][0]):
@@ -629,13 +637,13 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
             plt.xlabel('Sample Distance')
             plt.ylabel('Quality Properties')
             # ------------------------ Compute running average for Pipe Diameter
-            numbers_series = pd.Series(ringD1)
+            numbers_series = pd.Series(ringD1)  # Pipe Diameter's running Mean
             moving_averages = round(numbers_series.ewm(alpha=0.5, adjust=False).mean(), 2)
             m_avg = moving_averages.tolist()
 
-            y_nDiam = np.array(ringD1)
-            y_nOval = np.array(ringD2)
-            x_ppPos = np.array(ringD3)
+            y_nDiam = np.array(ringD1)      # Pipe Diameter
+            y_nOval = np.array(sPoint2)     # Ovality
+            x_ppPos = np.array(sPoint1)     # Pipe Position
             # ------------------------
             m_nDiam = np.array(m_avg)
             # print('Rolling averages1:', m_avg)
@@ -690,7 +698,7 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
             pdf.cell(25, 8, 'R-Count', 1, 0, 'C')
             pdf.cell(25, 8, 'V-Count', 1, 0, 'C')
             pdf.cell(25, 8, 'TapeChg', 1, 0, 'C')
-            pdf.cell(25, 8, 'CumTChg', 1, 0, 'C')
+            pdf.cell(25, 8, 'T-Width', 1, 0, 'C')
             pdf.cell(20, 8, "Status", 1, 2, 'C')
             pdf.set_font('helvetica', '', 12)
             pdf.cell(-130)
@@ -928,7 +936,8 @@ def get_data(layerN):
                     ring4A = rpData[i]['R4SPd']          #
                     ring4B = rpData[i]['R4NVd']          #
                 elif i == 4:
-                    cProc = 'OD Properties'              # 'LyID', 'PipePos', 'PipeDiam', 'Ovality', 'RampCnt', 'VoidCnt', 'TChange', 'TpWidth', 'Tension'
+                    # 'LyID', 'PipePos', 'PipeDiam', 'Ovality', 'RampCnt', 'VoidCnt', 'TChange', 'TpWidth', 'Tension'
+                    cProc = 'OD Properties'
                     rPage = '5of5'
                     Tvalu = [0.05, 0.05, 0.05, 0.05]
                     ring1A = rpData[i]['PipePos']
@@ -1014,34 +1023,35 @@ def get_data(layerN):
                     ring4A = rpData[i]['R4SPd']          #
                     ring4B = rpData[i]['R4NVd']          #
                 elif i == 6:
-                    cProc = 'OD Properties'              # Process ID
+                    # 'LyID', 'PipePos', 'PipeDiam', 'Ovality', 'RampCnt', 'VoidCnt', 'TChange', 'TpWidth', 'Tension'
+                    cProc = 'OD Properties'
                     rPage = '7of7'
-                    Tvalu = rpData[i]['PipePos']
-                    ring1A = rpData[i]['PipeDiam']
-                    ring1B = rpData[i]['Ovality']
-                    ring2A = rpData[i]['RampCnt']
-                    ring2B = rpData[i]['VoidCnt']
-                    ring3A = rpData[i]['TChangA']
-                    ring3B = rpData[i]['TChangB']
-                    ring4A = rpData[i]['TChangC']
-                    ring4B = rpData[i]['TChangD']
+                    Tvalu = [0.04, 0.04, 0.04, 0.04]
+                    ring1A = rpData[i]['PipePos']
+                    ring1B = rpData[i]['PipeDiam']
+                    ring2A = rpData[i]['Ovality']
+                    ring2B = rpData[i]['RampCnt']
+                    ring3A = rpData[i]['VoidCnt']
+                    ring3B = rpData[i]['TChange']
+                    ring4A = rpData[i]['TpWidth']
+                    ring4B = rpData[i]['Tension']
             # --------------------------#
             # psData.append(cProc)
             pgeDat.append(rPage)                    # Page ID
             # --------------------------#
             if cProc == 'OD Properties':
                 # ------------------------------
-                r1Data.append(ring1B)
-                r2Data.append(ring2B)
-                r3Data.append(ring3B)
-                r4Data.append(ring4B)
+                r1Data.append(ring1B)   # Pipe Diameter
+                r2Data.append(ring2B)   # Ramp Count
+                r3Data.append(ring3B)   # Hafner Tape Change
+                r4Data.append(ring4B)   # Cell Tension
                 # ----------------------
-                sptDat.append(ring1A)
-                sptDat.append(ring2A)
-                sptDat.append(ring3A)
-                sptDat.append(ring4A)
+                sptDat.append(ring1A)   # Pipe longitudinal Position
+                sptDat.append(ring2A)   # Pipe Ovality
+                sptDat.append(ring3A)   # Void Count
+                sptDat.append(ring4A)   # Tape Width
 
-                valuDat.append(0)
+                valuDat.append(0)       # Void Count Values R1
                 valuDat.append(0)
                 valuDat.append(0)
                 valuDat.append(0)
