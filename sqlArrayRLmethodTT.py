@@ -12,40 +12,57 @@ idx = count()
 now = datetime.now()
 
 dataList0 = []
-Idx, Idx, dL = [], [], []
+dL1, dL2, dL3 = [], [], []
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
+def sqlExec(t1, nGZ, grp_step, T1, T2, T3):
     """
     NOTE:
     """
-
-    # idx = str(idx)                                  # convert Query Indexes to string concatenation
-
+    # t1, t2, t3 = daq.cursor(), daq.cursor(), daq.cursor()
     group_step = int(grp_step)                      # group size/ sample sze
-    fetch_no = int(fetch_no)                        # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
+    print('\nDefault Sample Size:', nGZ, group_step, '\n')
 
-    # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
-    if len(dL) < (nGZ - 1):
-        n2fetch = nGZ                                       # fetch initial specified number
-        print('\nRows to Fetch:', n2fetch)
-        print('Processing SQL Row #:', int(idx) + fetch_no + 1, 'to', (int(idx) + fetch_no + 1) + n2fetch)
+    # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
+    if group_step == 1:
+        print('\nTTA:', len(dL1), dL1)
+        print('TTA:', len(dL2), dL2)
+        print('RMA:', len(dL3), dL3)
 
-    elif group_step == 1 and len(dL) >= nGZ:
-        print('\nSINGLE STEP SLIDE')
-        print('=================')
-        n2fetch = (nGZ + fetch_no)                          # fetch just one line to on top of previous fetch
-        idxA = int(idx) + (((fetch_no + 1) - 2) * nGZ) + 1
-        if len(Idx) > 1:
-            del Idx[:1]
-        Idx.append(idxA)
-        print('Processing SQL Row #:', 'T1:', idxA)
+        if len(dL1) < int(nGZ) or len(dL2) < int(nGZ):
+            n2fetch = int(nGZ)                                       # fetch initial specified number
+            print('1st Trip:', n2fetch)
+        elif len(dL1) == int(nGZ):
+            n2fetch = int(nGZ) # - len(dL1)
+            print('2nd Trip:', n2fetch)
+        else:
+            print('\nTP1', len(dL1), len(dL2), len(dL3)) # 50
+            dL1.pop(0)
+            dL2.pop(0)
+            dL3.pop(0)
+            n2fetch = 1
+            print('\nTTB:', len(dL1), dL1)
+            print('TTB:', len(dL2), dL2)
+            print('RMB:', len(dL3), dL3)
+            print('3rd Trip:', n2fetch)
+
+    elif group_step == 2:
+        if len(dL1) <= int(nGZ) or len(dL2) <= int(nGZ):
+            n2fetch = int(nGZ)
+        else:
+            del dL1[:(len(dL1) - 1)]
+            del dL2[:(len(dL2) - 1)]
+            n2fetch = int(nGZ) - 1
+        print('\nRows to Fetch on Discrete:', n2fetch)
+    else:
+        n2fetch = int(nGZ)
+    print('Fetch samples:', n2fetch)
 
     # ------------------------------------------------------------------------------------[]
-    # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data1 = daq.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
+    # data1 = t1.execute('SELECT TOP ('+ str(n2fetch) +') * FROM ' + str(T1)).fetchall()
+    data1 = t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY tStamp').fetchmany(n2fetch)
+    print('\nTT1:', len(data1), data1)
     if len(data1) != 0:
         for result in data1:
             result = list(result)
@@ -54,33 +71,54 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            dL.append(result)
+            dL1.append(result)
+            # if group_step == 1 and n2fetch:
 
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dL[0:(len(dL) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dL[0:(len(dL) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dL[0:(len(dL) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dL[0:(len(dL) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-        # print("Step List1:", len(dL1), dL1)       FIXME:
     else:
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    daq.close()
+    # t1.close()
 
-    return dL
+    # ------------------------------------------------------------------------------------[]
+    # data2 = t1.execute('SELECT TOP ('+ str(n2fetch) +') * FROM ' + str(T2)).fetchall()
+    data2 = t1.execute('SELECT * FROM ' + str(T2) + ' ORDER BY tStamp').fetchmany(n2fetch)
+    print('\nTT2', len(data2), data2)
+    if len(data2) != 0:
+        for result in data2:
+            result = list(result)
+            if UseRowIndex:
+                dataList0.append(next(idx))
+            else:
+                now = time.strftime("%H:%M:%S")
+                dataList0.append(time.strftime(now))
+            dL2.append(result)
+
+    else:
+        print('Process EOF reached...')
+        print('SPC Halting for 5 Minutes...')
+        time.sleep(5)
+    # t1.close()
+
+    # ------------------------------------------------------------------------------------[]
+    # data3 = t1.execute('SELECT TOP ('+ str(n2fetch) +') * FROM ' + str(T3)).fetchall()
+    data3 = t1.execute('SELECT * FROM ' + str(T3) + ' ORDER BY cLayer').fetchmany(n2fetch)
+    print('\nRM', len(data3), data3)
+    if len(data3) != 0:
+        for result in data3:
+            result = list(result)
+            if UseRowIndex:
+                dataList0.append(next(idx))
+            else:
+                now = time.strftime("%H:%M:%S")
+                dataList0.append(time.strftime(now))
+            dL3.append(result)
+
+    else:
+        print('Process EOF reached...')
+        print('SPC Halting for 5 Minutes...')
+        time.sleep(5)
+    # t1.close()
+
+    return dL1, dL2, dL3
 # -----------------------------------------------------------------------------------[Dr Labs]

@@ -10,12 +10,13 @@ Check SQL data columns ...
 
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'ZTT_' + pWON:
+    if pParam == 'ZTT_' + str(pWON):
         columns = [ # Tape Temperature --------------[]
-                   'tStmp', 'LyIDa', 'R1SPa', 'R1NVa', 'R2SPa',
+                   'LyIDa', 'R1SPa', 'R1NVa', 'R2SPa',
                    'R2NVa', 'R3SPa', 'R3NVa', 'R4SPa',  'R4NVa']
 
     else:
+        columns = 0
         print('Invalid Columns or Query error...')
 
     return columns

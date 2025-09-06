@@ -73,7 +73,8 @@ import loadSPCConfig as ty
 import rtP_Evaluator as tq
 from pydub import AudioSegment
 from matplotlib.animation import FuncAnimation
-from mpl_interactions import ioff, panhandler, zoom_factory
+from mpl_interactions import ioff, zoom_factory, panhandler
+
 # --------------------------
 import pParamsHL as dd
 import pWON_finder as wo
@@ -125,7 +126,7 @@ qMarker_rpt = 0.1
 sysrdy, sysRun, sysidl = 1, 0, 0
 # -------------
 gap_vol, ramp_vol = 0, 0
-vCount, pExLayer, pLength = 1000, 100, 10000
+vCount, pExLayer, pLength = 1000, 100, 150000
 # Pipe Expected/Predicted final Layer
 # --------------
 optm = True
@@ -218,7 +219,7 @@ B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
 
 plcConnex = []
 UsePLC_DBS = False                                       # specify SQl Query or PLC DB Query is in use
-UseSQL_DBS = False
+UseSQL_DBS = True
 sel_SS = "30"
 sel_gT = "S-Domino"
 
@@ -274,7 +275,6 @@ def clear_DF():
         else:
             pass
     # ----- Empty Data frame
-
 
 def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, SetPt, Value, Stdev, Tvalu, pgiD):
     global pgID
@@ -1695,6 +1695,7 @@ class collectiveEoL(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
+        self.running = False
         self.createWidgets()
 
     def createWidgets(self):
@@ -1782,10 +1783,11 @@ class collectiveEoL(ttk.Frame):
         if pRecipe == 'DNV':
             EoLRep = 'DNV'
             # ---------- Based on Group's URS ------------------#
-            T1 = 'ZTT_' + pWON          # Identify EOL_TT Table
-            T2 = 'ZST_' + pWON          # Identify EOL_ST Table
-            T3 = 'ZTG_' + pWON          # Identify EOL_TG Table
-            T4 = 'ZWS' + pWON           # Winding Speed
+            print('\nTP-verify pWON', pWON)
+            T1 = 'ZTT_' + str(pWON)          # Identify EOL_TT Table
+            T2 = 'ZST_' + str(pWON)          # Identify EOL_ST Table
+            T3 = 'ZTG_' + str(pWON)          # Identify EOL_TG Table
+            T4 = 'ZWS_' + str(pWON)          # Winding Speed
             # T5 = 'RC_' + pWON           # Identify RampCount Table - not visualised but reckoned on pdf report
             # T6 = 'VC_' + pWON           # Identify Void count table - not visualised but reckoned on pdf report
         elif pRecipe == 'MGM':
@@ -2248,7 +2250,8 @@ class collectiveEoL(ttk.Frame):
     def _dataControlEoL(self):
 
         # Initialise SQL Data connection per listed Table --------------------[]
-        if not inUseAlready:                # Load CommsPlc class once
+        if self.running and UseSQL_DBS:
+            print('\nCondition fulfilled....')
             ol_con = sq.DAQ_connect(1, 0)   # Load TG and VM data from PLC
         else:
             pass
@@ -2312,7 +2315,7 @@ class collectiveEoL(ttk.Frame):
         rptID = random_with_N_digits(10)
         # --------------------------------------------------# , , ,
         # declare asynchronous variables ------------------[]
-        if UseSQL_DBS:
+        if UseSQL_DBS and self.running:
             import VarSQL_EOLRPT as el                          # load SQL variables column names | rfVarSQL
             if pRecipe == 'DNV':
                 g1 = ott.validCols(T1)                          # Construct Table Column (Tape Temp)
@@ -2542,101 +2545,101 @@ class collectiveEoL(ttk.Frame):
             im185.set_xdata(np.arange(self.win_Xmax))
             if pRecipe == 'DNV':
                 # X Plot Y-Axis data points for XBar ---------------------------[ Mean TT ]
-                im10.set_ydata((ZX[0]).rolling(window=ttS, min_periods=1).mean())  # head 1
-                im11.set_ydata((ZX[1]).rolling(window=ttS, min_periods=1).mean())  # head 2
-                im12.set_ydata((ZX[2]).rolling(window=ttS, min_periods=1).mean())  # head 3
-                im13.set_ydata((ZX[3]).rolling(window=ttS, min_periods=1).mean())  # head 4
-                im14.set_ydata((ZX[4]).rolling(window=ttS, min_periods=1).mean())  # head 1
-                im15.set_ydata((ZX[5]).rolling(window=ttS, min_periods=1).mean())  # head 2
-                im16.set_ydata((ZX[6]).rolling(window=ttS, min_periods=1).mean())  # head 3
-                im17.set_ydata((ZX[7]).rolling(window=ttS, min_periods=1).mean())  # head 4
-                im18.set_ydata((ZX[8]).rolling(window=ttS, min_periods=1).mean())  # head 1
-                im19.set_ydata((ZX[9]).rolling(window=ttS, min_periods=1).mean())  # head 2
-                im20.set_ydata((ZX[10]).rolling(window=ttS, min_periods=1).mean())  # head 3
-                im21.set_ydata((ZX[11]).rolling(window=ttS, min_periods=1).mean())  # head 4
-                im22.set_ydata((ZX[12]).rolling(window=ttS, min_periods=1).mean())  # head 1
-                im23.set_ydata((ZX[13]).rolling(window=ttS, min_periods=1).mean())  # head 2
-                im24.set_ydata((ZX[14]).rolling(window=ttS, min_periods=1).mean())  # head 3
-                im25.set_ydata((ZX[15]).rolling(window=ttS, min_periods=1).mean())  # head 4
+                im10.set_ydata((ZX[0]).rolling(window=ttS).mean())  # head 1
+                im11.set_ydata((ZX[1]).rolling(window=ttS).mean())  # head 2
+                im12.set_ydata((ZX[2]).rolling(window=ttS).mean())  # head 3
+                im13.set_ydata((ZX[3]).rolling(window=ttS).mean())  # head 4
+                im14.set_ydata((ZX[4]).rolling(window=ttS).mean())  # head 1
+                im15.set_ydata((ZX[5]).rolling(window=ttS).mean())  # head 2
+                im16.set_ydata((ZX[6]).rolling(window=ttS).mean())  # head 3
+                im17.set_ydata((ZX[7]).rolling(window=ttS).mean())  # head 4
+                im18.set_ydata((ZX[8]).rolling(window=ttS).mean())  # head 1
+                im19.set_ydata((ZX[9]).rolling(window=ttS).mean())  # head 2
+                im20.set_ydata((ZX[10]).rolling(window=ttS).mean())  # head 3
+                im21.set_ydata((ZX[11]).rolling(window=ttS).mean())  # head 4
+                im22.set_ydata((ZX[12]).rolling(window=ttS).mean())  # head 1
+                im23.set_ydata((ZX[13]).rolling(window=ttS).mean())  # head 2
+                im24.set_ydata((ZX[14]).rolling(window=ttS).mean())  # head 3
+                im25.set_ydata((ZX[15]).rolling(window=ttS).mean())  # head 4
                 # ---------------------------------------[T1 std Dev]
-                im26.set_ydata((ZX[0]).rolling(window=ttS, min_periods=1).std())
-                im27.set_ydata((ZX[1]).rolling(window=ttS, min_periods=1).std())
-                im28.set_ydata((ZX[2]).rolling(window=ttS, min_periods=1).std())
-                im29.set_ydata((ZX[3]).rolling(window=ttS, min_periods=1).std())
-                im30.set_ydata((ZX[4]).rolling(window=ttS, min_periods=1).std())
-                im31.set_ydata((ZX[5]).rolling(window=ttS, min_periods=1).std())
-                im32.set_ydata((ZX[6]).rolling(window=ttS, min_periods=1).std())
-                im33.set_ydata((ZX[7]).rolling(window=ttS, min_periods=1).std())
-                im34.set_ydata((ZX[8]).rolling(window=ttS, min_periods=1).std())
-                im35.set_ydata((ZX[9]).rolling(window=ttS, min_periods=1).std())
-                im36.set_ydata((ZX[10]).rolling(window=ttS, min_periods=1).std())
-                im37.set_ydata((ZX[11]).rolling(window=ttS, min_periods=1).std())
-                im38.set_ydata((ZX[12]).rolling(window=ttS, min_periods=1).std())
-                im39.set_ydata((ZX[13]).rolling(window=ttS, min_periods=1).std())
-                im40.set_ydata((ZX[14]).rolling(window=ttS, min_periods=1).std())
-                im41.set_ydata((ZX[15]).rolling(window=ttS, min_periods=1).std())
+                im26.set_ydata((ZX[0]).rolling(window=ttS).std())
+                im27.set_ydata((ZX[1]).rolling(window=ttS).std())
+                im28.set_ydata((ZX[2]).rolling(window=ttS).std())
+                im29.set_ydata((ZX[3]).rolling(window=ttS).std())
+                im30.set_ydata((ZX[4]).rolling(window=ttS).std())
+                im31.set_ydata((ZX[5]).rolling(window=ttS).std())
+                im32.set_ydata((ZX[6]).rolling(window=ttS).std())
+                im33.set_ydata((ZX[7]).rolling(window=ttS).std())
+                im34.set_ydata((ZX[8]).rolling(window=ttS).std())
+                im35.set_ydata((ZX[9]).rolling(window=ttS).std())
+                im36.set_ydata((ZX[10]).rolling(window=ttS).std())
+                im37.set_ydata((ZX[11]).rolling(window=ttS).std())
+                im38.set_ydata((ZX[12]).rolling(window=ttS).std())
+                im39.set_ydata((ZX[13]).rolling(window=ttS).std())
+                im40.set_ydata((ZX[14]).rolling(window=ttS).std())
+                im41.set_ydata((ZX[15]).rolling(window=ttS).std())
                 # ----------------------------------------------------------------------[Mean ST]
-                im42.set_ydata((ZX[16]).rolling(window=stS, min_periods=1).mean())
-                im43.set_ydata((ZX[17]).rolling(window=stS, min_periods=1).mean())
-                im44.set_ydata((ZX[18]).rolling(window=stS, min_periods=1).mean())
-                im45.set_ydata((ZX[19]).rolling(window=stS, min_periods=1).mean())
-                im46.set_ydata((ZX[20]).rolling(window=stS, min_periods=1).mean())
-                im47.set_ydata((ZX[21]).rolling(window=stS, min_periods=1).mean())
-                im48.set_ydata((ZX[22]).rolling(window=stS, min_periods=1).mean())
-                im49.set_ydata((ZX[23]).rolling(window=stS, min_periods=1).mean())
-                im50.set_ydata((ZX[24]).rolling(window=stS, min_periods=1).mean())
-                im51.set_ydata((ZX[25]).rolling(window=stS, min_periods=1).mean())
-                im52.set_ydata((ZX[26]).rolling(window=stS, min_periods=1).mean())
-                im53.set_ydata((ZX[27]).rolling(window=stS, min_periods=1).mean())
-                im54.set_ydata((ZX[28]).rolling(window=stS, min_periods=1).mean())
-                im55.set_ydata((ZX[29]).rolling(window=stS, min_periods=1).mean())
-                im56.set_ydata((ZX[30]).rolling(window=stS, min_periods=1).mean())
-                im57.set_ydata((ZX[31]).rolling(window=stS, min_periods=1).mean())
+                im42.set_ydata((ZX[16]).rolling(window=stS).mean())
+                im43.set_ydata((ZX[17]).rolling(window=stS).mean())
+                im44.set_ydata((ZX[18]).rolling(window=stS).mean())
+                im45.set_ydata((ZX[19]).rolling(window=stS).mean())
+                im46.set_ydata((ZX[20]).rolling(window=stS).mean())
+                im47.set_ydata((ZX[21]).rolling(window=stS).mean())
+                im48.set_ydata((ZX[22]).rolling(window=stS).mean())
+                im49.set_ydata((ZX[23]).rolling(window=stS).mean())
+                im50.set_ydata((ZX[24]).rolling(window=stS).mean())
+                im51.set_ydata((ZX[25]).rolling(window=stS).mean())
+                im52.set_ydata((ZX[26]).rolling(window=stS).mean())
+                im53.set_ydata((ZX[27]).rolling(window=stS).mean())
+                im54.set_ydata((ZX[28]).rolling(window=stS).mean())
+                im55.set_ydata((ZX[29]).rolling(window=stS).mean())
+                im56.set_ydata((ZX[30]).rolling(window=stS).mean())
+                im57.set_ydata((ZX[31]).rolling(window=stS).mean())
                 # ---------------------------------------[T2 std Dev]
-                im58.set_ydata((ZX[16]).rolling(window=stS, min_periods=1).std())
-                im59.set_ydata((ZX[17]).rolling(window=stS, min_periods=1).std())
-                im60.set_ydata((ZX[18]).rolling(window=stS, min_periods=1).std())
-                im61.set_ydata((ZX[19]).rolling(window=stS, min_periods=1).std())
-                im62.set_ydata((ZX[20]).rolling(window=stS, min_periods=1).std())
-                im63.set_ydata((ZX[21]).rolling(window=stS, min_periods=1).std())
-                im64.set_ydata((ZX[22]).rolling(window=stS, min_periods=1).std())
-                im65.set_ydata((ZX[23]).rolling(window=stS, min_periods=1).std())
-                im66.set_ydata((ZX[24]).rolling(window=stS, min_periods=1).std())
-                im67.set_ydata((ZX[25]).rolling(window=stS, min_periods=1).std())
-                im68.set_ydata((ZX[26]).rolling(window=stS, min_periods=1).std())
-                im69.set_ydata((ZX[27]).rolling(window=stS, min_periods=1).std())
-                im70.set_ydata((ZX[28]).rolling(window=stS, min_periods=1).std())
-                im71.set_ydata((ZX[29]).rolling(window=stS, min_periods=1).std())
-                im72.set_ydata((ZX[30]).rolling(window=stS, min_periods=1).std())
-                im73.set_ydata((ZX[31]).rolling(window=stS, min_periods=1).std())
+                im58.set_ydata((ZX[16]).rolling(window=stS).std())
+                im59.set_ydata((ZX[17]).rolling(window=stS).std())
+                im60.set_ydata((ZX[18]).rolling(window=stS).std())
+                im61.set_ydata((ZX[19]).rolling(window=stS).std())
+                im62.set_ydata((ZX[20]).rolling(window=stS).std())
+                im63.set_ydata((ZX[21]).rolling(window=stS).std())
+                im64.set_ydata((ZX[22]).rolling(window=stS).std())
+                im65.set_ydata((ZX[23]).rolling(window=stS).std())
+                im66.set_ydata((ZX[24]).rolling(window=stS).std())
+                im67.set_ydata((ZX[25]).rolling(window=stS).std())
+                im68.set_ydata((ZX[26]).rolling(window=stS).std())
+                im69.set_ydata((ZX[27]).rolling(window=stS).std())
+                im70.set_ydata((ZX[28]).rolling(window=stS).std())
+                im71.set_ydata((ZX[29]).rolling(window=stS).std())
+                im72.set_ydata((ZX[30]).rolling(window=stS).std())
+                im73.set_ydata((ZX[31]).rolling(window=stS).std())
                 # ------------------------------------------------------------------[Mean TG]
-                im74.set_ydata((ZX[32]).rolling(window=tgS, min_periods=1).mean())
-                im75.set_ydata((ZX[33]).rolling(window=tgS, min_periods=1).mean())
-                im76.set_ydata((ZX[34]).rolling(window=tgS, min_periods=1).mean())
-                im77.set_ydata((ZX[35]).rolling(window=tgS, min_periods=1).mean())
-                im78.set_ydata((ZX[36]).rolling(window=tgS, min_periods=1).mean())
-                im79.set_ydata((ZX[37]).rolling(window=tgS, min_periods=1).mean())
-                im80.set_ydata((ZX[38]).rolling(window=tgS, min_periods=1).mean())
-                im81.set_ydata((ZX[39]).rolling(window=tgS, min_periods=1).mean())
+                im74.set_ydata((ZX[32]).rolling(window=tgS).mean())
+                im75.set_ydata((ZX[33]).rolling(window=tgS).mean())
+                im76.set_ydata((ZX[34]).rolling(window=tgS).mean())
+                im77.set_ydata((ZX[35]).rolling(window=tgS).mean())
+                im78.set_ydata((ZX[36]).rolling(window=tgS).mean())
+                im79.set_ydata((ZX[37]).rolling(window=tgS).mean())
+                im80.set_ydata((ZX[38]).rolling(window=tgS).mean())
+                im81.set_ydata((ZX[39]).rolling(window=tgS).mean())
                 # ---------------------------------------[TG std Dev]
-                im82.set_ydata((ZX[32]).rolling(window=tgS, min_periods=1).std())
-                im83.set_ydata((ZX[33]).rolling(window=tgS, min_periods=1).std())
-                im84.set_ydata((ZX[34]).rolling(window=tgS, min_periods=1).std())
-                im85.set_ydata((ZX[35]).rolling(window=tgS, min_periods=1).std())
-                im86.set_ydata((ZX[36]).rolling(window=tgS, min_periods=1).std())
-                im87.set_ydata((ZX[37]).rolling(window=tgS, min_periods=1).std())
-                im88.set_ydata((ZX[38]).rolling(window=tgS, min_periods=1).std())
-                im89.set_ydata((ZX[39]).rolling(window=tgS, min_periods=1).std())
+                im82.set_ydata((ZX[32]).rolling(window=tgS).std())
+                im83.set_ydata((ZX[33]).rolling(window=tgS).std())
+                im84.set_ydata((ZX[34]).rolling(window=tgS).std())
+                im85.set_ydata((ZX[35]).rolling(window=tgS).std())
+                im86.set_ydata((ZX[36]).rolling(window=tgS).std())
+                im87.set_ydata((ZX[37]).rolling(window=tgS).std())
+                im88.set_ydata((ZX[38]).rolling(window=tgS).std())
+                im89.set_ydata((ZX[39]).rolling(window=tgS).std())
                 # --------------------------------------------------------------------------- [Mean WS]
-                im74.set_ydata((ZX[32]).rolling(window=wsS, min_periods=1).mean())
-                im75.set_ydata((ZX[33]).rolling(window=wsS, min_periods=1).mean())
-                im76.set_ydata((ZX[34]).rolling(window=wsS, min_periods=1).mean())
-                im77.set_ydata((ZX[35]).rolling(window=wsS, min_periods=1).mean())
+                im74.set_ydata((ZX[32]).rolling(window=wsS).mean())
+                im75.set_ydata((ZX[33]).rolling(window=wsS).mean())
+                im76.set_ydata((ZX[34]).rolling(window=wsS).mean())
+                im77.set_ydata((ZX[35]).rolling(window=wsS).mean())
                 # ---------------------------------------[Std Dev]
-                im78.set_ydata((ZX[36]).rolling(window=wsS, min_periods=1).std())
-                im79.set_ydata((ZX[37]).rolling(window=wsS, min_periods=1).std())
-                im80.set_ydata((ZX[38]).rolling(window=wsS, min_periods=1).std())
-                im81.set_ydata((ZX[39]).rolling(window=stS, min_periods=1).std())
+                im78.set_ydata((ZX[36]).rolling(window=wsS).std())
+                im79.set_ydata((ZX[37]).rolling(window=wsS).std())
+                im80.set_ydata((ZX[38]).rolling(window=wsS).std())
+                im81.set_ydata((ZX[39]).rolling(window=stS).std())
                 # --------------------------------------[Void Count]
                 im90.set_ydata((ZX[41]).sum())              # Sum up the values for Ring 1
                 im91.set_ydata((ZX[42]).sum())              # Sum up the values for Ring 2
@@ -2650,193 +2653,193 @@ class collectiveEoL(ttk.Frame):
 
             elif pRecipe == 'MGM':
                 # X Plot Y-Axis data points for XBar ------------------------------[Laser Power]
-                im10.set_ydata((ZX[0]).rolling(window=lpS, min_periods=1).mean())  # head 1
-                im11.set_ydata((ZX[1]).rolling(window=lpS, min_periods=1).mean())  # head 2
-                im12.set_ydata((ZX[2]).rolling(window=lpS, min_periods=1).mean())  # head 3
-                im13.set_ydata((ZX[3]).rolling(window=lpS, min_periods=1).mean())  # head 4
-                im14.set_ydata((ZX[4]).rolling(window=lpS, min_periods=1).mean())  # head 1
-                im15.set_ydata((ZX[5]).rolling(window=lpS, min_periods=1).mean())  # head 2
-                im16.set_ydata((ZX[6]).rolling(window=lpS, min_periods=1).mean())  # head 3
-                im17.set_ydata((ZX[7]).rolling(window=lpS, min_periods=1).mean())  # head 4
-                im18.set_ydata((ZX[8]).rolling(window=lpS, min_periods=1).mean())  # head 1
-                im19.set_ydata((ZX[9]).rolling(window=lpS, min_periods=1).mean())  # head 2
-                im20.set_ydata((ZX[10]).rolling(window=lpS, min_periods=1).mean())  # head 3
-                im21.set_ydata((ZX[11]).rolling(window=lpS, min_periods=1).mean())  # head 4
-                im22.set_ydata((ZX[12]).rolling(window=lpS, min_periods=1).mean())  # head 1
-                im23.set_ydata((ZX[13]).rolling(window=lpS, min_periods=1).mean())  # head 2
-                im24.set_ydata((ZX[14]).rolling(window=lpS, min_periods=1).mean())  # head 3
-                im25.set_ydata((ZX[15]).rolling(window=lpS, min_periods=1).mean())  # head 4
+                im10.set_ydata((ZX[0]).rolling(window=lpS).mean())  # head 1
+                im11.set_ydata((ZX[1]).rolling(window=lpS).mean())  # head 2
+                im12.set_ydata((ZX[2]).rolling(window=lpS).mean())  # head 3
+                im13.set_ydata((ZX[3]).rolling(window=lpS).mean())  # head 4
+                im14.set_ydata((ZX[4]).rolling(window=lpS).mean())  # head 1
+                im15.set_ydata((ZX[5]).rolling(window=lpS).mean())  # head 2
+                im16.set_ydata((ZX[6]).rolling(window=lpS).mean())  # head 3
+                im17.set_ydata((ZX[7]).rolling(window=lpS).mean())  # head 4
+                im18.set_ydata((ZX[8]).rolling(window=lpS).mean())  # head 1
+                im19.set_ydata((ZX[9]).rolling(window=lpS).mean())  # head 2
+                im20.set_ydata((ZX[10]).rolling(window=lpS).mean())  # head 3
+                im21.set_ydata((ZX[11]).rolling(window=lpS).mean())  # head 4
+                im22.set_ydata((ZX[12]).rolling(window=lpS).mean())  # head 1
+                im23.set_ydata((ZX[13]).rolling(window=lpS).mean())  # head 2
+                im24.set_ydata((ZX[14]).rolling(window=lpS).mean())  # head 3
+                im25.set_ydata((ZX[15]).rolling(window=lpS).mean())  # head 4
                 # ---------------------------------------[T1 std Dev]
-                im26.set_ydata((ZX[0]).rolling(window=lpS, min_periods=1).std())
-                im27.set_ydata((ZX[1]).rolling(window=lpS, min_periods=1).std())
-                im28.set_ydata((ZX[2]).rolling(window=lpS, min_periods=1).std())
-                im29.set_ydata((ZX[3]).rolling(window=lpS, min_periods=1).std())
-                im30.set_ydata((ZX[4]).rolling(window=lpS, min_periods=1).std())
-                im31.set_ydata((ZX[5]).rolling(window=lpS, min_periods=1).std())
-                im32.set_ydata((ZX[6]).rolling(window=lpS, min_periods=1).std())
-                im33.set_ydata((ZX[7]).rolling(window=lpS, min_periods=1).std())
-                im34.set_ydata((ZX[8]).rolling(window=lpS, min_periods=1).std())
-                im35.set_ydata((ZX[9]).rolling(window=lpS, min_periods=1).std())
-                im36.set_ydata((ZX[10]).rolling(window=lpS, min_periods=1).std())
-                im37.set_ydata((ZX[11]).rolling(window=lpS, min_periods=1).std())
-                im38.set_ydata((ZX[12]).rolling(window=lpS, min_periods=1).std())
-                im39.set_ydata((ZX[13]).rolling(window=lpS, min_periods=1).std())
-                im40.set_ydata((ZX[14]).rolling(window=lpS, min_periods=1).std())
-                im41.set_ydata((ZX[15]).rolling(window=lpS, min_periods=1).std())
+                im26.set_ydata((ZX[0]).rolling(window=lpS).std())
+                im27.set_ydata((ZX[1]).rolling(window=lpS).std())
+                im28.set_ydata((ZX[2]).rolling(window=lpS).std())
+                im29.set_ydata((ZX[3]).rolling(window=lpS).std())
+                im30.set_ydata((ZX[4]).rolling(window=lpS).std())
+                im31.set_ydata((ZX[5]).rolling(window=lpS).std())
+                im32.set_ydata((ZX[6]).rolling(window=lpS).std())
+                im33.set_ydata((ZX[7]).rolling(window=lpS).std())
+                im34.set_ydata((ZX[8]).rolling(window=lpS).std())
+                im35.set_ydata((ZX[9]).rolling(window=lpS).std())
+                im36.set_ydata((ZX[10]).rolling(window=lpS).std())
+                im37.set_ydata((ZX[11]).rolling(window=lpS).std())
+                im38.set_ydata((ZX[12]).rolling(window=lpS).std())
+                im39.set_ydata((ZX[13]).rolling(window=lpS).std())
+                im40.set_ydata((ZX[14]).rolling(window=lpS).std())
+                im41.set_ydata((ZX[15]).rolling(window=lpS).std())
                 # ---------------------------------------------------------------[Laser Angle T2]
-                im42.set_ydata((ZX[16]).rolling(window=laS, min_periods=1).mean())
-                im43.set_ydata((ZX[17]).rolling(window=laS, min_periods=1).mean())
-                im44.set_ydata((ZX[18]).rolling(window=laS, min_periods=1).mean())
-                im45.set_ydata((ZX[19]).rolling(window=laS, min_periods=1).mean())
-                im46.set_ydata((ZX[20]).rolling(window=laS, min_periods=1).mean())
-                im47.set_ydata((ZX[21]).rolling(window=laS, min_periods=1).mean())
-                im48.set_ydata((ZX[22]).rolling(window=laS, min_periods=1).mean())
-                im49.set_ydata((ZX[23]).rolling(window=laS, min_periods=1).mean())
-                im50.set_ydata((ZX[24]).rolling(window=laS, min_periods=1).mean())
-                im51.set_ydata((ZX[25]).rolling(window=laS, min_periods=1).mean())
-                im52.set_ydata((ZX[26]).rolling(window=laS, min_periods=1).mean())
-                im53.set_ydata((ZX[27]).rolling(window=laS, min_periods=1).mean())
-                im54.set_ydata((ZX[28]).rolling(window=laS, min_periods=1).mean())
-                im55.set_ydata((ZX[29]).rolling(window=laS, min_periods=1).mean())
-                im56.set_ydata((ZX[30]).rolling(window=laS, min_periods=1).mean())
-                im57.set_ydata((ZX[31]).rolling(window=laS, min_periods=1).mean())
+                im42.set_ydata((ZX[16]).rolling(window=laS).mean())
+                im43.set_ydata((ZX[17]).rolling(window=laS).mean())
+                im44.set_ydata((ZX[18]).rolling(window=laS).mean())
+                im45.set_ydata((ZX[19]).rolling(window=laS).mean())
+                im46.set_ydata((ZX[20]).rolling(window=laS).mean())
+                im47.set_ydata((ZX[21]).rolling(window=laS).mean())
+                im48.set_ydata((ZX[22]).rolling(window=laS).mean())
+                im49.set_ydata((ZX[23]).rolling(window=laS).mean())
+                im50.set_ydata((ZX[24]).rolling(window=laS).mean())
+                im51.set_ydata((ZX[25]).rolling(window=laS).mean())
+                im52.set_ydata((ZX[26]).rolling(window=laS).mean())
+                im53.set_ydata((ZX[27]).rolling(window=laS).mean())
+                im54.set_ydata((ZX[28]).rolling(window=laS).mean())
+                im55.set_ydata((ZX[29]).rolling(window=laS).mean())
+                im56.set_ydata((ZX[30]).rolling(window=laS).mean())
+                im57.set_ydata((ZX[31]).rolling(window=laS).mean())
                 # ---------------------------------------[T2 std Dev]
-                im58.set_ydata((ZX[16]).rolling(window=laS, min_periods=1).std())
-                im59.set_ydata((ZX[17]).rolling(window=laS, min_periods=1).std())
-                im60.set_ydata((ZX[18]).rolling(window=laS, min_periods=1).std())
-                im61.set_ydata((ZX[19]).rolling(window=laS, min_periods=1).std())
-                im62.set_ydata((ZX[20]).rolling(window=laS, min_periods=1).std())
-                im63.set_ydata((ZX[21]).rolling(window=laS, min_periods=1).std())
-                im64.set_ydata((ZX[22]).rolling(window=laS, min_periods=1).std())
-                im65.set_ydata((ZX[23]).rolling(window=laS, min_periods=1).std())
-                im66.set_ydata((ZX[24]).rolling(window=laS, min_periods=1).std())
-                im67.set_ydata((ZX[25]).rolling(window=laS, min_periods=1).std())
-                im68.set_ydata((ZX[26]).rolling(window=laS, min_periods=1).std())
-                im69.set_ydata((ZX[27]).rolling(window=laS, min_periods=1).std())
-                im70.set_ydata((ZX[28]).rolling(window=laS, min_periods=1).std())
-                im71.set_ydata((ZX[29]).rolling(window=laS, min_periods=1).std())
-                im72.set_ydata((ZX[30]).rolling(window=laS, min_periods=1).std())
-                im73.set_ydata((ZX[31]).rolling(window=laS, min_periods=1).std())
+                im58.set_ydata((ZX[16]).rolling(window=laS).std())
+                im59.set_ydata((ZX[17]).rolling(window=laS).std())
+                im60.set_ydata((ZX[18]).rolling(window=laS).std())
+                im61.set_ydata((ZX[19]).rolling(window=laS).std())
+                im62.set_ydata((ZX[20]).rolling(window=laS).std())
+                im63.set_ydata((ZX[21]).rolling(window=laS).std())
+                im64.set_ydata((ZX[22]).rolling(window=laS).std())
+                im65.set_ydata((ZX[23]).rolling(window=laS).std())
+                im66.set_ydata((ZX[24]).rolling(window=laS).std())
+                im67.set_ydata((ZX[25]).rolling(window=laS).std())
+                im68.set_ydata((ZX[26]).rolling(window=laS).std())
+                im69.set_ydata((ZX[27]).rolling(window=laS).std())
+                im70.set_ydata((ZX[28]).rolling(window=laS).std())
+                im71.set_ydata((ZX[29]).rolling(window=laS).std())
+                im72.set_ydata((ZX[30]).rolling(window=laS).std())
+                im73.set_ydata((ZX[31]).rolling(window=laS).std())
                 # ----------------------------------------------------------------------[Tape Temp]
-                im74.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).mean())
-                im75.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).mean())
-                im76.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).mean())
-                im77.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).mean())
-                im78.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).mean())
-                im79.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).mean())
-                im80.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).mean())
-                im81.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).mean())
-                im82.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).mean())
-                im83.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).mean())
-                im84.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).mean())
-                im85.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).mean())
-                im86.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).mean())
-                im87.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).mean())
-                im88.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).mean())
-                im89.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).mean())
+                im74.set_ydata((ZX[32]).rolling(window=ttS).mean())
+                im75.set_ydata((ZX[33]).rolling(window=ttS).mean())
+                im76.set_ydata((ZX[34]).rolling(window=ttS).mean())
+                im77.set_ydata((ZX[35]).rolling(window=ttS).mean())
+                im78.set_ydata((ZX[36]).rolling(window=ttS).mean())
+                im79.set_ydata((ZX[37]).rolling(window=ttS).mean())
+                im80.set_ydata((ZX[38]).rolling(window=ttS).mean())
+                im81.set_ydata((ZX[39]).rolling(window=ttS).mean())
+                im82.set_ydata((ZX[32]).rolling(window=ttS).mean())
+                im83.set_ydata((ZX[33]).rolling(window=ttS).mean())
+                im84.set_ydata((ZX[34]).rolling(window=ttS).mean())
+                im85.set_ydata((ZX[35]).rolling(window=ttS).mean())
+                im86.set_ydata((ZX[36]).rolling(window=ttS).mean())
+                im87.set_ydata((ZX[37]).rolling(window=ttS).mean())
+                im88.set_ydata((ZX[38]).rolling(window=ttS).mean())
+                im89.set_ydata((ZX[39]).rolling(window=ttS).mean())
                 # ---------
-                im90.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).std())
-                im91.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).std())
-                im92.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).std())
-                im93.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).std())
-                im94.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).std())
-                im95.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).std())
-                im96.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).std())
-                im97.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).std())
-                im98.set_ydata((ZX[32]).rolling(window=ttS, min_periods=1).std())
-                im99.set_ydata((ZX[33]).rolling(window=ttS, min_periods=1).std())
-                im100.set_ydata((ZX[34]).rolling(window=ttS, min_periods=1).std())
-                im101.set_ydata((ZX[35]).rolling(window=ttS, min_periods=1).std())
-                im102.set_ydata((ZX[36]).rolling(window=ttS, min_periods=1).std())
-                im103.set_ydata((ZX[37]).rolling(window=ttS, min_periods=1).std())
-                im104.set_ydata((ZX[38]).rolling(window=ttS, min_periods=1).std())
-                im105.set_ydata((ZX[39]).rolling(window=ttS, min_periods=1).std())
+                im90.set_ydata((ZX[32]).rolling(window=ttS).std())
+                im91.set_ydata((ZX[33]).rolling(window=ttS).std())
+                im92.set_ydata((ZX[34]).rolling(window=ttS).std())
+                im93.set_ydata((ZX[35]).rolling(window=ttS).std())
+                im94.set_ydata((ZX[36]).rolling(window=ttS).std())
+                im95.set_ydata((ZX[37]).rolling(window=ttS).std())
+                im96.set_ydata((ZX[38]).rolling(window=ttS).std())
+                im97.set_ydata((ZX[39]).rolling(window=ttS).std())
+                im98.set_ydata((ZX[32]).rolling(window=ttS).std())
+                im99.set_ydata((ZX[33]).rolling(window=ttS).std())
+                im100.set_ydata((ZX[34]).rolling(window=ttS).std())
+                im101.set_ydata((ZX[35]).rolling(window=ttS).std())
+                im102.set_ydata((ZX[36]).rolling(window=ttS).std())
+                im103.set_ydata((ZX[37]).rolling(window=ttS).std())
+                im104.set_ydata((ZX[38]).rolling(window=ttS).std())
+                im105.set_ydata((ZX[39]).rolling(window=ttS).std())
                 # ----------------------------------------------------------------------- [Substrate Tape]
-                im106.set_ydata((ZX[47]).rolling(window=stS, min_periods=1).mean())  # head 1
-                im107.set_ydata((ZX[48]).rolling(window=stS, min_periods=1).mean())  # head 2
-                im108.set_ydata((ZX[49]).rolling(window=stS, min_periods=1).mean())  # head 3
-                im109.set_ydata((ZX[50]).rolling(window=stS, min_periods=1).mean())  # head 4
-                im110.set_ydata((ZX[51]).rolling(window=stS, min_periods=1).mean())  # head 1
-                im111.set_ydata((ZX[52]).rolling(window=stS, min_periods=1).mean())  # head 2
-                im112.set_ydata((ZX[53]).rolling(window=stS, min_periods=1).mean())  # head 3
-                im113.set_ydata((ZX[54]).rolling(window=stS, min_periods=1).mean())  # head 4
-                im114.set_ydata((ZX[55]).rolling(window=stS, min_periods=1).mean())  # head 1
-                im115.set_ydata((ZX[56]).rolling(window=stS, min_periods=1).mean())  # head 2
-                im116.set_ydata((ZX[57]).rolling(window=stS, min_periods=1).mean())  # head 3
-                im117.set_ydata((ZX[58]).rolling(window=stS, min_periods=1).mean())  # head 4
-                im118.set_ydata((ZX[59]).rolling(window=stS, min_periods=1).mean())
-                im119.set_ydata((ZX[60]).rolling(window=stS, min_periods=1).mean())
-                im120.set_ydata((ZX[61]).rolling(window=stS, min_periods=1).mean())
-                im121.set_ydata((ZX[62]).rolling(window=stS, min_periods=1).mean())
+                im106.set_ydata((ZX[47]).rolling(window=stS).mean())  # head 1
+                im107.set_ydata((ZX[48]).rolling(window=stS).mean())  # head 2
+                im108.set_ydata((ZX[49]).rolling(window=stS).mean())  # head 3
+                im109.set_ydata((ZX[50]).rolling(window=stS).mean())  # head 4
+                im110.set_ydata((ZX[51]).rolling(window=stS).mean())  # head 1
+                im111.set_ydata((ZX[52]).rolling(window=stS).mean())  # head 2
+                im112.set_ydata((ZX[53]).rolling(window=stS).mean())  # head 3
+                im113.set_ydata((ZX[54]).rolling(window=stS).mean())  # head 4
+                im114.set_ydata((ZX[55]).rolling(window=stS).mean())  # head 1
+                im115.set_ydata((ZX[56]).rolling(window=stS).mean())  # head 2
+                im116.set_ydata((ZX[57]).rolling(window=stS).mean())  # head 3
+                im117.set_ydata((ZX[58]).rolling(window=stS).mean())  # head 4
+                im118.set_ydata((ZX[59]).rolling(window=stS).mean())
+                im119.set_ydata((ZX[60]).rolling(window=stS).mean())
+                im120.set_ydata((ZX[61]).rolling(window=stS).mean())
+                im121.set_ydata((ZX[62]).rolling(window=stS).mean())
                 # ---------------------------------------#[Stddev]
-                im122.set_ydata((ZX[47]).rolling(window=stS, min_periods=1).std())
-                im123.set_ydata((ZX[48]).rolling(window=stS, min_periods=1).std())
-                im124.set_ydata((ZX[49]).rolling(window=stS, min_periods=1).std())
-                im125.set_ydata((ZX[50]).rolling(window=stS, min_periods=1).std())
-                im126.set_ydata((ZX[51]).rolling(window=stS, min_periods=1).std())
-                im127.set_ydata((ZX[52]).rolling(window=stS, min_periods=1).std())
-                im128.set_ydata((ZX[53]).rolling(window=stS, min_periods=1).std())
-                im129.set_ydata((ZX[54]).rolling(window=stS, min_periods=1).std())
-                im130.set_ydata((ZX[55]).rolling(window=stS, min_periods=1).std())
-                im131.set_ydata((ZX[56]).rolling(window=stS, min_periods=1).std())
-                im132.set_ydata((ZX[57]).rolling(window=stS, min_periods=1).std())
-                im133.set_ydata((ZX[58]).rolling(window=stS, min_periods=1).std())
-                im134.set_ydata((ZX[59]).rolling(window=stS, min_periods=1).std())
-                im135.set_ydata((ZX[60]).rolling(window=stS, min_periods=1).std())
-                im136.set_ydata((ZX[61]).rolling(window=stS, min_periods=1).std())
-                im137.set_ydata((ZX[62]).rolling(window=stS, min_periods=1).std())
+                im122.set_ydata((ZX[47]).rolling(window=stS).std())
+                im123.set_ydata((ZX[48]).rolling(window=stS).std())
+                im124.set_ydata((ZX[49]).rolling(window=stS).std())
+                im125.set_ydata((ZX[50]).rolling(window=stS).std())
+                im126.set_ydata((ZX[51]).rolling(window=stS).std())
+                im127.set_ydata((ZX[52]).rolling(window=stS).std())
+                im128.set_ydata((ZX[53]).rolling(window=stS).std())
+                im129.set_ydata((ZX[54]).rolling(window=stS).std())
+                im130.set_ydata((ZX[55]).rolling(window=stS).std())
+                im131.set_ydata((ZX[56]).rolling(window=stS).std())
+                im132.set_ydata((ZX[57]).rolling(window=stS).std())
+                im133.set_ydata((ZX[58]).rolling(window=stS).std())
+                im134.set_ydata((ZX[59]).rolling(window=stS).std())
+                im135.set_ydata((ZX[60]).rolling(window=stS).std())
+                im136.set_ydata((ZX[61]).rolling(window=stS).std())
+                im137.set_ydata((ZX[62]).rolling(window=stS).std())
                 # -----------------------------------------------------------------[Tape Gap T6]
-                im138.set_ydata((ZX[63]).rolling(window=tgS, min_periods=1).mean())
-                im139.set_ydata((ZX[64]).rolling(window=tgS, min_periods=1).mean())
-                im140.set_ydata((ZX[65]).rolling(window=tgS, min_periods=1).mean())
-                im141.set_ydata((ZX[66]).rolling(window=tgS, min_periods=1).mean())
-                im142.set_ydata((ZX[67]).rolling(window=tgS, min_periods=1).mean())
-                im143.set_ydata((ZX[68]).rolling(window=tgS, min_periods=1).mean())
-                im144.set_ydata((ZX[69]).rolling(window=tgS, min_periods=1).mean())
-                im145.set_ydata((ZX[70]).rolling(window=tgS, min_periods=1).mean())
+                im138.set_ydata((ZX[63]).rolling(window=tgS).mean())
+                im139.set_ydata((ZX[64]).rolling(window=tgS).mean())
+                im140.set_ydata((ZX[65]).rolling(window=tgS).mean())
+                im141.set_ydata((ZX[66]).rolling(window=tgS).mean())
+                im142.set_ydata((ZX[67]).rolling(window=tgS).mean())
+                im143.set_ydata((ZX[68]).rolling(window=tgS).mean())
+                im144.set_ydata((ZX[69]).rolling(window=tgS).mean())
+                im145.set_ydata((ZX[70]).rolling(window=tgS).mean())
                 # ----------- Std
-                im146.set_ydata((ZX[71]).rolling(window=tgS, min_periods=1).std())
-                im147.set_ydata((ZX[72]).rolling(window=tgS, min_periods=1).std())
-                im148.set_ydata((ZX[73]).rolling(window=tgS, min_periods=1).std())
-                im149.set_ydata((ZX[74]).rolling(window=tgS, min_periods=1).std())
-                im150.set_ydata((ZX[75]).rolling(window=tgS, min_periods=1).std())
-                im151.set_ydata((ZX[76]).rolling(window=tgS, min_periods=1).std())
-                im152.set_ydata((ZX[77]).rolling(window=tgS, min_periods=1).std())
-                im153.set_ydata((ZX[78]).rolling(window=tgS, min_periods=1).std())
+                im146.set_ydata((ZX[71]).rolling(window=tgS).std())
+                im147.set_ydata((ZX[72]).rolling(window=tgS).std())
+                im148.set_ydata((ZX[73]).rolling(window=tgS).std())
+                im149.set_ydata((ZX[74]).rolling(window=tgS).std())
+                im150.set_ydata((ZX[75]).rolling(window=tgS).std())
+                im151.set_ydata((ZX[76]).rolling(window=tgS).std())
+                im152.set_ydata((ZX[77]).rolling(window=tgS).std())
+                im153.set_ydata((ZX[78]).rolling(window=tgS).std())
                 # --------------------------------------------------------------[ Winding Angle]
-                im154.set_ydata((ZX[63]).rolling(window=waS, min_periods=1).mean())
-                im155.set_ydata((ZX[64]).rolling(window=waS, min_periods=1).mean())
-                im156.set_ydata((ZX[65]).rolling(window=waS, min_periods=1).mean())
-                im157.set_ydata((ZX[66]).rolling(window=waS, min_periods=1).mean())
-                im158.set_ydata((ZX[67]).rolling(window=waS, min_periods=1).mean())
-                im159.set_ydata((ZX[68]).rolling(window=waS, min_periods=1).mean())
-                im160.set_ydata((ZX[69]).rolling(window=waS, min_periods=1).mean())
-                im161.set_ydata((ZX[70]).rolling(window=waS, min_periods=1).mean())
-                im162.set_ydata((ZX[71]).rolling(window=waS, min_periods=1).mean())
-                im163.set_ydata((ZX[72]).rolling(window=waS, min_periods=1).mean())
-                im164.set_ydata((ZX[73]).rolling(window=waS, min_periods=1).mean())
-                im165.set_ydata((ZX[74]).rolling(window=waS, min_periods=1).mean())
-                im166.set_ydata((ZX[75]).rolling(window=waS, min_periods=1).mean())
-                im167.set_ydata((ZX[76]).rolling(window=waS, min_periods=1).mean())
-                im168.set_ydata((ZX[77]).rolling(window=waS, min_periods=1).mean())
-                im169.set_ydata((ZX[78]).rolling(window=waS, min_periods=1).mean())
+                im154.set_ydata((ZX[63]).rolling(window=waS).mean())
+                im155.set_ydata((ZX[64]).rolling(window=waS).mean())
+                im156.set_ydata((ZX[65]).rolling(window=waS).mean())
+                im157.set_ydata((ZX[66]).rolling(window=waS).mean())
+                im158.set_ydata((ZX[67]).rolling(window=waS).mean())
+                im159.set_ydata((ZX[68]).rolling(window=waS).mean())
+                im160.set_ydata((ZX[69]).rolling(window=waS).mean())
+                im161.set_ydata((ZX[70]).rolling(window=waS).mean())
+                im162.set_ydata((ZX[71]).rolling(window=waS).mean())
+                im163.set_ydata((ZX[72]).rolling(window=waS).mean())
+                im164.set_ydata((ZX[73]).rolling(window=waS).mean())
+                im165.set_ydata((ZX[74]).rolling(window=waS).mean())
+                im166.set_ydata((ZX[75]).rolling(window=waS).mean())
+                im167.set_ydata((ZX[76]).rolling(window=waS).mean())
+                im168.set_ydata((ZX[77]).rolling(window=waS).mean())
+                im169.set_ydata((ZX[78]).rolling(window=waS).mean())
                 # -----------------------------------------------------------------[Tape Placement Mean T7]
-                im170.set_ydata((ZX[79]).rolling(window=waS, min_periods=1).std())
-                im171.set_ydata((ZX[80]).rolling(window=waS, min_periods=1).std())
-                im172.set_ydata((ZX[81]).rolling(window=waS, min_periods=1).std())
-                im173.set_ydata((ZX[82]).rolling(window=waS, min_periods=1).std())
-                im174.set_ydata((ZX[83]).rolling(window=waS, min_periods=1).std())
-                im175.set_ydata((ZX[84]).rolling(window=waS, min_periods=1).std())
-                im176.set_ydata((ZX[85]).rolling(window=waS, min_periods=1).std())
-                im177.set_ydata((ZX[86]).rolling(window=waS, min_periods=1).std())
-                im178.set_ydata((ZX[79]).rolling(window=waS, min_periods=1).std())
-                im179.set_ydata((ZX[80]).rolling(window=waS, min_periods=1).std())
-                im180.set_ydata((ZX[81]).rolling(window=waS, min_periods=1).std())
-                im181.set_ydata((ZX[82]).rolling(window=waS, min_periods=1).std())
-                im182.set_ydata((ZX[83]).rolling(window=waS, min_periods=1).std())
-                im183.set_ydata((ZX[84]).rolling(window=waS, min_periods=1).std())
-                im184.set_ydata((ZX[85]).rolling(window=waS, min_periods=1).std())
-                im185.set_ydata((ZX[86]).rolling(window=waS, min_periods=1).std())
+                im170.set_ydata((ZX[79]).rolling(window=waS).std())
+                im171.set_ydata((ZX[80]).rolling(window=waS).std())
+                im172.set_ydata((ZX[81]).rolling(window=waS).std())
+                im173.set_ydata((ZX[82]).rolling(window=waS).std())
+                im174.set_ydata((ZX[83]).rolling(window=waS).std())
+                im175.set_ydata((ZX[84]).rolling(window=waS).std())
+                im176.set_ydata((ZX[85]).rolling(window=waS).std())
+                im177.set_ydata((ZX[86]).rolling(window=waS).std())
+                im178.set_ydata((ZX[79]).rolling(window=waS).std())
+                im179.set_ydata((ZX[80]).rolling(window=waS).std())
+                im180.set_ydata((ZX[81]).rolling(window=waS).std())
+                im181.set_ydata((ZX[82]).rolling(window=waS).std())
+                im182.set_ydata((ZX[83]).rolling(window=waS).std())
+                im183.set_ydata((ZX[84]).rolling(window=waS).std())
+                im184.set_ydata((ZX[85]).rolling(window=waS).std())
+                im185.set_ydata((ZX[86]).rolling(window=waS).std())
 
             # ------------------------------------------------------ Std Dev
             if len(ZX) > win_Xmax:
@@ -3023,6 +3026,7 @@ class common_rampCount(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=20)
+        self.running = False
         self.createWidgets()
 
     def createWidgets(self):
@@ -3083,7 +3087,7 @@ class common_rampCount(ttk.Frame):
         s_fetch, stp_Sz = str(cSS), 1        # entry value in string sql syntax
 
         # Obtain Volatile Data from sql Host Server ---------------------------[]
-        if not inUseAlready:  # Load CommsPlc class once
+        if self.running and UseSQL_DBS:
             rm_con = sq.DAQ_connect(1, 0)
         else:
             pass
@@ -3129,7 +3133,7 @@ class common_rampCount(ttk.Frame):
                 else:
                     self.rcD = rC.plcExec(rcT, rcS, rcTy)        #dbNo, sampleSiz, grpStep, Fetch Cycle
 
-            elif UseSQL_DBS:
+            elif UseSQL_DBS and self.running:
                 import sqlArrayRLmethodRC as rC
 
                 inProgress = True  # True for RetroPlay mode
@@ -3181,7 +3185,7 @@ class common_rampCount(ttk.Frame):
         else:
             pass
 
-        if UsePLC_DBS or UseSQL_DBS:
+        if UsePLC_DBS or UseSQL_DBS and self.running:
             g1 = qrc.validCols(rcT)                            # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(self.rcD, columns=g1)           # Import into python Dataframe
             RC = rc.loadProcesValues(df1)                      # Join data values under dataframe
@@ -3198,11 +3202,11 @@ class common_rampCount(ttk.Frame):
             im14.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1]
-            im10.set_ydata((RC[2]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im11.set_ydata((RC[3]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im12.set_ydata((RC[4]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im13.set_ydata((RC[5]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im14.set_ydata((total_cum).rolling(window=25, min_periods=1)[0:self.win_Xmax])     # Cumulative count
+            im10.set_ydata((RC[2]).rolling(window=25).mean()[0:self.win_Xmax])  # head 1
+            im11.set_ydata((RC[3]).rolling(window=25).mean()[0:self.win_Xmax])  # head 1
+            im12.set_ydata((RC[4]).rolling(window=25).mean()[0:self.win_Xmax])  # head 1
+            im13.set_ydata((RC[5]).rolling(window=25).mean()[0:self.win_Xmax])  # head 1
+            im14.set_ydata((total_cum).rolling(window=25)[0:self.win_Xmax])     # Cumulative count
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if len(RC) > win_Xmax:
@@ -3223,6 +3227,7 @@ class common_climateProfile(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=pEvX, y=20)     # 915
+        self.running = False
         self.createWidgets()
 
     def createWidgets(self):
@@ -3289,7 +3294,7 @@ class common_climateProfile(ttk.Frame):
         s_fetch, stp_Sz = str(cSS), 1        # entry value in string sql syntax
 
         # Obtain SQL Data Host Server ---------------------------[]
-        if not inUseAlready:                # Load CommsPlc class once
+        if self.running and UseSQL_DBS:                # Load CommsPlc class once
             ev_con = sq.DAQ_connect(1, 0)
         else:
             pass
@@ -3335,14 +3340,10 @@ class common_climateProfile(ttk.Frame):
                 else:
                     self.evD = sev.plcExec(evT, rcS, rcTy)                  # perform DB connections
 
-            elif UseSQL_DBS:
+            elif UseSQL_DBS and self.running:
                 inProgress = True  # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
                 print('DrLabs' + "' Runtime Optimisation is Enabled!")
-
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 if keyboard.is_pressed("Alt+Q") and not inProgress:
                     print('\nProduction is pausing...')
@@ -3387,7 +3388,7 @@ class common_climateProfile(ttk.Frame):
         else:
             pass
 
-        if UsePLC_DBS or UseSQL_DBS:
+        if UsePLC_DBS or UseSQL_DBS and self.running:
             g1 = qev.validCols(evT)                            # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(self.evT, columns=g1)            # Import into python Dataframe
             EV = ev.loadProcesValues(df1)                       # Join data values under dataframe
@@ -3407,14 +3408,14 @@ class common_climateProfile(ttk.Frame):
             im15.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1]
-            # im10.set_ydata((EV[2]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])   # time stamp
+            # im10.set_ydata((EV[2]).rolling(window=smp_Sz).mean()[0:db_freq])   # time stamp
             im10.set_ydata((EV[2])[0:self.win_Xmax])           # oven tempA
             im11.set_ydata((EV[3])[0:self.win_Xmax])           # oven temp B
             im12.set_ydata((EV[4])[0:self.win_Xmax])           # Cell Rel Temperature
             im13.set_ydata((EV[5])[0:self.win_Xmax])           # Cell Rel Humidity
             im14.set_ydata((EV[6])[0:self.win_Xmax])           # Factory Dew Point Temp
             im15.set_ydata((EV[7])[0:self.win_Xmax])           # Factory Humidity
-            # im11.set_ydata((CT[12]).rolling(window=smp_Sz, min_periods=1).mean()[0:db_freq])  # UVIndex
+            # im11.set_ydata((CT[12]).rolling(window=smp_Sz).mean()[0:db_freq])  # UVIndex
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if len(EV ) > win_Xmax:
@@ -3433,7 +3434,8 @@ class common_climateProfile(ttk.Frame):
 class common_gapCount(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.place(x=pTgX, y=20)    #[1600, 1820]
+        self.place(x=pTgX, y=20)
+        self.running = False
         self.createWidgets()
 
     def createWidgets(self):
@@ -3493,7 +3495,7 @@ class common_gapCount(ttk.Frame):
         s_fetch, stp_Sz = str(cSS), 1  # entry value in string sql syntax
 
         # Obtain SQL Data Host Server ---------------------------[]
-        if not inUseAlready:  # Load CommsPlc class once
+        if UseSQL_DBS and self.running:                          # Load CommsPlc class once
             gc_con = sq.DAQ_connect(1, 0)
         else:
             pass
@@ -3512,8 +3514,7 @@ class common_gapCount(ttk.Frame):
         # Define PLC/SMC error state -------------------------------------------#
 
         while True:
-            # print('Indefinite looping...')
-            if UsePLC_DBS:  # Not Using PLC Data
+            if UsePLC_DBS:                                                  # Not Using PLC Data
                 import plcArrayRLmethodVC as svc                            # DrLabs optimized Loader
 
                 inProgress = True                                           # True for RetroPlay mode
@@ -3537,16 +3538,12 @@ class common_gapCount(ttk.Frame):
                 else:
                     self.gcD = svc.plcExec(gcT, rcS, rcTy)           # perform DB connections
 
-            elif UseSQL_DBS:
+            elif UseSQL_DBS and self.running:
                 import sqlArrayRLmethodVC as svc                              # DrLabs optimization method
 
                 inProgress = True  # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
                 print('DrLabs' + "' Runtime Optimisation is Enabled!")
-
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 if keyboard.is_pressed("Alt+Q") and not inProgress:
                     print('\nProduction is pausing...')
@@ -3591,7 +3588,7 @@ class common_gapCount(ttk.Frame):
         else:
             pass                                            # load SQL variables column names | rfVarSQL
 
-        if UsePLC_DBS or UseSQL_DBS:
+        if UsePLC_DBS or UseSQL_DBS and self.running:
             g1 = qvc.validCols(gcT)
             df1 = pd.DataFrame(self.gcT, columns=g1)             # Import into python Dataframe vData
             VC = vc.loadProcesValues(df1)                      # Join data values under dataframe
@@ -3606,11 +3603,11 @@ class common_gapCount(ttk.Frame):
             im14.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1]
-            im10.set_ydata(VC[2].rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])   # Count under Ring 1
-            im11.set_ydata(VC[3].rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])   # Count under Ring 2
-            im12.set_ydata(VC[4].rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])   # Count under Ring 3
-            im13.set_ydata(VC[5].rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])   # Count under Ring 4
-            im14.set_ydata(VC[1].rolling(window=25, min_periods=1)[0:self.win_Xmax])          # Cumulative
+            im10.set_ydata(VC[2].rolling(window=25).mean()[0:self.win_Xmax])   # Count under Ring 1
+            im11.set_ydata(VC[3].rolling(window=25).mean()[0:self.win_Xmax])   # Count under Ring 2
+            im12.set_ydata(VC[4].rolling(window=25).mean()[0:self.win_Xmax])   # Count under Ring 3
+            im13.set_ydata(VC[5].rolling(window=25).mean()[0:self.win_Xmax])   # Count under Ring 4
+            im14.set_ydata(VC[1].rolling(window=25)[0:self.win_Xmax])          # Cumulative
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if len(VC) > win_Xmax:
@@ -3633,6 +3630,7 @@ class MonitorTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=20)
+        self.running = False
         self.createWidgets()
 
     def createWidgets(self):
@@ -3850,7 +3848,8 @@ class MonitorTabb(ttk.Frame):
         toolbar = NavigationToolbar2Tk(self.canvas, self)
         toolbar.update()
         self.canvas._tkcanvas.pack(expand=True)
-        # --------- call data block --------------
+
+        # --------- call data block --------------------------------
         threading.Thread(target=self._dataControl, daemon=True).start()
         # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
 
@@ -3858,7 +3857,7 @@ class MonitorTabb(ttk.Frame):
         s_fetch, stp_Sz = str(cSS), 1        # entry value in string sql syntax
 
         # Obtain Volatile Data from sql Host Server ---------------------------[]
-        if not inUseAlready:  # Load CommsPlc class once
+        if UseSQL_DBS and self.running:  # Load CommsPlc class once
             mt_con = sq.DAQ_connect(1, 0)
         else:
             pass
@@ -3880,14 +3879,10 @@ class MonitorTabb(ttk.Frame):
 
         while True:
             # print('Indefinite looping...')
-            if UseSQL_DBS:
+            if UseSQL_DBS and self.running:
                 inProgress = True                                            # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
                 print('DrLabs' + "' Runtime Optimisation is Enabled!")
-
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()             # Retrieve M.State from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 if keyboard.is_pressed("Alt+Q") and not inProgress:
                     print('\nProduction is pausing...')
@@ -3939,7 +3934,8 @@ class MonitorTabb(ttk.Frame):
         timei = time.time()                                                             # start timing the entire loop
 
         # declare asynchronous variables ------------------[]
-        if UseSQL_DBS:
+        if UseSQL_DBS and self.running:
+            print('\nMonitor Tabb running......')
             import VarSQL_PM as mt
             # ----------------------------------------------#
             if pRecipe == 'DNV':
@@ -4047,99 +4043,99 @@ class MonitorTabb(ttk.Frame):
 
             if pRecipe == 'DNV':
                 # X Plot Y-Axis data points for XBar ----------[Roller Pressure x16, A1]
-                im10.set_ydata((PM[13]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H1
-                im11.set_ydata((PM[14]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H2
-                im12.set_ydata((PM[15]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H3
-                im13.set_ydata((PM[16]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R1H4
-                im14.set_ydata((PM[17]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H1
-                im15.set_ydata((PM[18]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H2
-                im16.set_ydata((PM[19]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H3
-                im17.set_ydata((PM[20]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # R2H4
-                im18.set_ydata((PM[21]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im19.set_ydata((PM[22]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im20.set_ydata((PM[23]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im21.set_ydata((PM[24]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im22.set_ydata((PM[25]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im23.set_ydata((PM[26]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im24.set_ydata((PM[27]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im25.set_ydata((PM[28]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im10.set_ydata((PM[13]).rolling(window=25).mean()[0:self.win_Xmax])  # R1H1
+                im11.set_ydata((PM[14]).rolling(window=25).mean()[0:self.win_Xmax])  # R1H2
+                im12.set_ydata((PM[15]).rolling(window=25).mean()[0:self.win_Xmax])  # R1H3
+                im13.set_ydata((PM[16]).rolling(window=25).mean()[0:self.win_Xmax])  # R1H4
+                im14.set_ydata((PM[17]).rolling(window=25).mean()[0:self.win_Xmax])  # R2H1
+                im15.set_ydata((PM[18]).rolling(window=25).mean()[0:self.win_Xmax])  # R2H2
+                im16.set_ydata((PM[19]).rolling(window=25).mean()[0:self.win_Xmax])  # R2H3
+                im17.set_ydata((PM[20]).rolling(window=25).mean()[0:self.win_Xmax])  # R2H4
+                im18.set_ydata((PM[21]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im19.set_ydata((PM[22]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im20.set_ydata((PM[23]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im21.set_ydata((PM[24]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im22.set_ydata((PM[25]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im23.set_ydata((PM[26]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im24.set_ydata((PM[27]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im25.set_ydata((PM[28]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
                 # ------------------------------------- Tape Winding Speed x16, A2
-                im26.set_ydata((PM[6]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im27.set_ydata((PM[7]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im28.set_ydata((PM[8]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im29.set_ydata((PM[9]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im26.set_ydata((PM[6]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im27.set_ydata((PM[7]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im28.set_ydata((PM[8]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im29.set_ydata((PM[9]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
                 # --------------------------------------Active Cell Tension x1
-                im30.set_ydata((PM[1]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im30.set_ydata((PM[1]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
                 # ----------------------------------------Oven Temperature x4 (RTD & IR Temp)
-                im31.set_ydata((PM[2]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im32.set_ydata((PM[3]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im33.set_ydata((PM[4]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im34.set_ydata((PM[5]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im31.set_ydata((PM[2]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im32.set_ydata((PM[3]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im33.set_ydata((PM[4]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im34.set_ydata((PM[5]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
 
             elif pRecipe == 'MGM':
                 # -------------------------------------------------------------------------------[Laser Power]
-                im10.set_ydata((PM[30]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im11.set_ydata((PM[31]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im12.set_ydata((PM[32]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im13.set_ydata((PM[33]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im14.set_ydata((PM[34]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im15.set_ydata((PM[35]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im16.set_ydata((PM[36]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im17.set_ydata((PM[37]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im18.set_ydata((PM[38]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im19.set_ydata((PM[39]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im20.set_ydata((PM[40]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im21.set_ydata((PM[41]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im22.set_ydata((PM[42]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im23.set_ydata((PM[43]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im24.set_ydata((PM[44]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im25.set_ydata((PM[45]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+                im10.set_ydata((PM[30]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im11.set_ydata((PM[31]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im12.set_ydata((PM[32]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im13.set_ydata((PM[33]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im14.set_ydata((PM[34]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im15.set_ydata((PM[35]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im16.set_ydata((PM[36]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im17.set_ydata((PM[37]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im18.set_ydata((PM[38]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im19.set_ydata((PM[39]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im20.set_ydata((PM[40]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im21.set_ydata((PM[41]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im22.set_ydata((PM[42]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im23.set_ydata((PM[43]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im24.set_ydata((PM[44]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im25.set_ydata((PM[45]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
                 # -----------------------------------------------------[Cell Tension]
-                im26.set_ydata((PM[1]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])   # Segment 1
+                im26.set_ydata((PM[1]).rolling(window=25).mean()[0:self.win_Xmax])   # Segment 1
                 # --------------------------------------------------[Roller Pressure]
-                im27.set_ydata((PM[13]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im28.set_ydata((PM[14]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im29.set_ydata((PM[15]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im30.set_ydata((PM[16]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im31.set_ydata((PM[17]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im32.set_ydata((PM[18]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im33.set_ydata((PM[19]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im34.set_ydata((PM[20]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im35.set_ydata((PM[21]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im36.set_ydata((PM[22]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im37.set_ydata((PM[23]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im38.set_ydata((PM[24]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im39.set_ydata((PM[25]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im40.set_ydata((PM[26]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im41.set_ydata((PM[27]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im42.set_ydata((PM[28]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im27.set_ydata((PM[13]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im28.set_ydata((PM[14]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im29.set_ydata((PM[15]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im30.set_ydata((PM[16]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im31.set_ydata((PM[17]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im32.set_ydata((PM[18]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im33.set_ydata((PM[19]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im34.set_ydata((PM[20]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im35.set_ydata((PM[21]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im36.set_ydata((PM[22]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im37.set_ydata((PM[23]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im38.set_ydata((PM[24]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im39.set_ydata((PM[25]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im40.set_ydata((PM[26]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im41.set_ydata((PM[27]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im42.set_ydata((PM[28]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
                 # -------------------------------------------------------[Laser Angle]
-                im43.set_ydata((PM[47]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im44.set_ydata((PM[48]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im45.set_ydata((PM[49]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im46.set_ydata((PM[50]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im47.set_ydata((PM[51]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im48.set_ydata((PM[52]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im49.set_ydata((PM[53]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im50.set_ydata((PM[54]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im51.set_ydata((PM[55]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im52.set_ydata((PM[56]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im53.set_ydata((PM[57]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im54.set_ydata((PM[58]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-                im55.set_ydata((PM[59]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im56.set_ydata((PM[60]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im57.set_ydata((PM[61]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im58.set_ydata((PM[62]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im43.set_ydata((PM[47]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im44.set_ydata((PM[48]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im45.set_ydata((PM[49]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im46.set_ydata((PM[50]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im47.set_ydata((PM[51]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im48.set_ydata((PM[52]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im49.set_ydata((PM[53]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im50.set_ydata((PM[54]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im51.set_ydata((PM[55]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im52.set_ydata((PM[56]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im53.set_ydata((PM[57]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im54.set_ydata((PM[58]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
+                im55.set_ydata((PM[59]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im56.set_ydata((PM[60]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im57.set_ydata((PM[61]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im58.set_ydata((PM[62]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
                 # -------------------------------------------------[Oven Temperature]
-                im59.set_ydata((PM[2]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im60.set_ydata((PM[3]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im61.set_ydata((PM[4]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im62.set_ydata((PM[5]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im59.set_ydata((PM[2]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im60.set_ydata((PM[3]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im61.set_ydata((PM[4]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im62.set_ydata((PM[5]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
                 # ----------------------------------------------[Winding Speed x16]
-                im63.set_ydata((PM[6]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-                im64.set_ydata((PM[7]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-                im65.set_ydata((PM[8]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
-                im66.set_ydata((PM[9]).rolling(window=25, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
+                im63.set_ydata((PM[6]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 2
+                im64.set_ydata((PM[7]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 3
+                im65.set_ydata((PM[8]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 4
+                im66.set_ydata((PM[9]).rolling(window=25).mean()[0:self.win_Xmax])  # Segment 1
 
             # Setting up the parameters for moving windows Axes ---[]
             if len(PM) > win_Xmax:
@@ -4575,54 +4571,54 @@ class laserPowerTabb(ttk.Frame):
             im41.set_xdata(np.arange(self.win_Xmax))      # lpS, lTy
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im11.set_ydata((LP[1]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im12.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im13.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im10.set_ydata((LP[0]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 1
+            im11.set_ydata((LP[1]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 2
+            im12.set_ydata((LP[2]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 3
+            im13.set_ydata((LP[3]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(pAL, lpS, 'LP')
             # ---------------------------------------#
-            im14.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im15.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im16.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im17.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im14.set_ydata((LP[4]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 1
+            im15.set_ydata((LP[5]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 2
+            im16.set_ydata((LP[6]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 3
+            im17.set_ydata((LP[7]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(pAL, lpS, 'LP')
             # ---------------------------------------#
-            im18.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im19.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im20.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im21.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im18.set_ydata((LP[8]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 1
+            im19.set_ydata((LP[9]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 2
+            im20.set_ydata((LP[10]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 3
+            im21.set_ydata((LP[11]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(pAL, lpS, 'LP')
             # ---------------------------------------#
-            im22.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im23.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im24.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im25.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im22.set_ydata((LP[12]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 1
+            im23.set_ydata((LP[13]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 2
+            im24.set_ydata((LP[14]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 3
+            im25.set_ydata((LP[15]).rolling(window=lpS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(pAL, lpS, 'LP')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((LP[0]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im27.set_ydata((LP[1]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im28.set_ydata((LP[2]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im29.set_ydata((LP[3]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im26.set_ydata((LP[0]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im27.set_ydata((LP[1]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im28.set_ydata((LP[2]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im29.set_ydata((LP[3]).rolling(window=lpS).std()[0:self.win_Xmax])
 
-            im30.set_ydata((LP[4]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im31.set_ydata((LP[5]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im32.set_ydata((LP[6]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im33.set_ydata((LP[7]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im30.set_ydata((LP[4]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im31.set_ydata((LP[5]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im32.set_ydata((LP[6]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im33.set_ydata((LP[7]).rolling(window=lpS).std()[0:self.win_Xmax])
 
-            im34.set_ydata((LP[8]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im35.set_ydata((LP[9]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im36.set_ydata((LP[10]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im37.set_ydata((LP[11]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im34.set_ydata((LP[8]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im35.set_ydata((LP[9]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im36.set_ydata((LP[10]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im37.set_ydata((LP[11]).rolling(window=lpS).std()[0:self.win_Xmax])
 
-            im38.set_ydata((LP[12]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im39.set_ydata((LP[13]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im40.set_ydata((LP[14]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
-            im41.set_ydata((LP[15]).rolling(window=lpS, min_periods=1).std()[0:self.win_Xmax])
+            im38.set_ydata((LP[12]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im39.set_ydata((LP[13]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im40.set_ydata((LP[14]).rolling(window=lpS).std()[0:self.win_Xmax])
+            im41.set_ydata((LP[15]).rolling(window=lpS).std()[0:self.win_Xmax])
 
             # Compute entire Process Capability -----------#
             if not pAL:
@@ -5072,54 +5068,54 @@ class laserAngleTabb(ttk.Frame):
             im41.set_xdata(np.arange(db_freq))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((LA[0]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 1
-            im11.set_ydata((LA[1]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 2
-            im12.set_ydata((LA[2]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 3
-            im13.set_ydata((LA[3]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 4
+            im10.set_ydata((LA[0]).rolling(window=laS).mean()[0:db_freq])  # head 1
+            im11.set_ydata((LA[1]).rolling(window=laS).mean()[0:db_freq])  # head 2
+            im12.set_ydata((LA[2]).rolling(window=laS).mean()[0:db_freq])  # head 3
+            im13.set_ydata((LA[3]).rolling(window=laS).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(laHL, laS, 'LA')
             # ---------------------------------------#
-            im14.set_ydata((LA[4]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 1
-            im15.set_ydata((LA[5]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 2
-            im16.set_ydata((LA[6]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 3
-            im17.set_ydata((LA[7]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 4
+            im14.set_ydata((LA[4]).rolling(window=laS).mean()[0:db_freq])  # head 1
+            im15.set_ydata((LA[5]).rolling(window=laS).mean()[0:db_freq])  # head 2
+            im16.set_ydata((LA[6]).rolling(window=laS).mean()[0:db_freq])  # head 3
+            im17.set_ydata((LA[7]).rolling(window=laS).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(laHL, laS, 'LA')
             # ---------------------------------------#
-            im18.set_ydata((LA[8]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 1
-            im19.set_ydata((LA[9]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 2
-            im20.set_ydata((LA[10]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 3
-            im21.set_ydata((LA[11]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 4
+            im18.set_ydata((LA[8]).rolling(window=laS).mean()[0:db_freq])  # head 1
+            im19.set_ydata((LA[9]).rolling(window=laS).mean()[0:db_freq])  # head 2
+            im20.set_ydata((LA[10]).rolling(window=laS).mean()[0:db_freq])  # head 3
+            im21.set_ydata((LA[11]).rolling(window=laS).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(laHL, laS, 'LA')
             # ---------------------------------------#
-            im22.set_ydata((LA[12]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 1
-            im23.set_ydata((LA[13]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 2
-            im24.set_ydata((LA[14]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 3
-            im25.set_ydata((LA[15]).rolling(window=laS, min_periods=1).mean()[0:db_freq])  # head 4
+            im22.set_ydata((LA[12]).rolling(window=laS).mean()[0:db_freq])  # head 1
+            im23.set_ydata((LA[13]).rolling(window=laS).mean()[0:db_freq])  # head 2
+            im24.set_ydata((LA[14]).rolling(window=laS).mean()[0:db_freq])  # head 3
+            im25.set_ydata((LA[15]).rolling(window=laS).mean()[0:db_freq])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(laHL, laS, 'LA')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((LA[0]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im27.set_ydata((LA[1]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im28.set_ydata((LA[2]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im29.set_ydata((LA[3]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im26.set_ydata((LA[0]).rolling(window=laS).std()[0:db_freq])
+            im27.set_ydata((LA[1]).rolling(window=laS).std()[0:db_freq])
+            im28.set_ydata((LA[2]).rolling(window=laS).std()[0:db_freq])
+            im29.set_ydata((LA[3]).rolling(window=laS).std()[0:db_freq])
 
-            im30.set_ydata((LA[4]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im31.set_ydata((LA[5]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im32.set_ydata((LA[6]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im33.set_ydata((LA[7]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im30.set_ydata((LA[4]).rolling(window=laS).std()[0:db_freq])
+            im31.set_ydata((LA[5]).rolling(window=laS).std()[0:db_freq])
+            im32.set_ydata((LA[6]).rolling(window=laS).std()[0:db_freq])
+            im33.set_ydata((LA[7]).rolling(window=laS).std()[0:db_freq])
 
-            im34.set_ydata((LA[8]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im35.set_ydata((LA[9]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im36.set_ydata((LA[10]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im37.set_ydata((LA[11]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im34.set_ydata((LA[8]).rolling(window=laS).std()[0:db_freq])
+            im35.set_ydata((LA[9]).rolling(window=laS).std()[0:db_freq])
+            im36.set_ydata((LA[10]).rolling(window=laS).std()[0:db_freq])
+            im37.set_ydata((LA[11]).rolling(window=laS).std()[0:db_freq])
 
-            im38.set_ydata((LA[12]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im39.set_ydata((LA[13]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im40.set_ydata((LA[14]).rolling(window=laS, min_periods=1).std()[0:db_freq])
-            im41.set_ydata((LA[15]).rolling(window=laS, min_periods=1).std()[0:db_freq])
+            im38.set_ydata((LA[12]).rolling(window=laS).std()[0:db_freq])
+            im39.set_ydata((LA[13]).rolling(window=laS).std()[0:db_freq])
+            im40.set_ydata((LA[14]).rolling(window=laS).std()[0:db_freq])
+            im41.set_ydata((LA[15]).rolling(window=laS).std()[0:db_freq])
 
             # Compute entire Process Capability -----------#
             if not laHL:
@@ -5168,6 +5164,7 @@ class rollerForceTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
+        self.running = False
         self.create_widgets()
 
     def create_widgets(self):
@@ -5414,7 +5411,7 @@ class rollerForceTabb(ttk.Frame):
         s_fetch, stp_Sz, s_regm = str(rfS), rfTy, eolS
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:  # Load Coms Plc class once
+        if UseSQL_DBS and self.running:  # Load Coms Plc class once
             rf_con = sq.DAQ_connect(1, 0)
         else:
             pass
@@ -5458,14 +5455,10 @@ class rollerForceTabb(ttk.Frame):
                     self.rfDta = srf.plcExec(T1, s_fetch, stp_Sz, s_regm)
                     self.rfDtb = 0
 
-            elif UseSQL_DBS:
+            elif UseSQL_DBS and self.running:
                 inProgress = True  # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
                 print('DrLabs' + "' Runtime Optimisation is Enabled!")
-
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve M.State from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 if keyboard.is_pressed("Alt+Q") and not inProgress:
                     print('\nProduction is pausing...')
@@ -5564,54 +5557,54 @@ class rollerForceTabb(ttk.Frame):
             im41.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((RF[0]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im11.set_ydata((RF[1]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im12.set_ydata((RF[2]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im13.set_ydata((RF[3]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im10.set_ydata((RF[0]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 1
+            im11.set_ydata((RF[1]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 2
+            im12.set_ydata((RF[2]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 3
+            im13.set_ydata((RF[3]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im14.set_ydata((RF[4]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im15.set_ydata((RF[5]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im16.set_ydata((RF[6]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im17.set_ydata((RF[7]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im14.set_ydata((RF[4]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 1
+            im15.set_ydata((RF[5]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 2
+            im16.set_ydata((RF[6]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 3
+            im17.set_ydata((RF[7]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im18.set_ydata((RF[8]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im19.set_ydata((RF[9]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im20.set_ydata((RF[10]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im21.set_ydata((RF[11]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im18.set_ydata((RF[8]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 1
+            im19.set_ydata((RF[9]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 2
+            im20.set_ydata((RF[10]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 3
+            im21.set_ydata((RF[11]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im22.set_ydata((RF[12]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im23.set_ydata((RF[13]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im24.set_ydata((RF[14]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im25.set_ydata((RF[15]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im22.set_ydata((RF[12]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 1
+            im23.set_ydata((RF[13]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 2
+            im24.set_ydata((RF[14]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 3
+            im25.set_ydata((RF[15]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(rfHL, rfS, 'RF')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((RF[0]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im27.set_ydata((RF[1]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im28.set_ydata((RF[2]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im29.set_ydata((RF[3]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im26.set_ydata((RF[0]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im27.set_ydata((RF[1]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im28.set_ydata((RF[2]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im29.set_ydata((RF[3]).rolling(window=rfS).std()[0:self.win_Xmax])
 
-            im30.set_ydata((RF[4]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im31.set_ydata((RF[5]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im32.set_ydata((RF[6]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im33.set_ydata((RF[7]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im30.set_ydata((RF[4]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im31.set_ydata((RF[5]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im32.set_ydata((RF[6]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im33.set_ydata((RF[7]).rolling(window=rfS).std()[0:self.win_Xmax])
 
-            im34.set_ydata((RF[8]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im35.set_ydata((RF[9]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im36.set_ydata((RF[10]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im37.set_ydata((RF[11]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im34.set_ydata((RF[8]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im35.set_ydata((RF[9]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im36.set_ydata((RF[10]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im37.set_ydata((RF[11]).rolling(window=rfS).std()[0:self.win_Xmax])
 
-            im38.set_ydata((RF[12]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im39.set_ydata((RF[13]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im40.set_ydata((RF[14]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im41.set_ydata((RF[15]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im38.set_ydata((RF[12]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im39.set_ydata((RF[13]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im40.set_ydata((RF[14]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im41.set_ydata((RF[15]).rolling(window=rfS).std()[0:self.win_Xmax])
 
             # Compute entire Process Capability -----------#
             if not rfHL:
@@ -5661,13 +5654,15 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
+        self.running = True
         self.create_widgets()
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
-        global win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, im16, im17, a1, a2, a3, ttS, ttTy, T1, T2, T3, \
-            SrgA, im18, im19, im20, im21, im22, im23, im24, im25, im26, im27, im28, im29, im30, im31, im32, im33, im34, \
-            im35, im36, im37, im38, im39, im40, im41, im42, im43, im44, im45
+        # global win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, im16, im17, a1, a2, a3, ttS, ttTy, T1, T2, T3, \
+        #     SrgA, im18, im19, im20, im21, im22, im23, im24, im25, im26, im27, im28, im29, im30, im31, im32, im33, im34, \
+        #     im35, im36, im37, im38, im39, im40, im41, im42, im43, im44, im45, ttUSL, ttLSL, ttMean, ttLCL, ttUCL
+        global ttUCL, ttLCL, ttMean, ttDev, sUCLtt, sLCLtt, ttUSL, ttLSL
 
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
@@ -5675,18 +5670,26 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         else:
             import qParamsHL_MGM as qp
         # ------------------------------------------[]
-        ttS, ttTy, SrgA, SrgB, ttHL, ttAL, ttFO, ttP1, ttP2, ttP3, ttP4, ttP5 = qp.decryptpProcessLim(pWON, 'TT')
-        # Break down each element to useful list ---------------[Tape Temperature]
+        self.ttS, self.ttTy, self.olS, self.opS, self.DNV, self.AUTO, self.MGM, self.tape1, self.tape2, self.tape3, self.tape4, self.tape5 = qp.decryptpProcessLim(
+            pWON, 'TT')
 
-        if ttHL and ttP1 and ttP2 and ttP3 and ttP4 and ttP5:  #
-            ttPerf = '$Pp_{k' + str(ttS) + '}$'      # Using estimated or historical Mean
+        if self.ttS == 0 or self.ttTy == 0:
+            self.ttS, self.ttTy, self.olS, self.opS = 25, 1, 50, 20
+        print('\nCondition met, reset variables', self.ttS, self.ttTy, self.olS, self.opS)
+
+        # Break down each element to useful list ---------------[Tape Temperature]
+        print('\nSamples/Group Samples:', self.ttS, self.ttTy)
+
+        if self.tape1 != 0 and self.tape2 != 0 and self.tape3 != 0 and self.tape5 != 0 and self.tape5 != 0:
+            # if self.DNV  or self.MGM:   #
+            ttPerf = '$Pp_{k' + str(self.ttS) + '}$'      # Using estimated or historical Mean
             ttlabel = 'Pp'
             # -------------------------------
-            One = ttP1.split(',')                   # split into list elements
-            Two = ttP2.split(',')
-            Thr = ttP3.split(',')
-            For = ttP4.split(',')
-            Fiv = ttP5.split(',')
+            One = self.tape1.split(',')                   # split into list elements
+            Two = self.tape2.split(',')
+            Thr = self.tape3.split(',')
+            For = self.tape4.split(',')
+            Fiv = self.tape5.split(',')
             # -------------------------------
             dTape1 = One[1].strip("' ")                 # defined Tape Width
             dTape2 = Two[1].strip("' ")                 # defined Tape Width
@@ -5757,16 +5760,16 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                 ttUSL = (ttUCL - ttMean) / 3 * 6
                 ttLSL = (ttMean - ttLCL) / 3 * 6
                 # -------------------------------
-        else:  # Computes Shewhart constants (Automatic Limits)
-            ttUCL = 0
-            ttLCL = 0
-            ttMean = 0
-            ttDev = 0
-            sUCLtt = 0
-            sLCLtt = 0
-            ttUSL = 0
-            ttLSL = 0
-            ttPerf = '$Cp_{k' + str(ttS) + '}$'  # Using Automatic group Mean
+        else:  # Use default Limit values
+            ttUCL = 8
+            ttLCL = 2
+            ttMean = 5
+            ttDev = 5
+            sUCLtt = 6
+            sLCLtt = 4
+            ttUSL = 9
+            ttLSL = 1
+            ttPerf = '$Cp_{k' + str(self.ttS) + '}$'  # Using Automatic group Mean
             ttlabel = 'Cp'
 
         # ------------------------------------[End of Tape Temperature Abstraction]
@@ -5787,20 +5790,20 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minTT, YScale_maxTT = ttLSL - 8.5, ttUSL + 8.5       # Tape Temperature
-        sBar_minTT, sBar_maxTT = sLCLtt - 80, sUCLtt + 80           # Calibrate Y-axis for S-Plot
-        self.win_Xmin, self.win_Xmax = 0, (int(ttS) + 3)             # windows view = visible data points
+        self.sBar_minTT, self.sBar_maxTT = sLCLtt - 80, sUCLtt + 80           # Calibrate Y-axis for S-Plot
+        self.win_Xmin, self.win_Xmax = 0, (int(self.ttS) + 3)             # windows view = visible data points
         # ----------------------------------------------------------#
         YScale_minRM, YScale_maxRM = 0, pExLayer                    # Valid layer number
         self.win_XminRM, self.win_XmaxRM = 0, pLength                   # Get details from SCADA PIpe Recipe TODO[1]
 
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
         if pRecipe == 1:                    # PLC Data - for Live Production Analysis
-            T1 = SPC_TT
+            self.T1 = SPC_TT
         else:
             # SQL Data --------------------#
-            T1 = 'TT1_' + pWON             # Tape Temperature
-            T2 = 'TT2_' + pWON
-        T3 = 'RM_' + pWON                  # Ramp Profile Mapping from SQL table Only
+            self.T1 = 'TT1_' + pWON             # Tape Temperature
+            self.T2 = 'TT2_' + pWON
+        self.T3 = 'RM_' + pWON                  # Ramp Profile Mapping from SQL table Only
         # ----------------------------------------------------------#
 
         # Initialise runtime limits --------------------------------#
@@ -5811,7 +5814,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         self.a2.set_title('Tape Temperature [SDev]', fontsize=12, fontweight='bold')
         self.a3.set_title('Ramp Mapping Profile - [RMP]', fontsize=12, fontweight='bold')
         self.a3.set_facecolor("blue")        # set background color to blue
-        zoom_factory(self.a3)                # Allow plot's image  zooming
+        zoom = zoom_factory(self.a3, base_scale=1.2)                # Allow plot's image  zooming, anchor='left'
+        # pan_handler = panhandler(self.a3, button=1)
 
         self.a3.set_ylabel("2D - Staked Layer Ramp Mapping")
         self.a3.set_xlabel("Sample Distance (mt)")
@@ -5827,7 +5831,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         self.a1.set_ylim([YScale_minTT, YScale_maxTT], auto=True)
         self.a1.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------#
-        self.a2.set_ylim([sBar_minTT, sBar_maxTT], auto=True)
+        self.a2.set_ylim([self.sBar_minTT, self.sBar_maxTT], auto=True)
         self.a2.set_xlim([self.win_Xmin, self.win_Xmax])
         # --------------------------------------------------------[]
         self.a3.set_ylim([YScale_minRM, YScale_maxRM], auto=True)
@@ -5836,46 +5840,46 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         # --------------------------------------------------------[]
         # Define Plot area and axes -
         # ---------------------------------------------------------#
-        im10, = self.a1.plot([], [], 'o-', label='Tape Temp - (R1H1)')
-        im11, = self.a1.plot([], [], 'o-', label='Tape Temp - (R1H2)')
-        im12, = self.a1.plot([], [], 'o-', label='Tape Temp - (R1H3)')
-        im13, = self.a1.plot([], [], 'o-', label='Tape Temp - (R1H4)')
-        im14, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im15, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im16, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im17, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im10, = self.a1.plot([], [], 'o-', label='Tape Temp - (R1H1)')
+        self.im11, = self.a1.plot([], [], 'o-', label='Tape Temp - (R1H2)')
+        self.im12, = self.a1.plot([], [], 'o-', label='Tape Temp - (R1H3)')
+        self.im13, = self.a1.plot([], [], 'o-', label='Tape Temp - (R1H4)')
+        self.im14, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im15, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im16, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im17, = self.a2.plot([], [], 'o-', label='Tape Temp')
 
-        im18, = self.a1.plot([], [], 'o-', label='Tape Temp - (R2H1)')
-        im19, = self.a1.plot([], [], 'o-', label='Tape Temp - (R2H2)')
-        im20, = self.a1.plot([], [], 'o-', label='Tape Temp - (R2H3)')
-        im21, = self.a1.plot([], [], 'o-', label='Tape Temp - (R2H4)')
-        im22, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im23, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im24, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im25, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im18, = self.a1.plot([], [], 'o-', label='Tape Temp - (R2H1)')
+        self.im19, = self.a1.plot([], [], 'o-', label='Tape Temp - (R2H2)')
+        self.im20, = self.a1.plot([], [], 'o-', label='Tape Temp - (R2H3)')
+        self.im21, = self.a1.plot([], [], 'o-', label='Tape Temp - (R2H4)')
+        self.im22, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im23, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im24, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im25, = self.a2.plot([], [], 'o-', label='Tape Temp')
 
-        im26, = self.a1.plot([], [], 'o-', label='Tape Temp - (R3H1)')
-        im27, = self.a1.plot([], [], 'o-', label='Tape Temp - (R3H2)')
-        im28, = self.a1.plot([], [], 'o-', label='Tape Temp - (R3H3)')
-        im29, = self.a1.plot([], [], 'o-', label='Tape Temp - (R3H4)')
-        im30, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im31, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im32, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im33, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im26, = self.a1.plot([], [], 'o-', label='Tape Temp - (R3H1)')
+        self.im27, = self.a1.plot([], [], 'o-', label='Tape Temp - (R3H2)')
+        self.im28, = self.a1.plot([], [], 'o-', label='Tape Temp - (R3H3)')
+        self.im29, = self.a1.plot([], [], 'o-', label='Tape Temp - (R3H4)')
+        self.im30, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im31, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im32, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im33, = self.a2.plot([], [], 'o-', label='Tape Temp')
 
-        im34, = self.a1.plot([], [], 'o-', label='Tape Temp - (R4H1)')
-        im35, = self.a1.plot([], [], 'o-', label='Tape Temp - (R4H2)')
-        im36, = self.a1.plot([], [], 'o-', label='Tape Temp - (R4H3)')
-        im37, = self.a1.plot([], [], 'o-', label='Tape Temp - (R4H4)')
-        im38, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im39, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im40, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        im41, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im34, = self.a1.plot([], [], 'o-', label='Tape Temp - (R4H1)')
+        self.im35, = self.a1.plot([], [], 'o-', label='Tape Temp - (R4H2)')
+        self.im36, = self.a1.plot([], [], 'o-', label='Tape Temp - (R4H3)')
+        self.im37, = self.a1.plot([], [], 'o-', label='Tape Temp - (R4H4)')
+        self.im38, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im39, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im40, = self.a2.plot([], [], 'o-', label='Tape Temp')
+        self.im41, = self.a2.plot([], [], 'o-', label='Tape Temp')
         # --------------- Temperature Ramp Profile -------------------[ Important ]
-        im42 = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 1 Ramp')
-        im43 = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 2 Ramp')
-        im44 = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 3 Ramp')
-        im45 = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 4 Ramp')
+        self.im42, = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 1 Ramp')
+        self.im43, = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 2 Ramp')
+        self.im44, = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 3 Ramp')
+        self.im45, = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 4 Ramp')
 
         # self.canvas = FigureCanvasTkAgg(self.f, master=root) ----------#
         self.canvas = FigureCanvasTkAgg(self.f, self)
@@ -5892,11 +5896,14 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
 
     def _dataControlTT(self):
-        s_fetch, stp_Sz, s_regm = str(ttS), ttTy, SrgA    # entry value in string sql syntax ttS, ttTy,
-
+        s_fetch, stp_Sz, s_regm = str(self.ttS), self.ttTy, self.olS    # entry value in string sql syntax ttS, ttTy,
+        print('Initialisation Vars:', s_fetch, stp_Sz, s_regm)
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:                          # Load Comm Plc class once
-            tt_con = sq.DAQ_connect(1, 0)             # Connect PLC for real-time data
+        if self.running and UseSQL_DBS:                         # Load Comm Plc class once
+            tt_con = sq.DAQ_connect()                       # Connect SQL for real-time data
+            t1 = tt_con.cursor()
+            print('\nConnecting to SQL repository.....')
+
         else:
             pass
 
@@ -5921,6 +5928,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         import sqlArrayRLmethodRM as srm            # common method
 
         while True:
+            print('Retrieving data from repository...')
             if UsePLC_DBS:
                 inProgress = True                               # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
@@ -5939,17 +5947,13 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     autoSpcPause = False
                     print("Visualization in Real-time Mode...")
                     # Get list of relevant PLC Tables using conn() --------------------[]
-                    self.ttDta = pdA.plcExec(T1, s_fetch, stp_Sz, s_regm)
-                    self.ttDtb = 0
-                    self.rmDta = srm.sqlExec(tt_con, s_fetch, stp_Sz, T3)  # load only for RM
+                    self.ttDa = pdA.plcExec(self.T1, s_fetch, stp_Sz, s_regm)
+                    self.ttDb = 0
+                    self.rmDa = srm.sqlExec(t1, t2, t3, s_fetch, stp_Sz, self.T3)  # load only for RM
 
-            elif UseSQL_DBS:
-
+            elif UseSQL_DBS and self.running:
                 inProgress = False  # False for Real-time mode
                 print('\nSynchronous controller activated...')
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 # Either of the 2 combo variables are assigned to trigger routine pause
                 if keyboard.is_pressed("ctrl") and not inProgress:
@@ -5964,8 +5968,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     print("Visualization in Real-time Mode...")
 
                 else:
-                    self.ttDta, self.ttDtb = ptt.sqlExec(tt_con, s_fetch, stp_Sz, s_regm, T1, T2)
-                    self.rmDta = srm.sqlExec(tt_con, s_fetch, stp_Sz, s_regm, T3)
+                    self.ttDa, self.ttDb, self.rmDc = ptt.sqlExec(t1, s_fetch, stp_Sz, self.T1, self.T2, self.T3)
                     print("Visualization in Play Mode...")
                 print('\nUpdating....')
 
@@ -5974,8 +5977,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                 # Set condition for halting real-time plots in watchdog class -----------------------[]
                 """
                 # TODO --- values for inhibiting the SQL processing
-                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                    tt_con.close()
+                if keyboard.is_pressed("Alt+Q") or not self.ttDa:  # Terminate file-fetch
+                    t1.close()
                     print('SQL End of File, connection closes after 30 mins...')
                     time.sleep(60)
                     continue
@@ -5983,8 +5986,10 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     print('\nUpdating....')
             else:
                 pass
-            self.canvas.get_tk_widget().after(s_regm, self._ttDataPlot)  # Regime = every 10nseconds
-            time.sleep(0.5)
+            self.canvas.get_tk_widget().after(3, self._ttDataPlot)
+            # Call Ramp profiling -----
+            self.canvas.get_tk_widget().after(3, self._rmDataPlot)
+            time.sleep(0.1)
 
     # ================== End of synchronous Method ==========================--------------------[]
     def _ttDataPlot(self):
@@ -5998,173 +6003,191 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             stream = 1                                              # SQL Stream
             # Call synchronous data PLC function ------[A]
             g1 = qtt.validCols(T1)                                     # Load PLC-dB [SPC_TT]
-            df1 = pd.DataFrame(self.ttDta, columns=g1)              # Include table data into python Dataframe
+            df1 = pd.DataFrame(self.ttDa, columns=g1)              # Include table data into python Dataframe
             # ------------------------------------------#
             TT = tt.loadProcesValues(df1, stream)                   # Join data values under dataframe
-
-            g1 = qrm.validCols(T3)                                  # Construct Data Column selSqlColumnsTFM.py
-            df1 = pd.DataFrame(self.rmDta, columns=g1)              # Import into python Dataframe
-            RM = rm.loadProcesValues(df1)                           # Join data values under dataframe
-            print('\nSQL Content', df1.head(10))
+            # print('\nSQL Content', df1.tail(self.ttS))
             print("Memory Usage:", df1.info(verbose=False))         # Check memory utilizatio
 
         elif UseSQL_DBS:
             import VarSQL_TT as tt                                  # load SQL variables column names | rfVarSQL
             stream = 2  # SQL Stream
-            g1 = qtt.validCols(T1, pWON)  # Load TT1_
-            d1 = pd.DataFrame(self.ttDta, columns=g1)               # Include table data into python Dataframe
-            g2 = qtt.validCols(T2, pWON)  # Load TT2
-            d2 = pd.DataFrame(self.ttDtb, columns=g2)
-            # Concatenate all columns -----------[]
-            df1 = pd.concat([d1, d2], axis=1)
-            TT = tt.loadProcesValues(df1, stream)                   # Join data values under dataframe
-
+            g1 = qtt.validCols(self.T1, pWON)
+            d1 = pd.DataFrame(self.ttDa, columns=g1)               # Include table data into python Dataframe
+            g2 = qtt.validCols(self.T2, pWON)
+            d2 = pd.DataFrame(self.ttDb, columns=g2)
+            dfq = pd.concat([d1, d2], axis=1)
             # ----------------------------------
-            g1 = qrm.validCols(T3)                                  # Construct Data Column selSqlColumnsTFM.py
-            df1 = pd.DataFrame(self.rmDta, columns=g1)              # Import into python Dataframe
-            RM = rm.loadProcesValues(df1)                           # Join data values under dataframe
-            print('\nSQL Content', df1.head(10))
-            print("Memory Usage:", df1.info(verbose=False))         # Check memory utilization
+            TT = tt.loadProcesValues(dfq)
+            # ---------------------------------
+            # print('\nSQL Content TT:', dfq.tail(self.ttS))
+            print("Memory Usage:", dfq.info(verbose=False))         # Check memory utilization
             # --------------------------------------#
         else:
+            TT = 0
             print('Unknown Process Protocol...')
         # ------------------------------------------#
-        if UsePLC_DBS or UseSQL_DBS:
+        if UsePLC_DBS or UseSQL_DBS and self.running:
             # -------------------------------------[]
             # Plot X-Axis data points -------- X Plot
-            im10.set_xdata(np.arange(self.win_Xmax))
-            im11.set_xdata(np.arange(self.win_Xmax))
-            im12.set_xdata(np.arange(self.win_Xmax))
-            im13.set_xdata(np.arange(self.win_Xmax))
-            im14.set_xdata(np.arange(self.win_Xmax))
-            im15.set_xdata(np.arange(self.win_Xmax))
-            im16.set_xdata(np.arange(self.win_Xmax))
-            im17.set_xdata(np.arange(self.win_Xmax))
-            im18.set_xdata(np.arange(self.win_Xmax))
-            im19.set_xdata(np.arange(self.win_Xmax))
-            im20.set_xdata(np.arange(self.win_Xmax))
-            im21.set_xdata(np.arange(self.win_Xmax))
-            im22.set_xdata(np.arange(self.win_Xmax))
-            im23.set_xdata(np.arange(self.win_Xmax))
-            im24.set_xdata(np.arange(self.win_Xmax))
-            im25.set_xdata(np.arange(self.win_Xmax))
+            self.im10.set_xdata(np.arange(self.win_Xmax))
+            self.im11.set_xdata(np.arange(self.win_Xmax))
+            self.im12.set_xdata(np.arange(self.win_Xmax))
+            self.im13.set_xdata(np.arange(self.win_Xmax))
+            self.im14.set_xdata(np.arange(self.win_Xmax))
+            self.im15.set_xdata(np.arange(self.win_Xmax))
+            self.im16.set_xdata(np.arange(self.win_Xmax))
+            self.im17.set_xdata(np.arange(self.win_Xmax))
+            self.im18.set_xdata(np.arange(self.win_Xmax))
+            self.im19.set_xdata(np.arange(self.win_Xmax))
+            self.im20.set_xdata(np.arange(self.win_Xmax))
+            self.im21.set_xdata(np.arange(self.win_Xmax))
+            self.im22.set_xdata(np.arange(self.win_Xmax))
+            self.im23.set_xdata(np.arange(self.win_Xmax))
+            self.im24.set_xdata(np.arange(self.win_Xmax))
+            self.im25.set_xdata(np.arange(self.win_Xmax))
             # ------------------------------- S Plot
-            im26.set_xdata(np.arange(self.win_Xmax))
-            im27.set_xdata(np.arange(self.win_Xmax))
-            im28.set_xdata(np.arange(self.win_Xmax))
-            im29.set_xdata(np.arange(self.win_Xmax))
-            im30.set_xdata(np.arange(self.win_Xmax))
-            im31.set_xdata(np.arange(self.win_Xmax))
-            im32.set_xdata(np.arange(self.win_Xmax))
-            im33.set_xdata(np.arange(self.win_Xmax))
-            im34.set_xdata(np.arange(self.win_Xmax))
-            im35.set_xdata(np.arange(self.win_Xmax))
-            im36.set_xdata(np.arange(self.win_Xmax))
-            im37.set_xdata(np.arange(self.win_Xmax))
-            im38.set_xdata(np.arange(self.win_Xmax))
-            im39.set_xdata(np.arange(self.win_Xmax))
-            im40.set_xdata(np.arange(self.win_Xmax))
-            im41.set_xdata(np.arange(self.win_Xmax))
+            self.im26.set_xdata(np.arange(self.win_Xmax))
+            self.im27.set_xdata(np.arange(self.win_Xmax))
+            self.im28.set_xdata(np.arange(self.win_Xmax))
+            self.im29.set_xdata(np.arange(self.win_Xmax))
+            self.im30.set_xdata(np.arange(self.win_Xmax))
+            self.im31.set_xdata(np.arange(self.win_Xmax))
+            self.im32.set_xdata(np.arange(self.win_Xmax))
+            self.im33.set_xdata(np.arange(self.win_Xmax))
+            self.im34.set_xdata(np.arange(self.win_Xmax))
+            self.im35.set_xdata(np.arange(self.win_Xmax))
+            self.im36.set_xdata(np.arange(self.win_Xmax))
+            self.im37.set_xdata(np.arange(self.win_Xmax))
+            self.im38.set_xdata(np.arange(self.win_Xmax))
+            self.im39.set_xdata(np.arange(self.win_Xmax))
+            self.im40.set_xdata(np.arange(self.win_Xmax))
+            self.im41.set_xdata(np.arange(self.win_Xmax))
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im42.set_xdata(np.arange(self.win_Xmax))  # TODO - cross check with freq counter
-            im43.set_xdata(np.arange(self.win_Xmax))
-            im44.set_xdata(np.arange(self.win_Xmax))
-            im45.set_xdata(np.arange(self.win_Xmax))
-
-            # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((TT[0]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im11.set_ydata((TT[1]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im12.set_ydata((TT[2]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im13.set_ydata((TT[3]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            self.im10.set_ydata((TT[2]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            self.im11.set_ydata((TT[3]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            self.im12.set_ydata((TT[4]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            self.im13.set_ydata((TT[5]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
-            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(ttHL, ttS, 'TT')
+            # mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(ttHL, ttS, 'TT')
             # ---------------------------------------#
-            im14.set_ydata((TT[4]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im15.set_ydata((TT[5]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im16.set_ydata((TT[6]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im17.set_ydata((TT[7]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            self.im14.set_ydata((TT[6]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            self.im15.set_ydata((TT[7]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            self.im16.set_ydata((TT[8]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            self.im17.set_ydata((TT[9]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
-            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(ttHL, ttS, 'TT')
+            # mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(ttHL, ttS, 'TT')
             # ---------------------------------------#
-            im18.set_ydata((TT[8]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im19.set_ydata((TT[9]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im20.set_ydata((TT[10]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im21.set_ydata((TT[11]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            self.im18.set_ydata((TT[12]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            self.im19.set_ydata((TT[13]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            self.im20.set_ydata((TT[14]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            self.im21.set_ydata((TT[15]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
-            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(ttHL, ttS, 'TT')
+            # mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(ttHL, ttS, 'TT')
             # ---------------------------------------#
-            im22.set_ydata((TT[12]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im23.set_ydata((TT[13]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im24.set_ydata((TT[14]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im25.set_ydata((TT[15]).rolling(window=ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            self.im22.set_ydata((TT[16]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
+            self.im23.set_ydata((TT[17]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
+            self.im24.set_ydata((TT[18]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
+            self.im25.set_ydata((TT[19]).rolling(window=self.ttS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
-            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(ttHL, ttS, 'TT')
+            # mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(ttHL, ttS, 'TT')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((TT[0]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im27.set_ydata((TT[1]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im28.set_ydata((TT[2]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im29.set_ydata((TT[3]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im26.set_ydata((TT[2]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im27.set_ydata((TT[3]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im28.set_ydata((TT[4]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im29.set_ydata((TT[5]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
 
-            im30.set_ydata((TT[4]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im31.set_ydata((TT[5]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im32.set_ydata((TT[6]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im33.set_ydata((TT[7]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im30.set_ydata((TT[6]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im31.set_ydata((TT[7]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im32.set_ydata((TT[8]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im33.set_ydata((TT[9]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
 
-            im34.set_ydata((TT[8]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im35.set_ydata((TT[9]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im36.set_ydata((TT[10]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im37.set_ydata((TT[11]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im34.set_ydata((TT[12]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im35.set_ydata((TT[13]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im36.set_ydata((TT[14]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im37.set_ydata((TT[15]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
 
-            im38.set_ydata((TT[12]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im39.set_ydata((TT[13]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im40.set_ydata((TT[14]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-            im41.set_ydata((TT[15]).rolling(window=ttS, min_periods=1).std()[0:self.win_Xmax])
-
+            self.im38.set_ydata((TT[16]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im39.set_ydata((TT[17]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im40.set_ydata((TT[18]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
+            self.im41.set_ydata((TT[19]).rolling(window=self.ttS, min_periods=1).std()[0:self.win_Xmax])
             # Compute entire Process Capability -----------#
-            if not ttHL:
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLb, ppT, pkT, xline, sline = tq.tAutoPerf(ttS, mnA, mnB,
-                                                                                                      mnC, mnD, sdA,
-                                                                                                      sdB, sdC, sdD)
-            else:
-                xline, sline = ttMean, ttDev
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLb, dLCLba, ppT, pkT = tq.tManualPerf(mnA, mnB, mnC, mnD, sdA, sdB,
-                                                                                           sdC, sdD, ttUSL, ttLSL,
-                                                                                           ttUCL,
-                                                                                           ttLCL)
-            # ---------------------------------------------------------------------------------------[RAMP]
-            # TODO ----
-            # im42.set_ydata((RM[1]).rolling(window=ttSize, min_periods=1).mean()[0:self.win_Xmax])  # tStamp
-            im42.set_ydata((RM[1])[0:self.win_Xmax])              # Ring 1
-            im43.set_ydata((RM[2])[0:self.win_Xmax])              # Ring 2
-            im44.set_ydata((RM[3])[0:self.win_Xmax])              # Ring 3
-            im45.set_ydata((RM[4])[0:self.win_Xmax])              # Ring 4
 
             # # Declare Plots attributes --------------------------------------------------------[]
             # XBar Mean Plot
-            a1.axhline(y=xline, color="red", linestyle="--", linewidth=0.8)
-            a1.axhspan(xlcT, xucT, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 3 Sigma span (Purple)
-            a1.axhspan(xucT, xusT, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            a1.axhspan(xlcT, xlsT, facecolor='#8d8794', edgecolor='#8d8794')
+            self.a1.axhline(y=ttMean, color="red", linestyle="--", linewidth=0.8)
+            self.a1.axhspan(ttLCL, ttUCL, facecolor='#F9C0FD', edgecolor='#F9C0FD')         # 3 Sigma span (Purple)
+            self.a1.axhspan(ttUCL, ttUSL, facecolor='#8d8794', edgecolor='#8d8794')         # upper grey area
+            self.a1.axhspan(ttLSL, ttLCL, facecolor='#8d8794', edgecolor='#8d8794')         # Lower grey area
             # ---------------------- sBar_minTT, sBar_maxTT -------[]
+            self.a2.axhline(y=ttDev, color="red", linestyle="--", linewidth=0.8)
+            self.a2.axhspan(sLCLtt, sUCLtt, facecolor='#F9C0FD', edgecolor='#F9C0FD')         # 3 Sigma span (Purple)
+            self.a2.axhspan(sLCLtt, self.sBar_maxTT, facecolor='#8d8794', edgecolor='#CCCCFF')         # upper grey area
+            self.a2.axhspan(self.sBar_minTT, sLCLtt, facecolor='#8d8794', edgecolor='#CCCCFF')         # Lower grey area
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
-            if len(TT) > win_Xmax:
+            if len(TT) > self.win_Xmax:
                 TT.pop(0)
             self.canvas.draw_idle()
 
         else:
             print('Tape Temp standby mode, no active session...')
-            self.a2.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                         transform=self.a2.transAxes)
+            # self.a2.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+            #              transform=self.a2.transAxes)
             self.a1.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a1.transAxes)
 
         timef = time.time()
         lapsedT = timef - timei
         print(f"Process Interval TT: {lapsedT} sec\n")
-        # -----Canvas update --------------------------------------------[]
+    # -----Canvas update --------------------------------------------[]
 
+    def _rmDataPlot(self):
+        timei = time.time()         # start timing the entire loop
+
+        # Bi-stream Data Pooling Method ----------------#
+        # Call data loader Method-----------------------#
+        import VarSQL_RM as rm                                      # Sql common method
+        if UseSQL_DBS:
+            g3 = qtt.validCols(self.T3, pWON)                       # RM Profile
+            d3 = pd.DataFrame(self.rmDc, columns=g3)
+            # ---------------------------------
+            RM = rm.loadProcesValues(d3)                           # Join data values under dataframe
+            # ---------------------------------
+            # print('\nSQL Content RM:', d3.tail(self.ttS))
+            print("Memory Usage:", d3.info(verbose=False))         # Check memory utilization
+            # --------------------------------------#
+        else:
+            print('Unknown Process Protocol...')
+        # ------------------------------------------#
+        if UsePLC_DBS or UseSQL_DBS and self.running:
+            # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
+            self.im42.set_xdata(RM[0][0:self.win_XmaxRM])  # TODO - cross check with freq counter
+            self.im43.set_xdata(RM[1][0:self.win_XmaxRM])
+            self.im44.set_xdata(RM[2][0:self.win_XmaxRM])
+            self.im45.set_xdata(RM[3][0:self.win_XmaxRM])
+
+            # ---------------------------------------------------------------------[RAMP]
+            # TODO ----
+            self.im42.set_ydata(RM[5])
+            self.im43.set_ydata(RM[5])
+            self.im44.set_ydata(RM[5])
+            self.im45.set_ydata(RM[5])
+
+            # Setting up the parameters for moving windows Axes ---------------------------------[]
+            if len(RM) > self.win_XmaxRM:
+                RM.pop(0)
+            self.canvas.draw_idle()
+
+        else:
+            print('Tape Temp standby mode, no active session...')
+            self.a2.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a2.transAxes)
+
+        timef = time.time()
+        lapsedT = timef - timei
+        print(f"Process Interval TT: {lapsedT} sec\n")
 
 # ------------------------------------------------------------------------------------[Substrate Temperature]
 class substTempTabb(ttk.Frame):
@@ -6172,6 +6195,7 @@ class substTempTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
+        self.running = False
         self.create_widgets()
 
     def create_widgets(self):
@@ -6300,8 +6324,8 @@ class substTempTabb(ttk.Frame):
         if pRecipe == 1:
             T1 = SPC_ST
         else:
-            T1 = 'ST1_' + pWON  # Identify Table
-            T2 = 'ST2_' + pWON
+            T1 = 'ST1_' + str(pWON)  # Identify Table
+            T2 = 'ST2_' + str(pWON)
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -6410,10 +6434,10 @@ class substTempTabb(ttk.Frame):
 
 
     def _dataControlST(self):
-        s_fetch, stp_Sz, s_regm = str(stS), stTy, SrgA        # entry value in string sql syntax ttS, ttTy,
+        s_fetch, stp_Sz, s_regm = str(stS), stTy, SrgA       # entry value in string sql syntax ttS, ttTy,
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:                            # Load Coms Plc class once
+        if self.running and UseSQL_DBS:                      # Load Coms Plc class once
             st_con = sq.DAQ_connect(1, 0)
         else:
             pass
@@ -6460,12 +6484,9 @@ class substTempTabb(ttk.Frame):
                     # -----------------------------------------------------------------[]
                     self.stDta = pst.plcExec(T1, s_fetch, stp_Sz, s_regm)
 
-            elif UseSQL_DBS:
+            elif UseSQL_DBS and self.running:
                 inProgress = False  # False for Real-time mode
                 print('\nSynchronous controller activated...')
-                if not sysRun:
-                    sysRun, msctcp, msc_rt = wd.autoPausePlay()  # Retrieve MSC from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 # Either of the 2 combo variables are assigned to trigger routine pause
                 if keyboard.is_pressed("ctrl") and not inProgress:
@@ -6515,7 +6536,7 @@ class substTempTabb(ttk.Frame):
             df1 = pd.DataFrame(self.stDta, columns=g1)      # Include table data into python Dataframe
             ST = st.loadProcesValues(df1)                   # Join data values under dataframe
 
-        elif UseSQL_DBS:
+        elif UseSQL_DBS and self.running:
             import VarSQL_ST as st
             # -----------------------------------------#
             g1 = qst.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
@@ -6531,7 +6552,7 @@ class substTempTabb(ttk.Frame):
         else:
             print('Unknown Process Protocol...')
         # -------------------------------------------#
-        if UsePLC_DBS or UseSQL_DBS:
+        if UsePLC_DBS or UseSQL_DBS and self.running:
             # ---------------------------------------[]
             # Plot X-Axis data points -------- X Plot
             im10.set_xdata(np.arange(self.win_Xmax))
@@ -6568,54 +6589,54 @@ class substTempTabb(ttk.Frame):
             im40.set_xdata(np.arange(self.win_Xmax))
             im41.set_xdata(np.arange(self.win_Xmax))
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((ST[0]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im11.set_ydata((ST[1]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im12.set_ydata((ST[2]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im13.set_ydata((ST[3]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im10.set_ydata((ST[0]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
+            im11.set_ydata((ST[1]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
+            im12.set_ydata((ST[2]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
+            im13.set_ydata((ST[3]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(stHL, stS, 'ST')
             # ---------------------------------------#
-            im14.set_ydata((ST[4]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im15.set_ydata((ST[5]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im16.set_ydata((ST[6]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im17.set_ydata((ST[7]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im14.set_ydata((ST[4]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
+            im15.set_ydata((ST[5]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
+            im16.set_ydata((ST[6]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
+            im17.set_ydata((ST[7]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(stHL, stS, 'ST')
             # ---------------------------------------#
-            im18.set_ydata((ST[8]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im19.set_ydata((ST[9]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im20.set_ydata((ST[10]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im21.set_ydata((ST[11]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im18.set_ydata((ST[8]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
+            im19.set_ydata((ST[9]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
+            im20.set_ydata((ST[10]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
+            im21.set_ydata((ST[11]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(stHL, stS, 'ST')
             # ---------------------------------------#
-            im22.set_ydata((ST[12]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im23.set_ydata((ST[13]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im24.set_ydata((ST[14]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im25.set_ydata((ST[15]).rolling(window=stS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im22.set_ydata((ST[12]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
+            im23.set_ydata((ST[13]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
+            im24.set_ydata((ST[14]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
+            im25.set_ydata((ST[15]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(stHL, stS, 'ST')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((ST[0]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im27.set_ydata((ST[1]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im28.set_ydata((ST[2]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im29.set_ydata((ST[3]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
+            im26.set_ydata((ST[0]).rolling(window=stS).std()[0:self.win_Xmax])
+            im27.set_ydata((ST[1]).rolling(window=stS).std()[0:self.win_Xmax])
+            im28.set_ydata((ST[2]).rolling(window=stS).std()[0:self.win_Xmax])
+            im29.set_ydata((ST[3]).rolling(window=stS).std()[0:self.win_Xmax])
 
-            im30.set_ydata((ST[4]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im31.set_ydata((ST[5]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im32.set_ydata((ST[6]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im33.set_ydata((ST[7]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
+            im30.set_ydata((ST[4]).rolling(window=stS).std()[0:self.win_Xmax])
+            im31.set_ydata((ST[5]).rolling(window=stS).std()[0:self.win_Xmax])
+            im32.set_ydata((ST[6]).rolling(window=stS).std()[0:self.win_Xmax])
+            im33.set_ydata((ST[7]).rolling(window=stS).std()[0:self.win_Xmax])
 
-            im34.set_ydata((ST[8]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im35.set_ydata((ST[9]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im36.set_ydata((ST[10]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im37.set_ydata((ST[11]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
+            im34.set_ydata((ST[8]).rolling(window=stS).std()[0:self.win_Xmax])
+            im35.set_ydata((ST[9]).rolling(window=stS).std()[0:self.win_Xmax])
+            im36.set_ydata((ST[10]).rolling(window=stS).std()[0:self.win_Xmax])
+            im37.set_ydata((ST[11]).rolling(window=stS).std()[0:self.win_Xmax])
 
-            im38.set_ydata((ST[12]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im39.set_ydata((ST[13]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im40.set_ydata((ST[14]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
-            im41.set_ydata((ST[15]).rolling(window=stS, min_periods=1).std()[0:self.win_Xmax])
+            im38.set_ydata((ST[12]).rolling(window=stS).std()[0:self.win_Xmax])
+            im39.set_ydata((ST[13]).rolling(window=stS).std()[0:self.win_Xmax])
+            im40.set_ydata((ST[14]).rolling(window=stS).std()[0:self.win_Xmax])
+            im41.set_ydata((ST[15]).rolling(window=stS).std()[0:self.win_Xmax])
             # Compute entire Process Capability -----------#
             if not stHL:
                 mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLc, dLCLc, ppT, pkT, xline, sline = tq.tAutoPerf(stS, mnA, mnB,
@@ -6665,7 +6686,7 @@ class tapeGapPolTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        # define region ------
+        self.running = False
         self.display_rtStats()
 
     def display_rtStats(self):
@@ -6738,10 +6759,10 @@ class tapeGapPolTabb(ttk.Frame):
 
         # Real-Time Parameter according to updated requirements ----# 07/Feb/2025
         if pRecipe == 1:
-            T1 = SPC_TG                 # SPC Datablock
+            T1 = SPC_TG                     # SPC Datablock
         else:
-            T1 = 'TG_' + pWON           # Tape Gap
-        T2 = 'VM_' + pWON               # Void Mapping - Must be loaded from SQL repository
+            T1 = 'TG_' + str(pWON)           # Tape Gap
+        T2 = 'VM_' + str(pWON)               # Void Mapping - Must be loaded from SQL repository
         # ----------------------------------------------------------#
 
         # Initialise runtime limits --------------------------------#
@@ -6818,9 +6839,9 @@ class tapeGapPolTabb(ttk.Frame):
         s_fetch, stp_Sz, s_regm = str(tgS), tgTy, SrgA # SrgA = EoL sample regime
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:                                                   # Load CommsPlc class once
-            import CommsSql as q
-            tg_con = sq.DAQ_connect(1, 0)                                      # Load TG and VM data from PLC
+        if self.running and UseSQL_DBS:                 # Load CommsPlc class once
+            print('\nTape Gap connecting....')
+            tg_con = sq.DAQ_connect(1, 0)               # Load TG and VM data from PLC
         else:
             pass
 
@@ -6868,12 +6889,9 @@ class tapeGapPolTabb(ttk.Frame):
                     self.tgDta = pdC.plcExec(T1, s_fetch, stp_Sz)                          # get data from PLC array
                     self.vmDta = pdD.sqlExec(tg_con, s_fetch, stp_Sz, T2)           # get data from SQl Repo
 
-            elif UseSQL_DBS:
+            elif UseSQL_DBS and self.running:
                 inProgress = False                                                  # False for Real-time mode
                 print('\nSynchronous controller activated...')
-                if not sysRun:
-                   sysRun, msctcp, msc_rt = wd.autoPausePlay()                      # Retrieve MSC from Watchdog
-                print('SMC- Run/Code:', sysRun, msctcp, msc_rt)
 
                 # Either of the 2 combo variables are assigned to trigger routine pause
                 if keyboard.is_pressed("ctrl") and not inProgress:
@@ -6911,8 +6929,8 @@ class tapeGapPolTabb(ttk.Frame):
             self.canvas.get_tk_widget().after(s_regm, self._tgDataPlot)  # Regime = every 10nseconds
             time.sleep(0.5)
 
-
         # ================== End of synchronous Method ==========================
+
 
     def _tgDataPlot(self):
         # global gap_vol
@@ -6935,7 +6953,7 @@ class tapeGapPolTabb(ttk.Frame):
             print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
             print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
 
-        elif UseSQL_DBS:
+        elif UseSQL_DBS and self.running:
             import VarSQL_TG as tg                          # load SQL variables column names | rfVarSQL
             stream = 2                                      # SQL Stream
             g1 = qtg.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
@@ -6952,7 +6970,7 @@ class tapeGapPolTabb(ttk.Frame):
         else:
             print('Unknown Process Protocol...')
         # ------------------------------------------#
-        if UsePLC_DBS or UseSQL_DBS:
+        if UsePLC_DBS or UseSQL_DBS and self.running:
             # Plot X-Axis data points -------- X Plot
             im10.set_xdata(np.arange(self.win_Xmax))
             im11.set_xdata(np.arange(self.win_Xmax))
@@ -6976,30 +6994,30 @@ class tapeGapPolTabb(ttk.Frame):
             a4.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
-            im10.set_ydata((TG[0]).rolling(window=tgS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im11.set_ydata((TG[1]).rolling(window=tgS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im12.set_ydata((TG[2]).rolling(window=tgS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im13.set_ydata((TG[3]).rolling(window=tgS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+            im10.set_ydata((TG[0]).rolling(window=tgS).mean()[0:self.win_Xmax])  # Segment 1
+            im11.set_ydata((TG[1]).rolling(window=tgS).mean()[0:self.win_Xmax])  # Segment 2
+            im12.set_ydata((TG[2]).rolling(window=tgS).mean()[0:self.win_Xmax])  # Segment 3
+            im13.set_ydata((TG[3]).rolling(window=tgS).mean()[0:self.win_Xmax])  # Segment 4
             # ------ Evaluate Pp for Segments ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(tgHL, tgS, 'TG')
             # ---------------------------------------#
-            im14.set_ydata((TG[4]).rolling(window=tgS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im15.set_ydata((TG[5]).rolling(window=tgS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im16.set_ydata((TG[6]).rolling(window=tgS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im17.set_ydata((TG[7]).rolling(window=tgS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+            im14.set_ydata((TG[4]).rolling(window=tgS).mean()[0:self.win_Xmax])  # Segment 1
+            im15.set_ydata((TG[5]).rolling(window=tgS).mean()[0:self.win_Xmax])  # Segment 2
+            im16.set_ydata((TG[6]).rolling(window=tgS).mean()[0:self.win_Xmax])  # Segment 3
+            im17.set_ydata((TG[7]).rolling(window=tgS).mean()[0:self.win_Xmax])  # Segment 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(tgHL, tgS, 'TG')
 
             # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
-            im18.set_ydata((TG[0]).rolling(window=tgS, min_periods=1).std()[0:self.win_Xmax])
-            im19.set_ydata((TG[1]).rolling(window=tgS, min_periods=1).std()[0:self.win_Xmax])
-            im20.set_ydata((TG[2]).rolling(window=tgS, min_periods=1).std()[0:self.win_Xmax])
-            im21.set_ydata((TG[3]).rolling(window=tgS, min_periods=1).std()[0:self.win_Xmax])
+            im18.set_ydata((TG[0]).rolling(window=tgS).std()[0:self.win_Xmax])
+            im19.set_ydata((TG[1]).rolling(window=tgS).std()[0:self.win_Xmax])
+            im20.set_ydata((TG[2]).rolling(window=tgS).std()[0:self.win_Xmax])
+            im21.set_ydata((TG[3]).rolling(window=tgS).std()[0:self.win_Xmax])
 
-            im22.set_ydata((TG[4]).rolling(window=tgS, min_periods=1).std()[0:self.win_Xmax])
-            im23.set_ydata((TG[5]).rolling(window=tgS, min_periods=1).std()[0:self.win_Xmax])
-            im24.set_ydata((TG[6]).rolling(window=tgS, min_periods=1).std()[0:self.win_Xmax])
-            im25.set_ydata((TG[7]).rolling(window=tgS, min_periods=1).std()[0:self.win_Xmax])
+            im22.set_ydata((TG[4]).rolling(window=tgS).std()[0:self.win_Xmax])
+            im23.set_ydata((TG[5]).rolling(window=tgS).std()[0:self.win_Xmax])
+            im24.set_ydata((TG[6]).rolling(window=tgS).std()[0:self.win_Xmax])
+            im25.set_ydata((TG[7]).rolling(window=tgS).std()[0:self.win_Xmax])
 
             if not tgHL:
                 mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(tgS, mnA, mnB,
@@ -7059,6 +7077,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
+        self.running = False
         self.create_widgets()
 
     def create_widgets(self):
@@ -7229,7 +7248,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         s_fetch, stp_Sz, s_regm = str(ttS), ttTy, SrgA
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
-        if not inUseAlready:
+        if UseSQL_DBS and self.running:
             tp_con = sq.DAQ_connect(1, 0)
         else:
             pass
@@ -7347,7 +7366,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         else:
             print('Unknown Process Protocol...')
         # -------------------------------------------------------------------------------------[]
-        if UsePLC_DBS or UseSQL_DBS:
+        if UsePLC_DBS or UseSQL_DBS and self.running:
             im10.set_xdata(np.arange(self.win_Xmax))
             im11.set_xdata(np.arange(self.win_Xmax))
             im12.set_xdata(np.arange(self.win_Xmax))
@@ -7366,30 +7385,30 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
             im25.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
-            im10.set_ydata((TP[0]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im11.set_ydata((TP[1]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im12.set_ydata((TP[2]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im13.set_ydata((TP[3]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+            im10.set_ydata((TP[0]).rolling(window=tpS).mean()[0:self.win_Xmax])  # Segment 1
+            im11.set_ydata((TP[1]).rolling(window=tpS).mean()[0:self.win_Xmax])  # Segment 2
+            im12.set_ydata((TP[2]).rolling(window=tpS).mean()[0:self.win_Xmax])  # Segment 3
+            im13.set_ydata((TP[3]).rolling(window=tpS).mean()[0:self.win_Xmax])  # Segment 4
             # ------ Evaluate Pp for Segments ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(tpHL, tpS, 'TP')
             # ---------------------------------------#
-            im14.set_ydata((TP[4]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im15.set_ydata((TP[5]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
-            im16.set_ydata((TP[6]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 3
-            im17.set_ydata((TP[7]).rolling(window=tpS, min_periods=1).mean()[0:self.win_Xmax])  # Segment 4
+            im14.set_ydata((TP[4]).rolling(window=tpS).mean()[0:self.win_Xmax])  # Segment 1
+            im15.set_ydata((TP[5]).rolling(window=tpS).mean()[0:self.win_Xmax])  # Segment 2
+            im16.set_ydata((TP[6]).rolling(window=tpS).mean()[0:self.win_Xmax])  # Segment 3
+            im17.set_ydata((TP[7]).rolling(window=tpS).mean()[0:self.win_Xmax])  # Segment 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(tpHL, tpS, 'TP')
 
             # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
-            im18.set_ydata((TP[0]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
-            im19.set_ydata((TP[1]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
-            im20.set_ydata((TP[2]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
-            im21.set_ydata((TP[3]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
+            im18.set_ydata((TP[0]).rolling(window=tpS).std()[0:self.win_Xmax])
+            im19.set_ydata((TP[1]).rolling(window=tpS).std()[0:self.win_Xmax])
+            im20.set_ydata((TP[2]).rolling(window=tpS).std()[0:self.win_Xmax])
+            im21.set_ydata((TP[3]).rolling(window=tpS).std()[0:self.win_Xmax])
 
-            im22.set_ydata((TP[4]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
-            im23.set_ydata((TP[5]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
-            im24.set_ydata((TP[6]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
-            im25.set_ydata((TP[7]).rolling(window=tpS, min_periods=1).std()[0:self.win_Xmax])
+            im22.set_ydata((TP[4]).rolling(window=tpS).std()[0:self.win_Xmax])
+            im23.set_ydata((TP[5]).rolling(window=tpS).std()[0:self.win_Xmax])
+            im24.set_ydata((TP[6]).rolling(window=tpS).std()[0:self.win_Xmax])
+            im25.set_ydata((TP[7]).rolling(window=tpS).std()[0:self.win_Xmax])
 
 
             # Compute entire Process Capability -----------#
@@ -7833,54 +7852,54 @@ class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all ob
             im41.set_xdata(np.arange(self.win_Xmax))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((cRF[0]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im11.set_ydata((cRF[1]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im12.set_ydata((cRF[2]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im13.set_ydata((cRF[3]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im10.set_ydata((cRF[0]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 1
+            im11.set_ydata((cRF[1]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 2
+            im12.set_ydata((cRF[2]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 3
+            im13.set_ydata((cRF[3]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
             mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im14.set_ydata((cRF[4]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im15.set_ydata((cRF[5]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im16.set_ydata((cRF[6]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im17.set_ydata((cRF[7]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im14.set_ydata((cRF[4]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 1
+            im15.set_ydata((cRF[5]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 2
+            im16.set_ydata((cRF[6]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 3
+            im17.set_ydata((cRF[7]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
             mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im18.set_ydata((cRF[8]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im19.set_ydata((cRF[9]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im20.set_ydata((cRF[10]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im21.set_ydata((cRF[11]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im18.set_ydata((cRF[8]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 1
+            im19.set_ydata((cRF[9]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 2
+            im20.set_ydata((cRF[10]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 3
+            im21.set_ydata((cRF[11]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
             mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(rfHL, rfS, 'RF')
             # ---------------------------------------#
-            im22.set_ydata((cRF[12]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 1
-            im23.set_ydata((cRF[13]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 2
-            im24.set_ydata((cRF[14]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 3
-            im25.set_ydata((cRF[15]).rolling(window=rfS, min_periods=1).mean()[0:self.win_Xmax])  # head 4
+            im22.set_ydata((cRF[12]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 1
+            im23.set_ydata((cRF[13]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 2
+            im24.set_ydata((cRF[14]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 3
+            im25.set_ydata((cRF[15]).rolling(window=rfS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
             mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(rfHL, rfS, 'RF')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((cRF[0]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im27.set_ydata((cRF[1]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im28.set_ydata((cRF[2]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im29.set_ydata((cRF[3]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im26.set_ydata((cRF[0]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im27.set_ydata((cRF[1]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im28.set_ydata((cRF[2]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im29.set_ydata((cRF[3]).rolling(window=rfS).std()[0:self.win_Xmax])
 
-            im30.set_ydata((cRF[4]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im31.set_ydata((cRF[5]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im32.set_ydata((cRF[6]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im33.set_ydata((cRF[7]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im30.set_ydata((cRF[4]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im31.set_ydata((cRF[5]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im32.set_ydata((cRF[6]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im33.set_ydata((cRF[7]).rolling(window=rfS).std()[0:self.win_Xmax])
 
-            im34.set_ydata((cRF[8]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im35.set_ydata((cRF[9]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im36.set_ydata((cRF[10]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im37.set_ydata((cRF[11]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im34.set_ydata((cRF[8]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im35.set_ydata((cRF[9]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im36.set_ydata((cRF[10]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im37.set_ydata((cRF[11]).rolling(window=rfS).std()[0:self.win_Xmax])
 
-            im38.set_ydata((cRF[12]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im39.set_ydata((cRF[13]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im40.set_ydata((cRF[14]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
-            im41.set_ydata((cRF[15]).rolling(window=rfS, min_periods=1).std()[0:self.win_Xmax])
+            im38.set_ydata((cRF[12]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im39.set_ydata((cRF[13]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im40.set_ydata((cRF[14]).rolling(window=rfS).std()[0:self.win_Xmax])
+            im41.set_ydata((cRF[15]).rolling(window=rfS).std()[0:self.win_Xmax])
 
             # Compute entire Process Capability -----------#
             if not rfHL:
@@ -8196,8 +8215,8 @@ class cascadeCommonViewsEoL(ttk.Frame):          # Load common Cascade and all o
             im10.set_xdata(np.arange(self.win_Xmax))
             im11.set_xdata(np.arange(self.win_Xmax))
             # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
-            im10.set_ydata((RF[0]).rolling(window=smp_Sz, min_periods=1).mean()[0:self.win_Xmax])  # Segment 1
-            im11.set_ydata((RF[1]).rolling(window=smp_Sz, min_periods=1).mean()[0:self.win_Xmax])  # Segment 2
+            im10.set_ydata((RF[0]).rolling(window=smp_Sz).mean()[0:self.win_Xmax])  # Segment 1
+            im11.set_ydata((RF[1]).rolling(window=smp_Sz).mean()[0:self.win_Xmax])  # Segment 2
             if not useHL and not pMinMax:  # switch to control plot on shewhart model
                 mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLd, dLCLd, ppT, pkT, xline, sline = tq.tAutoPerf(smp_Sz, mnA,
                                                                                                       mnB,

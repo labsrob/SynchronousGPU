@@ -3385,15 +3385,41 @@ import requests
 import cfscrape
 from bs4 import BeautifulSoup as bs
 
-header = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"}
-s = requests.session()
-scraper=cfscrape.create_scraper(sess=s) #i use cfscrape because the page uses cloudflare anti ddos page
-scraper.get("https://www.bstn.com/einloggen", headers=header)
-myacc={"login[email]": "labsrob@gmail.com", #obviously change
-"login[password]": "password123"}
-entry=scraper.post("https://www.bstn.com/einloggen", headers=header, data=myacc)
-soup=bs(entry.text, 'lxml')
-accnm=soup.find('meta',{'property':'og:title'})['content']
-print("Logged in as: " + accnm)
-aaaa=scraper.get("https://www.bstn.com/kundenkonto", headers=header)
-print(aaaa.cookies)
+# header = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"}
+# s = requests.session()
+# scraper=cfscrape.create_scraper(sess=s) #i use cfscrape because the page uses cloudflare anti ddos page
+# scraper.get("https://www.bstn.com/einloggen", headers=header)
+# myacc={"login[email]": "labsrob@gmail.com", #obviously change
+# "login[password]": "password123"}
+# entry=scraper.post("https://www.bstn.com/einloggen", headers=header, data=myacc)
+# soup=bs(entry.text, 'lxml')
+# accnm=soup.find('meta',{'property':'og:title'})['content']
+# print("Logged in as: " + accnm)
+# aaaa=scraper.get("https://www.bstn.com/kundenkonto", headers=header)
+# print(aaaa.cookies)
+
+
+# Implementation of matplotlib function
+from matplotlib.axis import Axis
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider, Button, RadioButtons
+
+fig, ax1 = plt.subplots()
+plt.subplots_adjust(bottom=0.25)
+t = np.arange(0.0, 1.0, 0.001)
+a0 = 5
+f0 = 3
+delta_f = 5.0
+s = a0 * np.sin(2 * np.pi * f0 * t)
+
+ax1.plot(t, s, lw=2, color='green')
+
+ax1.xaxis.pan(-2)
+
+ax1.grid()
+
+fig.suptitle("""matplotlib.axis.Axis.pan()
+function Example\n""", fontweight="bold")
+
+plt.show()
