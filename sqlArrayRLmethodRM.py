@@ -10,76 +10,63 @@ import os
 UseRowIndex = True
 idx = count()
 now = datetime.now()
-
-dataList0 = []
-Idx, Idx, dL = [], [], []
-st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
+dataList0, dL = [], []
 
 
-def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
+def sqlExec(daq, nGZ, grp_step, T3):
     """
     NOTE:
     """
-    # idx = str(idx)                                  # convert Query Indexes to string concatenation
-
+    t1 = daq.cursor()
     group_step = int(grp_step)                      # group size/ sample sze
-    fetch_no = int(fetch_no)                        # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
+    n2fetch = int(nGZ) # + 2
+    print('\nDefault Sample Size:', n2fetch, group_step, '\n')
 
-    # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
-    if len(dL) < (nGZ - 1):
-        n2fetch = nGZ                                       # fetch initial specified number
-        print('\nRows to Fetch:', n2fetch)
-        print('Processing SQL Row #:', int(idx) + fetch_no + 1, 'to', (int(idx) + fetch_no + 1) + n2fetch)
+    # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
+    if group_step == 1:
+        print('\nTTA:', len(dL), dL)
+        if len(dL) < int(nGZ):
+            n2fetch = int(nGZ)  # fetch initial specified number
 
-    elif group_step == 1 and len(dL) >= nGZ:
-        print('\nSINGLE STEP SLIDE')
-        print('=================')
-        n2fetch = (nGZ + fetch_no)                          # fetch just one line to on top of previous fetch
-        idxA = int(idx) + (((fetch_no + 1) - 2) * nGZ) + 1
-        if len(Idx) > 1:
-            del Idx[:1]
-        Idx.append(idxA)
-        print('Processing SQL Row #:', 'T1:', idxA)
+        elif len(dL) == int(nGZ):
+            n2fetch = int(nGZ)  # - len(dL1)
 
+        else:
+            # dL.pop(0)
+            n2fetch = 10
+            print('\nTTB:', len(dL), dL)
+
+    elif group_step == 2:
+        if len(dL) <= int(nGZ):
+            n2fetch = int(nGZ)
+        else:
+            n2fetch = int(nGZ) - 1
+        print('\nRows to Fetch on Discrete:', n2fetch)
+    else:
+        n2fetch = int(nGZ)
+    print('Fetch RMP samples:', n2fetch)
     # ------------------------------------------------------------------------------------[]
-    # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data1 = daq.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    if len(data1) != 0:
-        for result in data1:
+    # data3 = t1.execute('SELECT TOP ('+ str(n2fetch) +') * FROM ' + str(T3)).fetchall()
+    data3 = t1.execute('SELECT * FROM ' + str(T3) + ' ORDER BY cLayer').fetchmany(n2fetch)
+    print('RMP', len(data3), data3)
+    if len(data3) != 0:
+        for result in data3:
             result = list(result)
             if UseRowIndex:
                 dataList0.append(next(idx))
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
+            # if len(dL) > n2fetch:
+            #     dL.pop(0)
             dL.append(result)
+            # print('Round Trip:', idx)
 
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dL[0:(len(dL) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dL[0:(len(dL) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dL[0:(len(dL) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After window limit (move)
-                del dL[0:(len(dL) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-        # print("Step List1:", len(dL1), dL1)       FIXME:
     else:
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    daq.close()
+    # t1.close()
 
     return dL
 # -----------------------------------------------------------------------------------[Dr Labs]

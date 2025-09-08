@@ -18,9 +18,6 @@ def validCols(pParam, pWON=None):
         columns = ['tStamp', 'cLayer', 'R3H1TT', 'R3H2TT', 'R3H3TT',
                    'R3H4TT', 'R4H1TT', 'R4H2TT', 'R4H3TT', 'R4H4TT']
 
-    elif pParam == 'RM_' + str(pWON):
-        columns = ['R1Pos', 'R2Pos', 'R3Pos', 'R4Pos', 'PipeDir', 'cLayer']
-
     elif pParam == 'SPC_TT':
         columns = ['cLayer', 'R1H1', 'R1H2', 'R1H3', 'R1H4',
                    'R2H1', 'R2H2', 'R2H3', 'R2H4', 'R3H1', 'R3H2',

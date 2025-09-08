@@ -37,7 +37,7 @@ def editPHL():
         pass
 
 
-def paramsEntry(modal, gSize, gMode, defHL, defAL, defFO, pRP, pTT, pST, pWS, pTG):
+def paramsEntry(modal, gSize, gMode, defHL, defAL, defFO, pRP, pTT, pST, pWS, pTG): #
     global pTy, xUCL, xUCL1, xUCL2, xUCL3, xUCL4, xLCL, xLCL1, xLCL2, xLCL3, xLCL4, \
            xMean, xMean1, xMean2, xMean3, xMean4, sMean, sMean1, sMean2, sMean3, sMean4,\
            xUSL, xUSL1, xUSL2, xUSL3, xUSL4, xLSL, xLSL1, xLSL2, xLSL3, xLSL4, \
@@ -152,12 +152,12 @@ def paramsEntry(modal, gSize, gMode, defHL, defAL, defFO, pRP, pTT, pST, pWS, pT
     xUCLtg4, xLCLtg4, sUCLtg4, sLCLtg4 = StringVar(modal), StringVar(modal), StringVar(modal), StringVar(modal)
     xUSLtg4, xLSLtg4, sReg = StringVar(modal), StringVar(modal), StringVar(modal)
 
-    sSize = gSize           # copy into new var
+    sSize = gSize       # copy into new var
     gType = gMode
-    enHL = defHL
-    enAL = defAL
-    enFO = defFO
-    popmodal = modal        # copy into new var
+    enHL = defHL        # DNV Historical Limits
+    enAL = defAL        # Automatic Limits
+    enFO = defFO        # Commercial limits
+    popmodal = modal    # copy into new var
 
     if pRP.get():
         print("\nRoller Pressure Checked..")

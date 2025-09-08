@@ -74,7 +74,7 @@ import rtP_Evaluator as tq
 from pydub import AudioSegment
 from matplotlib.animation import FuncAnimation
 from mpl_interactions import ioff, zoom_factory, panhandler
-
+import keyboard  # for temporary use
 # --------------------------
 import pParamsHL as dd
 import pWON_finder as wo
@@ -220,6 +220,7 @@ B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
 plcConnex = []
 UsePLC_DBS = False                                       # specify SQl Query or PLC DB Query is in use
 UseSQL_DBS = True
+c_status = False
 sel_SS = "30"
 sel_gT = "S-Domino"
 
@@ -5659,9 +5660,6 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
-        # global win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, im16, im17, a1, a2, a3, ttS, ttTy, T1, T2, T3, \
-        #     SrgA, im18, im19, im20, im21, im22, im23, im24, im25, im26, im27, im28, im29, im30, im31, im32, im33, im34, \
-        #     im35, im36, im37, im38, im39, im40, im41, im42, im43, im44, im45, ttUSL, ttLSL, ttMean, ttLCL, ttUCL
         global ttUCL, ttLCL, ttMean, ttDev, sUCLtt, sLCLtt, ttUSL, ttLSL
 
         # Load Quality Historical Values -----------[]
@@ -5681,7 +5679,6 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         print('\nSamples/Group Samples:', self.ttS, self.ttTy)
 
         if self.tape1 != 0 and self.tape2 != 0 and self.tape3 != 0 and self.tape5 != 0 and self.tape5 != 0:
-            # if self.DNV  or self.MGM:   #
             ttPerf = '$Pp_{k' + str(self.ttS) + '}$'      # Using estimated or historical Mean
             ttlabel = 'Pp'
             # -------------------------------
@@ -5761,10 +5758,10 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                 ttLSL = (ttMean - ttLCL) / 3 * 6
                 # -------------------------------
         else:  # Use default Limit values
-            ttUCL = 8
-            ttLCL = 2
-            ttMean = 5
-            ttDev = 5
+            ttUCL = 80
+            ttLCL = 20
+            ttMean = 50
+            ttDev = 50
             sUCLtt = 6
             sLCLtt = 4
             ttUSL = 9
@@ -5875,7 +5872,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         self.im39, = self.a2.plot([], [], 'o-', label='Tape Temp')
         self.im40, = self.a2.plot([], [], 'o-', label='Tape Temp')
         self.im41, = self.a2.plot([], [], 'o-', label='Tape Temp')
-        # --------------- Temperature Ramp Profile -------------------[ Important ]
+        # --------------- Temperature Ramp Profile -------------------[ self.important ]
         self.im42, = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 1 Ramp')
         self.im43, = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 2 Ramp')
         self.im44, = self.a3.plot([], [], marker='|', color='w', linestyle='', label='Ring 3 Ramp')
@@ -5891,45 +5888,55 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         self.canvas._tkcanvas.pack(expand=True)
 
         # --------- call data block -------------------------------------#
-        threading.Thread(target=self._dataControlTT, daemon=True).start()
+        mp_TT = threading.Thread(target=self._dataControlTT, daemon=True)  # .start()
+        mp_RMP = threading.Thread(target=self._dataControlRMP, daemon=True) #.start()
+        mp_TT.start()
+        mp_RMP.start()
         # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------#
 
 
     def _dataControlTT(self):
+        global c_status
+
         s_fetch, stp_Sz, s_regm = str(self.ttS), self.ttTy, self.olS    # entry value in string sql syntax ttS, ttTy,
         print('Initialisation Vars:', s_fetch, stp_Sz, s_regm)
+        c_status = False
+
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
         if self.running and UseSQL_DBS:                         # Load Comm Plc class once
-            tt_con = sq.DAQ_connect()                       # Connect SQL for real-time data
-            t1 = tt_con.cursor()
             print('\nConnecting to SQL repository.....')
-
+            tt_con = sq.DAQ_connect()                       # Connect SQL for real-time data
+            print('\nSQL Connection is:', tt_con)
         else:
-            pass
+            tt_con = False
 
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
-        """
-        Load watchdog function with synchronous function every seconds
-        """
+        def check_connection_status():
+            if tt_con is None:
+                c_status = False
+            else:
+                c_status = True
+            return c_status
 
         # Initialise RT variables ---[]
         autoSpcRun = True
         autoSpcPause = False
-        import keyboard  # for temporary use
 
-        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-        sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-        # Define PLC/SMC error state -------------------------------------------#
-
+        # Initialise RT variables ---[]
         if UsePLC_DBS:
             import plcArrayRLmethodTT as pdA
-        elif UseSQL_DBS:
-            import sqlArrayRLmethodTT as ptt
-        import sqlArrayRLmethodRM as srm            # common method
+            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+            # Define PLC/SMC error state -------------------------------------------#
 
+        elif UseSQL_DBS:
+            import sqlArrayRLmethodTT as pdB
+        # ----------------------------------------------#
         while True:
-            print('Retrieving data from repository...')
-            if UsePLC_DBS:
+            print('Retrieving TT data from repository...')
+            # c_status = check_connection_status()
+
+            if UsePLC_DBS and c_status:
                 inProgress = True                               # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
 
@@ -5948,10 +5955,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     print("Visualization in Real-time Mode...")
                     # Get list of relevant PLC Tables using conn() --------------------[]
                     self.ttDa = pdA.plcExec(self.T1, s_fetch, stp_Sz, s_regm)
-                    self.ttDb = 0
-                    self.rmDa = srm.sqlExec(t1, t2, t3, s_fetch, stp_Sz, self.T3)  # load only for RM
 
-            elif UseSQL_DBS and self.running:
+            elif UseSQL_DBS and c_status:
                 inProgress = False  # False for Real-time mode
                 print('\nSynchronous controller activated...')
 
@@ -5968,7 +5973,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     print("Visualization in Real-time Mode...")
 
                 else:
-                    self.ttDa, self.ttDb, self.rmDc = ptt.sqlExec(t1, s_fetch, stp_Sz, self.T1, self.T2, self.T3)
+                    self.ttDa, self.ttDb = pdB.sqlExec(tt_con, s_fetch, stp_Sz, self.T1, self.T2)
                     print("Visualization in Play Mode...")
                 print('\nUpdating....')
 
@@ -5978,7 +5983,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                 """
                 # TODO --- values for inhibiting the SQL processing
                 if keyboard.is_pressed("Alt+Q") or not self.ttDa:  # Terminate file-fetch
-                    t1.close()
+                    self.tt_con.close()
                     print('SQL End of File, connection closes after 30 mins...')
                     time.sleep(60)
                     continue
@@ -5987,9 +5992,10 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             else:
                 pass
             self.canvas.get_tk_widget().after(3, self._ttDataPlot)
-            # Call Ramp profiling -----
-            self.canvas.get_tk_widget().after(3, self._rmDataPlot)
-            time.sleep(0.1)
+            print('\nConnection Status before check is: ', c_status)
+            c_status = check_connection_status()
+            print('Connection Status after check is: ', c_status)
+            time.sleep(2)
 
     # ================== End of synchronous Method ==========================--------------------[]
     def _ttDataPlot(self):
@@ -5998,36 +6004,38 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         # Bi-stream Data Pooling Method ----------------#
         # Call data loader Method-----------------------#
         import VarSQL_RM as rm                                      # Sql common method
-        if UsePLC_DBS == 1:
+        if UsePLC_DBS and c_status:
             import VarPLC_TT as tt
-            stream = 1                                              # SQL Stream
-            # Call synchronous data PLC function ------[A]
-            g1 = qtt.validCols(T1)                                     # Load PLC-dB [SPC_TT]
-            df1 = pd.DataFrame(self.ttDa, columns=g1)              # Include table data into python Dataframe
-            # ------------------------------------------#
-            TT = tt.loadProcesValues(df1, stream)                   # Join data values under dataframe
-            # print('\nSQL Content', df1.tail(self.ttS))
-            print("Memory Usage:", df1.info(verbose=False))         # Check memory utilizatio
 
-        elif UseSQL_DBS:
-            import VarSQL_TT as tt                                  # load SQL variables column names | rfVarSQL
-            stream = 2  # SQL Stream
+            # Call synchronous data PLC function ------[A]
+            g1 = qtt.validCols(T1)                                      # Load PLC-dB [SPC_TT]
+            df1 = pd.DataFrame(self.ttDa, columns=g1)                   # Include table data into python Dataframe
+            # ------------------------------------------#
+            TT = tt.loadProcesValues(df1)                               # Join data values under dataframe
+            # print('\nSQL Content', df1.tail(self.ttS))
+            print("Memory Usage:", df1.info(verbose=False))             # Check memory utilizatio
+
+        elif UseSQL_DBS and c_status:
+            import VarSQL_TT as tt                                      # load SQL variables column names | rfVarSQL
+
             g1 = qtt.validCols(self.T1, pWON)
-            d1 = pd.DataFrame(self.ttDa, columns=g1)               # Include table data into python Dataframe
+            d1 = pd.DataFrame(self.ttDa, columns=g1)                    # Include table data into python Dataframe
+
             g2 = qtt.validCols(self.T2, pWON)
             d2 = pd.DataFrame(self.ttDb, columns=g2)
-            dfq = pd.concat([d1, d2], axis=1)
+
+            p_data = pd.concat([d1, d2], axis=1)
             # ----------------------------------
-            TT = tt.loadProcesValues(dfq)
+            TT = tt.loadProcesValues(p_data)
             # ---------------------------------
             # print('\nSQL Content TT:', dfq.tail(self.ttS))
-            print("Memory Usage:", dfq.info(verbose=False))         # Check memory utilization
+            print("Memory Usage:", p_data.info(verbose=False))         # Check memory utilization
             # --------------------------------------#
         else:
             TT = 0
-            print('Unknown Process Protocol...')
+            print('Unknown [TT] Process Protocol...')
         # ------------------------------------------#
-        if UsePLC_DBS or UseSQL_DBS and self.running:
+        if c_status and UsePLC_DBS or c_status and UseSQL_DBS:
             # -------------------------------------[]
             # Plot X-Axis data points -------- X Plot
             self.im10.set_xdata(np.arange(self.win_Xmax))
@@ -6121,7 +6129,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             self.a1.axhspan(ttUCL, ttUSL, facecolor='#8d8794', edgecolor='#8d8794')         # upper grey area
             self.a1.axhspan(ttLSL, ttLCL, facecolor='#8d8794', edgecolor='#8d8794')         # Lower grey area
             # ---------------------- sBar_minTT, sBar_maxTT -------[]
-            self.a2.axhline(y=ttDev, color="red", linestyle="--", linewidth=0.8)
+            self.a2.axhline(y=ttDev, color="blue", linestyle="--", linewidth=0.8)
             self.a2.axhspan(sLCLtt, sUCLtt, facecolor='#F9C0FD', edgecolor='#F9C0FD')         # 3 Sigma span (Purple)
             self.a2.axhspan(sLCLtt, self.sBar_maxTT, facecolor='#8d8794', edgecolor='#CCCCFF')         # upper grey area
             self.a2.axhspan(self.sBar_minTT, sLCLtt, facecolor='#8d8794', edgecolor='#CCCCFF')         # Lower grey area
@@ -6133,8 +6141,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         else:
             print('Tape Temp standby mode, no active session...')
-            # self.a2.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
-            #              transform=self.a2.transAxes)
+            self.a2.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a2.transAxes)
             self.a1.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                          transform=self.a1.transAxes)
 
@@ -6143,14 +6151,85 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         print(f"Process Interval TT: {lapsedT} sec\n")
     # -----Canvas update --------------------------------------------[]
 
+    def _dataControlRMP(self):
+        global c_status
+
+        s_fetch, stp_Sz, s_regm = str(self.ttS), self.ttTy, self.olS    # entry value in string sql syntax ttS, ttTy,
+        print('Initialisation Vars:', s_fetch, stp_Sz, s_regm)
+        c_status = False
+
+        # Obtain Volatile Data from PLC Host Server ---------------------------[]
+        if self.running and UseSQL_DBS:                         # Load Comm Plc class once
+            print('\nConnecting to SQL repository.....')
+            rm_con = sq.DAQ_connect()                       # Connect SQL for real-time data
+            print('\nSQL Connection is:', rm_con)
+        else:
+            rm_con = None
+
+        # Evaluate conditions for SQL Data Fetch ------------------------------[A]
+        def check_connection_status():
+            if rm_con is None:
+                c_status = False
+            else:
+                c_status = True
+            return c_status
+
+        # Initialise RT variables ---[]
+        import sqlArrayRLmethodRM as prm
+        # ----------------------------------------------#
+        while True:
+            print('Retrieving RMP data from repository...')
+            c_status = check_connection_status()
+
+            if UseSQL_DBS and c_status:
+                inProgress = False  # False for Real-time mode
+                print('\nSynchronous controller activated...')
+
+                # Either of the 2 combo variables are assigned to trigger routine pause
+                if keyboard.is_pressed("ctrl") and not inProgress:
+                    print('\nProduction is pausing...')
+                    if not autoSpcPause:
+                        autoSpcRun = not autoSpcRun
+                        autoSpcPause = True
+                        # play(error)                                               # Pause mode with audible Alert
+                        print("\nVisualization in Paused Mode...")
+                    else:
+                        autoSpcPause = False
+                    print("Visualization in Real-time Mode...")
+
+                else:
+                    self.rmDc = prm.sqlExec(rm_con, s_fetch, stp_Sz, self.T3)
+                    print("Visualization in Play Mode...")
+                print('\nUpdating....')
+
+                # ------ Inhibit iteration ----------------------------------------------------------[]
+                """
+                # Set condition for halting real-time plots in watchdog class -----------------------[]
+                """
+                # TODO --- values for inhibiting the SQL processing
+                if keyboard.is_pressed("Alt+Q") or not self.rmDc:  # Terminate file-fetch
+                    rm_con.close()
+                    print('SQL End of File, connection closes after 30 mins...')
+                    time.sleep(60)
+                    continue
+                else:
+                    print('\nUpdating....')
+            else:
+                pass
+            self.canvas.get_tk_widget().after(10, self._rmDataPlot)
+            c_status = check_connection_status()
+            print('Connection RMP Status after check is: ', c_status)
+            time.sleep(2)
+
+
     def _rmDataPlot(self):
         timei = time.time()         # start timing the entire loop
 
         # Bi-stream Data Pooling Method ----------------#
         # Call data loader Method-----------------------#
         import VarSQL_RM as rm                                      # Sql common method
-        if UseSQL_DBS:
-            g3 = qtt.validCols(self.T3, pWON)                       # RM Profile
+        if UseSQL_DBS and c_status:
+            g3 = qrm.validCols(self.T3, pWON)                       # RM Profile
             d3 = pd.DataFrame(self.rmDc, columns=g3)
             # ---------------------------------
             RM = rm.loadProcesValues(d3)                           # Join data values under dataframe
@@ -6159,9 +6238,10 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             print("Memory Usage:", d3.info(verbose=False))         # Check memory utilization
             # --------------------------------------#
         else:
+            RM = 0
             print('Unknown Process Protocol...')
         # ------------------------------------------#
-        if UsePLC_DBS or UseSQL_DBS and self.running:
+        if c_status and UseSQL_DBS:     # accessible through sql only!
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
             self.im42.set_xdata(RM[0][0:self.win_XmaxRM])  # TODO - cross check with freq counter
             self.im43.set_xdata(RM[1][0:self.win_XmaxRM])
@@ -6181,13 +6261,13 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             self.canvas.draw_idle()
 
         else:
-            print('Tape Temp standby mode, no active session...')
-            self.a2.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                         transform=self.a2.transAxes)
+            print('RMP standby mode, no active session...')
+            self.a3.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                         transform=self.a3.transAxes)
 
         timef = time.time()
         lapsedT = timef - timei
-        print(f"Process Interval TT: {lapsedT} sec\n")
+        print(f"Process Interval RMP: {lapsedT} sec\n")
 
 # ------------------------------------------------------------------------------------[Substrate Temperature]
 class substTempTabb(ttk.Frame):
@@ -6200,7 +6280,7 @@ class substTempTabb(ttk.Frame):
 
     def create_widgets(self):
         """Create the widgets for the GUI"""
-        global win_Xmin, win_Xmax, im10, im11, im12, im13, im14, im15, a1, a2, a3, stS, stTy, T1, T2, T3, SrgA, SrgB
+        global stUCL, stLCL, stMean, stDev, sUCLst, sLCLst, stUSL, stLSL
 
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
@@ -6208,18 +6288,19 @@ class substTempTabb(ttk.Frame):
         else:
             import qParamsHL_MGM as qp
         # -----------------------------------------
-        stS, stTy, SrgA, SrgB, stHL, stAL, stFO, stP1, stP2, stP3, stP4, stP5 = qp.decryptpProcessLim(pWON, 'ST')
+        self.stS, self.stTy, self.olS, self.opS, self.DNV, self.AUTO, self.MGM, self.tape1, self.tape2, self.tape3, self.tape4, self.tape5 = qp.decryptpProcessLim(pWON, 'ST')
         # -----------------------------------------
         # Break down each element to useful list -----------[Substrate Temperature]
-        if stHL and stP1 and stP2 and stP3 and stP4 and stP5:
-            stPerf = '$Pp_{k' + str(stS) + '}$'  # Using estimated or historical Mean
+
+        if self.tape1 != 0 and self.tape2 != 0 and self.tape3 != 0 and self.tape5 != 0 and self.tape5 != 0:
+            stPerf = '$Pp_{k' + str(self.stS) + '}$'  # Using estimated or historical Mean
             stlabel = 'Pp'
             # -------------------------------
-            One = stP1.split(',')                       # split into list elements
-            Two = stP2.split(',')
-            Thr = stP3.split(',')
-            For = stP4.split(',')
-            Fiv = stP5.split(',')
+            One = self.tape1.split(',')                       # split into list elements
+            Two = self.tape2.split(',')
+            Thr = self.tape3.split(',')
+            For = self.tape4.split(',')
+            Fiv = self.tape5.split(',')
             # -------------------------------
             dTape1 = One[1].strip("' ")                     # defined Tape Width
             dTape2 = Two[1].strip("' ")                     # defined Tape Width
@@ -6291,15 +6372,15 @@ class substTempTabb(ttk.Frame):
                 stLSL = (stMean - stLCL) / 3 * 6
                 # -------------------------------
         else:  # Computes Shewhart constants (Automatic Limits)
-            stUCL = 0
-            stLCL = 0
-            stMean = 0
-            stDev = 0
-            sUCLst = 0
-            sLCLst = 0
-            stUSL = 0
-            stLSL = 0
-            stPerf = '$Cp_{k' + str(stS) + '}$'           # Using Automatic group Mean
+            stUCL = 80
+            stLCL = 20
+            stMean = 50
+            stDev = 50
+            sUCLst = 60
+            sLCLst = 40
+            stUSL = 90
+            stLSL = 10
+            stPerf = '$Cp_{k' + str(self.stS) + '}$'           # Using Automatic group Mean
             stlabel = 'Cp'
 
         label = ttk.Label(self, text='[' + str(pMode) + ' Mode]', font=LARGE_FONT)
@@ -6317,15 +6398,16 @@ class substTempTabb(ttk.Frame):
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
         # Calibrate limits for X-moving Axis -----------------------#
         YScale_minST, YScale_maxST = stLSL - 8.5, stUSL + 8.5
-        sBar_minST, sBar_maxST = sLCLst - 80, sUCLst + 80           # Calibrate Y-axis for S-Plot
-        self.win_Xmin, self.win_Xmax = 0, (int(stS) + 3)             # windows view = visible data points
+        self.sBar_minST, self.sBar_maxST = sLCLst - 80, sUCLst + 80           # Calibrate Y-axis for S-Plot
+        self.win_Xmin, self.win_Xmax = 0, (int(self.stS) + 3)             # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
         if pRecipe == 1:
-            T1 = SPC_ST
+            self.T1 = SPC_ST
         else:
-            T1 = 'ST1_' + str(pWON)  # Identify Table
-            T2 = 'ST2_' + str(pWON)
+            self.T1 = 'ST1_' + str(pWON)    # Identify Table
+            self.T2 = 'ST2_' + str(pWON)
+        self.T3 = 'RC_' + pWON              # Ramp Profile Mapping from SQL table Only
         # ----------------------------------------------------------#
 
         # Initialise runtime limits
@@ -6343,7 +6425,7 @@ class substTempTabb(ttk.Frame):
         self.a1.set_ylim([YScale_minST, YScale_maxST], auto=True)
         self.a1.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------#
-        self.a2.set_ylim([sBar_minST, sBar_maxST], auto=True)
+        self.a2.set_ylim([self.sBar_minST, self.sBar_maxST], auto=True)
         self.a2.set_xlim([self.win_Xmin, self.win_Xmax])
 
         # ----------------------------------------------------------[]
@@ -6354,41 +6436,41 @@ class substTempTabb(ttk.Frame):
         # ----------------------------------------------------------------[]
         # Define Plot area and axes -
         # ----------------------------------------------------------------#
-        im10, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R1H1)')
-        im11, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R1H2)')
-        im12, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R1H3)')
-        im13, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R1H4)')
-        im14, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im15, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im16, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im17, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im10, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R1H1)')
+        self.im11, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R1H2)')
+        self.im12, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R1H3)')
+        self.im13, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R1H4)')
+        self.im14, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im15, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im16, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im17, = self.a2.plot([], [], 'o-', label='Substrate Temp')
 
-        im18, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R2H1)')
-        im19, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R2H2)')
-        im20, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R2H3)')
-        im21, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R2H4)')
-        im22, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im23, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im24, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im25, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im18, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R2H1)')
+        self.im19, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R2H2)')
+        self.im20, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R2H3)')
+        self.im21, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R2H4)')
+        self.im22, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im23, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im24, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im25, = self.a2.plot([], [], 'o-', label='Substrate Temp')
 
-        im26, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R3H1)')
-        im27, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R3H2)')
-        im28, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R3H3)')
-        im29, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R3H4)')
-        im30, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im31, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im32, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im33, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im26, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R3H1)')
+        self.im27, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R3H2)')
+        self.im28, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R3H3)')
+        self.im29, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R3H4)')
+        self.im30, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im31, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im32, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im33, = self.a2.plot([], [], 'o-', label='Substrate Temp')
 
-        im34, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R4H1)')
-        im35, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R4H2)')
-        im36, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R4H3)')
-        im37, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R4H4)')
-        im38, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im39, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im40, = self.a2.plot([], [], 'o-', label='Substrate Temp')
-        im41, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im34, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R4H1)')
+        self.im35, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R4H2)')
+        self.im36, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R4H3)')
+        self.im37, = self.a1.plot([], [], 'o-', label='Substrate Temp - (R4H4)')
+        self.im38, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im39, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im40, = self.a2.plot([], [], 'o-', label='Substrate Temp')
+        self.im41, = self.a2.plot([], [], 'o-', label='Substrate Temp')
 
         # Statistical Feed -----------------------------------------[]
         self.a3.text(0.466, 0.945, 'Performance Feed - ST', fontsize=16, fontweight='bold', ha='center', va='center',
@@ -6434,36 +6516,45 @@ class substTempTabb(ttk.Frame):
 
 
     def _dataControlST(self):
-        s_fetch, stp_Sz, s_regm = str(stS), stTy, SrgA       # entry value in string sql syntax ttS, ttTy,
+        s_fetch, stp_Sz, s_regm = str(self.stS), self.stTy, self.olS       # entry value in string sql syntax ttS, ttTy,
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
         if self.running and UseSQL_DBS:                      # Load Coms Plc class once
-            st_con = sq.DAQ_connect(1, 0)
+            print('\nConnecting to SQL repository.....')
+            st_con = sq.DAQ_connect()
+            print('\nSQL Connection is:', st_con)
         else:
-            pass
+            st_con = False
 
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
-        """
-        Load watchdog function with synchronous function every seconds
-        """
+        def check_connection_status():
+            if st_con is None:
+                c_status = False
+            else:
+                c_status = True
+            return c_status
+
         # Initialise RT variables ---[]
         autoSpcRun = True
         autoSpcPause = False
-        import keyboard  # for temporary use
 
-        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-        sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-        # Define PLC/SMC error state -------------------------------------------#
+
 
         if UsePLC_DBS:
             import plcArrayRLmethodST as pst # DrLabs optimization method
+
+            # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
+            sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
+            # Define PLC/SMC error state -------------------------------------------#
+
         elif UseSQL_DBS:
             import sqlArrayRLmethodST as pst  # DrLabs optimization method
         # ------------------------------------#
 
         while True:
+            print('Retrieving ST data from repository...')
             # print('Indefinite looping...')
-            if UsePLC_DBS:                                      # Using PLC Data
+            if UsePLC_DBS and c_status:                                      # Using PLC Data
                 inProgress = True                                   # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
 
@@ -6482,9 +6573,9 @@ class substTempTabb(ttk.Frame):
                     autoSpcPause = False
                     print("Visualization in Real-time Mode...")
                     # -----------------------------------------------------------------[]
-                    self.stDta = pst.plcExec(T1, s_fetch, stp_Sz, s_regm)
+                    self.stDta = pst.plcExec(self.T1, s_fetch, stp_Sz, s_regm)
 
-            elif UseSQL_DBS and self.running:
+            elif UseSQL_DBS and c_status:
                 inProgress = False  # False for Real-time mode
                 print('\nSynchronous controller activated...')
 
@@ -6501,7 +6592,7 @@ class substTempTabb(ttk.Frame):
                     print("Visualization in Real-time Mode...")
 
                 else:
-                    self.stDta, self.stDtb = pst.sqlExec(st_con, s_fetch, stp_Sz, s_regm, T1, T2)
+                    self.stDta, self.stDtb = pst.sqlExec(st_con, s_fetch, stp_Sz, self.T1, self.T2)
                     print("Visualization in Play Mode...")
                 print('\nUpdating....')
 
@@ -6529,136 +6620,140 @@ class substTempTabb(ttk.Frame):
         timei = time.time()                                 # start timing the entire loop
 
         # Call data loader Method---------------------#
-        if UsePLC_DBS == 1:
+        if UsePLC_DBS and c_status:
             import VarPLC_ST as st
+
             # Call synchronous data function ---------[]
-            g1 = qst.validCols(T1)                          # Load defined valid columns for PLC Data
+            g1 = qst.validCols(self.T1)                          # Load defined valid columns for PLC Data
             df1 = pd.DataFrame(self.stDta, columns=g1)      # Include table data into python Dataframe
             ST = st.loadProcesValues(df1)                   # Join data values under dataframe
 
         elif UseSQL_DBS and self.running:
             import VarSQL_ST as st
             # -----------------------------------------#
-            g1 = qst.validCols(T1)                          # Construct Data Column selSqlColumnsTFM.py
+            g1 = qst.validCols(self.T1)                          # Construct Data Column selSqlColumnsTFM.py
             d1 = pd.DataFrame(self.tDta, columns=g1)        # Import into python Dataframe
-            g2 = qla.validCols(T2)
+
+            g2 = qla.validCols(self.T2)
             d2 = pd.DataFrame(self.tDtb, columns=g2)
 
-            # Concatenate all columns -----------[]
-            df1 = pd.concat([d1, d2], axis=1)
-            ST = st.loadProcesValues(df1)                   # Join data values under dataframe
-            print('\nSQL Content', df1.head(10))
-            print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
+            p_data = pd.concat([d1, d2], axis=1)
+            ST = st.loadProcesValues(p_data)                   # Join data values under dataframe
+            # ---------------------------------
+            # print('\nSQL Content', df1.head(10))
+            print("Memory Usage:", p_data.info(verbose=False))  # Check memory utilization
+
         else:
-            print('Unknown Process Protocol...')
+            ST = 0
+            print('Unknown [ST] Process Protocol...')
         # -------------------------------------------#
-        if UsePLC_DBS or UseSQL_DBS and self.running:
+        if UsePLC_DBS and c_status or UseSQL_DBS and c_status:
             # ---------------------------------------[]
             # Plot X-Axis data points -------- X Plot
-            im10.set_xdata(np.arange(self.win_Xmax))
-            im11.set_xdata(np.arange(self.win_Xmax))
-            im12.set_xdata(np.arange(self.win_Xmax))
-            im13.set_xdata(np.arange(self.win_Xmax))
-            im14.set_xdata(np.arange(self.win_Xmax))
-            im15.set_xdata(np.arange(self.win_Xmax))
-            im16.set_xdata(np.arange(self.win_Xmax))
-            im17.set_xdata(np.arange(self.win_Xmax))
-            im18.set_xdata(np.arange(self.win_Xmax))
-            im19.set_xdata(np.arange(self.win_Xmax))
-            im20.set_xdata(np.arange(self.win_Xmax))
-            im21.set_xdata(np.arange(self.win_Xmax))
-            im22.set_xdata(np.arange(self.win_Xmax))
-            im23.set_xdata(np.arange(self.win_Xmax))
-            im24.set_xdata(np.arange(self.win_Xmax))
-            im25.set_xdata(np.arange(self.win_Xmax))
+            self.im10.set_xdata(np.arange(self.win_Xmax))
+            self.im11.set_xdata(np.arange(self.win_Xmax))
+            self.im12.set_xdata(np.arange(self.win_Xmax))
+            self.im13.set_xdata(np.arange(self.win_Xmax))
+            self.im14.set_xdata(np.arange(self.win_Xmax))
+            self.im15.set_xdata(np.arange(self.win_Xmax))
+            self.im16.set_xdata(np.arange(self.win_Xmax))
+            self.im17.set_xdata(np.arange(self.win_Xmax))
+            self.im18.set_xdata(np.arange(self.win_Xmax))
+            self.im19.set_xdata(np.arange(self.win_Xmax))
+            self.im20.set_xdata(np.arange(self.win_Xmax))
+            self.im21.set_xdata(np.arange(self.win_Xmax))
+            self.im22.set_xdata(np.arange(self.win_Xmax))
+            self.im23.set_xdata(np.arange(self.win_Xmax))
+            self.im24.set_xdata(np.arange(self.win_Xmax))
+            self.im25.set_xdata(np.arange(self.win_Xmax))
             # ------------------------------- S Plot
-            im26.set_xdata(np.arange(self.win_Xmax))
-            im27.set_xdata(np.arange(self.win_Xmax))
-            im28.set_xdata(np.arange(self.win_Xmax))
-            im29.set_xdata(np.arange(self.win_Xmax))
-            im30.set_xdata(np.arange(self.win_Xmax))
-            im31.set_xdata(np.arange(self.win_Xmax))
-            im32.set_xdata(np.arange(self.win_Xmax))
-            im33.set_xdata(np.arange(self.win_Xmax))
-            im34.set_xdata(np.arange(self.win_Xmax))
-            im35.set_xdata(np.arange(self.win_Xmax))
-            im36.set_xdata(np.arange(self.win_Xmax))
-            im37.set_xdata(np.arange(self.win_Xmax))
-            im38.set_xdata(np.arange(self.win_Xmax))
-            im39.set_xdata(np.arange(self.win_Xmax))
-            im40.set_xdata(np.arange(self.win_Xmax))
-            im41.set_xdata(np.arange(self.win_Xmax))
+            self.im26.set_xdata(np.arange(self.win_Xmax))
+            self.im27.set_xdata(np.arange(self.win_Xmax))
+            self.im28.set_xdata(np.arange(self.win_Xmax))
+            self.im29.set_xdata(np.arange(self.win_Xmax))
+            self.im30.set_xdata(np.arange(self.win_Xmax))
+            self.im31.set_xdata(np.arange(self.win_Xmax))
+            self.im32.set_xdata(np.arange(self.win_Xmax))
+            self.im33.set_xdata(np.arange(self.win_Xmax))
+            self.im34.set_xdata(np.arange(self.win_Xmax))
+            self.im35.set_xdata(np.arange(self.win_Xmax))
+            self.im36.set_xdata(np.arange(self.win_Xmax))
+            self.im37.set_xdata(np.arange(self.win_Xmax))
+            self.im38.set_xdata(np.arange(self.win_Xmax))
+            self.im39.set_xdata(np.arange(self.win_Xmax))
+            self.im40.set_xdata(np.arange(self.win_Xmax))
+            self.im41.set_xdata(np.arange(self.win_Xmax))
             # X Plot Y-Axis data points for XBar --------------------------------------------[  # Ring 1 ]
-            im10.set_ydata((ST[0]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
-            im11.set_ydata((ST[1]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
-            im12.set_ydata((ST[2]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
-            im13.set_ydata((ST[3]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
+            self.im10.set_ydata((ST[0]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
+            self.im11.set_ydata((ST[1]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
+            self.im12.set_ydata((ST[2]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
+            self.im13.set_ydata((ST[3]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 1 ---------#
-            mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(stHL, stS, 'ST')
+            # mnA, sdA, xusA, xlsA, xucA, xlcA, ppA, pkA = tq.eProcessR1(stHL, stS, 'ST')
             # ---------------------------------------#
-            im14.set_ydata((ST[4]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
-            im15.set_ydata((ST[5]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
-            im16.set_ydata((ST[6]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
-            im17.set_ydata((ST[7]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
+            self.im14.set_ydata((ST[4]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
+            self.im15.set_ydata((ST[5]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
+            self.im16.set_ydata((ST[6]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
+            self.im17.set_ydata((ST[7]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 2 ---------#
-            mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(stHL, stS, 'ST')
+            # mnB, sdB, xusB, xlsB, xucB, xlcB, ppB, pkB = tq.eProcessR2(stHL, stS, 'ST')
             # ---------------------------------------#
-            im18.set_ydata((ST[8]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
-            im19.set_ydata((ST[9]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
-            im20.set_ydata((ST[10]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
-            im21.set_ydata((ST[11]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
+            self.im18.set_ydata((ST[8]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
+            self.im19.set_ydata((ST[9]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
+            self.im20.set_ydata((ST[10]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
+            self.im21.set_ydata((ST[11]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 3 ---------#
-            mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(stHL, stS, 'ST')
+            # mnC, sdC, xusC, xlsC, xucC, xlcC, ppC, pkC = tq.eProcessR3(stHL, stS, 'ST')
             # ---------------------------------------#
-            im22.set_ydata((ST[12]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
-            im23.set_ydata((ST[13]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
-            im24.set_ydata((ST[14]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
-            im25.set_ydata((ST[15]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
+            self.im22.set_ydata((ST[12]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 1
+            self.im23.set_ydata((ST[13]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 2
+            self.im24.set_ydata((ST[14]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 3
+            self.im25.set_ydata((ST[15]).rolling(window=stS).mean()[0:self.win_Xmax])  # head 4
             # ------ Evaluate Pp for Ring 4 ---------#
-            mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(stHL, stS, 'ST')
+            # mnD, sdD, xusD, xlsD, xucD, xlcD, ppD, pkD = tq.eProcessR4(stHL, stS, 'ST')
             # ---------------------------------------#
             # S Plot Y-Axis data points for StdDev ----------------------------------------
-            im26.set_ydata((ST[0]).rolling(window=stS).std()[0:self.win_Xmax])
-            im27.set_ydata((ST[1]).rolling(window=stS).std()[0:self.win_Xmax])
-            im28.set_ydata((ST[2]).rolling(window=stS).std()[0:self.win_Xmax])
-            im29.set_ydata((ST[3]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im26.set_ydata((ST[0]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im27.set_ydata((ST[1]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im28.set_ydata((ST[2]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im29.set_ydata((ST[3]).rolling(window=stS).std()[0:self.win_Xmax])
 
-            im30.set_ydata((ST[4]).rolling(window=stS).std()[0:self.win_Xmax])
-            im31.set_ydata((ST[5]).rolling(window=stS).std()[0:self.win_Xmax])
-            im32.set_ydata((ST[6]).rolling(window=stS).std()[0:self.win_Xmax])
-            im33.set_ydata((ST[7]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im30.set_ydata((ST[4]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im31.set_ydata((ST[5]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im32.set_ydata((ST[6]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im33.set_ydata((ST[7]).rolling(window=stS).std()[0:self.win_Xmax])
 
-            im34.set_ydata((ST[8]).rolling(window=stS).std()[0:self.win_Xmax])
-            im35.set_ydata((ST[9]).rolling(window=stS).std()[0:self.win_Xmax])
-            im36.set_ydata((ST[10]).rolling(window=stS).std()[0:self.win_Xmax])
-            im37.set_ydata((ST[11]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im34.set_ydata((ST[8]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im35.set_ydata((ST[9]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im36.set_ydata((ST[10]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im37.set_ydata((ST[11]).rolling(window=stS).std()[0:self.win_Xmax])
 
-            im38.set_ydata((ST[12]).rolling(window=stS).std()[0:self.win_Xmax])
-            im39.set_ydata((ST[13]).rolling(window=stS).std()[0:self.win_Xmax])
-            im40.set_ydata((ST[14]).rolling(window=stS).std()[0:self.win_Xmax])
-            im41.set_ydata((ST[15]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im38.set_ydata((ST[12]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im39.set_ydata((ST[13]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im40.set_ydata((ST[14]).rolling(window=stS).std()[0:self.win_Xmax])
+            self.im41.set_ydata((ST[15]).rolling(window=stS).std()[0:self.win_Xmax])
             # Compute entire Process Capability -----------#
-            if not stHL:
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLc, dLCLc, ppT, pkT, xline, sline = tq.tAutoPerf(stS, mnA, mnB,
-                                                                                                      mnC, mnD, sdA,
-                                                                                                      sdB, sdC, sdD)
-            else:
-                xline, sline = stMean, stDev
-                mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLc, dLCLc, ppT, pkT = tq.tManualPerf(mnA, mnB, mnC, mnD, sdA, sdB,
-                                                                                          sdC, sdD, stUSL, stLSL, stUCL,
-                                                                                          stLCL)
+            # if not stHL:
+            #     mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLc, dLCLc, ppT, pkT, xline, sline = tq.tAutoPerf(stS, mnA, mnB,
+            #                                                                                           mnC, mnD, sdA,
+            #                                                                                           sdB, sdC, sdD)
+            # else:
+            #     xline, sline = stMean, stDev
+            #     mnT, sdT, xusT, xlsT, xucT, xlcT, dUCLc, dLCLc, ppT, pkT = tq.tManualPerf(mnA, mnB, mnC, mnD, sdA, sdB,
+            #                                                                               sdC, sdD, stUSL, stLSL, stUCL,
+            #                                                                               stLCL)
             # # Declare Plots attributes ------------------------------------------------------------[]
             # XBar Mean Plot
-            a1.axhline(y=xline, color="red", linestyle="--", linewidth=0.8)
-            a1.axhspan(xlcT, xucT, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 3 Sigma span (Purple)
-            a1.axhspan(xucT, xusT, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
-            a1.axhspan(xlcT, xlsT, facecolor='#8d8794', edgecolor='#8d8794')
+            self.a1.axhline(y=stMean, color="red", linestyle="--", linewidth=0.8)
+            self.a1.axhspan(stLCL, stUCL, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 3 Sigma span (Purple)
+            self.a1.axhspan(stUCL, stUSL, facecolor='#8d8794', edgecolor='#8d8794')  # grey area
+            self.a1.axhspan(stLSL, stLCL, facecolor='#8d8794', edgecolor='#8d8794')
             # ---------------------- sBar_minST, sBar_maxST -------[]
             # Define Legend's Attributes  ----
-            a2.axhline(y=sline, color="blue", linestyle="--", linewidth=0.8)
-            a2.axhspan(dLCLc, dUCLc, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 1 Sigma Span
-            a2.axhspan(dUCLc, sBar_maxST, facecolor='#CCCCFF', edgecolor='#CCCCFF')  # 1 Sigma above the Mean
-            a2.axhspan(sBar_minST, dLCLc, facecolor='#CCCCFF', edgecolor='#CCCCFF')
+            self.a2.axhline(y=stDev, color="blue", linestyle="--", linewidth=0.8)
+            self.a2.axhspan(sLCLst, sUCLst, facecolor='#F9C0FD', edgecolor='#F9C0FD')  # 1 Sigma Span
+            self.a2.axhspan(sLCLst, self.sBar_maxST, facecolor='#CCCCFF', edgecolor='#CCCCFF')  # 1 Sigma above the Mean
+            self.a2.axhspan(self.sBar_minST, sLCLst, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if len(ST) > win_Xmax:
@@ -8609,6 +8704,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
 
     def dMinMaxPlot():
         global pStat, dMax, mMax, oMax, OT, CT, RP, WS, LP, LA, m1, m2, m3, m4, m5, m6, xlp, xla, xtp, xrf, xtt, xst, xtg
+
         if dnvMinMax.get():
             print('\nMonitoring Parameters for DNV Production..')
             dMax = 1
@@ -8672,6 +8768,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
 
     def mMinMaxPlot():
         global pStat, dMax, mMax, oMax, OT, CT, WS, RP, LP, LA, xlp, xla, xtp, xrf, xtt, xst, xtg, m1, m2, m3, m4, m5, m6
+
         if mgmMinMax.get():
             print('\nMonitoring Parameters for Commercial Production..')
             dMax = 0
@@ -8762,7 +8859,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pLP.set(0)
 
@@ -8776,7 +8873,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pLA.set(0)
 
@@ -8790,7 +8887,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pTP.set(0)
 
@@ -8804,7 +8901,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pRF.set(0)
 
@@ -8818,7 +8915,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(1)
             pST.set(0)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pTT.set(0)
 
@@ -8832,7 +8929,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pST.set(1)
             pTG.set(0)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pST.set(0)
 
@@ -8846,7 +8943,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(1)
-            hlb.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pLP, pLA, pTP, pRF, pTT, pST, pTG)
+            hlb.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pLP, pLA, pTP, pRF, pTT, pST, pTG)
         else:
             pLA.set(0)
 
@@ -8857,9 +8954,13 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pST.set(0)
             pWS.set(0)
             pTG.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
+            hla.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pRP, pTT, pST, pWS, pTG) #
         else:
             pTT.set(0)
+            pRP.set(0)
+            pST.set(0)
+            pWS.set(0)
+            pTG.set(0)
 
     def runChecksC():
         if pST.get():
@@ -8868,9 +8969,13 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pWS.set(0)
             pTG.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
+            hla.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pRP, pTT, pST, pWS, pTG)
         else:
             pST.set(0)
+            pRP.set(0)
+            pTT.set(0)
+            pWS.set(0)
+            pTG.set(0)
 
     def runChecksD():
         if pWS.get():
@@ -8879,9 +8984,13 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pTG.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
+            hla.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pRP, pTT, pST, pWS, pTG)
         else:
             pWS.set(0)
+            pRP.set(0)
+            pTT.set(0)
+            pST.set(0)
+            pTG.set(0)
 
     def runChecksE():
         if pTG.get():
@@ -8890,23 +8999,27 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pTT.set(0)
             pST.set(0)
             pWS.set(0)
-            hla.paramsEntry(modal, sel_SS, sel_gT, dnv, mgm, aut, pRP, pTT, pST, pWS, pTG)
+            hla.paramsEntry(modal, sel_SS, sel_gT, mdnv, aut, ymgm, pRP, pTT, pST, pWS, pTG)
         else:
             pTG.set(0)
+            pRP.set(0)
+            pTT.set(0)
+            pST.set(0)
+            pWS.set(0)
 
 
     def dnvConfigs():
-        global modal, pRP, pTT, pST, pWS, pTG
+        global modal, pRP, pTT, pST, pWS, pTG, mdnv, aut, ymgm
 
         # prevent parent window closure until 'Save settings' ---[]
         root.protocol("WM_DELETE_WINDOW", preventClose)  # prevent closure even when using (ALT + F4)
         # -------------------------------------------------------[]
+        mdnv, aut, ymgm = 1, 0, 0
 
         modal = Toplevel(root)
         modal.wm_attributes('-topmost', True)
 
         pRP, pTT, pST, pWS, pTG = IntVar(), IntVar(), IntVar(), IntVar(), IntVar()
-
         # ----------------------------------------------------------------------------------[]
         modal.resizable(False, False)
 
@@ -8958,11 +9071,13 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
 
 # ------------------------------------------------------------------------------------------------[]
     def mgmConfigs():
-        global modal, pLP, pLA, pTP, pRF, pTT, pST, pTG
+        global modal, pLP, pLA, pTP, pRF, pTT, pST, pTG, mdnv, aut, ymgm
 
         # prevent parent window closure until 'Save settings' ---[]
         root.protocol("WM_DELETE_WINDOW", preventClose)  # prevent closure even when using (ALT + F4)
         # -------------------------------------------------------[]
+
+        mdnv, aut, ymgm = 0, 0, 1
 
         modal = Toplevel(root)
         modal.wm_attributes('-topmost', True)
@@ -9025,11 +9140,12 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
         return
 
     def enDNV():
-        global dnv, mgm, aut
+        global dnv, aut, mgm
+
         if pLmtA.get():
             dnv = 1
-            mgm = 0
             aut = 0
+            mgm = 0
             dnv_butt.config(state="normal")
             mgm_butt.config(state="disabled")
             pLmtA.set(dnv)
@@ -9037,22 +9153,23 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pLmtB.set(mgm)
         else:
             dnv = 1
-            mgm = 0
             aut = 0
+            mgm = 0
             dnv_butt.config(state="disabled")
             mgm_butt.config(state="disabled")
             pLmtA.set(dnv)
             shewhart.set(aut)
             pLmtB.set(mgm)
 
-        return dnv, mgm, aut
+        return dnv, aut, mgm
 
     def enAUTO():
-        global dnv, mgm, aut
+        global dnv, aut, mgm
+
         if shewhart.get():
             dnv = 0
-            mgm = 0
             aut = 1
+            mgm = 0
             dnv_butt.config(state="disabled")
             mgm_butt.config(state="disabled")
             pLmtA.set(dnv)
@@ -9060,22 +9177,23 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pLmtB.set(mgm)
         else:
             dnv = 0
-            mgm = 0
             aut = 1
+            mgm = 0
             dnv_butt.config(state="disabled")
             mgm_butt.config(state="disabled")
             pLmtA.set(dnv)
             shewhart.set(aut)
             pLmtB.set(mgm)
 
-        return dnv, mgm, aut
+        return dnv, aut, mgm
 
     def enMGM():
-        global dnv, mgm, aut
+        global dnv, aut, mgm
+
         if pLmtB.get():
             dnv = 0
-            mgm = 1
             aut = 0
+            mgm = 1
             mgm_butt.config(state="normal")
             dnv_butt.config(state="disabled")
             pLmtA.set(dnv)
@@ -9083,15 +9201,15 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
             pLmtB.set(mgm)
         else:
             dnv = 0
-            mgm = 1
             aut = 0
+            mgm = 1
             mgm_butt.config(state="disabled")
             dnv_butt.config(state="disabled")
             pLmtA.set(dnv)
             shewhart.set(aut)
             pLmtB.set(mgm)
 
-        return dnv, mgm, aut
+        return dnv, aut, mgm
 
     def watchDG():
         global rMode, HeadA, HeadB, closeV
