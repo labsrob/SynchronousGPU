@@ -69,7 +69,7 @@ def sqlExec(daq, nGZ, grp_step, T1, T2):
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    # t1.close()
+    # t1.close()  # close cursor
 
     # ------------------------------------------------------------------------------------[]
     # data2 = t1.execute('SELECT TOP ('+ str(n2fetch) +') * FROM ' + str(T2)).fetchall()
@@ -91,7 +91,7 @@ def sqlExec(daq, nGZ, grp_step, T1, T2):
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    # t1.close()
+    t1.close() # close cursor
 
     return dL1, dL2
 # -----------------------------------------------------------------------------------[Dr Labs]
