@@ -21,6 +21,7 @@ def validCols(pParam, pWON=None):
                    'GaugeB1', 'GaugeB2', 'GaugeB3', 'GaugeB4', 'PipeDir']
 
     else:
+        columns = 0
         print('Invalid Columns or Query error...')
 
     return columns

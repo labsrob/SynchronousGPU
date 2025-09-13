@@ -26,35 +26,33 @@ def sqlExec(daq, nGZ, grp_step, T1, T2):
 
     # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
     if group_step == 1:
-        if len(dL1) < int(nGZ) or len(dL2) < int(nGZ):
-            n2fetch = int(nGZ)  # fetch initial specified number
-            print('1st Trip:', n2fetch)
+        if len(dL1) < n2fetch or len(dL2) < n2fetch:
+            fetch = int(nGZ)  # fetch initial specified number
 
         elif len(dL1) == int(nGZ):
-            n2fetch = int(nGZ)  # - len(dL1)
-            print('2nd Trip:', n2fetch)
+            fetch = int(nGZ)  # - len(dL1)
 
         else:
             dL1.pop(0)
             dL2.pop(0)
-            n2fetch = 1
+            fetch = 1
 
     elif group_step == 2:
-        if len(dL1) <= int(nGZ) or len(dL2) <= int(nGZ):
-            n2fetch = int(nGZ)
+        if len(dL1) <= n2fetch or len(dL2) <= n2fetch:
+            fetch = int(nGZ)
         else:
             del dL1[:(len(dL1) - 1)]
             del dL2[:(len(dL2) - 1)]
-            n2fetch = int(nGZ) - 1
+            fetch = int(nGZ) - 1
         print('\nRows to Fetch on Discrete:', n2fetch)
     else:
-        n2fetch = int(nGZ)
-    print('\nTTA:', n2fetch, len(dL1), dL1)
-    print('TTB:', n2fetch, len(dL2), dL2)
+        fetch = int(nGZ)
+    print('\nTTA:', fetch, len(dL1), dL1)
+    print('TTB:', fetch, len(dL2), dL2)
 
     # ------------------------------------------------------------------------------------[]
-    # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data1 = t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY tStamp').fetchmany(n2fetch)
+    # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(fetch)
+    data1 = t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY tStamp').fetchmany(fetch)
     if len(data1) != 0:
         for result in data1:
             result = list(result)
@@ -72,8 +70,8 @@ def sqlExec(daq, nGZ, grp_step, T1, T2):
     # t1.close()  # close cursor
 
     # ------------------------------------------------------------------------------------[]
-    # data2 = t1.execute('SELECT TOP ('+ str(n2fetch) +') * FROM ' + str(T2)).fetchall()
-    data2 = t1.execute('SELECT * FROM ' + str(T2) + ' ORDER BY tStamp').fetchmany(n2fetch)
+    # data2 = t1.execute('SELECT TOP ('+ str(fetch) +') * FROM ' + str(T2)).fetchall()
+    data2 = t1.execute('SELECT * FROM ' + str(T2) + ' ORDER BY tStamp').fetchmany(fetch)
     print('TT2', len(data2), data2)
     if len(data2) != 0:
         for result in data2:

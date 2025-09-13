@@ -16,35 +16,42 @@ Idx, Idx, dL = [], [], []
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def sqlExec(nGZ, grp_step, daq, rT1, sCentr, fetch_no):
+def sqlExec(conn, nGZ, grp_step, sCentr, T1):
     """
     NOTE:
     """
-    # idx = str(idx)                                  # convert Query Indexes to string concatenation
+    t1 = conn.cursor()                              # convert Query Indexes to string concatenation
 
     group_step = int(grp_step)                      # group size/ sample sze
-    fetch_no = int(fetch_no)                        # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
+    n2fetch = int(nGZ)                             # dbfreq = TODO look into any potential conflict
+    print('\nDefault Sample Size:', n2fetch, group_step, '\n')
 
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
-    if len(dL) < (nGZ - 1):
-        n2fetch = nGZ                                       # fetch initial specified number
-        print('\nRows to Fetch:', n2fetch)
-        print('Processing SQL Row #:', int(sCentr) + fetch_no + 1, 'to', (int(sCentr) + fetch_no + 1) + n2fetch)
+    if group_step == 1:
+        if len(dL) < n2fetch:
+            fetch = n2fetch  # fetch initial specified number
 
-    elif group_step == 1 and len(dL) >= nGZ:
-        print('\nSINGLE STEP SLIDE')
-        print('=================')
-        n2fetch = (nGZ + fetch_no)                          # fetch just one line to on top of previous fetch
-        idxA = int(sCentr) + (((fetch_no + 1) - 2) * nGZ) + 1
-        if len(sCentr) > 1:
-            del sCentr[:1]
-        Idx.append(idxA)
-        print('Processing SQL Row #:', 'T1:', idxA)
+        elif len(dL) == int(nGZ):
+            fetch = n2fetch  # - len(dL1)
+        else:
+            dL.pop(0)
+            fetch = 10
+
+    elif group_step == 2:
+        if len(dL) <= n2fetch:
+            fetch = n2fetch
+        elif len(dL) == n2fetch:
+            fetch = n2fetch - 1
+        else:
+            dL.pop(0)
+            fetch = n2fetch + 1
+    else:
+        fetch = n2fetch
+    print('\nCumulative RM:', len(dL), dL)
 
     # ------------------------------------------------------------------------------------[]
     # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data = daq.execute('SELECT * FROM ' + rT1 + ' WHERE sCentre = ' + str(sCentr)).fetchmany(n2fetch)
+    data = t1.execute('SELECT * FROM ' + str(T1) + ' WHERE sCentre = ' + str(sCentr)).fetchmany(fetch)
     if len(data) != 0:
         for result in data:
             result = list(result)

@@ -16,35 +16,41 @@ Idx, dL = [], []
 st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
 
 
-def sqlExec(nGZ, grp_step, daq, rT1, sCentr, fetch_no):
+def sqlExec(conn, nGZ, grp_step, T1):
     """
     NOTE:
     """
-    # idx = str(idx)                                  # convert Query Indexes to string concatenation
+    t1 = conn.cursor()                        # convert Query Indexes to string concatenation
 
-    group_step = int(grp_step)                      # group size/ sample sze
-    fetch_no = int(fetch_no)                        # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
+    group_step = int(grp_step)                # group size/ sample sze
+    n2fetch = int(nGZ)                        # dbfreq = TODO look into any potential conflict
 
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
-    if len(dL) < (nGZ - 1):
-        n2fetch = nGZ                                       # fetch initial specified number
-        print('\nRows to Fetch:', n2fetch)
-        print('Processing SQL Row #:', int(sCentr) + fetch_no + 1, 'to', (int(sCentr) + fetch_no + 1) + n2fetch)
+    if group_step == 1:
+        if len(dL) < n2fetch:
+            fetch = n2fetch  # fetch initial specified number
 
-    elif group_step == 1 and len(dL) >= nGZ:
-        print('\nSINGLE STEP SLIDE')
-        print('=================')
-        n2fetch = (nGZ + fetch_no)                          # fetch just one line to on top of previous fetch
-        idxA = int(sCentr) + (((fetch_no + 1) - 2) * nGZ) + 1
-        if len(Idx) > 1:
-            del Idx[:1]
-        Idx.append(idxA)
-        print('Processing Sample Distance #:', idxA)
+        elif len(dL) == int(nGZ):
+            fetch = n2fetch  # - len(dL1)
+        else:
+            dL.pop(0)
+            fetch = 10
+
+    elif group_step == 2:
+        if len(dL) <= n2fetch:
+            fetch = n2fetch
+        elif len(dL) == n2fetch:
+            fetch = n2fetch - 1
+        else:
+            # dL.pop(0)
+            fetch = n2fetch + 1
+    else:
+        fetch = n2fetch
+    print('\nCumulative VMP:', len(dL), dL)
 
     # ------------------------------------------------------------------------------------[]
-    # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data1 = daq.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
+    data1 = t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY cLayer').fetcall()
+    # data1 = t1.execute('SELECT * FROM ' + str(T1)).fetchmany(fetch)
     if len(data1) != 0:
         for result in data1:
             result = list(result)
@@ -54,32 +60,13 @@ def sqlExec(nGZ, grp_step, daq, rT1, sCentr, fetch_no):
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
             dL.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dL[0:(len(dL) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dL[0:(len(dL) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dL[0:(len(dL) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dL[0:(len(dL) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
         # print("Step List1:", len(dL1), dL1)       FIXME:
+
     else:
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    daq.close()
+    t1.close()
 
     return dL
 # -----------------------------------------------------------------------------------[Dr Labs]

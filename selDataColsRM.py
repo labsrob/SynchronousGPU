@@ -17,6 +17,7 @@ def validCols(pParam, pWON=None):
         columns = ['R1Pos', 'R2Pos', 'R3Pos', 'R4Pos', 'PipeDir', 'cLayer']
 
     else:
+        columns = 0
         print('Invalid Columns or Query error...')
 
     return columns

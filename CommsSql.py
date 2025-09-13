@@ -2,10 +2,13 @@
 # About: Module saves all extracted data from prescription notes
 # Author: Dr Robert B. Labs
 
+import pymssql
 import pyodbc                       # pyodbc is an open source Python module that makes accessing ODBC databases.
 from datetime import date, datetime
+
 import numpy as np
 import loadSQLConfig as tx
+
 # import Test_PING as sql
 from tkinter import messagebox
 today = date.today()
@@ -96,13 +99,14 @@ def sql_connectTT():
     conn = None
     resilenceN = 5
     wait2retry = 2
+    Certify = 'Certify'
     # ---------------------------------------------------------#
 
     if conn == None:
         print('\n[TT] Connecting to SQL server...')
-        # Ensure connection is robust and resilent ------
+        # Ensure connection is robust and resillence ------
         for attempt in range(1, resilenceN + 1):
-
+            # Use pymssql or pyodbc
             try:
                 conn = pyodbc.connect('Driver={SQL Server};'
                                       'Server=' + server_IP + ';'
@@ -309,7 +313,7 @@ def sql_connectTG():
     return None
 
 # -------------------------------------------------------------------------[TG Mapping]
-def sql_connectTM():
+def sql_connectVMP():
     """
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call

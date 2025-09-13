@@ -3317,9 +3317,7 @@ class CommonPlot:
 
         self.colors = ["cyan", "magenta", "gold", "gray", "black"]
         for i in range(self.num_sensors):
-            self.ax.plot([], [], lw=1.2,
-                         color=self.colors[i % len(self.colors)],
-                         label=f"Common S{i+1}")
+            self.ax.plot([], [], lw=1.2, color=self.colors[i % len(self.colors)], label=f"Common S{i+1}")
         self.ax.legend(loc="upper right")
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=root)
