@@ -5988,7 +5988,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     autoSpcPause = False
                     print("[TT] Visualization in Real-time Mode...")
                     # Get list of relevant PLC Tables using conn() --------------------[]
-                    self.ttD1 = pdB.plcExec(self.T1, s_fetch, stp_Sz, s_regm)
+                    self.ttD1, self.rmD3 = pdB.plcExec(self.T1, self.T3, s_fetch, stp_Sz, s_regm)
 
             elif UseSQL_DBS and self.running:
                 inProgress = False  # False for Real-time mode
@@ -6008,7 +6008,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
                 else:
                     time.sleep(5)
-                    self.ttD1, self.ttD2 = pdA.sqlExec(self.tt_con, s_fetch, stp_Sz, self.T1, self.T2)
+                    self.ttD1, self.ttD2, self.rmD3 = pdA.sqlExec(self.tt_con, s_fetch, stp_Sz, self.T1, self.T2, self.T3)
                     print("[TT] Visualization in Play Mode...")
                 print('\nUpdating....')
 
@@ -6240,7 +6240,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
                 else:
                     time.sleep(2)
-                    self.ttD3 = pdB.sqlExec(self.rm_con, s_fetch, stp_Sz, self.T3)
+                    # self.ttD3 = pdB.sqlExec(self.rm_con, s_fetch, stp_Sz, self.T3)
                     print("[RMP] Visualization in Play Mode...")
                 print('\nUpdating....')
 
