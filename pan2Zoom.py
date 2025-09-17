@@ -67,7 +67,8 @@ import matplotlib.pyplot as plt
 #         self.a3.set_ylim(ylim[0] - dy, ylim[1] - dy)
 #         # self.canvas.draw_idle()
 #         self.a3.figure.canvas.draw_idle()
-    # --------------------- End of pan zoom method ------------------
+
+# --------------------- End of pan zoom method ------------------------------[]
 class PanZoom:
     def __init__(self, ax, base_scale=1.2):
         self.ax = ax
@@ -128,9 +129,9 @@ class PanZoom:
         self.ax.set_ylim(ylim[0] - dy * scale_y, ylim[1] - dy * scale_y)
         self.ax.figure.canvas.draw_idle()
 
-# Example usage --------------------------
-# fig, ax = plt.subplots()
-# ax.plot(range(100), [i**0.5 for i in range(100)])
-#
-# pz = PanZoom(ax)  # activate pan + zoom
-# plt.show()
+# Example usage ---------------------------------------[]
+fig, ax = plt.subplots()
+ax.plot(range(100), [i**0.5 for i in range(100)])
+
+pz = PanZoom(ax)    # activate pan + zoom
+plt.show()

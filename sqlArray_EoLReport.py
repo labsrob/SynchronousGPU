@@ -12,15 +12,15 @@ idx = count()
 now = datetime.now()
 
 dataList0 = []
-rTT, rST, rTG, rWA, rWS = [], [], [], [], []            # DNV
-rLP, rLA, rTT, rST, rTG, rWA = [], [], [], [], [], []   # MGM
+rTT, rST, rTG, rWS, rPP = [], [], [], [], []            # DNV
+rLP, rLA, rTT, rST, rTG, rWA, rPP = [], [], [], [], [], [], []   # MGM
 
 
-def dnv_sqlExec(sq_con, T1, T2, T3, T4, layerNo):
+def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
     """
     NOTE:
     """
-    t1, t2, t3, t4 = sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor()
+    t1, t2, t3, t4, t5 = sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor()
 
     # ------------------ Load randomised samples --------------------------------------------------------------[A]
     if len(rTT) > 0:    # clean up accumulator
@@ -107,7 +107,32 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, layerNo):
             time.sleep(5)
         t4.close()
 
-    return rTT, rST, rTG, rWS
+    # Pipe Profile ------------------------------------------------------------------------------------------[D]
+    if len(rPP) > 0:    # clean up accumulator
+        del rPP[:]
+    dataPP = t5.execute('Select * FROM ' + str(T5) + ' where [LyID] = ' + str(layerNo)).fetchall()
+    print('TP-SQL', len(dataPP), dataPP)
+    if len(dataPP) != 0:
+        for result in dataPP:
+            result = list(result)
+            if UseRowIndex:
+                dataList0.append(next(idx))
+            else:
+                now = time.strftime("%H:%M:%S")
+                dataList0.append(time.strftime(now))
+            rPP.append(result)
+
+        # print("Step List1:", len(dL1), dL1)       FIXME:
+
+    else:
+        dataPP = 0, 0, 0, 0, 0, 0, 0, 0, 0
+        print('Process EOF reached...')
+        print('SPC Halting for 5 Minutes...')
+        time.sleep(5)
+    t5.close()
+
+
+    return rTT, rST, rTG, rWS, rPP
 # -------------------------------------------------------------------------------------------------------[XXXXXXX]
 
 

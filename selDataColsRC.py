@@ -17,6 +17,7 @@ def validCols(pParam, pWON=None):
         columns = ['sCentre', 'RAMPosA', 'rMarkerA', 'RAMPosB', 'rMarkerB', 'RAMPosC', 'rMarkerC', 'RAMPosD', 'rMarkerD', 'PipeDir', 'cLayer', 'totalR']
 
     else:
+        columns = 0
         print('Invalid Columns or Query error...')
 
     return columns

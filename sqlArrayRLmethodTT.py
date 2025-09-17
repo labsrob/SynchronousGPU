@@ -14,7 +14,7 @@ now = datetime.now()
 dataList0, dL1, dL2, dL3 = [], [], [], []
 
 
-def sqlExec(daq, nGZ, grp_step, T1, T2, T3):
+def sqlExec(daq, nGZ, grp_step, T1, T2, T3, dbfreq):
 
     """
     NOTE:
@@ -23,14 +23,20 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, T3):
 
     nGZ = int(nGZ)
     group_step = int(grp_step)
-    fetch_no = int(len(dataList0))  # int(nGZ) + 3
-    print('\nIndex Counter:', fetch_no, group_step, '\n')
+    fetch_no = dbfreq
+    print('\nIndex Counter:', fetch_no, 'To Fetch', nGZ, '\n')
 
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     if group_step == 1:
         print('\nSINGLE STEP SLIDE')
-        n2fetch = nGZ + 1
-        print('Rows to Fetch:', nGZ)
+        # if len(dL1) < (nGZ -1):
+        #     n2fetch = nGZ
+        # elif len(dL1) >= nGZ:
+        #     n2fetch = 1
+        # else:
+        #     n2fetch = nGZ
+        n2fetch = nGZ
+        print('Processing SQL Row #:', fetch_no, 'to', (fetch_no + nGZ))
 
     else:
         print('\nGROUP STEP SLIDE')
@@ -39,41 +45,43 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, T3):
         print('Rows to Fetch:', nGZ)
 
     # -------------------------------Assuming a very large dataset -------------------------[]
-    data1 = t1.execute('SELECT TOP (' + str(n2fetch) +') * FROM ' + str(T1)).fetchmany(n2fetch)
-    # data1 = t1.execute('SELECT * FROM ' + str(T1)).fetchmany(n2fetch)
+    # data1 = t1.execute('SELECT TOP (' + str(n2fetch) +') * FROM ' + str(T1)).fetchmany(n2fetch)
+    data1 = t1.execute('SELECT * FROM ' + str(T1)).fetchmany(n2fetch)
     print('\nTotal SQL Processed TT1:', data1)
-    if len(data1) == n2fetch:
+    if len(data1) != 0:
         for result in data1:
             result = list(result)
-            dL1.append(result)
 
             if UseRowIndex:
                 dataList0.append(next(idx))
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-            # dL1.append(result)
-            print('[TT1] Total Fetched:', len(dL1))
+            dL1.append(result)
+
             # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            if group_step > 1:
-                if len(dL1) >= nGZ and fetch_no <= 31:  # Retain group and step size
-                    del dL1[0:(len(dL1) - nGZ)]
-                elif (fetch_no + 1) >= 32:
-                    del dL1[0:(len(dL1) - fetch_no)]
+            # Step processing rate =1 ---[static window]
+            # Step processing rate >1 ---[static window]
+            if group_step > 1 and len(dL1) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
+                del dL1[0:(len(dL1) - nGZ)]
+
+            # Step processing rate >1 ---[moving window]
+            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dL1[0:(len(dL1) - fetch_no)]
 
             # Step processing rate =1 ---[static window]
-            elif group_step == 1:
-                if len(dL1) >= nGZ and fetch_no <= 31:
-                    del dL1[0:(len(dL1) - nGZ)]  # delete overflow data
-                elif (fetch_no + 1) >= 32:  # moving windows
-                    del dL1[0:(len(dL1) - fetch_no)]
+            elif group_step == 1 and len(dL1) >= (nGZ + n2fetch) and fetch_no <= 21:
+                del dL1[0:(len(dL1) - nGZ)]  # delete overflow data
+
+            # Step processing rate =1 ---[moving window]
+            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dL1[0:(len(dL1) - fetch_no)]
 
             else:  # len(dL1) < nGZ:
                 pass
-
-            # print('ZIPPED', zip(fetch_no, dL1))
             print('[TT1] Total Fetched:', len(dL1))
     else:
+        dataList0.append(next(idx))
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
@@ -96,23 +104,28 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, T3):
                 dataList0.append(time.strftime(now))
 
             # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            if group_step > 1:
-                if len(dL2) >= nGZ and fetch_no <= 31:  # Retain group and step size
+                # Step processing rate >1 ---[static window]
+                if group_step > 1 and len(dL2) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
                     del dL2[0:(len(dL2) - nGZ)]
-                elif (fetch_no + 1) >= 32:
+
+                # Step processing rate >1 ---[moving window]
+                elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
                     del dL2[0:(len(dL2) - fetch_no)]
 
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1:
-                if len(dL2) >= nGZ and fetch_no <= 31:
-                    del dL2[0:(len(dL2) - nGZ)]         # delete overflow data
-                elif (fetch_no + 1) >= 32:              # moving windows
+                # Step processing rate =1 ---[static window]
+                elif group_step == 1 and len(dL2) >= (nGZ + n2fetch) and fetch_no <= 21:
+                    del dL2[0:(len(dL2) - nGZ)]  # delete overflow data
+
+                # Step processing rate =1 ---[moving window]
+                elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
                     del dL2[0:(len(dL2) - fetch_no)]
 
-            else:  # len(dL1) < nGZ:
-                pass
+                else:  # len(dL1) < nGZ:
+                    pass
+
             print('[TT2] Total Fetched:', len(dL2))
     else:
+        dataList0.append(next(idx))
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
@@ -122,22 +135,39 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, T3):
     # ------------------------------------------------------------------------------------[]
     # data3 = t1.execute('SELECT TOP ('+ str(n2fetch) +') * FROM ' + str(T3)).fetchall()
     data3 = t3.execute('SELECT * FROM ' + str(T3)).fetchmany(n2fetch)
-    print('Cumulative RMB:', len(dL3), '\n')
+    print('Total SQL Fetched RMP:', data3)
     if len(data3) == n2fetch:
         for result in data3:
             result = list(result)
-            dL3.append(result)
-
             if UseRowIndex:
                 dataList0.append(next(idx))
             else:
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
-
+            dL3.append(result)
             # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
+            # Step processing rate >1 ---[static window]
+            if group_step > 1 and len(dL3) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
+                del dL3[0:(len(dL3) - nGZ)]
 
+            # Step processing rate >1 ---[moving window]
+            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dL3[0:(len(dL3) - fetch_no)]
+
+            # Step processing rate =1 ---[static window]
+            elif group_step == 1 and len(dL3) >= (nGZ + n2fetch) and fetch_no <= 21:
+                del dL3[0:(len(dL3) - nGZ)]  # delete overflow data
+
+            # Step processing rate =1 ---[moving window]
+            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
+                del dL3[0:(len(dL3) - fetch_no)]
+
+            else:  # len(dL1) < nGZ:
+                pass
+            print('[RMP] Total Fetched:', len(dL3))
 
     else:
+        dataList0.append(next(idx))
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)

@@ -631,7 +631,7 @@
 #     print('No Nvidia GPU in system!')
 #
 # # --------------------------------------------------
-import torch
+# import torch
 import GPUtil as gp
 #
 # use_cuda = gp.getAvailable()
@@ -651,8 +651,8 @@ import GPUtil as gp
 # # Payload Tester ---------------------------#
 # from numba_cuda import jit, cuda
 
-from numba import jit, cuda
-import numpy as np
+# from numba import jit, cuda
+# import numpy as np
 from timeit import default_timer as timer
 
 # # ----- Factorial TIme ------
@@ -901,7 +901,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from fpdf import FPDF
 from random import randint
-
+import numpy as np
 spDat, vDat, sdDat, tDat, pgeDat, psData, rD1, rD2, rD3, rD4 = [], [], [], [], [], [], [], [], [], []
 
 docs = 'C:\\synchronousDOCS\\'
@@ -1187,7 +1187,7 @@ def generate_pdf(rptID, cPipe, psData, custm, usrID, layrN, ring1, ring2, ring3,
         pdf.cell(-30)
         pdf.image(docs+'barchart_L' + str(lID) + '_' + str(pgiD[x]) + '.png', x=10, y=145, w=0, h=130, type='', link='')
 
-        # pdf.set_font('arial', '', 8)
+        # pdf.set_font('arial', 'B', 8)
         pdf.set_font('helvetica', '', 7)
         with pdf.rotation(angle=90, x=3, y=280):
             pdf.text(10, 280, "SPC Generated Report - " + (str(dID)))
@@ -1279,23 +1279,23 @@ def get_data():
         # print('\nTP01', rpData[i])
         if i == 0:
             cProc = 'Tape Temperature'          # Process ID
-            rPage = '1of4'
+            rPage = '1of5'
             Tvalu = [0.05, 0.05, 0.05, 0.05]    # Tolerance
         elif i == 1:
             cProc = 'Substrate Temperature'     # Process ID
-            rPage = '2of4'
+            rPage = '2of5'
             Tvalu = [0.02, 0.02, 0.02, 0.02]    # Tolerance
         elif i == 2:
             cProc = 'Gap Measurement'           # Process ID
-            rPage = '3of4'
+            rPage = '3of5'
             Tvalu = [0.03, 0.03, 0.03, 0.03]    # Tolerance
         elif i == 3:
             cProc = 'Winding Speed'             # Process ID
-            rPage = '4of4'
+            rPage = '4of5'
             Tvalu = [0.04, 0.04, 0.04, 0.04]    # Tolerance
         elif i == 4:
             cProc = 'Quantitative Properties'   # Process ID
-            rPage = '4of4'
+            rPage = '5of5'
             Tvalu = 0                           # Tolerance
 
         # -------------------
@@ -1538,3 +1538,4 @@ class PDFViewer(ScrolledText):
 #
 # root.mainloop()
 
+# --------------------------------------------------

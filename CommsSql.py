@@ -213,7 +213,7 @@ def sql_connectST():
         for attempt in range(1, max_retry + 1):
 
             try:
-                conn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
+                conn = pyodbc.connect('Driver={SQL Server};'
                                       'Server=' + server_IP + ';'
                                       'Database=' + db_ref + ';'
                                       'Encrypt=' + Encrypt + ';'
@@ -272,7 +272,7 @@ def sql_connectTG():
         for attempt in range(1, max_retry + 1):
 
             try:
-                conn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
+                conn = pyodbc.connect('Driver={SQL Server};'
                                       'Server=' + server_IP + ';'
                                       'Database=' + db_ref + ';'
                                       'Encrypt=' + Encrypt + ';'
@@ -331,7 +331,7 @@ def sql_connectVMP():
         for attempt in range(1, max_retry + 1):
 
             try:
-                conn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
+                conn = pyodbc.connect('Driver={SQL Server};'
                                       'Server=' + server_IP + ';'
                                       'Database=' + db_ref + ';'
                                       'Encrypt=' + Encrypt + ';'
@@ -390,7 +390,7 @@ def sql_connectMP():
         for attempt in range(1, max_retry + 1):
             # {SQL Server}
             try:
-                conn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
+                conn = pyodbc.connect('Driver={SQL Server};'
                                       'Server=' + server_IP + ';'
                                       'Database=' + db_ref + ';'
                                       'Encrypt=' + Encrypt + ';'
@@ -432,7 +432,7 @@ def DAQ_connect():
         print('\n[EoL] Connecting to SQL server...')
 
         try:
-            conn = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
+            conn = pyodbc.connect('Driver={SQL Server};'
                                   'Server=' + server_IP + ';'
                                   'Database=' + db_ref + ';'
                                   'Encrypt=' + Encrypt + ';'
