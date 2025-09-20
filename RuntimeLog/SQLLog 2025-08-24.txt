@@ -1,0 +1,1 @@
+2025-08-24 03:23.28 --- ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (64); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
