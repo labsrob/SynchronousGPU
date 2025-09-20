@@ -94,7 +94,7 @@ def check_PLC_Status():
 
 
 def disconnct_PLC():
-	state = check_PLC_connect()
+	state = check_PLC_Status()
 	if state == 'true':
 		pCon.disconnect(TCP01_IP, RACK, SLOT)
 	else:

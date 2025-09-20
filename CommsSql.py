@@ -81,7 +81,7 @@ def check_SQL_Status(maxAttempts, waitAttempts):
                 print("\nThe DB Server is up and running!!")
                 return True
             else:
-                print("Sorry, DB Server connection failed. Remaining " +str((maxAttempts) - (attemptNumber)), 'attempts..')
+                print("Sorry, Server connection failed. Remaining " +str((maxAttempts) - (attemptNumber)), 'attempts..')
                 #return False
             time.sleep(waitAttempts)
     print("Giving up, maximum attempts for DB to come online exceeded!")
@@ -90,7 +90,9 @@ def check_SQL_Status(maxAttempts, waitAttempts):
 
 # ----------- Establish Independent SQl Connection for Parallel Processing ---
 def sql_connectTT():
+    # Tape Temperature SQL Instance
     """
+    Parallel connection call for Tape Temperature Model - RL
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
     """
@@ -103,8 +105,8 @@ def sql_connectTT():
     # ---------------------------------------------------------#
 
     if conn == None:
-        print('\n[TT] Connecting to SQL server...')
-        # Ensure connection is robust and resillence ------
+        print('[TT] Connecting to SQL server...')
+        # Ensure connection is robust and resilience ------
         for attempt in range(1, resilenceN + 1):
             # Use pymssql or pyodbc
             try:
@@ -148,9 +150,74 @@ def sql_connectTT():
 
     return None
 
-# -------------------------------------------------------------------------[]Ramp Mapping
-def sql_connectRMP():
+# -------------------------------------------------------------[ST Instance]
+def sql_connectST():
+    # Substrate Temperature SQL Instance
     """
+    Parallel connection call for Tape Temperature Model - RL
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    resilenceN = 5
+    wait2retry = 2
+    Certify = 'Certify'
+    # ---------------------------------------------------------#
+
+    if conn == None:
+        print('[ST] Connecting to SQL server...')
+        # Ensure connection is robust and resillence ------
+        for attempt in range(1, resilenceN + 1):
+            # Use pymssql or pyodbc
+            try:
+                conn = pyodbc.connect('Driver={SQL Server};'
+                                      'Server=' + server_IP + ';'
+                                      'Database=' + db_ref + ';'
+                                      'Encrypt=' + Encrypt + ';'
+                                      'TrustServerCertificate=' + Certify + ';'
+                                      'uid=' + isAtho + ';'
+                                      'pwd=' + yekref + ';'
+                                      'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+                # conn = True
+                print('\n[ST] SQL Server connection active!\n')
+                return conn
+
+            except Exception as err:
+                wait_time = wait2retry * (2 ** (attempt - 1))
+                errorLog(f"[ST] Reconnect attempt {attempt}/{resilenceN} failed: {err}") #(str(err))                      # Log the error in txt file
+                # -----------------------
+                if attempt < resilenceN:
+                    #logging.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                else:
+                    # logging.critical("Max retries reached. Exiting.")
+                    # raise  # or return None if you prefer soft e
+                    errorConnect()
+                    print('\n[ST] Connection issue: Server is inaccessible!')
+        return None        # conn = False
+
+    else:                                           # when connection = 1 and requires disconnect
+        try:
+            conn.close()
+            errorNote()
+            print('\n[ST] Active connection will be closed...')
+
+        except Exception as err:
+            print(f"[ST] Connection Error: {err}")       # catch whatever error raised
+            # conn = False
+            errorLog(err)
+        print('\nConnection Summary:', conn)
+
+    return None
+
+
+# ------------------------------------------------------------[]Ramp Mapping]
+
+def sql_connectRMP():   # Temperature Ramp Profile
+    """
+    Parallel connection call for Ramp Profile Model - RL
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
     """
@@ -195,8 +262,10 @@ def sql_connectRMP():
 
 
 # -------------------------------------------------------------------------[Substrate]
-def sql_connectST():
+def sql_connectVMP():
+    # Void Mapping Profile instance
     """
+    Parallel connection call for Substrate Temperature Model - RL
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
     """
@@ -208,7 +277,7 @@ def sql_connectST():
     # ---------------------------------------------------------#
 
     if conn == None:
-        print('\n[ST] Connecting to SQL server...')
+        print('[VMP] Connecting to SQL server...')
         # Ensure connection is roboust enough ------
         for attempt in range(1, max_retry + 1):
 
@@ -222,12 +291,12 @@ def sql_connectST():
                                       'pwd=' + yekref + ';'
                                       'MultipleActiveResultSets=True', timeout=5, autocommit=True)
                 # conn = True
-                print('\n[ST] SQL Server connection active!\n')
+                print('\n[VMP] SQL Server connection active!\n')
                 return conn
 
             except Exception as err:
                 wait_time = wait2retry * (2 ** (attempt - 1))
-                errorLog(f"[ST] Reconnect attempt {attempt}/{max_retry} failed: {err}") #(str(err))                      # Log the error in txt file
+                errorLog(f"[VMP] Reconnect attempt {attempt}/{max_retry} failed: {err}") #(str(err))                      # Log the error in txt file
                 # -----------------------
                 if attempt < max_retry:
                     #logging.info(f"Retrying in {wait_time} seconds...")
@@ -236,17 +305,17 @@ def sql_connectST():
                     # logging.critical("Max retries reached. Exiting.")
                     # raise  # or return None if you prefer soft e
                     errorConnect()
-                    print('\n[ST] Connection issue: SQL Server is inaccessible!')
+                    print('\n[VMP] Connection issue: SQL Server is inaccessible!')
         return None        # conn = False
 
     else:                                           # when connection = 1 and requires disconnect
         try:
             conn.close()
             errorNote()
-            print('\n[ST] Active connection will be closed...')
+            print('\n[VMP] Active connection will be closed...')
 
         except Exception as err:
-            print(f"[ST] Connection Error: {err}")       # catch whatever error raised
+            print(f"[VMP] Connection Error: {err}")       # catch whatever error raised
             # conn = False
             errorLog(err)
         print('\nConnection Summary:', conn)
@@ -256,6 +325,7 @@ def sql_connectST():
 # -------------------------------------------------------------------------[Tape Gap]
 def sql_connectTG():
     """
+    Parallel connection call for Tape Gap Model - RL
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
     """
@@ -267,7 +337,7 @@ def sql_connectTG():
     # ---------------------------------------------------------#
 
     if conn == None:
-        print('\n[TG] Connecting to SQL server...')
+        print('[TG] Connecting to SQL server...')
         # Ensure connection is roboust enough ------
         for attempt in range(1, max_retry + 1):
 
@@ -313,8 +383,10 @@ def sql_connectTG():
     return None
 
 # -------------------------------------------------------------------------[TG Mapping]
-def sql_connectVMP():
+def sql_connectRTM():
+    # Real-Time Monitoring Parameters
     """
+    Parallel connection call for Process Monitors Model - RL
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
     """
@@ -326,7 +398,7 @@ def sql_connectVMP():
     # ---------------------------------------------------------#
 
     if conn == None:
-        print('\n[TM] Connecting to SQL server...')
+        print('[RTM] Connecting to SQL server...')
         # Ensure connection is roboust enough ------
         for attempt in range(1, max_retry + 1):
 
@@ -340,7 +412,7 @@ def sql_connectVMP():
                                       'pwd=' + yekref + ';'
                                       'MultipleActiveResultSets=True', timeout=5, autocommit=True)
                 # conn = True
-                print('\n[TM] SQL Server connection active!\n')
+                print('\n[RTM] SQL Server connection active!\n')
                 return conn
 
             except Exception as err:
@@ -354,17 +426,17 @@ def sql_connectVMP():
                     # logging.critical("Max retries reached. Exiting.")
                     # raise  # or return None if you prefer soft e
                     errorConnect()
-                    print('\n[TM] Connection issue: SQL Server is inaccessible!')
+                    print('\n[RTM] Connection issue: SQL Server is inaccessible!')
         return None        # conn = False
 
     else:                                           # when connection = 1 and requires disconnect
         try:
             conn.close()
             errorNote()
-            print('\n[TM] Active connection will be closed...')
+            print('\n[RTM] Active connection will be closed...')
 
         except Exception as err:
-            print(f"[TM] Connection Error: {err}")       # catch whatever error raised
+            print(f"[RTM] Connection Error: {err}")       # catch whatever error raised
             # conn = False
             errorLog(err)
         print('\nConnection Summary:', conn)
@@ -372,7 +444,8 @@ def sql_connectVMP():
     return None
 
 # -------------------------------------------------------------------------[Monitoring Params]
-def sql_connectMP():
+def sql_connectLP():
+    # Laser Power SQL Instance
     """
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
@@ -385,7 +458,7 @@ def sql_connectMP():
     # ---------------------------------------------------------#
 
     if conn == None:
-        print('\n[MP] Connecting to SQL server...')
+        print('[LP] Connecting to SQL server...')
         # Ensure connection is roboust enough ------
         for attempt in range(1, max_retry + 1):
             # {SQL Server}
@@ -399,12 +472,12 @@ def sql_connectMP():
                                       'pwd=' + yekref + ';'
                                       'MultipleActiveResultSets=True', timeout=5, autocommit=True)
                 # conn = True
-                print('\n[MP] SQL Server connection active!\n')
+                print('\n[LP] SQL Server connection active!\n')
                 return conn
 
             except Exception as err:
                 wait_time = wait2retry * (2 ** (attempt - 1))
-                errorLog(f"[MP] Reconnect attempt {attempt}/{max_retry} failed: {err}") #(str(err))                      # Log the error in txt file
+                errorLog(f"[LP] Reconnect attempt {attempt}/{max_retry} failed: {err}") #(str(err))                      # Log the error in txt file
                 # -----------------------
                 if attempt < max_retry:
                     #logging.info(f"Retrying in {wait_time} seconds...")
@@ -413,12 +486,193 @@ def sql_connectMP():
                     # logging.critical("Max retries reached. Exiting.")
                     # raise  # or return None if you prefer soft e
                     errorConnect()
-                    print('\n[MP] Connection issue: SQL Server is inaccessible!')
+                    print('\n[LP] Connection issue: SQL Server is inaccessible!')
         return None        # conn = False
 
     return None
 
 # -------------------------------------------------------------------------[]
+def sql_connectEV():
+    """
+    Parallel connection call for commonClimate Profile Model - RL
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    max_retry = 5
+    wait2retry = 2
+    # ---------------------------------------------------------#
+
+    if conn == None:
+        print('\n[cEV] Connecting to SQL server...')
+        # Ensure connection is roboust enough ------
+        for attempt in range(1, max_retry + 1):
+
+            try:
+                conn = pyodbc.connect('Driver={SQL Server};'
+                                      'Server=' + server_IP + ';'
+                                      'Database=' + db_ref + ';'
+                                      'Encrypt=' + Encrypt + ';'
+                                      'TrustServerCertificate=' + Certify + ';'
+                                      'uid=' + isAtho + ';'
+                                      'pwd=' + yekref + ';'
+                                      'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+                # conn = True
+                print('\n[cEV] SQL Server connection active!\n')
+                return conn
+
+            except Exception as err:
+                wait_time = wait2retry * (2 ** (attempt - 1))
+                errorLog(f"[cEV] Reconnect attempt {attempt}/{max_retry} failed: {err}") #(str(err))                      # Log the error in txt file
+                # -----------------------
+                if attempt < max_retry:
+                    #logging.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                else:
+                    # logging.critical("Max retries reached. Exiting.")
+                    # raise  # or return None if you prefer soft e
+                    errorConnect()
+                    print('\n[cEV] Connection issue: SQL Server is inaccessible!')
+        return None        # conn = False
+
+    else:                                           # when connection = 1 and requires disconnect
+        try:
+            conn.close()
+            errorNote()
+            print('\n[cEV] Active connection will be closed...')
+
+        except Exception as err:
+            print(f"[cEV] Connection Error: {err}")       # catch whatever error raised
+            # conn = False
+            errorLog(err)
+        print('\nConnection Summary:', conn)
+
+    return None
+
+# -------------------------------------------------------------------------------------------------------
+def sql_connectVC():
+    """
+    Parallel connection call for common Ramp Count Model - RL
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    max_retry = 5
+    wait2retry = 2
+    # ---------------------------------------------------------#
+
+    if conn == None:
+        print('[cVC] Connecting to SQL server...')
+        # Ensure connection is roboust enough ------
+        for attempt in range(1, max_retry + 1):
+
+            try:
+                conn = pyodbc.connect('Driver={SQL Server};'
+                                      'Server=' + server_IP + ';'
+                                      'Database=' + db_ref + ';'
+                                      'Encrypt=' + Encrypt + ';'
+                                      'TrustServerCertificate=' + Certify + ';'
+                                      'uid=' + isAtho + ';'
+                                      'pwd=' + yekref + ';'
+                                      'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+                # conn = True
+                print('\n[cVC] SQL Server connection active!\n')
+                return conn
+
+            except Exception as err:
+                wait_time = wait2retry * (2 ** (attempt - 1))
+                errorLog(f"[cVC] Reconnect attempt {attempt}/{max_retry} failed: {err}") #(str(err))                      # Log the error in txt file
+                # -----------------------
+                if attempt < max_retry:
+                    #logging.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                else:
+                    # logging.critical("Max retries reached. Exiting.")
+                    # raise  # or return None if you prefer soft e
+                    errorConnect()
+                    print('\n[cVC] Connection issue: SQL Server is inaccessible!')
+        return None        # conn = False
+
+    else:                                           # when connection = 1 and requires disconnect
+        try:
+            conn.close()
+            errorNote()
+            print('\n[cVC] Active connection will be closed...')
+
+        except Exception as err:
+            print(f"[cVC] Connection Error: {err}")       # catch whatever error raised
+            # conn = False
+            errorLog(err)
+        print('\nConnection Summary:', conn)
+
+    return None
+
+# --------------------------------------------------------------------
+def sql_connectRC():
+    """
+    Parallel connection call for common Ramp Count model
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    max_retry = 5
+    wait2retry = 2
+    # ---------------------------------------------------------#
+
+    if conn == None:
+        print('[cRC] Connecting to SQL server...')
+        # Ensure connection is roboust enough ------
+        for attempt in range(1, max_retry + 1):
+
+            try:
+                conn = pyodbc.connect('Driver={SQL Server};'
+                                      'Server=' + server_IP + ';'
+                                      'Database=' + db_ref + ';'
+                                      'Encrypt=' + Encrypt + ';'
+                                      'TrustServerCertificate=' + Certify + ';'
+                                      'uid=' + isAtho + ';'
+                                      'pwd=' + yekref + ';'
+                                      'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+                # conn = True
+                print('\n[cRC] SQL Server connection active!\n')
+                return conn
+
+            except Exception as err:
+                wait_time = wait2retry * (2 ** (attempt - 1))
+                errorLog(f"[cRC] Reconnect attempt {attempt}/{max_retry} failed: {err}") #(str(err))                      # Log the error in txt file
+                # -----------------------
+                if attempt < max_retry:
+                    #logging.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                else:
+                    # logging.critical("Max retries reached. Exiting.")
+                    # raise  # or return None if you prefer soft e
+                    errorConnect()
+                    print('\n[cRC] Connection issue: SQL Server is inaccessible!')
+        return None        # conn = False
+
+    else:                                           # when connection = 1 and requires disconnect
+        try:
+            conn.close()
+            errorNote()
+            print('\n[cRC] Active connection will be closed...')
+
+        except Exception as err:
+            print(f"[cRC] Connection Error: {err}")       # catch whatever error raised
+            # conn = False
+            errorLog(err)
+        print('\nConnection Summary:', conn)
+
+    return None
+
+
+# ----------------------------------------------------------------------------
 def DAQ_connect():
     """
     state: 1 connected, 0 Not connected
@@ -464,91 +718,3 @@ def ensure_connection(conn):
         return DAQ_connect()
 
 # --------------------------------------------------------------------------------
-
-
-# -----------------------------------------------------------------------
-# import pyodbc
-# import threading
-# import time
-# import random
-#
-# # Connection string - change as per your SQL Server configuration
-# CONNECTION_STRING = (
-#     "DRIVER={ODBC Driver 17 for SQL Server};"
-#     "SERVER=localhost;"  # Or IP address or server\instance
-#     "DATABASE=YourDatabaseName;"
-#     "UID=your_username;"
-#     "PWD=your_password;"
-# )
-#
-#
-# def create_user_table(user_id):
-#     conn = pyodbc.connect(CONNECTION_STRING)
-#     cursor = conn.cursor()
-#     table_name = f"user_{user_id}_data"
-#
-#     create_table_sql = f"""
-#     IF NOT EXISTS (
-#         SELECT * FROM INFORMATION_SCHEMA.TABLES
-#         WHERE TABLE_NAME = '{table_name}'
-#     )
-#     BEGIN
-#         CREATE TABLE {table_name} (
-#             id INT IDENTITY(1,1) PRIMARY KEY,
-#             value NVARCHAR(255)
-#         )
-#     END
-#     """
-#
-#     cursor.execute(create_table_sql)
-#     conn.commit()
-#     conn.close()
-#     print(f"[User {user_id}] Table ensured.")
-#
-#
-# def user_session(user_id, data_to_insert):
-#     table_name = f"user_{user_id}_data"
-#     conn = pyodbc.connect(CONNECTION_STRING)
-#     cursor = conn.cursor()
-#
-#     # Insert data
-#     for value in data_to_insert:
-#         cursor.execute(f"INSERT INTO {table_name} (value) VALUES (?)", value)
-#         conn.commit()
-#         print(f"[User {user_id}] Inserted: {value}")
-#         time.sleep(random.uniform(0.1, 0.5))  # Simulate delay
-#
-#     # Fetch data
-#     cursor.execute(f"SELECT * FROM {table_name}")
-#     rows = cursor.fetchall()
-#     print(f"[User {user_id}] Data in table:")
-#     for row in rows:
-#         print(f"   {row.id}: {row.value}")
-#
-#     conn.close()
-#
-#
-# def main():
-#     user_ids = ['TT', 'ST', 'TG']
-#     threads = []
-#
-#     # Create a table for each user
-#     for user_id in user_ids:
-#         create_user_table(user_id)
-#
-#     # Launch a thread for each user session
-#     for user_id in user_ids:
-#         data = [f"Data-{user_id}-{i}" for i in range(5)]
-#         thread = threading.Thread(target=user_session, args=(user_id, data))
-#         threads.append(thread)
-#         thread.start()
-#
-#     # Wait for all threads to complete
-#     for thread in threads:
-#         thread.join()
-#
-#     print("All user sessions completed.")
-#
-#
-# if __name__ == "__main__":
-#     main()

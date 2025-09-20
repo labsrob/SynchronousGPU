@@ -9,14 +9,12 @@ import os
 import snap7
 
 arrayTP, TP_list, Idx1, y_common, array2D = [], [], [], [], []
-db_number, start_offset, bit_offset = 89, 0, 0
+db_number, start_offset, bit_offset = 215, 0, 0
 start_address = 0  					# starting address
 r_length = 4  						# double word (4 Bytes)
 b_length = 1  						# boolean size = 1 Byte
 r_data = 52.4
 pCon = snap7.client.Client()
-
-
 
 # ---------------------- Collective Functions ---------------------------------------
 
@@ -177,8 +175,8 @@ def plcExec(db_number, nGZ, grp_step, fetch_no):
 			TP_list.append(TP16)
 
 			# Deposit list column content into rows array ----------[]
-			if len(TP_list) > 82:
-				del TP_list[0:(len(TP_list) - 82)]				# trim columns to shape
+			if len(TP_list) > 17:
+				del TP_list[0:(len(TP_list) - 17)]				# trim columns to shape
 				print('\nReseTPing Column Size...', len(TP_list))
 
 			arrayTP.append(TP_list)

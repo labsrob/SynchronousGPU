@@ -10,12 +10,12 @@ Tape Temperature measured in Degree Celsius (°C)
 
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'TTA_' + str(pWON):
-        columns = ['IDtt01', 'tStamp', 'cLayer', 'R1H1TT', 'R1H2TT', 'R1H3TT',
+    if pParam == 'TT1_' + str(pWON):
+        columns = ['tStamp', 'cLayer', 'R1H1TT', 'R1H2TT', 'R1H3TT',
                    'R1H4TT', 'R2H1TT', 'R2H2TT', 'R2H3TT', 'R2H4TT']
 
-    elif pParam == 'TTB_' + str(pWON):
-        columns = ['IDtt02', 'tStamp', 'cLayer', 'R3H1TT', 'R3H2TT', 'R3H3TT',
+    elif pParam == 'TT2_' + str(pWON):
+        columns = ['tStamp', 'cLayer', 'R3H1TT', 'R3H2TT', 'R3H3TT',
                    'R3H4TT', 'R4H1TT', 'R4H2TT', 'R4H3TT', 'R4H4TT']
 
     elif pParam == 'SPC_TT':

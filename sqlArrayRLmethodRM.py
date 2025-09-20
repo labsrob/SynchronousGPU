@@ -7,75 +7,50 @@ import time
 import timeit
 import os
 
-UseRowIndex = True
-idx = count()
-now = datetime.now()
-dataList0, dL3 = [], []
+
+last_ts = None
+st_id = 0
+dL = []                                              # SQL start index unless otherwise stated by the index tracker!
 
 
-def sqlExec(daq, nGZ, grp_step, T3):
+def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
+    global last_ts
     """
     NOTE:
     """
+    # idx = str(idx)                                    # convert Query Indexes to string concatenation
     t1 = daq.cursor()
 
-    nGZ = int(nGZ)
+    n2fetch = int(nGZ)
     group_step = int(grp_step)
-    fetch_no = int(len(dataList0))  # int(nGZ) + 3
-    print('\nDefault Sample Size:', fetch_no, group_step, '\n')
+    fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
+    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
 
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
-    if group_step == 1:
-        print('\nSINGLE STEP SLIDE')
-        n2fetch = nGZ + 1
-        print('Rows to Fetch:', nGZ)
+    try:
+        if last_ts is None:
+            t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY cLayer ASC')
+        else:
+            t1.execute('SELECT * FROM ' + str(T1) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_ts)
+        data1 = t1.fetchmany(n2fetch)
 
-    else:
-        print('\nGROUP STEP SLIDE')
-        print('=================')
-        n2fetch = nGZ + (nGZ - 1)
-        print('Rows to Fetch:', nGZ)
+        # --------------- Re-assemble into dynamic buffer -----
+        if len(data1) != 0:
+            for result in data1:
+                result = list(result)
+                dL.append(result)
+            last_ts = data1[-1].id_col
+        else:
+            print('[RM] Process EOF reached...')
+            print('[RM] Halting for 5 Minutes...')
+            time.sleep(300)
 
-    # ------------------------------------------------------------------------------------[]
-    # data3 = t1.execute('SELECT TOP (' + str(n2fetch) + ') * FROM ' + str(T3)).fetchall()
-    data3 = t1.execute('SELECT TOP (' + str(n2fetch) + ') * FROM ' + str(T3)+ ' ORDER BY cLayer').fetchall() #.fetchmany(n2fetch)
-    # data3 = t1.execute('SELECT * FROM ' + str(T3)).fetchmany(n2fetch)
-    print('Total SQL Processed RMP:', data3, '\n')
-    if len(data3) != 0:
-        for result in data3:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            # dL3.append(result)
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            if group_step > 1:
-                if len(dL3) >= nGZ and fetch_no <= 31:  # Retain group and step size
-                    del dL3[0:(len(dL3) - nGZ)]
-                elif (fetch_no + 1) >= 32:
-                    del dL3[0:(len(dL3) - fetch_no)]
+    except Exception as e:
+        print("[RM] Ramp Count Data trickling...")  # , e)
+        time.sleep(2)
 
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1:
-                if len(dL3) >= nGZ and fetch_no <= 31:
-                    del dL3[0:(len(dL3) - nGZ)]  # delete overflow data
-                elif (fetch_no + 1) >= 32:  # moving windows
-                    del dL3[0:(len(dL3) - fetch_no)]
+    t1.close()
 
-            else:  # len(dL1) < nGZ:
-                pass
-            dL3.append(result)
-            # print('ZIPPED', zip(fetch_no, dL1))
-            print('[RMP] Total Fetched:', len(dL3))
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-
-    t1.close()  # close cursor
-
-    return dL3
+    return dL
 # -----------------------------------------------------------------------------------[Dr Labs]
+

@@ -174,8 +174,9 @@ codeDescript = ["No state @ Startup Mode",
 				"Unknown State, ask any operating Supervisor",
 				"Unknown State definition"]
 
-db_number = 89
-s_offset = [0, 874, 878, 880, 66, 360, 875, 876, 68, 882, 886, 890, 894, 2, 80, 898]
+db_number = 89	# SPC Automatic for general control watchdog method
+s_offset = [0, 2, 4, 260, 262, 264, 266, 268, 272, 276, 280, 84, 288, 292, 296, 300, 304, 308, 312, 316, 320, 324,
+			328, 332, 336, 340, 344, 348, 352, 356, 360, 364, 368, 372, 376, ]
 b_offset = [0, 1, 2, 3, 4, 5, 6, 7]
 
 loadOnce = False
@@ -243,12 +244,12 @@ def watchDogController():
 	rngFOR = plc.readBool(db_number, s_offset[0], b_offset[6])  		# Ring 4 is ready
 	# -------------------------------------------------------
 	msctcp = plc.readInteger(db_number, s_offset[2], b_offset[0])		# Machine State Code (msc)
-	won_NO = plc.readBool(db_number, s_offset[4], b_offset[0])			# Work Order Number
+	won_NO = plc.readString(db_number, s_offset[4], b_offset[0])		# Work Order Number
 	prodTA = plc.readBool(db_number, s_offset[260], b_offset[0])		# Active DNV Process
 	prodTB = plc.readBool(db_number, s_offset[261], b_offset[1])  		# Active MGM Process
 	# -------------------------------------------------------
-	tLayer = plc.readBool(db_number, s_offset[262], b_offset[0])		# Total required Layer
-	cLayer = plc.readBool(db_number, s_offset[264], b_offset[0])  		# Current achieved layer
+	tLayer = plc.readInteger(db_number, s_offset[262], b_offset[0])		# Total required Layer
+	cLayer = plc.readInteger(db_number, s_offset[264], b_offset[0])  	# Current achieved layer
 
 	time.sleep(10)														# 10 seconds non-blocking interval
 	rt_satus = dict(zip(machineCode_Data, codeDescript))

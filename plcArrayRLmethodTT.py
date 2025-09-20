@@ -9,14 +9,12 @@ import os
 import snap7
 
 arrayTT, tt_list, Idx1, y_common, array2D = [], [], [], [], []
-db_number, start_offset, bit_offset = 89, 0, 0
+db_number, start_offset, bit_offset = 152, 0, 0
 start_address = 0  					# starting address
 r_length = 4  						# double word (4 Bytes)
 b_length = 1  						# boolean size = 1 Byte
 r_data = 52.4
 pCon = snap7.client.Client()
-
-
 
 # ---------------------- Collective Functions ---------------------------------------
 

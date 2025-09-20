@@ -8,12 +8,11 @@ Ramp count data
 """
 
 
-def validCols(pParam, pWON=None):
-    # print('Detected RingHead Combo:', configH)
-    if pParam == 'RC_' + str(pWON):
-        columns = ['sCentre', 'RAMPosA', 'rMarkerA', 'RAMPosB', 'rMarkerB', 'RAMPosC', 'rMarkerC', 'RAMPosD', 'rMarkerD', 'PipeDir', 'cLayer', 'totalR']
+def validCols(pParam):
+    if pParam[0:3] == 'RC_':
+        columns = ['id_col', 'sCentre', 'RAMPosA', 'rMarkerA', 'RAMPosB', 'rMarkerB', 'RAMPosC', 'rMarkerC', 'RAMPosD', 'rMarkerD', 'PipeDir', 'cLayer', 'totalR']
 
-    elif pParam == 'SPC_RC':
+    elif pParam[0:3] == 'SPC_RC':
         columns = ['sCentre', 'RAMPosA', 'rMarkerA', 'RAMPosB', 'rMarkerB', 'RAMPosC', 'rMarkerC', 'RAMPosD', 'rMarkerD', 'PipeDir', 'cLayer', 'totalR']
 
     else:

@@ -9,7 +9,7 @@ import os
 import snap7
 
 arrayST, st_list, Idx1, y_common, array2D = [], [], [], [], []
-db_number, start_offset, bit_offset = 89, 0, 0
+db_number, start_offset, bit_offset = 153, 0, 0
 start_address = 0  					# starting address
 r_length = 4  						# double word (4 Bytes)
 b_length = 1  						# boolean size = 1 Byte
@@ -175,8 +175,8 @@ def plcExec(db_number, nGZ, grp_step, fetch_no):
 			st_list.append(TS4)
 
 			# Deposit list column content into rows array ----------[]
-			if len(st_list) > 82:
-				del st_list[0:(len(st_list) - 82)]				# trim columns to shape
+			if len(st_list) > 17:
+				del st_list[0:(len(st_list) - 17)]				# trim columns to shape
 				print('\nResetting Column Size...', len(st_list))
 
 			arrayST.append(st_list)

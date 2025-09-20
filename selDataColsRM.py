@@ -11,7 +11,7 @@ Ramp data
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'RMA_' + pWON:
-        columns = ['IDrmp', 'R1Pos', 'R2Pos', 'R3Pos', 'R4Pos', 'PipeDir', 'cLayer']
+        columns = ['id_col', 'R1Pos', 'R2Pos', 'R3Pos', 'R4Pos', 'PipeDir', 'cLayer']
 
     elif pParam == 'SPC_RM':
         columns = ['R1Pos', 'R2Pos', 'R3Pos', 'R4Pos', 'PipeDir', 'cLayer']
