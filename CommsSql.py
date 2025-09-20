@@ -168,7 +168,7 @@ def sql_connectST():
 
     if conn == None:
         print('[ST] Connecting to SQL server...')
-        # Ensure connection is robust and resillence ------
+        # Ensure connection is robust and resilience ------
         for attempt in range(1, resilenceN + 1):
             # Use pymssql or pyodbc
             try:

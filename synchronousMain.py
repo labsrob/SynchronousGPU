@@ -228,7 +228,7 @@ error = AudioSegment.from_wav(impath+'error.wav')
 csv_file = (path)
 df = pd.read_csv(csv_file)
 
-# Define statistical operations -----------------------[]
+# Define statistical operations ---------------[]
 WeldQualityProcess = True
 paused = False
 
@@ -243,8 +243,8 @@ B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
 # ----------------------------------------------[]
 
 plcConnex = []
-UsePLC_DBS = True                                       # specify SQl Query or PLC DB Query is in use
-UseSQL_DBS = False
+UsePLC_DBS = False                                       # specify SQl Query or PLC DB Query is in use
+UseSQL_DBS = True
 ql_alive = False
 rm_alive = False
 
@@ -307,7 +307,7 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
 
     # Initialise dataframe from Tables -[]
     if rptID == 'EoL':
-        rpID = 'QA Report (EoL) # ' + str(layrN)            # Report ID/Description
+        rpID = 'QA Report (EoL) # ' + str(layrN)           # Report ID/Description
     else:
         rpID = 'QA Report (EoP) # ' + str(layrN)           # Report ID/Description
     # ----------------------------------#
@@ -1411,7 +1411,7 @@ def tabbed_cascadeMode(cMode, cType):
 
 # -------- Controls --------
 
-def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[TABBED ]
+def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[TABBED]
     global hostConn, pRecipe, pMode, actTabb
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
@@ -1444,8 +1444,8 @@ def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[T
     # Load from CFG fine and parse the variables ---------[x]
 
     # Set up embedding notebook (tabs) -------------------[B]
-    notebook = ttk.Notebook(root, width=scrW, height=850)                   # Declare Tab overall Screen size[2500, 2540,]
-    notebook.grid(column=0, row=0, padx=10, pady=450) #, expand=True)       # Tab's spatial position on the Parent [450]
+    notebook = ttk.Notebook(root, width=scrW, height=850)     # Declare Tab overall Screen size[2500, 2540,]
+    notebook.grid(column=0, row=0, padx=10, pady=450)         # Tab's spatial position on the Parent [450]
     if pRecipe == 'DNV':
         tab1 = ttk.Frame(notebook)
         tab2 = ttk.Frame(notebook)
@@ -1466,7 +1466,7 @@ def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[T
         tab10 = ttk.Frame(notebook)
 
     # ------------------------------------------ DNV Statistical Process Parameters -----[]
-    if pRecipe == 'DNV':                                    # and int(TT) and int(ST) and int(TG) and not int(LP) and not int(LA):
+    if pRecipe == 'DNV':                                    # int(LP) and not int(LA):
         print('Loading DNV Algorithm...\n')
         notebook.add(tab1, text="Tape Temperature")         # Stats x16
         notebook.add(tab2, text="Substrate Temperature")    # Stats x16
@@ -1477,7 +1477,7 @@ def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[T
         notebook.add(tab5, text="EoL Report System")        # Report
         notebook.add(tab6, text="EoP Report System")        # Report
 
-    elif pRecipe == 'MGM':                                  # and int(LP) and int(LA) and int(TP) and int(RF) and int(TT) and int(ST) and int(TG):
+    elif pRecipe == 'MGM':                                  # int(TT) and int(ST) and int(TG):
         print('Loading Commercial Algorithm...\n')
         notebook.add(tab1, text="Laser Power")              # Stats
         notebook.add(tab2, text="Laser Angle")              # Stats
@@ -1749,12 +1749,63 @@ class collectiveEoL(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
+        self.loadEoL = False
+        self.toggle_state = True
+        self.canvas = None
 
-        # prevents user possible double loading -----
-        if not self.running:
+        self.enViz = ttk.Button(self, text="Open EoL Report", command=self.toggle)
+        self.enViz.pack(padx=1220, pady=1)
+
+        # ------------------------ End of Layer Static Data Call/Stop Call ------------------[]
+    # def enableEoLReport(self):
+        if not self.running and UsePLC_DBS:
             self.running = True
+            self.loadEoL = True
             threading.Thread(target=self.createEoLViz, daemon=True).start()
+            print('[EoL] is now running....')
+
+    def toggle(self):
+        if self.toggle_state:
+            self.enableEoLReport()
+            self.enViz.config(text="Close EoL Report")
+        else:
+            self.closeOutEoL()
+            self.enViz.config(text="Open EoL Report")
+        self.toggle_state = not self.toggle_state
+
+    def enableEoLReport(self):  # Only on Post production ----------------[]
+        global eol
+
+        self.running = True
+        if not self.loadEoL:
+            self.loadEoL = True
+            # self.__init__()
+            eol = threading.Thread(target=self.createEoLViz, daemon=True)
+            eol.start()
+        print('[EoL] is now running....')
+        self.acknEoLOpened()
+
+    def closeOutEoL(self):
+        global eol
+
+        self.loadEoL = False
+        self.running = False
+        print('User requested for cancellation, please wait...')
+        self.canvas.get_tk_widget().destroy()
+        if eol.is_alive():
+            print("Thread has exited.")
+            eol.join()
+        self.acknEoLClosed()
+
+
+    def acknEoLOpened(self):
+        messagebox.showinfo("EoL:", "End of Layer successfully loaded!")
+
+    def acknEoLClosed(self):
+        messagebox.showinfo("EoL:", "End of Layer successfully closed!")
+    # ----------------------------------------------------------------[]
+    # -------------------------- Ramp Profiling Static Data Call --------------------------[]
 
     def createEoLViz(self):
         global progressB, win_Xmin, win_Xmax, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, im10, im11, im12, \
@@ -1803,7 +1854,7 @@ class collectiveEoL(ttk.Frame):
         upload_report = ttk.Button(self, text="View EoL Summary", command=lambda: PDFViewer.viewReport(self=None))
         upload_report.place(x=2380, y=1)
         # Define Axes ---------------------#
-        self.f = Figure(figsize=(pMtX, 8), dpi=100)
+        self.f = Figure(figsize=(pMtX, 8), dpi=100)  # pMtX
         self.f.subplots_adjust(left=0.022, bottom=0.05, right=0.983, top=0.936, wspace=0.1, hspace=0.17)
         # ---------------------------------[]
         if pRecipe == 'DNV':
@@ -1831,6 +1882,7 @@ class collectiveEoL(ttk.Frame):
 
         # Declare Plots attributes ----------------------------[H]
         plt.rcParams.update({'font.size': 7})                   # Reduce font size to 7pt for all legends
+        # self.canvas.draw()
 
         # Calibrate limits for X-moving Axis -------------------#
         YScale_minEOL, YScale_maxEOL = 0, pExLayer              # Roller Force
@@ -3119,10 +3171,10 @@ class common_rampCount(ttk.Frame):
         self.win_Xmin, self.win_Xmax = 0, pExLayer                  # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        if UseSQL_DBS:
-            self.T1 = 'RC_' + str(pWON)
-        else:
-            self.T1 = SPC_RC
+        # if UseSQL_DBS:
+        self.T1 = 'RC_' + str(pWON)
+        # else:
+        #     self.T1 = SPC_RC
         # ----------------------------------------------------------#
         self.a1.legend(["Cumulative Ramp Count"], loc='upper right', fontsize="x-large")
         self.a1.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -3158,7 +3210,7 @@ class common_rampCount(ttk.Frame):
         s_fetch, stp_Sz = 10, 1        # entry value in string sql syntax
 
         # Obtain Volatile Data from sql Host Server ---------------------------[]
-        if self.running and UseSQL_DBS:
+        if self.running:
             rc_con = sq.sql_connectRC()
         else:
             pass
@@ -3175,12 +3227,11 @@ class common_rampCount(ttk.Frame):
         # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
         sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
         # Define PLC/SMC error state -------------------------------------------#
-        if UseSQL_DBS:
-            import sqlArrayRLmethodRC as rC
+        import sqlArrayRLmethodRC as rC
 
         while True:
             time.sleep(5)
-            # This peocedure must be valid either on PLC/SQL baseed runtime
+            # This procedure must be valid either on PLC/SQL baseed runtime
             if self.running and rc_con:
 
                 inProgress = True  # True for RetroPlay mode
@@ -3227,13 +3278,7 @@ class common_rampCount(ttk.Frame):
         timei = time.time()                                 # start timing the entire loop
 
         # Call data loader Method---------------------------#
-        if UsePLC_DBS == 1:
-            import VarPLC_RC as rc
-        elif UseSQL_DBS:
-            # ----------------------------------------------#
-            import VarSQL_RC as rc                          # load SQL variables column names | rfVarSQL
-        else:
-            pass
+        import VarSQL_RC as rc                              # load SQL variables column names | rfVarSQL
 
         if self.running:
             g1 = qrc.validCols(self.T1)                        # Construct Data Column selSqlColumnsTFM.py
@@ -3313,15 +3358,14 @@ class common_climateProfile(ttk.Frame):
         self.win_Xmin, self.win_Xmax = 0, 32        # X - Axis range
 
         # Load SQL Query Table -------------------------------------#
-        if UseSQL_DBS:
-            self.evT = 'EV_' + str(pWON)
-        else:
-            self.evT = SPC_EV  # PLC Data
+        # if UseSQL_DBS:
+        self.evT = 'EV_' + str(pWON)
+        # else:
+        #     self.evT = SPC_EV  # PLC Data
         # Environmental Values Reprocessed from SQL
 
         uvIndex = 3.6
         # ----------------------------------------------------------#
-
         self.a2.legend(["PO64PX E-Profile"], fontsize="x-large")
         self.a2.grid(color="0.5", linestyle='-', linewidth=0.5)
         self.a2.set_xlabel("Time Series")
@@ -3367,7 +3411,7 @@ class common_climateProfile(ttk.Frame):
         s_fetch, stp_Sz = 30, 1        # entry value in string sql syntax 30=14, 60=13,
 
         # Obtain SQL Data Host Server ---------------------------[]
-        if self.running and UseSQL_DBS:                # Load CommsPlc class once
+        if self.running:                # Load CommsPlc class once
             ev_con = sq.sql_connectEV()
         else:
             pass
@@ -3384,8 +3428,7 @@ class common_climateProfile(ttk.Frame):
         # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
         sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
         # Define PLC/SMC error state -------------------------------------------#
-        if UseSQL_DBS:
-            import sqlArrayRLmethodEV as sev
+        import sqlArrayRLmethodEV as sev
 
         while True:
             time.sleep(5)
@@ -3435,11 +3478,7 @@ class common_climateProfile(ttk.Frame):
         timei = time.time()                                 # start timing the entire loop
 
         # Call data loader Method---------------------------#
-        if UseSQL_DBS:
-            # ----------------------------------------------#
-            import VarSQL_EV as ev                          # load SQL variables column names | rfVarSQL
-        else:
-            pass
+        import VarSQL_EV as ev                          # load SQL variables column names | rfVarSQL
 
         if self.running:
             g1 = qev.validCols(self.evT)                        # SQL Table
@@ -3535,10 +3574,10 @@ class common_gapCount(ttk.Frame):
         self.win_Xmin, self.win_Xmax = 0, pExLayer                      # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        if UseSQL_DBS:
-            self.gcT = 'VC_' + str(pWON)
-        else:
-            self.gcT = SPC_VC
+        # if UseSQL_DBS:
+        self.gcT = 'VC_' + str(pWON)
+        # else:
+        #     self.gcT = SPC_VC
         # ----------------------------------------------------------#
         self.a3.legend(["Cumulative Gap Count"], loc='upper right', fontsize="x-large")
         self.a3.grid(color="0.5", linestyle='-', linewidth=0.5)
@@ -3574,7 +3613,7 @@ class common_gapCount(ttk.Frame):
         s_fetch, stp_Sz = 32, 1  # entry value in string sql syntax
 
         # Obtain SQL Data Host Server ---------------------------[]
-        if UseSQL_DBS and self.running:                          # Load CommsPlc class once
+        if self.running:                          # Load CommsPlc class once
             import sqlArrayRLmethodVC as svc
             gc_con = sq.sql_connectVC()
         else:
@@ -3640,10 +3679,7 @@ class common_gapCount(ttk.Frame):
         timei = time.time()                                # start timing the entire loop
 
         # Call data loader Method--------------------------#
-        if UseSQL_DBS:
-            import VarSQL_VC as vc                          # load SQL variables column names | rfVarSQL
-        else:
-            pass                                            # load SQL variables column names | rfVarSQL
+        import VarSQL_VC as vc                          # load SQL variables column names | rfVarSQL
 
         if self.running:
             g1 = qvc.validCols(self.gcT)
@@ -3935,10 +3971,10 @@ class MonitorTabb(ttk.Frame):
         s_fetch, stp_Sz = str(cSS), 1        # entry value in string sql syntax
 
         # Obtain RT Monitoring Data ---------------------------[]
-        if UseSQL_DBS:
-            if self.running:
-                import sqlArrayRLmethodPM as spm
-                mt_con = sq.sql_connectRTM()
+        # if UseSQL_DBS:
+        if self.running:
+            import sqlArrayRLmethodPM as spm
+            mt_con = sq.sql_connectRTM()
         else:
             print('[RTM] Data Source selection is Unknown')
             mt_con = None
@@ -3951,7 +3987,7 @@ class MonitorTabb(ttk.Frame):
         while True:
             time.sleep(3)
             # ------------------------------
-            if UseSQL_DBS and mt_con:
+            if self.running and mt_con:
                 inProgress = True                                            # True for RetroPlay mode
                 print('\nAsynchronous controller activated...')
                 print('DrLabs' + "' Runtime Optimisation is Enabled!")
@@ -4012,7 +4048,7 @@ class MonitorTabb(ttk.Frame):
         timei = time.time()                                                             # start timing the entire loop
 
         # declare asynchronous variables ------------------[]
-        if UseSQL_DBS and self.running:
+        if self.running:
             print('\nMonitor Tabb running......')
             import VarSQL_PM as mt
             # ----------------------------------------------#
@@ -5746,24 +5782,26 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
         self.runRMP = False
 
         # prevents user possible double loading -----
         if not self.running:
             self.running = True
             threading.Thread(target=self.createProcessTT, daemon=True).start()
-
+            print('[TT] is now running....')
     # ------------------------ Ramp Profiling Static Data Call/Stop Call ------------------[]
     def do_RMP_viz(self):
         if not self.runRMP:
             self.runRMP = True
             # reload class method for Ramp plot
-            threading.Thread(target=self.dataControlRM, daemon=True).start()
+            self.dtc = threading.Thread(target=self.dataControlRM, daemon=True)
+            self.dtc.start()
             self.rampVizCall()
 
     def clear_RMP_viz(self):
         self.runRMP = False
+        self.dtc.start()
         self.rampVizClose()
 
     def rampVizCall(self):
@@ -6408,7 +6446,7 @@ class substTempTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
 
         # prevents user possible double loading -----
         if not self.running:
@@ -6668,19 +6706,19 @@ class substTempTabb(ttk.Frame):
         if UseSQL_DBS:
             if self.running:
                 import sqlArrayRLmethodST as pst
-                st_con = sq.sql_connectTT()
+                st_con = sq.sql_connectST()
             else:
                 st_con = None
 
         elif UsePLC_DBS:
             if self.running:
                 import plcArrayRLmethodST as  pst
-                print('\n[TT] Activating watchdog...')
+                print('\n[ST] Activating watchdog...')
             else:
                 # dtST_ready = True
                 print('[ST] Data Source selection is Unknown')
         else:
-            print('[TT] Unknown Protocol...')
+            print('[ST] Unknown Protocol...')
 
         # Initialise RT variables ---[]
         autoSpcRun = True
@@ -6777,11 +6815,11 @@ class substTempTabb(ttk.Frame):
             ST = st.loadProcesValues(df1)                    # Join data values under dataframe
             print("Memory Usage:", df1.info(verbose=False))
 
-        elif self.running:
+        elif UseSQL_DBS and self.running:
             import VarSQL_ST as st
-            g1 = qst.validCols(self.T1, pWON)                      # Construct Data Column selSqlColumnsTFM.py
-            d1 = pd.DataFrame(self.stDta, columns=g1)        # Import into python Dataframe
-            g2 = qst.validCols(self.T2, pWON)
+            g1 = qst.validCols(self.T1)                     # Construct Data Column selSqlColumnsTFM.py
+            d1 = pd.DataFrame(self.stDta, columns=g1)       # Import into python Dataframe
+            g2 = qst.validCols(self.T2)
             d2 = pd.DataFrame(self.stDtb, columns=g2)
 
             p_data = pd.concat([d1, d2], axis=1)
@@ -6928,7 +6966,7 @@ class tapeGapPolTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
         self.runVMP = False
 
         # prevents user possible double loading -----
@@ -7116,7 +7154,7 @@ class tapeGapPolTabb(ttk.Frame):
         global batch_TG
 
         batch_TG = 1
-        s_fetch, stp_Sz, s_regm = str(self.tgS), self.tgTy, self.olS  # entry value in string sql syntax ttS, ttTy,
+        s_fetch, stp_Sz, s_regm = 300, 1, 10  # entry value in string sql syntax ttS, ttTy,
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
@@ -7626,12 +7664,12 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         self.canvas._tkcanvas.pack(expand=True)
 
         # --------- call data block -------------------------------------#
-        threading.Thread(target=self._dataControlTP, daemon=True).start()
+        threading.Thread(target=self.dataControlTP, daemon=True).start()
         # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------#
 
 
-    def _dataControlTP(self):
-        s_fetch, stp_Sz, s_regm = str(ttS), ttTy, SrgA
+    def dataControlTP(self):
+        s_fetch, stp_Sz, s_regm = 300, 1, 10  # 10 sec per meter length
 
         # Obtain Volatile Data from PLC Host Server ---------------------------[]
         if UseSQL_DBS and self.running:

@@ -3423,3 +3423,136 @@ from matplotlib.axis import Axis
 # plt.show()
 
 # -------------------------------------------------------------------------[]
+import tkinter as tk
+
+# Functions to control
+def function_one():
+    print("Function One is executed.")
+
+def function_two():
+    print("Function Two is executed.")
+
+# Toggle function
+def toggle():
+    global toggle_state
+    if toggle_state:
+        function_one()
+        button.config(text="Run Function Two")
+    else:
+        function_two()
+        button.config(text="Run Function One")
+    toggle_state = not toggle_state
+
+# Create the main window
+# root = tk.Tk()
+# root.title("Toggle Button Demo")
+# root.geometry("300x150")
+#
+# # Initial toggle state (True: Function One next, False: Function Two next)
+# toggle_state = True
+#
+# # Create the button
+# button = tk.Button(root, text="Run Function One", command=toggle, width=20, height=2)
+# button.pack(pady=40)
+#
+# # Run the GUI loop
+# root.mainloop()
+import tkinter as tk
+
+def create_canvas():
+    """Create a new canvas if it doesn't exist."""
+    global canvas
+    if canvas is None:
+        canvas = tk.Canvas(root, bg="white", width=300, height=200)
+        canvas.pack(pady=20)
+        canvas.create_text(150, 100, text="New Canvas", fill="black")
+    else:
+        print("Canvas already exists.")
+
+def remove_canvas():
+    """Destroy the canvas if it exists."""
+    global canvas
+    if canvas is not None:
+        canvas.destroy()
+        canvas = None
+    else:
+        print("No canvas to remove.")
+
+# Main window
+# root = tk.Tk()
+# root.title("Canvas Create/Remove Example")
+# root.geometry("400x350")
+#
+# canvas = None  # Global canvas reference
+#
+# # Buttons
+# btn_create = tk.Button(root, text="Create Canvas", command=create_canvas)
+# btn_create.pack(pady=10)
+#
+# btn_remove = tk.Button(root, text="Remove Canvas", command=remove_canvas)
+# btn_remove.pack(pady=10)
+#
+# # Run the GUI loop
+# root.mainloop()
+
+# -------------------------------------
+import tkinter as tk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+import numpy as np
+
+class PlotApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Matplotlib in Tkinter")
+        self.root.geometry("600x500")
+
+        # Create matplotlib figure
+        self.fig = plt.Figure(figsize=(5, 4), dpi=100)
+
+        # Embed canvas in Tkinter
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
+        self.canvas_widget = self.canvas.get_tk_widget()
+        self.canvas_widget.pack()
+
+        # Buttons
+        btn_frame = tk.Frame(self.root)
+        btn_frame.pack(pady=10)
+
+        self.plot_btn = tk.Button(btn_frame, text="Plot New Data", command=self.plot_data)
+        self.plot_btn.pack(side=tk.LEFT, padx=10)
+
+        self.clear_btn = tk.Button(btn_frame, text="Clear Plot", command=self.clear_plot)
+        self.clear_btn.pack(side=tk.LEFT, padx=10)
+
+        # Initial plot
+        self.plot_data()
+
+    def plot_data(self):
+        """Create a new plot and update the canvas."""
+        self.fig.clf()  # Clear old content
+        ax = self.fig.add_subplot(111)
+
+        # Generate some data to plot
+        x = np.linspace(0, 10, 100)
+        y = np.sin(x + np.random.rand())
+
+        ax.plot(x, y, label="Random Sine Wave", color="blue")
+        ax.set_title("New Plot")
+        ax.set_xlabel("X Axis")
+        ax.set_ylabel("Y Axis")
+        ax.legend()
+
+        self.canvas.draw()
+
+    def clear_plot(self):
+        """Clear the figure (no plot shown)."""
+        self.fig.clf()      # Clear all axes
+        self.canvas.draw()  # Update the canvas
+
+# Run the GUI
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = PlotApp(root)
+    root.mainloop()
+
