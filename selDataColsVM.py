@@ -11,7 +11,7 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'VM_' +pWON:
-        columns = ['sCount', 'sCenter', 'AvgGap',
+        columns = ['id_col', 'sCount', 'sCenter', 'AvgGap',
                    'MaxGap', 'cLayer', 'sDistance']
 
     elif pParam == 'SPC_VM':

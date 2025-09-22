@@ -6,7 +6,7 @@
 # ------------------------------------------------------------------------
 from pynput.keyboard import Key, Listener
 
-import CommsPlc as plc
+import CommsPlc as pCon
 from datetime import datetime
 from time import sleep
 import os
@@ -22,7 +22,7 @@ WON_Array = []
 
 # Perform connection with PLC in real time ------[]
 if not autoCONN:
-    plc.connectM2M()
+    pCon.connectM2M()
 autoCONN = True
 
 
@@ -54,10 +54,10 @@ def get_activeRings():
 
     try:  # TODO Please validate function and db offsets
         # Get details of the Active Rings only, OEE data is obtainiable from SQL Server Stream
-        R1 = plc.readInteger(db_number, start_offset[18], bit_offset[0])  # Sql Table 1 Ring-1 - 902.0
-        R2 = plc.readInteger(db_number, start_offset[19], bit_offset[0])  # Sql Table 2 Ring-1 - 904.0
-        R3 = plc.readInteger(db_number, start_offset[20], bit_offset[0])  # Sql Table 3 Ring-2 - 906.0
-        R4 = plc.readInteger(db_number, start_offset[21], bit_offset[0])  # Sql Table 4 Ring-2 - 908.0
+        R1 = pCon.readInteger(db_number, start_offset[18], bit_offset[0])  # Sql Table 1 Ring-1 - 902.0
+        R2 = pCon.readInteger(db_number, start_offset[19], bit_offset[0])  # Sql Table 2 Ring-1 - 904.0
+        R3 = pCon.readInteger(db_number, start_offset[20], bit_offset[0])  # Sql Table 3 Ring-2 - 906.0
+        R4 = pCon.readInteger(db_number, start_offset[21], bit_offset[0])  # Sql Table 4 Ring-2 - 908.0
 
     except Exception as err:
         print(f"Exception Error: '{err}'")
@@ -69,14 +69,14 @@ def get_activeRings():
 def recall_last_rt_idx():
     print('Checking Data Index readiness...')
     try:    # SPC processed SQL rows/ index
-        idx1 = plc.readInteger(db_number, start_offset[18], bit_offset[0])  # Sql Table 1 Ring-1 - 902.0
-        idx2 = plc.readInteger(db_number, start_offset[19], bit_offset[0])  # Sql Table 2 Ring-1 - 904.0
-        idx3 = plc.readInteger(db_number, start_offset[20], bit_offset[0])  # Sql Table 3 Ring-2 - 906.0
-        idx4 = plc.readInteger(db_number, start_offset[21], bit_offset[0])  # Sql Table 4 Ring-2 - 908.0
-        idx5 = plc.readInteger(db_number, start_offset[22], bit_offset[0])  # Sql Table 5 Ring-3 - 910.0
-        idx6 = plc.readInteger(db_number, start_offset[23], bit_offset[0])  # Sql Table 6 Ring-3 - 912.0
-        idx7 = plc.readInteger(db_number, start_offset[24], bit_offset[0])  # Sql Table 7 Ring-4 - 914.0
-        idx8 = plc.readInteger(db_number, start_offset[25], bit_offset[0])  # Sql Table 8 Ring-4 - 916.0
+        idx1 = pCon.readInteger(db_number, start_offset[18], bit_offset[0])  # Sql Table 1 Ring-1 - 902.0
+        idx2 = pCon.readInteger(db_number, start_offset[19], bit_offset[0])  # Sql Table 2 Ring-1 - 904.0
+        idx3 = pCon.readInteger(db_number, start_offset[20], bit_offset[0])  # Sql Table 3 Ring-2 - 906.0
+        idx4 = pCon.readInteger(db_number, start_offset[21], bit_offset[0])  # Sql Table 4 Ring-2 - 908.0
+        idx5 = pCon.readInteger(db_number, start_offset[22], bit_offset[0])  # Sql Table 5 Ring-3 - 910.0
+        idx6 = pCon.readInteger(db_number, start_offset[23], bit_offset[0])  # Sql Table 6 Ring-3 - 912.0
+        idx7 = pCon.readInteger(db_number, start_offset[24], bit_offset[0])  # Sql Table 7 Ring-4 - 914.0
+        idx8 = pCon.readInteger(db_number, start_offset[25], bit_offset[0])  # Sql Table 8 Ring-4 - 916.0
     except Exception as err_spcRec:
         print(f"Exception Error: '{err_spcRec}'")
 
@@ -86,7 +86,7 @@ def recall_last_rt_idx():
 # PLC current index row reference from SQL Data --------------------------[]
 def recall_fromPLC_WON():
     try:
-        getWON = plc.readString(db_number, start_offset[1122], bit_offset[0])
+        getWON = pCon.readString(db_number, start_offset[1122], bit_offset[0])
 
     except Exception as err:
         print(f"Exception Error: '{err}'")
@@ -97,14 +97,14 @@ def recall_fromPLC_WON():
 # Send sql index to PLC for recall in the process if needed
 def update_procesed_idx(p_1dx, p_2dx, p_3dx, p_4dx, p_5dx, p_6dx, p_7dx, p_8dx):
     try:
-        plc.writeReal(db_number, start_offset[18], p_1dx)   # Sql Table 1 Ring-1 - 902.0
-        plc.writeReal(db_number, start_offset[19], p_2dx)   # Sql Table 2 Ring-1 - 904.0
-        plc.writeReal(db_number, start_offset[20], p_3dx)   # Sql Table 3 Ring-2 - 906.0
-        plc.writeReal(db_number, start_offset[21], p_4dx)   # Sql Table 4 Ring-2 - 908.0
-        plc.writeReal(db_number, start_offset[22], p_5dx)   # Sql Table 5 Ring-3 - 910.0
-        plc.writeReal(db_number, start_offset[23], p_6dx)   # Sql Table 6 Ring-3 - 912.0
-        plc.writeReal(db_number, start_offset[24], p_7dx)   # Sql Table 7 Ring-4 - 914.0
-        plc.writeReal(db_number, start_offset[25], p_8dx)   # Sql Table 8 Ring-4 - 916.0
+        pCon.writeReal(db_number, start_offset[18], p_1dx)   # Sql Table 1 Ring-1 - 902.0
+        pCon.writeReal(db_number, start_offset[19], p_2dx)   # Sql Table 2 Ring-1 - 904.0
+        pCon.writeReal(db_number, start_offset[20], p_3dx)   # Sql Table 3 Ring-2 - 906.0
+        pCon.writeReal(db_number, start_offset[21], p_4dx)   # Sql Table 4 Ring-2 - 908.0
+        pCon.writeReal(db_number, start_offset[22], p_5dx)   # Sql Table 5 Ring-3 - 910.0
+        pCon.writeReal(db_number, start_offset[23], p_6dx)   # Sql Table 6 Ring-3 - 912.0
+        pCon.writeReal(db_number, start_offset[24], p_7dx)   # Sql Table 7 Ring-4 - 914.0
+        pCon.writeReal(db_number, start_offset[25], p_8dx)   # Sql Table 8 Ring-4 - 916.0
 
     except Exception as err:
         print(f"Exception Error: '{err}'")
@@ -114,10 +114,10 @@ def update_procesed_idx(p_1dx, p_2dx, p_3dx, p_4dx, p_5dx, p_6dx, p_7dx, p_8dx):
 
 def stopTCP_Ctrl():
     if not autoSTOP:
-        auto_ACK = plc.readBool(db_number, start_offset[4], bit_offset[2])
+        auto_ACK = pCon.readBool(db_number, start_offset[4], bit_offset[2])
     try:
-        autoStop = plc.writeBool(db_number, start_offset[6], bit_offset[3], True)
-        pipe_Pos = plc.readReal(db_number, start_offset[8], bit_offset[0])
+        autoStop = pCon.writeBool(db_number, start_offset[6], bit_offset[3], True)
+        pipe_Pos = pCon.readReal(db_number, start_offset[8], bit_offset[0])
     except Exception as err:
         print(f"SPC Stop Read/Write Error: {err}")
 
@@ -158,11 +158,11 @@ def processR1_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
             else:
                 pass
             # Write sigma values into PLC data blocks if PLC Query is true ---[]
-            plc.writeReal(db_number, start_offset[6], v1)
-            plc.writeReal(db_number, start_offset[7], v2)
-            plc.writeReal(db_number, start_offset[8], v3)
-            plc.writeReal(db_number, start_offset[9], v4)
-            plc.writeReal(db_number, start_offset[28], SigPid)
+            pCon.writeReal(db_number, start_offset[6], v1)
+            pCon.writeReal(db_number, start_offset[7], v2)
+            pCon.writeReal(db_number, start_offset[8], v3)
+            pCon.writeReal(db_number, start_offset[9], v4)
+            pCon.writeReal(db_number, start_offset[28], SigPid)
 
     except Exception as err:
         print(f"PLC Write Error: {err}")
@@ -170,8 +170,8 @@ def processR1_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     # Read Pipe Discrete Position --------------------------[]
     if clayer==None and pPos==None and md:
         try:
-            layer = plc.readInteger(db_number, start_offset[0], bit_offset[0])
-            pPos = plc.readReal(db_number, start_offset[1], bit_offset[0])
+            layer = pCon.readInteger(db_number, start_offset[0], bit_offset[0])
+            pPos = pCon.readReal(db_number, start_offset[1], bit_offset[0])
         except Exception as err:
             print(f"PLC Read Error: {err}")
     else:
@@ -215,11 +215,11 @@ def processR2_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
             else:
                 pass
             # Perform realtime update into PLC data blocks if PLC Query is true ---------[]
-            plc.writeReal(db_number, start_offset[2], v1)
-            plc.writeReal(db_number, start_offset[3], v2)
-            plc.writeReal(db_number, start_offset[4], v3)
-            plc.writeReal(db_number, start_offset[5], v4)
-            plc.writeReal(db_number, start_offset[28], SigPid)
+            pCon.writeReal(db_number, start_offset[2], v1)
+            pCon.writeReal(db_number, start_offset[3], v2)
+            pCon.writeReal(db_number, start_offset[4], v3)
+            pCon.writeReal(db_number, start_offset[5], v4)
+            pCon.writeReal(db_number, start_offset[28], SigPid)
 
     except Exception as err:
         print(f"PLC Write Error: {err}")
@@ -227,8 +227,8 @@ def processR2_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     # Read Pipe Discrete Position --------------------------[]
     if clayer==None and pPos==None and md:
         try:
-            layer = plc.readInteger(db_number, start_offset[0], bit_offset[0])
-            pPos = plc.readReal(db_number, start_offset[1], bit_offset[0])
+            layer = pCon.readInteger(db_number, start_offset[0], bit_offset[0])
+            pPos = pCon.readReal(db_number, start_offset[1], bit_offset[0])
         except Exception as err:
             print(f"PLC Read Error: {err}")
     else:
@@ -272,11 +272,11 @@ def processR3_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md, WN):
             else:
                 pass
             # Perform realtime update into PLC data blocks if PLC Query is true ---------[]
-            plc.writeReal(db_number, start_offset[10], v1)
-            plc.writeReal(db_number, start_offset[11], v2)
-            plc.writeReal(db_number, start_offset[12], v3)
-            plc.writeReal(db_number, start_offset[13], v4)
-            plc.writeReal(db_number, start_offset[28], SigPid)
+            pCon.writeReal(db_number, start_offset[10], v1)
+            pCon.writeReal(db_number, start_offset[11], v2)
+            pCon.writeReal(db_number, start_offset[12], v3)
+            pCon.writeReal(db_number, start_offset[13], v4)
+            pCon.writeReal(db_number, start_offset[28], SigPid)
 
     except Exception as err:
         print(f"PLC Write Error: {err}")
@@ -284,8 +284,8 @@ def processR3_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md, WN):
     # Read Pipe Discrete Position --------------------------[]
     if clayer==None and pPos==None and md:
         try:
-            layer = plc.readInteger(db_number, start_offset[0], bit_offset[0])
-            pPos = plc.readReal(db_number, start_offset[1], bit_offset[0])
+            layer = pCon.readInteger(db_number, start_offset[0], bit_offset[0])
+            pPos = pCon.readReal(db_number, start_offset[1], bit_offset[0])
         except Exception as err:
             print(f"PLC Read Error: {err}")
     else:
@@ -329,11 +329,11 @@ def processR4_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md, WN):
             else:
                 pass
             # Perform realtime update into PLC data blocks if PLC Query is true ---------[]
-            plc.writeReal(db_number, start_offset[14], v1)
-            plc.writeReal(db_number, start_offset[15], v2)
-            plc.writeReal(db_number, start_offset[16], v3)
-            plc.writeReal(db_number, start_offset[17], v4)
-            plc.writeReal(db_number, start_offset[28], SigPid)
+            pCon.writeReal(db_number, start_offset[14], v1)
+            pCon.writeReal(db_number, start_offset[15], v2)
+            pCon.writeReal(db_number, start_offset[16], v3)
+            pCon.writeReal(db_number, start_offset[17], v4)
+            pCon.writeReal(db_number, start_offset[28], SigPid)
 
     except Exception as err:
         print(f"PLC Write Error: {err}")
@@ -341,8 +341,8 @@ def processR4_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md, WN):
     # Read Pipe Discrete Position --------------------------[]
     if clayer==None and pPos==None and md:
         try:
-            layer = plc.readInteger(db_number, start_offset[0], bit_offset[0])
-            pPos = plc.readReal(db_number, start_offset[1], bit_offset[0])
+            layer = pCon.readInteger(db_number, start_offset[0], bit_offset[0])
+            pPos = pCon.readReal(db_number, start_offset[1], bit_offset[0])
         except Exception as err:
             print(f"PLC Read Error: {err}")
     else:

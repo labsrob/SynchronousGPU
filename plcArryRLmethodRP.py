@@ -14,55 +14,55 @@ RPart_address = 0  					# RParting address
 r_length = 4  						# double word (4 Bytes)
 b_length = 1  						# boolean size = 1 Byte
 r_data = 52.4
-plc = snap7.client.Client()
+pCon = snap7.client.Client()
 
 
 # ---------------------- Collective Functions ---------------------------------------
 
 def readBool(db_number, RPart_offset, bit_offset):
-	reading = plc.db_read(db_number, RPart_offset, b_length)
+	reading = pCon.db_read(db_number, RPart_offset, b_length)
 	a = snap7.util.get_bool(reading, 0, bit_offset)
 	print('DB Number: ' + str(db_number) + ' Bit: ' + str(RPart_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
 	return a
 
 
 def readReal(db_number, RPart_offset, bit_offset):
-	reading = plc.db_read(db_number, RPart_offset, r_length)
+	reading = pCon.db_read(db_number, RPart_offset, r_length)
 	a = snap7.util.get_real(reading, 0)
 	# print('DB Number: ' + RPr(db_number) + ' Bit: ' + RPr(RPart_offset) + '.' + RPr(bit_offset) + ' Value: ' + RPr(a))
 	return a
 
 def readInteger(db_number, RPart_offset, bit_offset):
-	reading = plc.db_read(db_number, RPart_offset, r_length)
+	reading = pCon.db_read(db_number, RPart_offset, r_length)
 	a = snap7.util.get_int(reading, 0)
 	# print('DB Number: ' + RPr(db_number) + ' Bit: ' + RPr(RPart_offset) + '.' + RPr(bit_offset) + ' Value: ' + RPr(a))
 	return a
 
 def readRPring(db_number, RPart_offset, bit_offset):
 	r_length = 16
-	reading = plc.db_read(db_number, RPart_offset, r_length)
+	reading = pCon.db_read(db_number, RPart_offset, r_length)
 	a = snap7.util.get_RPring(reading, 0)
 	print('DB Number: ' + str(db_number) + ' Bit: ' + str(RPart_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
 	return a
 
 def writeBool(db_number, RPart_offset, bit_offset, value):
-	bArray = plc.db_read(db_number, RPart_offset, b_length)    		# (db, RPart offset, [b_length = read 1 byte])
+	bArray = pCon.db_read(db_number, RPart_offset, b_length)    		# (db, RPart offset, [b_length = read 1 byte])
 	snap7.util.set_bool(bArray, 0, bit_offset, value)    			# (value 1= true;0=false)
-	plc.db_write(db_number, RPart_offset, bArray)       			# write back the bytearray
+	pCon.db_write(db_number, RPart_offset, bArray)       			# write back the bytearray
 	return 	# None
 
 def writeReal(db_number, RPart_offset, r_data):
 	# reading = plc.db_read(db_number, RPart_offset, r_length)
 	data = bytearray(4)
 	snap7.util.set_real(data, 0, r_data)
-	plc.db_write(db_number, RPart_offset, data)
+	pCon.db_write(db_number, RPart_offset, data)
 	return
 
 def writeInteger(db_number, RPart_offset, r_data):
 	# reading = plc.db_read(db_number, RPart_offset, r_length)
 	data = bytearray(4)
 	snap7.util.set_int(data, 0, r_data)
-	plc.db_write(db_number, RPart_offset, data)
+	pCon.db_write(db_number, RPart_offset, data)
 	return
 
 # --------------------------------------------------------------------------------------------------------------------[]

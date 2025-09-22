@@ -198,7 +198,7 @@ def decryptMetricsGeneral(WONID):
             TG = onetimepad.decrypt(limpParams["Tape_void"], 'random')
 
         except KeyError:
-            print('Process config record not found. Loading default values for WON#' + WONID)
+            print('Existing configuration file not found! \nLoading default config on WON# ' + WONID)
             cDM = 0
             cSS = 0
             cGS = 0
@@ -219,7 +219,7 @@ def decryptMetricsGeneral(WONID):
             TG = 0
 
     else:
-        print('Configuration file does not exist, loading dummy variables...')
+        print('Configuration not found, \nloading default values...')
         cDM = 0
         cSS = 30
         cGS = 2

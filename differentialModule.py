@@ -10,6 +10,7 @@ from tkinter import *               # Load this Library first
 from random import randint
 from PIL import ImageTk, Image      # Python Imaging Library
 from multiprocessing import Process
+import threading
 from threading import *
 from datetime import datetime
 from time import sleep
@@ -17,6 +18,8 @@ import os
 import psutil
 import CommsPlc as plc
 # -------------------------------------
+sysrdy, sysidle = 0, 1		# details for AutoProcess visualisation
+running = True				# Default Snooze argument
 
 # ----------------------------------- Watch Dog Control ------------------
 # Ensure you update these parameters if anything changes in the SCADA  state machine codes ---------------------------
@@ -418,15 +421,15 @@ def watchDog():
 			elif msctcp == 301 and sysrdy and sysidle:
 				print('\nTCP in Standby mode...')
 
-			elif sqlrdy and msctcp == 110 and not sysidle:
+			elif sysrdy and msctcp == 110 and not sysidle:
 				print('\nTCP in Ready mode...')
 
 			# When TCP is in Error, indicate the SMC to Vis Screen ------------------------[]
-			elif spcInUse and msctcp == 111 or msctcp == 261 or msctcp == 325 or msctcp == 438 or msctcp == 515:
+			elif msctcp == 111 or msctcp == 261 or msctcp == 325 or msctcp == 438 or msctcp == 515:
 				state = codeDescript[10]  # TCP in Categorised process Error state --------[]
 				print('\nTCP in '+state)
 
-			elif spcInUse and msctcp == machineCode_Data[0]:
+			elif msctcp == machineCode_Data[0]:
 				state = codeDescript[0]		# Unknown State, Call Engineering Team --------[]
 				print('\nTCP in '+state)
 
@@ -554,7 +557,7 @@ def watchDog():
 				state = codeDescript[131]		# Dynamic triggered soft soft in effect ---[]
 				print('\nTCP: '+state)
 
-			elif sysrdy and sysRun and spcInUse:   							# ready to start prod [and sqlrdy]
+			elif sysrdy and sysRun:   							# ready to start prod [and sqlrdy]
 				print("\nWatchDog: Real-Time visualization begins...", msctcp)
 				if not inProgress and msctcp == machineCode_Data[128]:		# "Tape laying Process in Progress 314"
 					print('Watchdog: Launching visualisation...')
@@ -597,7 +600,7 @@ def watchDog():
 					print("\nWatchDog: Visualization Resumes...")
 
 			else:
-				if not sysrdy and spcInUse and not sqlrdy and msctcp == 0 and not sysRun:
+				if not sysrdy and msctcp == 0 and not sysRun:
 					inProgress = False
 					print('\nWatchDog: Ending the process...')
 				time.sleep(.5)
@@ -627,7 +630,7 @@ bit_offset = [0, 1]
 
 # -----------------------
 # w, h = 425, 250
-w, h = 780, 450
+# w, h = 780, 450
 # w, h = 425, 250
 # -----------------------
 
@@ -652,39 +655,36 @@ def errorLog(err):
     f.write(event+' --- '+err+'\n')
     f.close()
 
-
 # Window Exit Functions ---------------[]
 def to_GUI(event):
-    # ---------------------------------[]
-    print('\nExiting Splash Screen...')
-    timer.cancel()
-    mySplash.destroy()
-    if mySplash.withdraw:
-        import synchronousMain as rb
-        print('Loading SPC GUI...\n')
-        print('\nMenu Thread ID:', get_ident())
-    rb.userMenu()             # calling Main Function
-
-    return
+	# ---------------------------------[]
+	print('\nExiting Splash Screen, Loading GUI...')
+	timer.cancel()
+	mySplash.destroy()
+	if mySplash.withdraw:
+		import synchronousMain as rb
+		print('\nMenu Thread ID:', get_ident())
+	# t3 = threading.Thread(target=rb.main(), name='t3')
+	threading.Thread(target=rb.main(), name='t3').start()
+	return
 
 def to_dScr(event):
     # ---------------------------------[]
-    print('\nExiting Splash Screen...')
+    print('\nSplash Screen snoozing...')
     timer.cancel()
     mySplash.destroy()
     if mySplash.withdraw:
-        import Screen_Saver as sz
         print('Loading SPC GUI...\n')
         print('\nMenu Thread ID:', get_ident())
-    sz.sScreen()             # called function
+    dScreen()             # default screen after snooze
 
     return
 
-def repoxy(event):
+def to_AutoProcess(event):
     # ------------------------------------------
     import synchronousMain as rb
 
-    print('\nMomentary paused Screen Saver...')
+    print('\nSplash repositioned, calling Auto visualisation...')
     timer.cancel()
 
     mySplash.deiconify()
@@ -696,10 +696,10 @@ def repoxy(event):
     y_c = int((screen_h / 2) - (h / 2))
 
     mySplash.deiconify()
-    mySplash.geometry(f"{w}x{h}+{x_c}+{y_c}")
+    mySplash.geometry(f"{w}x{h}+{x_c}+{y_c}")				# Reposition Splash
     sleep(.9)
     rb.common_PA()
-    # mySplash.after(10000, lambda: move_window())        # delay for 10 seconds
+    # mySplash.after(10000, lambda: move_window())          # delay for 10 seconds
     return
 
 # Check Screen resolution -----------------------------[]
@@ -749,35 +749,32 @@ def checkRes():
 
 
 def move_window():
-    global timer
+	global timer, w, h
 
-    timer = Timer(2, move_window)       # Start threading.Timer()
+	timer = Timer(2, move_window)  # Start threading.Timer()
+	# sysrdy, sysidle = 0, 1
 
-    mySplash.bind("<Motion>", to_GUI)           # To GUI Menu
-    mySplash.bind("<Escape>", to_GUI)           # To GUI Menu
-    if sysrdy and not sysidle:
-        repoxy(event=None)
-	# mySplash.after(5000, lambda: out())
-    mySplash.config(cursor="none")
+	mySplash.bind("<Motion>", to_GUI)   # To GUI Menu
+	mySplash.bind("<Escape>", to_dScr)  # To snooze
+	mySplash.config(cursor="none")
+	# ------------------------------- Get msc_code #
+	if sysrdy and not sysidle:
+		to_AutoProcess(event=None)
+	else:
+		pass
+	# --------------------------------------------------[]
+	# timei = time.time()  # start timing the entire loop
+	print('\nSPC in Snooze mode, press Esc to standby or Other keys to resume')  # Snooze function
+	mySplash.geometry(f"{w}x{h}+{int(randint(10, 1900))}+{int(randint(10, 1000))}")
+	if not timer.is_alive():
+		timer.start()
+	else:
+		timer.cancel()
+		mySplash.deiconify()
+	mySplash.after(10000, lambda: to_dScr(event=None))
+	# to_dScr(event=None)   # To default screen saver
 
-    # --------------------------------------------------[]
-    # timei = time.time()  # start timing the entire loop
-    print('\nSPC in Snooze mode, press Esc to standby or Other keys to resume')             # Snooze function
-    mySplash.geometry(f"{w}x{h}+{int(randint(10, 1900))}+{int(randint(10, 1000))}")
-    if not timer.is_alive():
-        timer.start()
-        # timef = time.time()
-    else:
-        timer.cancel()
-        mySplash.deiconify()
-
-    # lpsdT = timef - timei
-    # print(f"\nProcess Interval: {lpsdT} sec\n")
-    # if lpsdT == 60:
-    #     to_dScr(event=None)   # To default screen saver
-
-    return
-
+	return
 
 def sendM2M_ACK():
     # Send acknowledgement by raising M2MConACK on SCADA Process and activate watchdog ---[]
@@ -949,13 +946,12 @@ def autoSplash(istener, splash):
     Label(mySplash, text="WatchDog activated, remote call!", justify=LEFT).place(x=140, y=215)
 
     # Initiate a new thread / process -------------------------------[C]
-    import spcWatchDog as wd
-    print('Loading Watchdog Module, please wait... ')
-    npid = wd.watchDog(listener, splash)  # carry 2 variables along, required to remove screen splash
-    p = Process(target=npid)
-    p.start()
-    # p.join()
-
+    # import spcWatchDog as wd
+    # print('Loading Watchdog Module, please wait... ')
+    # npid = wd.watchDog(listener, splash)  # carry 2 variables along, required to remove screen splash
+    # p = Process(target=npid)
+    # p.start()
+    # # p.join()
     mySplash.after(60000, lambda: move_window())        # call snooze function with false token
 
     return splashInUse
@@ -1070,11 +1066,6 @@ def localSplash():
 
 	Label(mySplash, text="OPC UA Watchdog enabled!", justify=LEFT, font=("NovaMono", f)).place(x=p, y=v)
 	# Initiate a new thread / process -------------------------------[C]
-	import spcWatchDog as wd
-	print('Loading Watchdog Module, please wait... ')
-	npid = wd.watchDog(mySplash)  # required to remove screen splash
-	p = Process(target=npid)
-	p.start()
 	mySplash.after(5000, lambda: move_window())
 	mySplash.update_idletasks()
 
@@ -1099,29 +1090,28 @@ def mSplash():
 
 # -------------------------------Default Screen Saver ----------------
 
-# ---------------------------
-running = True
-
 # close window
 def toSplash(event):
-    # ----------------
-    running = False
-    # ----------------
-    print('Exiting to Splash...')
-    sleep(.9)
-    root.destroy()
-    mSplash()
-    os._exit(0)
+	# ----------------
+	running = False			# Terminate loop
+	# ----------------
+	print('Exiting to Splash...')
+	sleep(.9)
+	root.destroy()			# Cancel snooze Instance
+	mSplash()				# Load Splash Screen & Initialise variables
+	os._exit(0)				# Exit Snooze
+	return running
 
 def toProcess(event):
-    # ----------------
-    running = False
-    # ----------------
-    print('Exiting to Process...')
-    sleep(.9)
-    root.destroy()
-    # mSplash()		# to synchronousMain:function
-    os._exit(0)
+	# ----------------
+	running = False				# Terminate loop
+	# ----------------
+	print('Exiting to Process...')
+	sleep(.9)
+	root.destroy()				# Cancel snooze Instance
+	to_AutoProcess(event=None)	# Call Visualisation object
+	os._exit(0)					# Exit Snooze
+	return running
 
 def showDefaultScreen():
     while running:
@@ -1141,12 +1131,14 @@ def dScreen():
 	# Window Attributes
 	root.overrideredirect(True)
 	root.wm_attributes("-transparentcolor", "gray99")
+
 	#--------------
-	msC.set(0)		# sysrdy
+	msC.set(sysrdy)		# sysrdy
 	#---------------
-	root.bind("<Motion>", toSplash)    # Mouse action to Splash Screen
-	root.bind("<Escape>", toSplash)    # Code from watchdog to Visualisation
-	if msC == '4132':
+
+	root.bind("<Motion>", toSplash)    	# Mouse action to Splash Screen
+	root.bind("<Escape>", toSplash)    	# Escape Button to Splash Screen
+	if msC == '4132':					# Code from watchdog to Visualisation
 		toProcess()
 	else:
 		pass

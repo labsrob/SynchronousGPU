@@ -8,21 +8,22 @@ Substrate Temperature measured in Degree Celsius (°C)
 """
 
 
-def validCols(pParam, pWON=None):
+def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'ST1_' + pWON:
-        columns = ['tStamp', 'cLayer', 'R1H1TT', 'R1H2TT', 'R1H3TT',
-                   'R1H4TT', 'R2H1TT', 'R2H2TT', 'R2H3TT', 'R2H4TT']
+    if pParam[0:3] == 'ST1_':
+        columns = ['tStamp', 'cLayer', 'R1H1ST', 'R1H2ST', 'R1H3ST',
+                   'R1H4ST', 'R2H1ST', 'R2H2ST', 'R2H3ST', 'R2H4ST']
 
-    elif pParam == 'ST2_' + pWON:
-        columns = ['tStamp', 'cLayer', 'R3H1TT', 'R3H2TT', 'R3H3TT',
-                   'R3H4TT', 'R4H1TT', 'R4H2TT', ' R4H3TT', 'R4H4TT']
+    elif pParam[0:3] == 'ST2_':
+        columns = ['tStamp', 'cLayer', 'R3H1ST', 'R3H2ST', 'R3H3ST',
+                   'R3H4ST', 'R4H1ST', 'R4H2ST', 'R4H3ST', 'R4H4ST']
 
-    elif pParam == 'SPC_ST':
+    elif pParam[0:3] == 'SPC_ST':
         columns = ['cLayer', 'R1H1', 'R1H2', 'R1H3', 'R1H4',
                    'R2H1', 'R2H2', 'R2H3', 'R2H4', 'R3H1', 'R3H2',
-                   'R3H3', 'R3H4', 'R4H1', 'R4H2',' R4H3', 'R4H4']
+                   'R3H3', 'R3H4', 'R4H1', 'R4H2','R4H3', 'R4H4']
     else:
+        columns = 0
         print('Invalid Columns or Query error...')
 
     return columns

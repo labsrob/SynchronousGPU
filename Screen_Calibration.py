@@ -65,6 +65,7 @@ def getSCRdetails():
 
     detectScr = monitor_areas()
     detSCR = len(detectScr)
+    print('Available (' + str(detSCR) + ') visualisation Screen')
 
     if detSCR == 1:
         print('Mono-screen(' + str(detSCR) + ') configuration, suitable for DNV/MGM Tabbed visualisation only')
@@ -79,7 +80,7 @@ def getSCRdetails():
         print('Screen Width:', T1)
 
     elif 1 < detSCR < 3:  # greater than 1 but less than 3
-        print('Multi-screen(' + str(detSCR) + ') configuration, but not valid for DNV/MGM Cascade.')
+        print('Multi-screen (' + str(detSCR) + ') configuration, but valid for DNV/MGM Tabbed only.')
         T1 = detectScr[0][2]
         T2 = detectScr[1][2]
         T3 = 0
@@ -90,8 +91,20 @@ def getSCRdetails():
         T8 = 0
         print('Screen Widths:', T1, T2, T3)
 
+    elif detSCR == 3:
+        print('Multi-screen (' + str(detSCR) + ') configuration, suitable for DNV Tabbed visualisation')
+        T1 = detectScr[0][2]
+        T2 = detectScr[1][2]
+        T3 = detectScr[2][2]
+        T4 = 0
+        T5 = 0
+        T6 = 0
+        T7 = 0
+        T8 = 0
+        print('Screen Widths:', T1, T2, T3, T4)  # detectScr[3][2]
+
     elif detSCR == 4:
-        print('Multi-screen(' + str(detSCR) + ') configuration, suitable for DNV Cascade visualisation')
+        print('Multi-screen (' + str(detSCR) + ') configuration, suitable for DNV Cascade visualisation')
         T1 = detectScr[0][2]
         T2 = detectScr[1][2]
         T3 = detectScr[2][2]
@@ -103,7 +116,7 @@ def getSCRdetails():
         print('Screen Widths:', T1, T2, T3, T4)
 
     elif 4 < detSCR < 8:
-        print('Multi-screen(' + str(detSCR) + ') configuration, not suitable for MGM Cascade visualisation')
+        print('Multi-screen (' + str(detSCR) + ') configuration, not suitable for MGM Cascade visualisation')
         T1 = detectScr[0][2]
         T2 = detectScr[1][2]
         T3 = detectScr[2][2]
@@ -115,7 +128,7 @@ def getSCRdetails():
         print('Screen Widths:', T1, T2, T3, T4, T5, T6, T7)
 
     else:
-        print('Multi-screen(' + str(detSCR) + ') configuration, suitable for MGM Cascade visualisation')
+        print('Multi-screen (' + str(detSCR) + ') configuration, suitable for MGM Cascade visualisation')
         T1 = detectScr[0][2]
         T2 = detectScr[1][2]
         T3 = detectScr[2][2]
@@ -127,3 +140,5 @@ def getSCRdetails():
         print('Screen Widths:', T1, T2, T3, T4, T5, T6, T7, T8)
 
     return detSCR, T1, T2, T3, T4, T5, T6, T7, T8
+
+# getSCRdetails()

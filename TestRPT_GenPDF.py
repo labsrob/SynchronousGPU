@@ -78,8 +78,6 @@ plt.boxplot(data, labels=['Actual', 'Nominal', 'Deviation'])
 
 # legend()
 # axis([0, 4, 0, 5])
-
-# savefig('barchart.png')
 savefig('barchart.png')
 
 pdf = FPDF()

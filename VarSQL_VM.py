@@ -11,7 +11,7 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlVM = [df1['sCount'], df1['sCenter'], df1['AvgGap'],
+    sqlVM = [df1['id_col'], df1['sCount'], df1['sCenter'], df1['AvgGap'],
              df1['MaxGap'], df1['cLayer'], df1['sDistance']]
 
     return sqlVM

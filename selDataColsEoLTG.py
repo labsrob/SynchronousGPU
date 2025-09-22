@@ -8,14 +8,14 @@ Check SQL data columns ...
 """
 
 
-def validCols(pParam, pWON=None):
-    # print('Detected RingHead Combo:', configH)
-    if pParam == 'ZTG_' + pWON:
-        columns = [ # Tape Temperature --------------[]
+def validCols(pParam):
+    if pParam[0:3] == 'ZTG_':
+        columns = [# Tape Temperature --------------[]
                    'tStmc', 'LyIDc', 'R1SPc', 'R1NVc', 'R2SPc',
                    'R2NVc', 'R3SPc', 'R3NVc', 'R4SPc',  'R4NVc']
 
     else:
+        columns = 0
         print('Invalid Columns or Query error...')
 
     return columns
