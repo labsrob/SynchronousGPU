@@ -12,9 +12,10 @@ def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'ZWS_' + pWON:      # EOL_WS is so named as ZWS
         columns = [ # Tape Temperature --------------[]
-                   'tStmd', 'LyIDd', 'R1SPd', 'R1NVd', 'R2SPd',
-                   'R2NVd', 'R3SPd', 'R3NVd', 'R4SPd',  'R4NVd']
+                   'LyID', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
     else:
+        columns = 0
         print('Invalid Columns or Query error...')
 
     return columns

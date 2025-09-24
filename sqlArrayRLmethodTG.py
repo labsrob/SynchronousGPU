@@ -14,7 +14,7 @@ dL1 = []                                              # SQL start index unless o
 
 
 def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
-    global last_t1, last_t2
+    global last_t1
     """
     NOTE:
     """
@@ -31,7 +31,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
         if last_t1 is None:
             t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY cLayer ASC')
         else:
-            t1.execute('SELECT * FROM ' + str(T1) + ' WHERE tStmc > ? ORDER BY LyIDc ASC', last_t1)
+            t1.execute('SELECT * FROM ' + str(T1) + ' WHERE tStamp > ? ORDER BY LyIDc ASC', last_t1)
 
         data1 = t1.fetchmany(n2fetch)
 
@@ -40,7 +40,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
             for result in data1:
                 result = list(result)
                 dL1.append(result)
-            last_t1 = data1[-1].tStmc
+            last_t1 = data1[-1].tStamp
         else:
             print('[TG] Process EOF reached...')
             time.sleep(300)
@@ -51,4 +51,5 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
 
     t1.close()
 
+    return dL1
 # -----------------------------------------------------------------------------------[Dr Labs]

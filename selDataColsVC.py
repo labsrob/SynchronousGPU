@@ -11,10 +11,10 @@ YTape Void count data
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam[0:3] == 'VC_':
-        columns = ['id_col', 'sCentre', 'VODPosA', 'vMarkerA', 'VODPosB', 'vMarkerB', 'VODPosC',
+        columns = ['sCentre', 'VODPosA', 'vMarkerA', 'VODPosB', 'vMarkerB', 'VODPosC',
                    'vMarkerC', 'VODPosD', 'vMarkerD', 'PipeDir', 'cLayer', 'totalV']
 
-    elif pParam[0:3] == 'SPC_VC':
+    elif pParam[0:6] == 'SPC_VC':
         columns = ['sCentre', 'VODPosA', 'vMarkerA', 'VODPosB', 'vMarkerB', 'VODPosC',
                    'vMarkerC', 'VODPosD', 'vMarkerD', 'PipeDir', 'cLayer', 'totalV']
 

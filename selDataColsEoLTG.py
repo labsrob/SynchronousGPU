@@ -11,8 +11,8 @@ Check SQL data columns ...
 def validCols(pParam):
     if pParam[0:3] == 'ZTG_':
         columns = [# Tape Temperature --------------[]
-                   'tStmc', 'LyIDc', 'R1SPc', 'R1NVc', 'R2SPc',
-                   'R2NVc', 'R3SPc', 'R3NVc', 'R4SPc',  'R4NVc']
+                  'LyID', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
 
     else:
         columns = 0

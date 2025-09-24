@@ -88,7 +88,7 @@ def check_PLC_Status():
 		active_conn = 'True'
 	else:
 		active_conn = 'False'
-		connectM2M(1, 2)
+		# connectM2M(1, 2)
 
 	return active_conn
 

@@ -5,268 +5,128 @@ from itertools import count
 from datetime import datetime, timedelta
 import time
 
+last_t1 = None
+last_t2 = None
+last_t3 = None
+last_t4 = None
+
+st_id = 0
+dL1, dL2, dL3, dL4 = [], [], [], []                                              # SQL start index unless otherwise stated by the index tracker!
 
 
-UseRowIndex = True
-idx = count()
-now = datetime.now()
-
-dataList0 = []
-rTT, rST, rTG, rWS, rPP = [], [], [], [], []            # DNV
-rLP, rLA, rTT, rST, rTG, rWA, rPP = [], [], [], [], [], [], []   # MGM
-
-
-def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
+def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
+    global last_t1, last_t2, last_t3, last_t4
     """
     NOTE:
     """
-    t1, t2, t3, t4, t5 = sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor()
+    # idx = str(idx)                                    # convert Query Indexes to string concatenation
+    t1, t2, t3, t4 = daq.cursor(), daq.cursor(), daq.cursor(), daq.cursor()
 
-    # ------------------ Load randomised samples --------------------------------------------------------------[A]
-    if len(rTT) > 0:    # clean up accumulator
-        del rTT[:]
-    dataTT = t1.execute('Select * FROM ' + str(T1) + ' where [LyIDa] = ' + str(layerNo)).fetchall()
-    # print('TP00', dataTT)
-    if len(dataTT) != 0:
-        for result in dataTT:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rTT.append(result)
-        # print("\nStep List1 @"+str(layerNo)+':', len(rTT), rTT, '\n')  # FIXME:
+    n2fetch = int(nGZ)
+    group_step = int(grp_step)
+    fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
+    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
 
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-    t1.close()
-
-    # Substrate Temperature --------------------------------------------------------------------------------[B]
-    if len(rST) > 0:    # clean up accumulator
-        del rST[:]
-    dataST = t2.execute('Select * FROM ' + str(T2) + ' where [LyIDb] = ' + str(layerNo)).fetchall()
-    if len(dataST) != 0:
-        for result in dataST:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rST.append(result)
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-    t2.close()
-
-    # Tape Gap Procedure ------------------------------------------------------------------------------------[C]
-    if len(rTG) > 0:    # clean up accumulator
-        del rTG[:]
-    dataTG = t3.execute('Select * FROM ' + str(T3) + ' where [LyIDc] = ' + str(layerNo)).fetchall()
-    if len(dataTG) != 0:
-        for result in dataTG:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rTG.append(result)
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-    t3.close()
-
-    # Ramp Profile ------------------------------------------------------------------------------------------[D]
-    if len(rWS) > 0:    # clean up accumulator
-        del rWS[:]
-    if T4[0:4] == 'WS_':
-        dataWS = t4.execute('Select * FROM ' + str(T4) + ' where [LyIDd] = ' + str(layerNo)).fetchall()
-        if len(dataWS) != 0:
-            for result in dataWS:
-                result = list(result)
-                if UseRowIndex:
-                    dataList0.append(next(idx))
-                else:
-                    now = time.strftime("%H:%M:%S")
-                    dataList0.append(time.strftime(now))
-                rWS.append(result)
-
-            # print("Step List1:", len(dL1), dL1)       FIXME:
-
+    # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
+    try:
+        if last_t1 is None:
+            t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY cLayer ASC')
         else:
-            print('Process EOF reached...')
-            print('SPC Halting for 5 Minutes...')
-            time.sleep(5)
-        t4.close()
+            t1.execute('SELECT * FROM ' + str(T1) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_t1)
+        data1 = t1.fetchmany(n2fetch)
 
-    # Pipe Profile ------------------------------------------------------------------------------------------[D]
-    if len(rPP) > 0:    # clean up accumulator
-        del rPP[:]
-    dataPP = t5.execute('Select * FROM ' + str(T5) + ' where [LyID] = ' + str(layerNo)).fetchall()
-    print('TP-SQL', len(dataPP), dataPP)
-    if len(dataPP) != 0:
-        for result in dataPP:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rPP.append(result)
+        # --------------- Re-assemble into dynamic buffer -----
+        if len(data1) != 0:
+            for result in data1:
+                result = list(result)
+                dL1.append(result)
+            last_t1 = data1[-1].id_col
+        else:
+            print('[TT] Process EOF reached...')
+            print('[TT] Halting for 5 Minutes...')
+            time.sleep(300)
 
-        # print("Step List1:", len(dL1), dL1)       FIXME:
+    except Exception as e:
+        print("[TT] Tape Temp Data trickling...")  # , e)
+        time.sleep(2)
 
-    else:
-        dataPP = 0, 0, 0, 0, 0, 0, 0, 0, 0
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-    t5.close()
-
-
-    return rTT, rST, rTG, rWS, rPP
-# -------------------------------------------------------------------------------------------------------[XXXXXXX]
-
-
-def mgm_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
-    """
-    NOTE:
-    """
-    t1, t2, t3, t4, t5, t6 = sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor(), sq_con.cursor()
-
-    # ------------------ Load randomised samples --------------------------------------------------------------[A]
-    if len(rLP) > 0:  # clean up accumulator
-        del rLP[:]
-    dataLP = t1.execute('Select * FROM ' + str(T1) + ' where [LyID] = ' + str(layerNo)).fetchall()
-    # print('TP00', dataTT)
-    if len(dataLP) != 0:
-        for result in dataLP:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rLP.append(result)
-        # print("Step List1:", len(rTT), rTT)  #      FIXME:
-
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
     t1.close()
 
-    # Laser Angle  --------------------------------------------------------------------------------[B]
-    if len(rLA) > 0:  # clean up accumulator
-        del rLA[:]
-    dataLA = t2.execute('Select * FROM ' + str(T2) + ' where [LyID] = ' + str(layerNo)).fetchall()
-    if len(dataLA) != 0:
-        for result in dataLA:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rLA.append(result)
+    # ------------------------------------------------------------------------------------[]
+    try:
+        if last_t2 is None:
+            t2.execute('SELECT * FROM ' + str(T2) + ' ORDER BY cLayer ASC')
+        else:
+            t2.execute('SELECT * FROM ' + str(T2) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_t2)
+        data2 = t2.fetchmany(n2fetch)
 
-        # print("Step List1:", len(dL1), dL1)       FIXME:
+        # --------------- Re-assemble into dynamic buffer -----
+        if len(data2) != 0:
+            for result in data2:
+                result = list(result)
+                dL2.append(result)
+            last_t2 = data2[-1].id_col
+        else:
+            print('[ST] Process EOF reached...')
+            print('[ST] Halting for 5 Minutes...')
+            time.sleep(300)
 
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
+    except Exception as e:
+        print("[ST] Substrate Temp Data trickling...")  # , e)
+        time.sleep(2)
+
     t2.close()
 
-    # Tape Temperature --------------------------------------------------------------------------------[B]
-    if len(rTT) > 0:  # clean up accumulator
-        del rTT[:]
-    dataTT = t3.execute('Select * FROM ' + str(T3) + ' where [LyID] = ' + str(layerNo)).fetchall()
-    if len(dataTT) != 0:
-        for result in dataTT:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rTT.append(result)
+    # ------------------------------------------------------------------------------------[]
+    try:
+        if last_t3 is None:
+            t3.execute('SELECT * FROM ' + str(T3) + ' ORDER BY cLayer ASC')
+        else:
+            t3.execute('SELECT * FROM ' + str(T3) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_t3)
+        data3 = t3.fetchmany(n2fetch)
 
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
+        # --------------- Re-assemble into dynamic buffer -----
+        if len(data3) != 0:
+            for result in data3:
+                result = list(result)
+                dL3.append(result)
+            last_t3 = data3[-1].id_col
+        else:
+            print('[TG] Process EOF reached...')
+            print('[TG] Halting for 5 Minutes...')
+            time.sleep(300)
+
+    except Exception as e:
+        print("[TG] Tape Gap Data trickling...")  # , e)
+        time.sleep(2)
+
     t3.close()
 
-    # Substrate Temperature --------------------------------------------------------------------------[D]
-    if len(rST) > 0:  # clean up accumulator
-        del rST[:]
-    dataST = t4.execute('Select * FROM ' + str(T4) + ' where [LyID] = ' + str(layerNo)).fetchall()
-    if len(dataST) != 0:
-        for result in dataST:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rST.append(result)
+    # ------------------------------------------------------------------------------------[]
+    try:
+        if last_t4 is None:
+            t4.execute('SELECT * FROM ' + str(T4) + ' ORDER BY cLayer ASC')
+        else:
+            t4.execute('SELECT * FROM ' + str(T4) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_t4)
+        data4 = t4.fetchmany(n2fetch)
 
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
+        # --------------- Re-assemble into dynamic buffer -----
+        if len(data4) != 0:
+            for result in data4:
+                result = list(result)
+                dL4.append(result)
+            last_t4 = data4[-1].id_col
+        else:
+            print('[WS] Process EOF reached...')
+            print('[WS] Halting for 5 Minutes...')
+            time.sleep(300)
+
+    except Exception as e:
+        print("[WS] Winding Speed Data trickling...")  # , e)
+        time.sleep(2)
+
     t4.close()
 
-    # Tape Gap Procedure ------------------------------------------------------------------------------------[C]
-    if len(rTG) > 0:  # clean up accumulator
-        del rTG[:]
-    dataTG = t5.execute('Select * FROM ' + str(T5) + ' where [LyID] = ' + str(layerNo)).fetchall()
-    if len(dataTG) != 0:
-        for result in dataTG:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            rTG.append(result)
+    return dL1, dL2, dL3, dL4
 
-    else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-    t5.close()
-
-    # Ramp Profile ------------------------------------------------------------------------------------------[D]
-    if len(rWA) > 0:  # clean up accumulator
-        del rWA[:]
-    if T4[0:4] == 'ZWA_':
-        dataWA = t6.execute('Select * FROM ' + str(T6) + ' where [LyID] = ' + str(layerNo)).fetchall()
-        if len(dataWA) != 0:
-            for result in dataWA:
-                result = list(result)
-                if UseRowIndex:
-                    dataList0.append(next(idx))
-                else:
-                    now = time.strftime("%H:%M:%S")
-                    dataList0.append(time.strftime(now))
-                rWA.append(result)
-            # print("Step List1:", len(dL1), dL1)       FIXME:
-
-        else:
-            print('Process EOF reached...')
-            print('SPC Halting for 5 Minutes...')
-            time.sleep(5)
-        t6.close()
-
-    return rLP, rLA, rTT, rST, rTG, rWA
 # -------------------------------------------------------------------------------------------------------[XXXXXXX]

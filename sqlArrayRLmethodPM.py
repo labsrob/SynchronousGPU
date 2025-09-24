@@ -10,18 +10,18 @@ import os
 last_t1 = None
 last_t2 = None
 last_t3 = None
-last_t4 = None
+
 st_id = 0
 dL1, dL2, dL3, dL4 = [], [], [], []                                              # SQL start index unless otherwise stated by the index tracker!
 
 
-def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
-    global last_t1, last_t2, last_t3, last_t4
+def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, fetch_no):
+    global last_t1, last_t2, last_t3
     """
     NOTE:
     """
     # idx = str(idx)                                    # convert Query Indexes to string concatenation
-    t1, t2, t3, t4 = daq.cursor(), daq.cursor(), daq.cursor(), daq.cursor()
+    t1, t2, t3 = daq.cursor(), daq.cursor(), daq.cursor()
 
     n2fetch = int(nGZ)
     group_step = int(grp_step)
@@ -102,33 +102,9 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
         time.sleep(2)
 
     t3.close()
-
     # ------------------------------------------------------------------------------------[]
-    try:
-        if last_t4 is None:
-            t4.execute('SELECT * FROM ' + str(T4) + ' ORDER BY cLayer ASC')  # WS
-        else:
-            t4.execute('SELECT * FROM ' + str(T4) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_t4)
 
-        data4 = t4.fetchmany(n2fetch)
-
-        # --------------- Re-assemble into dynamic buffer -----
-        if len(data4) != 0:
-            for result in data4:
-                result = list(result)
-                dL4.append(result)
-            last_t4 = data4[-1].id_col
-        else:
-            print('[WS] Process EOF reached...')
-            time.sleep(300)
-
-    except Exception as e:
-        print("[WS] Ramp Count Data trickling...")  # , e)
-        time.sleep(2)
-
-    t4.close()
-    # -----------------
-    return dL1, dL2, dL3, dL4
+    return dL1, dL2, dL3
 # -------------------------------------------------------------------------------------------------------------[XXXXXXX]
 
 

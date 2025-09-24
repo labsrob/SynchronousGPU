@@ -42,31 +42,31 @@ machineCode_Data = [40960, 40992, 41008, 41040, 41072, 41088, 43392, 43408, 4505
 					45600, 45648, 45712, 45872, 45968, 46160, 46176, 46384, 46464, 46592, 47488, 47504, 49152, 49200,
 					49216, 49232, 49280, 49296, 49424, 49440, 49488, 49504, 49520, 49536, 49664, 51584, 51600, 53248,
 					53280, 53328, 53376, 53392, 53648, 53792, 53824, 53840, 53872, 53888, 53904, 54032, 54048, 54064,
-					54080, 55680, 55696, 57344, 57360, 57408, 57424, 57488, 57600, 57616, 57648, 59776, 59792]
+					54080, 55680, 55696, 57344, 57360, 57408, 57424, 57488, 57600, 57616, 57648, 59776, 59792, 49728]
 
 codeDescript = ["StandBy State, Call Engineers ...", "Production Mode Confirmed", "Selecting Initial Direction",
 				"Operator Confirming Pipe Load Procedure", "Operator Confirming Pipe Parameters",
 				"Loading Pipe Parameter", "Startup Completed", "Unknown State!", "StandBy State...",
 				"Running Pipe Param Algorithm", "Setting Production Mode", "Initiating Pipe Reversal Sequence",
-				"Activating Chuks System", "Activating Pipe Reversal Mode", "Pipe in Reversing Motion…",
-				"Activating Hafner Change Procedure", "Hafner Replacement Procedure Completed", "Adjusting Pipe Position",
+				"Activating Chucks System", "Activating Pipe Reversal Mode", "Pipe in Reversing Motion…",
+				"Activating Haffner Change Procedure", "Haffner Replacement Procedure Completed", "Adjusting Pipe Position",
 				"Setting Polarised Camera to Position", "Setting Tape Feed to Start Position",
 				"Setting Laser Angle to Start Position", "Moving to Tape Tracking Referenced Positions",
 				"Moving Rings to Start Positions", "System Getting Ready", "System in Ready State …", "Unknown State!",
-				"StandBy State...", "Retracking Shrinkage Encoders", "Activating Tape Laying System", "Checking Tape Present",
-				"Feeding Tape under Rollers", "Setting Rollers Down ...", "Activating Lasers...", "Activating Autoweld...",
+				"StandBy State...", "Re-tracking Shrinkage Encoders", "Activating Tape Laying System", "Checking Tape Present",
+				"Feeding Tape under Rollers", "Setting Rollers Down ...", "Activating Lasers...", "Activating Auto-weld...",
 				"Starting Tape Wind…", "Soft Stop Induced by Laser System", "Soft Stop Induced by Subsystem",
-				"E-Stop OR Fault Activated Stop", "End of Tape Winding Procedure", "Pipe Runing Algorithm Completed",
-				"Unknown State!", "StandBy State...", "Activationg Stop Recovery...", "Activating Hafner Replacement Procedure",
-				"Positioning Rings for Hafner Replacement", "Hafner Replacement Procedure Completed", "Retracting Shrinkage Encoders",
-				"Moving to Tails Removal Position", "Acknowledging Tails Removeal Procedure", "Activating Camera Alignment Recovery",
-				"Moving to Tape Tracking Ref Postions", "Referencing Tape Tracking Cameras", "Implementing Tape Tracking Recovery",
+				"E-Stop OR Fault Activated Stop", "End of Tape Winding Procedure", "Pipe Running Algorithm Completed",
+				"Unknown State!", "StandBy State...", "Activation Stop Recovery...", "Activating Haffner Replacement Procedure",
+				"Positioning Rings for Haffner Replacement", "Haffner Replacement Procedure Completed", "Retracting Shrinkage Encoders",
+				"Moving to Tails Removal Position", "Acknowledging Tails Removal Procedure", "Activating Camera Alignment Recovery",
+				"Moving to Tape Tracking Ref Positions", "Referencing Tape Tracking Cameras", "Implementing Tape Tracking Recovery",
 				"Moving to Recovery Start Positions", "Activating Shrinkage Encoder After Recovery",
-				"Moving Tape Feed to Sart Postions", "Moving Laser Angles to Start Postions",
+				"Moving Tape Feed to Start Positions", "Moving Laser Angles to Start Positions",
 				"Recovery Procedure Executed Successfully", "Unknown State!", "StandBy State...", "Pipe Unloading Procedure Started",
-				"Positioning Rings for Hafner Replacement", "Hafner Replacement Completed", "Retracting KEYENCE Arms..",
+				"Positioning Rings for Haffner Replacement", "Haffner Replacement Completed", "Retracting KEYENCE Arms..",
 				"Retracting Shrinkage Encoders...", "Executing Pipe Release Procedure..", "Executing Pipe UNLOAD Procedure…",
-				"Pipe Build Completion Successful", "Unknown State!"]
+				"Pipe Build Completion Successful", "Unknown State!", "End of Pipe Layer"]
 
 # -------------------------------------------------------------------------------------[]
 db_number = 89
@@ -174,6 +174,9 @@ def liveProductionRdy():
 		try:
 			sysidl = xp.readBool(db_number, s_offset[0], b_offset[1])  # System idling
 			sysrdy = xp.readBool(db_number, s_offset[0], b_offset[2])  # System Ready
+			sysRun = xp.readBool(db_number, s_offset[0], b_offset[0])  # System is runing
+			# won_NO = xp.readBool(db_number, s_offset[4], b_offset[0])  # Work Order Number
+			# msctcp = xp.readInteger(db_number, s_offset[2], b_offset[0])  # Machine State Code (msc)
 
 		except Exception as err:
 			print(f"Exception Error: '{err}'")
@@ -183,14 +186,15 @@ def liveProductionRdy():
 	else:
 		sysidl = False
 		sysrdy = False
+		won_NO = False
+		msctcp = False
 		print('Sorry, PLC Host not responding, retry within seconds..')
-	return sysidl, sysrdy
+	return sysidl, sysrdy, sysRun #, won_NO, msctcp
 
 
 def watchDogController():
 	# global c
 
-	# Allow connection once unless connection drops out -----
 	if not xp.connectPLC:
 		connectPLC = xp.connectM2M()
 		print('M2M Connection Established:', connectPLC)
@@ -208,7 +212,7 @@ def watchDogController():
 	rngFOR = xp.readBool(db_number, s_offset[0], b_offset[6])  # Ring 4 is ready
 	# -------------------------------------------------------
 	msctcp = xp.readInteger(db_number, s_offset[2], b_offset[0])  # Machine State Code (msc)
-	won_NO = xp.readBool(db_number, s_offset[4], b_offset[0])  # Work Order Number
+	won_NO = xp.readString(db_number, s_offset[4], b_offset[0])  # Work Order Number
 	prodTA = xp.readBool(db_number, s_offset[260], b_offset[0])  # Active DNV Process
 	prodTB = xp.readBool(db_number, s_offset[261], b_offset[1])  # Active MGM Process
 	# -------------------------------------------------------
@@ -974,6 +978,7 @@ def dScreen():
 	root.wm_attributes("-transparentcolor", "gray99")
 	root.bind("<Motion>", toSplash)    # Mouse action to Splash Screen
 	root.bind("<Escape>", toSplash)    # Code from watchdog to Visualisation
+
 	if sysrdy:
 		toProcess()						# Exit to auto Processing
 	else:

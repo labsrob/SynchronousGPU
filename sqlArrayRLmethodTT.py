@@ -40,6 +40,7 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
             for result in data1:
                 result = list(result)
                 dL1.append(result)
+            print('\nTP1:', dL1)
             last_t1 = data1[-1].tStamp
         else:
             print('[TT_1] Process EOF reached...')
@@ -66,6 +67,7 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
             for result in data2:
                 result = list(result)
                 dL2.append(result)
+            print('\nTP2:', dL2)
             last_t2 = data2[-1].tStamp
         else:
             print('[TT_2] Process EOF reached...')
