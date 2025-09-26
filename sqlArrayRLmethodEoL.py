@@ -26,12 +26,47 @@ st_id  = 0                                               # SQL start index unles
 eol_sr = 0.5
 # ------------ PDF Generator Method ---------------------------------------------------------
 
+def rpt_SQLconnect():
+    """
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    # ---------------------------------------------------------#
+    if conn == None:
+        print('\n[EoL] Connecting to SQL server...')
 
-def dnv_sqlExec(tempo, T1, T2, T3, T4, T5, layerNo):
+        try:
+            conn = pyodbc.connect('Driver={SQL Server};'
+                                  'Server=' + server_IP + ';'
+                                  'Database=' + db_ref + ';'
+                                  'Encrypt=' + Encrypt + ';'
+                                  'TrustServerCertificate=' + Certify + ';'
+                                  'uid=' + isAtho + ';'
+                                  'pwd=' + yekref + ';'
+                                  'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+            # conn = True
+            print('\n[EoL] SQL Server connection active!\n')
+            return conn
+
+        except Exception as err:
+            print('\n[EoL] Connection issue: SQL Server is inaccessible!')
+
+    return None
+
+
+def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
     """
     NOTE:
     """
-    # tempo = rpt_SQLconnect()
+    # Provide critical and robust connection for End of Layer report
+    if sq_con is None:
+        tempo = rpt_SQLconnect()
+    else:
+        tempo = sq_con
+    # --------------------------------------
     t1, t2 = tempo.cursor(), tempo.cursor()
     t3, t4 = tempo.cursor(), tempo.cursor()
     t5 = tempo.cursor()
@@ -133,7 +168,7 @@ def dnv_sqlExec(tempo, T1, T2, T3, T4, T5, layerNo):
     t4.close()
 
     # Pipe Properties Profile ------------------------------------------------------------------------------------------[D]
-    dataPP = t4.execute('Select * FROM ' + str(T5) + ' where [cLyr] = '+ str(layerNo)).fetchall()
+    dataPP = t5.execute('Select * FROM ' + str(T5) + ' where [cLyr] = '+ str(layerNo)).fetchall()
     if len(dataPP) != 0:
         for result in dataPP:
             result = list(result)

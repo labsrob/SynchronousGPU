@@ -877,7 +877,7 @@ def layerProcess(cLayerN=None):
 def get_data(layerN):
     global rpData, pdf_genA, ol_con
 
-    pdf_genA = True
+    pdf_genA, sq_con = True, None
     layrN = layerN
     # ---------- Based on Group's URS ------------------#
     if pRecipe == 'DNV':
@@ -899,10 +899,10 @@ def get_data(layerN):
     # Initialise SQL Data connection per listed Table --------------------[]
     progressB.start()
     print("Retrieving data for Layer#:", layrN, ' please wait...')
-    if not ol_con:
+    if sq_con is None:
         sq_con = sq.rpt_SQLconnect()
     else:
-        sq_con = ol_con     # Copy to sq_con but dont close conn. Only close the cursor()
+        sq_con = viz_con
     # ------------------------------#
     if sq_con:
         time.sleep(2)
@@ -1453,21 +1453,26 @@ def menuExit():
 
 # ------------------------------------------------------------------------------------[ MAIN PROGRAM ]
 
-def tabbed_cascadeMode(cMode, cType):
+def tabbed_cascadeMode(pWON, cType):
     global p1, p2, p3, p4, p5, p6, p7, hostConn, pRecipe, pMode
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
+    
+    cType = DNV / MGM
+    pMode = Auto / Manual 
     """
 
-    if cMode == 1:
+    if uCalling == 1:
         print('Connecting to PLC Host...')
-    elif cMode == 2:
+        pMode = 'Auto Triggered RT Live Procedure'
+    elif uCalling == 2:
         print('Connecting to SQL Server...')
+        pMode = 'Operator Triggered PPA Procedure'
     else:
         print('Standby/Maintenance Mode...')
     # Specify production type -----------[DNV/MGM]
-    pMode = cMode
+
     pRecipe = cType
     print('Loading ' + pRecipe + ' Production Data...\n')
 
@@ -1486,7 +1491,7 @@ def tabbed_cascadeMode(cMode, cType):
 
     # Load class object from Cascade Switcher Method -----------[x]
     import CascadeSwitcher as cs
-    p1, p2, p3, p4, p5, p6, p7, p8 = cs.myMain(pMode, pRecipe)   # runtimeType, process RecipeType
+    p1, p2, p3, p4, p5, p6, p7, p8 = cs.myMain(pMode, pWON, pRecipe)   # runtimeType, process RecipeType
     # ----------------------------------------------------------[]
 
     # Set up embedding notebook (tabs) ------------------------[B]
@@ -1522,10 +1527,14 @@ def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[T
         cMode = 'Real-time Live'
         print('Locating PLC Host...')
     elif cMode == 2:
+        cMode = 'Semi Automatic'
+        print('Connecting to PLC-SQL Server...')
+    elif cMode == 3:
         cMode = 'Post Processing'
         print('Connecting to SQL Server...')
     else:
         print('Standby/Maintenance Mode')
+
     # Specify production type -----------[DNV/MGM]
     pMode = cMode       # 1=PLC, 2=SQL
     pRecipe = cType     # DNV/MGM
@@ -1850,63 +1859,67 @@ class collectiveEoL(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
         self.loadEoL = False
         self.toggle_state = True
-        self.createEoLViz()
+        # self.createEoLViz()
+        print('Decode', pMode, UseSQL_DBS, UsePLC_DBS)
 
-        # Button-------
-    #     if not UseSQL_DBS and not sysRun and msctcp == 49728:
-    #         self.enViz = ttk.Button(self, text="Open EoL Static Report", command=self.toggle)
-    #         self.enViz.pack(padx=1220, pady=1)
-    #     elif UseSQL_DBS:
-    #         self.enViz = ttk.Button(self, text="Open EoL Static Report", command=self.toggle)
-    #         self.enViz.pack(padx=1220, pady=1)
-    #     else:
-    #         self.enViz = ttk.Button(self, text="Open EoL Static Report", command=self.catch_virtue)
-    #         self.enViz.pack(padx=1220, pady=1)
-    #     # # ------------------------ End of Layer Static Data Call/Stop Call ------------------[]
+        # Button-------Trigger --------------
+        if uCalling == 1:  # TCP01 Process Triggered msctcp == 49728:
+            self.createEoLViz()
+            self.running = True
+
+        elif uCalling == 2:
+            self.enViz = ttk.Button(self, text="Open EoL Static Report", command=self.toggle)
+            self.enViz.pack(padx=1220, pady=1)
+        else:
+            self.enViz = ttk.Button(self, text="Open EoL Static Report", command=self.catch_virtue)
+            self.enViz.pack(padx=1220, pady=1)
+        # # ------------------------ End of Layer Static Data Call/Stop Call ------------------[]
     #
-    # def toggle(self):
-    #     if self.toggle_state:
-    #         self.enableEoLReport()
-    #         self.enViz.config(text="Close EoL Visualisation")
-    #     else:
-    #         self.closeOutEoL()
-    #         self.enViz.config(text="Open EoL Static Report")
-    #     self.toggle_state = not self.toggle_state
-    #
-    # def enableEoLReport(self):  # Only on Post production ----------------[]
-    #     global eol
-    #
-    #     self.running = True
-    #     self.canvas = True
-    #     if not self.loadEoL:
-    #         self.loadEoL = True
-    #         eol = threading.Thread(target=self.createEoLViz, daemon=True)
-    #         eol.start()
-    #     print('[EoL Viz] is now running....')
-    #     self.acknEoLOpened()
-    #
-    # def closeOutEoL(self):
-    #     global eol
-    #
-    #     self.loadEoL = False
-    #     self.running = False
-    #     if self.canvas:
-    #         print('User requested for cancellation, please wait...')
-    #         self.canvas.get_tk_widget().destroy()
-    #         self.toolbar.destroy()
-    #         label.destroy()
-    #         self.canvas = None
-    #         print('[EoL] report viz is now closed!')
-    #     # eol.terminate() # not required since the process is daemon set!
-    #     eol.join()
-    #     self.acknEoLClosed()
+    def toggle(self):
+        if self.toggle_state:
+            self.enableEoLReport()
+            self.enViz.config(text="Close EoL Visualisation")
+        else:
+            self.closeOutEoL()
+            self.enViz.config(text="Open EoL Static Report")
+        self.toggle_state = not self.toggle_state
+
+    def enableEoLReport(self):  # Only on Post production ----------------[]
+        global eol
+
+        self.running = True
+        self.canvas = True
+        if not self.loadEoL:
+            self.loadEoL = True
+            eol = threading.Thread(target=self.createEoLViz, daemon=True)
+            eol.start()
+        print('[EoL Viz] is now running....')
+        self.acknEoLOpened()
+
+    def closeOutEoL(self):
+        global eol
+
+        self.loadEoL = False
+        self.running = False
+        if self.canvas:
+            print('User requested for cancellation, please wait...')
+            self.canvas.get_tk_widget().destroy()
+            self.toolbar.destroy()
+            label.destroy()
+            self.canvas = None
+            print('[EoL] report viz is now closed!')
+        # eol.terminate() # not required since the process is daemon set!
+        eol.join()
+        self.acknEoLClosed()
 
 
     def catch_virtue(self):
-        messagebox.showinfo("Patient!:", "End of Layer report is at EoL!")
+        messagebox.showinfo("Patient!:", "End of Layer report is unpacking!")
+        time.sleep(5)
+        self.toggle()
 
     def acknEoLOpened(self):
         messagebox.showinfo("EoL:", "End of Layer successfully loaded!")
@@ -2287,7 +2300,7 @@ class collectiveEoL(ttk.Frame):
         # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------------#
 
     def dataControlEoL(self):
-        global layerN, msctcp, sysRun, batch_EoL
+        global layerN, msctcp, sysRun, batch_EoL, viz_con
 
         batch_EoL = 1
         s_fetch, stp_Sz = 100, 1  # 100 data points per Pipe's meter length
@@ -8402,51 +8415,69 @@ class cascadeCommonViewsRPT(ttk.Frame):                                # End of 
 # qType = 0   # default play mode
 
 
-def userMenu(uCalled, WON, pMode=None):     # listener, myplash
+def userMenu(uCalled, WON, vMode=None):     # listener, myplash
     print('\nWelcome to Magma Synchronous SPC!')
-    global sqlRO, metRO, HeadA, HeadB, vTFM, comboL, comboR, qType, uCalling, pWON, root, cLayerN, sysRun, sysidl, sysrdy, pRecipe, msc_rt, piPos
+    global sqlRO, metRO, HeadA, HeadB, vTFM, comboL, comboR, qType, uCalling, pWON, root, cLayerN, \
+        sysRun, sysidl, sysrdy, pRecipe, msc_rt, piPos, UsePLC_DBS, UseSQL_DBS
 
     uCalling = uCalled
     # ---- retrieve WON from called Method -----------------------------[]
+    """
+    uCalled = 1 (PLC Trigger)
+    uCalled = 2 (SQL Trigger)
+    uCalled = 3 (Operator launched)
+    # -----------------------------
+    vMode = 1 (Cascade View)
+    vMode = 2 (Tabbed View)
+    
+    """
+
     if uCalling == 1:       # Process Call Procedure
-        print('Automatic process call procedure...\n')
+        print('Automatic Process Call Procedure...\n')
         sysRun, sysidl, sysrdy, msc_rt, cLyr, piPos, mStatus = wd.autoPausePlay()
         cLayerN = cLyr          # default layer number
         pWON = WON
 
-        if len(pWON) == 8 and pMode == 0:
+        if len(pWON) == 8:
             import qParamsHL_DNV as dnv
+            print('processing DNV parameters...\n')
             pRecipe = 'DNV'
-            # ---------------------------------------
-            if 1 <= aSCR <= 3:
-                tabbed_canvas(1, 'DNV')         # automatically chose tabb view for DNV
-            elif 4 <= aSCR <= 8:
-                tabbed_cascadeMode(2, 'DNV')    # automatically chose cascade view for DNV
+            UsePLC_DBS = True
+
+            # --------- based on Hardware Screen -----
+            if 1 <= aSCR <= 3 and vMode == 2:           # allow Tabbed visualisation
+                tabbed_canvas(pWON, 'DNV')       # on DNV
+            elif 4 <= aSCR <= 8 and vMode == 1:         # allow cascade view
+                tabbed_cascadeMode(pWON, 'DNV')  # automatically chose cascade view for DNV
             else:
                 pass
-        elif len(pWON) >= 8 and pMode == 1:
+
+        elif len(pWON) >= 8:                            # allow cascade view on MGM
             import qParamsHL_MGM as mgm
             print('processing MGM parameters...\n')
             pRecipe = 'MGM'
+
             # ---------------------------------------
-            if 1 <= aSCR <= 6:
-                tabbed_canvas(1, 'MGM')         # automatically chose tabb view for MGM
-            elif 7 <= aSCR <= 10:
-                tabbed_cascadeMode(2, 'MGM')    # automatically chose cascade view for MGM
+            if 1 <= aSCR <= 6 and vMode == 2:
+                tabbed_canvas(pWON, 'MGM')         # automatically chose tabb view for MGM
+            elif 7 <= aSCR <= 10 and vMode == 1:
+                tabbed_cascadeMode(pWON, 'MGM')    # automatically chose cascade view for MGM
             else:
                 pass
 
     elif uCalling == 2:     # User GUI Call Procedure
-        print('Loading GUI Automatic Protocol..')
+        print('Loading GUI Semi-Automatic Procedure..')
+        UseSQL_DBS = True
+
         if WON != 0:
             pWON = WON
         else:
             today = date.today()
             pWON = today.strftime("%Y%m%d")
 
-        if len(pWON) == 8 and pMode == 0:
+        if len(pWON) == 8:
             print('\nRequesting for DNV Procedure...')
-        elif len(pWON) >= 8 and pMode == 1:
+        elif len(pWON) >= 8:
             print('\nRequesting for MGM Procedure...')
         else:
             print('Invalid command sequence')
@@ -8460,24 +8491,24 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
         sysidl = 'NA'
         sysRun = 'NA'
         load_Stats_Params(pWON)
-        # print('Recipe Type:', pRecipe)
 
     elif uCalling == 3:     # uCalling == 3, Manual Call Procedure
-        print('Loading GUI Manual Protocol...')
+        print('Service Call Procedure..')
+        UseSQL_DBS = True
+
         if WON != 0:
             pWON = WON
         else:
             today = date.today()
             pWON = today.strftime("%Y%m%d")
         # -----------------------------------
-        if len(pWON) == 8 and pMode == 0:
-            print('\nRequesting for DNV Procedure...')
-        elif len(pWON) >= 8 and pMode == 0:
-            print('\nRequesting for MGM Procedure...')
+        if len(pWON) == 8:
+            print('\nRequesting for Service...')
+        elif len(pWON) >= 8:
+            print('\nRequesting for Service...')
         else:
             print('Invalid command sequence')
             exit('Exiting...')
-
         mStatus = 'NA'
         piPos = 'N/A in offline mode.'
         cLayerN = 0          # assumed layer number
@@ -8486,7 +8517,7 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
         sysidl = 'NA'
         sysRun = 'NA'
         load_Stats_Params(pWON)
-        # print('\nRecipe Type:', pRecipe)
+
     else:
         print('Sorry, invalid process specified...')
         exit('Exiting')
@@ -10631,4 +10662,4 @@ def userMenu(uCalled, WON, pMode=None):     # listener, myplash
 #    userMenu()
 # Calling: [Manual call = 0, Process Auto Call = 1, Auto GUI Call = 2] -----------#
 # userMenu(0, 1) # Auto Process call
-userMenu(3, '20250923', 0)
+userMenu(3, '20250923', 2)
