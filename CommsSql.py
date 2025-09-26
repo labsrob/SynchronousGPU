@@ -782,3 +782,32 @@ def ensure_connection(conn):
         return # DAQ_connect()
 
 # --------------------------------------------------------------------------------
+def rpt_SQLconnect():
+    """
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    # ---------------------------------------------------------#
+    if conn == None:
+        print('\n[EoL] Connecting to SQL server...')
+
+        try:
+            conn = pyodbc.connect('Driver={SQL Server};'
+                                  'Server=' + server_IP + ';'
+                                  'Database=' + db_ref + ';'
+                                  'Encrypt=' + Encrypt + ';'
+                                  'TrustServerCertificate=' + Certify + ';'
+                                  'uid=' + isAtho + ';'
+                                  'pwd=' + yekref + ';'
+                                  'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+            # conn = True
+            print('\n[EoL] SQL Server connection active!\n')
+            return conn
+
+        except Exception as err:
+            print('\n[EoL] Connection issue: SQL Server is inaccessible!')
+
+    return None
