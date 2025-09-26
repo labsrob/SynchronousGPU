@@ -673,7 +673,7 @@ def sql_connectRC():
 
 
 # ----------------------------------------------------------------------------
-def DAQ_connect():
+def eolViz_connect():
     """
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
@@ -683,7 +683,7 @@ def DAQ_connect():
     conn = None
     # ---------------------------------------------------------#
     if conn == None:
-        print('\n[EoL] Connecting to SQL server...')
+        print('\n[EoL Viz] Connecting to SQL server...')
 
         try:
             conn = pyodbc.connect('Driver={SQL Server};'
@@ -695,16 +695,80 @@ def DAQ_connect():
                                   'pwd=' + yekref + ';'
                                   'MultipleActiveResultSets=True', timeout=5, autocommit=True)
             # conn = True
-            print('\n[EoL] SQL Server connection active!\n')
+            print('\n[EoL Viz] SQL Server connection active!\n')
             return conn
 
         except Exception as err:
             errorLog(str(err))                      # Log the error in txt file
             errorConnect()
-            print('\n[EoL] Connection issue: SQL Server is inaccessible!')
+            print('\n[EoL Viz] Connection issue: SQL Server is inaccessible!')
 
         return None
 
+# ----------------------------------------------------------------------------
+def eolRPT_connect():
+    """
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    # ---------------------------------------------------------#
+    if conn == None:
+        print('\n[EoL RPT] Connecting to SQL server...')
+
+        try:
+            conn = pyodbc.connect('Driver={SQL Server};'
+                                  'Server=' + server_IP + ';'
+                                  'Database=' + db_ref + ';'
+                                  'Encrypt=' + Encrypt + ';'
+                                  'TrustServerCertificate=' + Certify + ';'
+                                  'uid=' + isAtho + ';'
+                                  'pwd=' + yekref + ';'
+                                  'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+            # conn = True
+            print('\n[EoL RPT] SQL Server connection active!\n')
+            return conn
+
+        except Exception as err:
+            errorLog(str(err))                      # Log the error in txt file
+            errorConnect()
+            print('\n[EoL RPT] Connection issue: SQL Server is inaccessible!')
+
+        return None
+
+def wonFinder_connect():
+    """
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    # ---------------------------------------------------------#
+    if conn == None:
+        print('\n[WON Finder] Connecting to SQL server...')
+
+        try:
+            conn = pyodbc.connect('Driver={SQL Server};'
+                                  'Server=' + server_IP + ';'
+                                  'Database=' + db_ref + ';'
+                                  'Encrypt=' + Encrypt + ';'
+                                  'TrustServerCertificate=' + Certify + ';'
+                                  'uid=' + isAtho + ';'
+                                  'pwd=' + yekref + ';'
+                                  'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+            # conn = True
+            print('\n[WON Finder] SQL Server connection active!\n')
+            return conn
+
+        except Exception as err:
+            errorLog(str(err))                      # Log the error in txt file
+            errorConnect()
+            print('\n[WON Finder] Connection issue: SQL Server is inaccessible!')
+
+        return None
 
 def ensure_connection(conn):
     """Check if connection is alive, reconnect if needed."""
@@ -715,6 +779,6 @@ def ensure_connection(conn):
         return conn
     except Exception:
         print("Reconnecting...")
-        return DAQ_connect()
+        return # DAQ_connect()
 
 # --------------------------------------------------------------------------------

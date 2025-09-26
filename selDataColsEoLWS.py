@@ -8,12 +8,12 @@ Check SQL data columns ...
 """
 
 
-def validCols(pParam, pWON=None):
+def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'ZWS_' + pWON:      # EOL_WS is so named as ZWS
+    if pParam[0:4] == 'ZWS_':      # EOL_WS is so named as ZWS
         columns = [ # Tape Temperature --------------[]
-                   'LyID', 'R1SP', 'R1NV', 'R2SP',
-                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
+                   'id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']
     else:
         columns = 0
         print('Invalid Columns or Query error...')

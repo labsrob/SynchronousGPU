@@ -86,10 +86,10 @@ def successNote():
 def check_PLC_Status():
 	if conPlc:
 		active_conn = 'True'
+		successNote()
 	else:
 		active_conn = 'False'
-		# connectM2M(1, 2)
-
+		errorLog(err)
 	return active_conn
 
 
@@ -105,41 +105,36 @@ def disconnct_PLC():
 
 def connectM2M(maxAttempts, waitAttempts):
 	global conPlc, pCon, err
-	retry = 0
 
+	retry = 0
 	while not conPlc and retry < 2:
 		sleep(2)		# Pause for connection to be through
-		# continuously try to connect to PLC or set trial times using while loop
-		# if not plc.get_connected() or plc.get_cpu_state() == 'S7CpuStatusUnknown':
-		try:
-			# ------------------------------------------------------------------------------
-			print('\nChecking active connectivity to OPC-UA Host... ')
-			pCon.connect(TCP01_IP, RACK, SLOT)  	# Details of TCP/IP Connection (from HW settings)
-			# set connectPLC bit to high/low for future uses----
 
-		except Exception as err:
-			connectPLC = False
-			print(f"Error: '{err}'")
-			errorLog(f"{err}")
-			sleep(.5)
-		else:
-			if pCon.get_connected() and pCon.get_cpu_state() != 'S7CpuStatusUnknown':
-				conPlc = True
-				# print('Connection state is:', connectPLC)
-				successNote()
-				print("\nM2M link established")
+		if not pCon.get_connected() or pCon.get_cpu_state() == 'S7CpuStatusUnknown':
+			try:
+				# -----------------------------------0-------------------------------------------
+				print('\nChecking active connectivity to OPC-UA Host... ')
+				pCon.connect(TCP01_IP, RACK, SLOT)  	# Details of TCP/IP Connection (from HW settings)
+
+			except Exception as err:
+				print(f"Error: '{err}'")
+				errorLog(f"{err}")
+				sleep(.5)
+
 			else:
-				pCon.disconnect()        # destroy()	/ safe function
-				conPlc = False		# set bit to low
-				errorLog('Issues with M2M Connection')
-				print('Issues with M2M connection, try again later..')
-		retry += 1
-		# print('TP01', conPlc)
+				if pCon.get_connected() and pCon.get_cpu_state() != 'S7CpuStatusUnknown':
+					conPlc = True
+					successNote()
+					print("\nM2M link established")
+				else:
+					pCon.disconnect()        	# destroy()	/ safe function
+					conPlc = False				# set bit to low
+					errorLog('Issues with M2M Connection')
+					print('Issues with M2M connection, try again later..')
+			retry += 1
 
 	return conPlc
-# ===================================================================== #
-# establish PLC connection -----
-# connectM2M()
+# ========================================================================================================#
 
 
 def readBool(db_number, start_offset, bit_offset):
@@ -159,27 +154,23 @@ def readReal(db_number, start_offset, bit_offset):
 def readInteger(db_number, start_offset, bit_offset):
 	reading = pCon.db_read(db_number, start_offset, r_length)
 	a = snap7.util.get_int(reading, 0)
-	# print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
+	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
 	return a
 
 
 def readString(db_number, start_offset, bit_offset):
-	r_length = 16
+	r_length = 2 # 16
 	reading = pCon.db_read(db_number, start_offset, r_length)
 	a = snap7.util.get_string(reading, 0)
 	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
 	return a
 
-# ----------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------[]
 def writeBool(db_number, start_offset, bit_offset, value):
 	bArray = pCon.db_read(db_number, start_offset, b_length)    		# (db, start offset, [b_length = read 1 byte])
 	snap7.util.set_bool(bArray, 0, bit_offset, value)    			# (value 1= true;0=false)
 	pCon.db_write(db_number, start_offset, bArray)       			# write back the bytearray
 	return 	# None
-
-
-# Write TrigValues for: R1H1/R1H2/R1H3/R1H4 | R2H1/R2H2/R2H3/R2H4 | R3H1/R3H2/R3H3/R3H4 | R4H1/R4H2/R4H3/R4H4 ---[]
-# -----------------------------------------------------------------------------------------------------------------
 
 def writeReal(db_number, start_offset, r_data):
 	# reading = plc.db_read(db_number, start_offset, r_length)
@@ -197,8 +188,6 @@ def writeInteger(db_number, start_offset, r_data):
 
 
 # Arrays: Read once, write into SPC INI config -----------------------------------------------------------------[]
-# Obtain SCADA user metrics from PLC and save into config.ini
-# This functions runs after it's launched by a remote SCADA operator ---
 
 
 class spcMetricsModule(object):
@@ -1041,3 +1030,4 @@ def paramDataRequest(pREQ, nGZ, grp_step, fetch_no):
 			print(f"\nLoad Interval: {timef - timei} sec\n", 'Fetch No:', fetch_no)
 
 	return array2D
+

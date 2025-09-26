@@ -8,12 +8,12 @@ Pll production procedure relies on Word Order Number - Pssuming a Unique identit
 Puthor: Dr Robert Labs
 """
 # Variables required here: The aggregated plots for monitoring process variables
-# Separate EoL parameter because they could use different sampling regime
+
 
 def loadProcesValues(df1):
-    rpTT = [ # ------ Tape Temperature --------------------------------#
-            df1['id_col'], df1['cLyr'], df1['R1SP'], df1['R1NV'],
-            df1['R2SP'], df1['R2NV'], df1['R3SP'],
-            df1['R3NV'], df1['R4SP'], df1['R4NV']]
+    vizEoL = [ # ------ Substrate Temp ------------------------------------------#
+              df1['id_col'], df1['cLyr'], df1['R1SP'], df1['R1NV'],
+              df1['R2SP'], df1['R2NV'], df1['R3SP'],
+              df1['R3NV'], df1['R4SP'], df1['R4NV']]
 
-    return rpTT
+    return vizEoL

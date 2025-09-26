@@ -9,10 +9,10 @@ Check SQL data columns ...
 
 
 def validCols(pParam):
-    if pParam[0:3] == 'ZTG_':
+    if pParam[0:4] == 'ZTG_':
         columns = [# Tape Temperature --------------[]
-                  'LyID', 'R1SP', 'R1NV', 'R2SP',
-                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
+                  'id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']
 
     else:
         columns = 0

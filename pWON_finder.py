@@ -54,7 +54,7 @@ def errornotFoundWON():
 def srcforOEE(MatchOEE):
 
     import CommsSql as sqlc
-    sql = sqlc.DAQ_connect()        # Execute connection
+    sql = sqlc.wonFinder_connect()        # Execute connection
     conn_oee = sql.cursor()         # Convert to cursor
 
 
@@ -85,7 +85,7 @@ def srcforOEE(MatchOEE):
             oeeID = gOEE
         else:
             # print('Complicated....:', gOEE)
-            validOEE = 'C'  # Complicated or multiple matching Tables
+            validOEE = 'C'                  # Complicated or multiple matching Tables
             oeeID = gOEE
 
     # ---------------------------------[]
@@ -93,6 +93,7 @@ def srcforOEE(MatchOEE):
 
 
 def srcTable(sD1, sD2, uWON):               # Post Production data search
+    global pWON
     # ----------------------#
     # Load SQL server library --------------#
     import CommsSql as s_con
@@ -101,8 +102,10 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
     EndSearchD = str(sD2)
 
     # Test connection readiness and clear any flags
-    sqlT = s_con.DAQ_connect()              # Execute connection
+    sqlT = s_con.wonFinder_connect()        # Execute connection
     conn = sqlT.cursor()                    # Convert to cursor
+    # --------------------------------------#
+    pWON = uWON
 
     # ----------------------------------- If Search was by Date String ----------------------[]
     if StaSearchD != '0' and EndSearchD != '0':               # If Date search
@@ -144,7 +147,7 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         derivedOEE = derivedWON
         # --------------------------------------------------#
 
-        if nTables != 0 and nTables <= 18:                   # Production file for DNV exist - OEE data
+        if nTables != 0 and nTables <= 19:                   # Production file for DNV exist - OEE data
             # List tables that meet this condition ---------[# schema_name	table_name	create_date]
             # mTables = conn_sq.execute(
             #     'SELECT name as table_name, create_date from '
@@ -172,16 +175,17 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             T12 = str(mTables[11][0])  # TT2_
             T13 = str(mTables[12][0])  # VC_
             T14 = str(mTables[13][0])  # VM_
-            T15 = str(mTables[13][0])  # ZST_
-            T16 = str(mTables[13][0])  # ZTG_
-            T17 = str(mTables[13][0])  # ZTT_
-            T18 = str(mTables[13][0])  # ZWS_
+            T15 = str(mTables[14][0])  # ZST_
+            T16 = str(mTables[15][0])  # ZTG_
+            T17 = str(mTables[16][0])  # ZTT_
+            T18 = str(mTables[17][0])  # ZWS_
+            T19 = str(mTables[18][0])
 
-            DNV_tables = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18]
+            DNV_tables = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19]
             for (i, item) in enumerate(DNV_tables, start=1):
                 print(i, item)
 
-        elif nTables > 18 and nTables <= 30:
+        elif nTables > 19 and nTables <= 30:
             # List tables that meet this condition ---------[# schema_name	table_name	create_date]
             # mTables = conn_sq.execute(
             #     'SELECT schema_name(schema_id) as schema_name, name as table_name, create_date from '
@@ -238,6 +242,7 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
 
     # ------------------------------------- If Search was by Work Order Number -----------------------[]
     elif uWON != 0 and StaSearchD == '0' and EndSearchD =='0':                        # WON is searched by WO# -------[]
+
         # print('Work Order Number Search...')
         pTables = conn.execute('Select count(*) AS ValidTotal from information_schema.Tables where '
                                      'TABLE_NAME like ' + "'" '%' + str(uWON) + '%' "'").fetchone()
@@ -268,12 +273,13 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             T12 = str(mTables[11][0])   # TT2_
             T13 = str(mTables[12][0])   # VC_
             T14 = str(mTables[13][0])   # VM_
-            T15 = str(mTables[13][0])  # ZST_
-            T16 = str(mTables[13][0])  # ZTG_
-            T17 = str(mTables[13][0])  # ZTT_
-            T18 = str(mTables[13][0])  # ZWS_
+            T15 = str(mTables[14][0])  # ZPP_
+            T16 = str(mTables[15][0])  # ZST_
+            T17 = str(mTables[16][0])  # ZTG_
+            T18 = str(mTables[17][0])  # ZTT_
+            T19 = str(mTables[18][0])  # ZWS_
             #
-            DNV_tables = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18]
+            DNV_tables = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19]
             for (i, item) in enumerate(DNV_tables, start=1):
                 print(i, item)
 

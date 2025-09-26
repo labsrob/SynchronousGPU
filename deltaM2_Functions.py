@@ -17,7 +17,7 @@ from time import sleep
 import os
 import psutil
 from datetime import datetime, date
-
+import snap7
 import CommsPlc as xp
 # ----------------------------------------------------------------[]
 sysrdy, sysidl, sysRun = 0, 1, 0
@@ -42,7 +42,8 @@ machineCode_Data = [40960, 40992, 41008, 41040, 41072, 41088, 43392, 43408, 4505
 					45600, 45648, 45712, 45872, 45968, 46160, 46176, 46384, 46464, 46592, 47488, 47504, 49152, 49200,
 					49216, 49232, 49280, 49296, 49424, 49440, 49488, 49504, 49520, 49536, 49664, 51584, 51600, 53248,
 					53280, 53328, 53376, 53392, 53648, 53792, 53824, 53840, 53872, 53888, 53904, 54032, 54048, 54064,
-					54080, 55680, 55696, 57344, 57360, 57408, 57424, 57488, 57600, 57616, 57648, 59776, 59792, 49728]
+					54080, 55680, 55696, 57344, 57360, 57408, 57424, 57488, 57600, 57616, 57648, 59776, 59792, 49728,
+					-18032, 0]
 
 codeDescript = ["StandBy State, Call Engineers ...", "Production Mode Confirmed", "Selecting Initial Direction",
 				"Operator Confirming Pipe Load Procedure", "Operator Confirming Pipe Parameters",
@@ -66,21 +67,66 @@ codeDescript = ["StandBy State, Call Engineers ...", "Production Mode Confirmed"
 				"Recovery Procedure Executed Successfully", "Unknown State!", "StandBy State...", "Pipe Unloading Procedure Started",
 				"Positioning Rings for Haffner Replacement", "Haffner Replacement Completed", "Retracting KEYENCE Arms..",
 				"Retracting Shrinkage Encoders...", "Executing Pipe Release Procedure..", "Executing Pipe UNLOAD Procedure…",
-				"Pipe Build Completion Successful", "Unknown State!", "End of Pipe Layer"]
+				"Pipe Build Completion Successful", "Unknown State!", "End of Pipe Layer", "Unknown State, ask the Operators",
+				"Unknown State Machine"]
 
 # -------------------------------------------------------------------------------------[]
-db_number = 89
-s_offset = [0, 874, 878, 880, 66, 360, 875, 876, 68, 882, 886, 890, 894, 2, 80, 898]
-b_offset = [0, 1, 2, 3, 4, 5, 6, 7]
+_Plc= snap7.client.Client()
+pCon = _Plc.connect('192.168.100.100', 0, 1)
+db_number, start_offset, bit_offset = 89, 0, 0
+# ---------------------------------OPC UA Details ---------------------------[Dr Labs, RB]
+value, data = True, False  			# 1 = true | 0 = false
+start_address = 0  					# starting address
+r_length = 4  						# double word (4 Bytes = 32 bit value) / 9dp precision
+r_length2 = 8						# Quadruple word (8 bytes = 64 bit value)/15dp precision
+b_length = 1  						# boolean size = 1 Byte
+r_data = 52.4
+initialise = 0
 
-start_offset = [898, 894]
-bit_offset = [0, 1]
-
+con_plc = False
 loadOnce = False
 inProgress = False
 timeA = time.time()  						# start timing the entire loop
-# -------------------------------------------------------------------------------------[]
 
+# -------------------------------------------------------------------------------------[]
+def readBool(db_number, start_offset, bit_offset):
+	reading = pCon.db_read(db_number, start_offset, b_length)
+	a = snap7.util.get_bool(reading, 0, bit_offset)
+	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
+	return a
+
+
+def readReal(db_number, start_offset, bit_offset):
+	reading = pCon.db_read(db_number, start_offset, r_length)
+	a = snap7.util.get_real(reading, 0)
+	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
+	return a
+
+
+def readLReal(db_number, start_offset, bit_offset):
+	reading = pCon.db_read(db_number, start_offset, r_length2)
+	a = snap7.util.get_real(reading, 0)
+	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
+	return a
+
+
+def readInteger(db_number, start_offset, bit_offset):
+	reading = pCon.db_read(db_number, start_offset, r_length)
+	a = snap7.util.get_int(reading, 0)
+	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
+	return a
+
+
+def readString(db_number, start_offset, bit_offset):
+	r_length = 2 # 16
+	reading = pCon.db_read(db_number, start_offset, r_length)
+	a = snap7.util.get_string(reading, 0)
+	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
+	return a
+
+# ---------------------------------------------------------------------------#
+
+# End of Library for M2M connectivity and PLC OPC UA Datablocks ------------#
 def errorLog(err):
 	fileName = datetime.now().strftime('WDELog '+"%Y-%m-%d")
 	event = datetime.now().strftime("%Y-%m-%d %H:%M.%S")
@@ -104,12 +150,12 @@ def autoPausePlay():
 	print('Checking SMC readiness...')
 	# while True:
 	try:
-		sysRun = xp.readBool(db_number, s_offset[0], b_offset[0])			# False/True
-		sysIdl = xp.readBool(db_number, s_offset[0], b_offset[1])  			# System idling
-		sysRdy = xp.readBool(db_number, s_offset[0], b_offset[2])  			# System Ready
-		mscTcp = xp.readInteger(db_number, s_offset[2], b_offset[0])   		# Machine State Code (msc)
-		cLayer = xp.readBool(db_number, s_offset[264], b_offset[0])  		# Current achieved layer
-		pipPos = xp.readBool(db_number, s_offset[436], b_offset[0])  		# Current achieved layer
+		sysRun = readBool(db_number, 0, 0)			# False/True
+		sysIdl = readBool(db_number, 0, 1)  			# System idling
+		sysRdy = readBool(db_number, 0, 2)  			# System Ready
+		mscTcp = readInteger(db_number, 2, 0)   		# Machine State Code (msc)
+		cLayer = readInteger(db_number, 264, 0)  		# Current achieved layer
+		pipPos = readReal(db_number, 436, 0)  		# Current achieved layer
 		# Obtain State machine code description ----------------------------#
 		rt_stat = dict(zip(machineCode_Data, codeDescript))
 
@@ -132,10 +178,11 @@ def autoPausePlay():
 def rt_autoPausePlay():
 	print('Checking SMC readiness...')
 	try:
-		sRun = xp.readBool(db_number, s_offset[0], b_offset[0])		# False/True
-		msc = xp.readInteger(db_number, s_offset[2], b_offset[0])   # Machine State Code (msc)
-		cLayr = xp.readInteger(db_number, s_offset[264], b_offset[0])
+		sRun = readBool(db_number, 0, 0)		# False/True
+		msc = readInteger(db_number, 2, 0)   # Machine State Code (msc)
+		cLayr = readInteger(db_number, 264,0)
 		rt_satus = dict(zip(machineCode_Data, codeDescript))
+
 	except Exception as err:
 		print(f"Exception Error: '{err}'")
 		errorLog(f"{err}")
@@ -167,65 +214,21 @@ def checkPLC():
 
 
 def liveProductionRdy():
-	# Allow connection once unless connection drops out -----
-	cPlc = xp.connectM2M(3, 2)
-	# ------- Obtain readiness from host PLC --------
-	if cPlc:
-		try:
-			sysidl = xp.readBool(db_number, s_offset[0], b_offset[1])  # System idling
-			sysrdy = xp.readBool(db_number, s_offset[0], b_offset[2])  # System Ready
-			sysRun = xp.readBool(db_number, s_offset[0], b_offset[0])  # System is runing
-			# won_NO = xp.readBool(db_number, s_offset[4], b_offset[0])  # Work Order Number
-			# msctcp = xp.readInteger(db_number, s_offset[2], b_offset[0])  # Machine State Code (msc)
+	# Take a peep into TCP01 activity ---------
+	try:
+		sysRun = readBool(db_number, 0, 0)  		# System is running
+		sysidl = readBool(db_number, 0, 1)  		# System idling
+		sysrdy = readBool(db_number, 0, 2)  		# System Ready
+		msctcp = readInteger(db_number, 2, 0)  	# Machine State Code (msc)
+		won_NO = readString(db_number, 4, 0)  	# Work Order Number
 
-		except Exception as err:
-			print(f"Exception Error: '{err}'")
-			errorLog(f"{err}")
-			sysidl = False
-			sysrdy = False
-	else:
+	except Exception as err:
+		print(f"Exception Error: '{err}'")
+		errorLog(f"{err}")
 		sysidl = False
 		sysrdy = False
-		won_NO = False
-		msctcp = False
-		print('Sorry, PLC Host not responding, retry within seconds..')
-	return sysidl, sysrdy, sysRun #, won_NO, msctcp
 
-
-def watchDogController():
-	# global c
-
-	if not xp.connectPLC:
-		connectPLC = xp.connectM2M()
-		print('M2M Connection Established:', connectPLC)
-
-	# if connectPLC:
-	print('\nChecking machine state at interval...')
-	# -------------------------------------------------------
-	sysRun = xp.readBool(db_number, s_offset[0], b_offset[0])  # System is runing
-	sysidl = xp.readBool(db_number, s_offset[0], b_offset[1])  # System idling
-	sysrdy = xp.readBool(db_number, s_offset[0], b_offset[2])  # System Ready
-	# ------------------------------------------------------
-	rngONE = xp.readBool(db_number, s_offset[0], b_offset[3])  # Ring 1 is ready
-	rngTWO = xp.readBool(db_number, s_offset[0], b_offset[4])  # Ring 2 is ready
-	rngTHR = xp.readBool(db_number, s_offset[0], b_offset[5])  # Ring 3 is ready
-	rngFOR = xp.readBool(db_number, s_offset[0], b_offset[6])  # Ring 4 is ready
-	# -------------------------------------------------------
-	msctcp = xp.readInteger(db_number, s_offset[2], b_offset[0])  # Machine State Code (msc)
-	won_NO = xp.readString(db_number, s_offset[4], b_offset[0])  # Work Order Number
-	prodTA = xp.readBool(db_number, s_offset[260], b_offset[0])  # Active DNV Process
-	prodTB = xp.readBool(db_number, s_offset[261], b_offset[1])  # Active MGM Process
-	# -------------------------------------------------------
-	tLayer = xp.readBool(db_number, s_offset[262], b_offset[0])  # Total required Layer
-	cLayer = xp.readBool(db_number, s_offset[264], b_offset[0])  # Current achieved layer
-	pipPos = xp.readBool(db_number, s_offset[436], b_offset[0])  # Current achieved layer
-	time.sleep(10)  # 10 seconds non-blocking interval
-
-	rt_satus = dict(zip(machineCode_Data, codeDescript))
-	msc_rt = rt_satus[msctcp]
-	print('\nTCP01 Status:', msc_rt)
-
-	return sysRun, sysidl, sysrdy, rngONE, rngTWO, rngTHR, rngFOR, won_NO, prodTA, prodTB, tLayer, cLayer, pipPos, msctcp
+	return sysRun, sysidl, sysrdy, msctcp, won_NO
 
 
 def autoLaunchViz():			# obtain required variables for playing visualization
@@ -247,21 +250,19 @@ def autoLaunchViz():			# obtain required variables for playing visualization
 		print('Loading runtime variables...\n')
 
 		# Allow connection once unless connection drops out -----
-		if not xp.connectPLC:
-			connectPLC = xp.connectM2M()
-			print('Auto-Launch: M2M Connection Established:', connectPLC)
+		if not con_plc:
+			conPlc = xp.connectM2M(1, 1)
+			print('Auto-Launch: M2M Connection Established:', conPlc)
 
 		# Obtain runtime Process variable -------------------------[]
-		OE = xp.readBool(db_number, s_offset[1], b_offset[0])
-		RP = xp.readBool(db_number, s_offset[1], b_offset[1])
-		TT = xp.readBool(db_number, s_offset[1], b_offset[2])
-		DT = xp.readBool(db_number, s_offset[1], b_offset[3])
-		TG = xp.readBool(db_number, s_offset[1], b_offset[4])
+		TT = readBool(db_number, s_offset[1], b_offset[2])
+		ST = readBool(db_number, s_offset[1], b_offset[3])
+		TG = readBool(db_number, s_offset[1], b_offset[4])
 
 		# Monitor a parameter --------------------------------
-		LP = xp.readBool(db_number, s_offset[5], b_offset[0])
-		TS = xp.readBool(db_number, s_offset[5], b_offset[1])
-		LA = xp.readBool(db_number, s_offset[5], b_offset[2])
+		LP = readBool(db_number, s_offset[5], b_offset[0])
+		TS = readBool(db_number, s_offset[5], b_offset[1])
+		LA = readBool(db_number, s_offset[5], b_offset[2])
 
 		# Permutate the active Monitoring Parameter ---------------[]
 		if not LP and not TS and LA:
@@ -274,12 +275,12 @@ def autoLaunchViz():			# obtain required variables for playing visualization
 			MP = 0
 		print('\nLoading the monitoring parameter..', MP)
 		# ----------------------------------------------------
-		HeadA = xp.readBool(db_number, s_offset[1], b_offset[6])		# View type A
-		HeadB = xp.readBool(db_number, s_offset[1], b_offset[7])		# View type B
-		HeadC = xp.readBool(db_number, s_offset[6], b_offset[0])		# FMC Grand View
-		vAPT4 = 0 														# DNV Grand View
-		sqlTbls = xp.readBool(db_number, s_offset[6], b_offset[1])
-		plcTbls = xp.readBool(db_number, s_offset[6], b_offset[2])
+		HeadA = readBool(db_number, s_offset[1], b_offset[6])		# View type A
+		HeadB = readBool(db_number, s_offset[1], b_offset[7])		# View type B
+		HeadC = readBool(db_number, s_offset[6], b_offset[0])		# FMC Grand View
+		vAPT4 = 0 													# DNV Grand View
+		sqlTbls = readBool(db_number, s_offset[6], b_offset[1])
+		plcTbls = readBool(db_number, s_offset[6], b_offset[2])
 
 		# include retrospectivePlay, SQL date search start/end ----
 		ret, stad, stpd = 0, 0, 0		# required for real-time runtime visualization.
@@ -331,6 +332,44 @@ def autoLaunchViz():			# obtain required variables for playing visualization
 	return inProgress
 
 
+def watchDogController():
+	global con_plc
+
+	if not con_plc:
+		conPlc = xp.connectM2M(1, 1)
+		print('M2M Connection Established:', conPlc)
+		con_plc = True
+
+	# if connectPLC:
+	print('\nChecking machine state at interval...')
+	# -------------------------------------------------------
+	sysRun = readBool(db_number, 0, 0)  	# System is runing
+	sysidl = readBool(db_number, 0, 1)  	# System idling
+	sysrdy = readBool(db_number, 0, 2)  	# System Ready
+	# ------------------------------------------------------
+	rngONE = readBool(db_number, 0, 3)  	# Ring 1 is ready
+	rngTWO = readBool(db_number, 0, 4)  	# Ring 2 is ready
+	rngTHR = readBool(db_number, 0, 5)  	# Ring 3 is ready
+	rngFOR = readBool(db_number, 0, 6)  	# Ring 4 is ready
+	# ------------------------------------------------------
+	msctcp = readInteger(db_number, 2, 0) # Machine State Code (msc)
+	won_NO = readString(db_number, 4, 0)  # Work Order Number
+	prodTA = readBool(db_number, 260, 0)  # Active DNV Process
+	prodTB = readBool(db_number, 261, 1)  # Active MGM Process
+	# -------------------------------------------------------
+	tLayer = readInteger(db_number, 262, 0)  # Total required Layer
+	cLayer = readInteger(db_number, 264, 0)  # Current achieved layer
+	# pipPos = readLReal(db_number, 436, 0)  # Pipe Axial Position
+	time.sleep(10)  # 10 seconds non-blocking interval
+
+	rt_satus = dict(zip(machineCode_Data, codeDescript))
+	msc_rt = rt_satus[msctcp]
+	print('\nTCP01 Status:', msc_rt)
+
+	return sysRun, sysidl, sysrdy, rngONE, rngTWO, rngTHR, rngFOR, won_NO, prodTA, prodTB, tLayer, cLayer, msctcp
+
+
+
 # This is the THINK THANK common to all real-time procedures ======================================================[]
 def watchDog():
 	global sysRun, sysidl, sysrdy, rngONE, rngTWO, rngTHR, rngFOR, msctcp, won_NO, prodTA, prodTB, tLayer, cLayer
@@ -354,8 +393,9 @@ def watchDog():
 	# Obtain dynamic values -----------------------------------------[]
 	while True:
 		try:
+			sleep(10)
 			# Update status every 10 sec ----------------------------[]
-			sysRun, sysidl, sysrdy, rngONE, rngTWO, rngTHR, rngFOR, won_NO, prodTA, prodTB, tLayer, cLayer, pipPos, msctcp = watchDogController()
+			sysRun, sysidl, sysrdy, rngONE, rngTWO, rngTHR, rngFOR, won_NO, prodTA, prodTB, tLayer, cLayer, msctcp = watchDogController()
 			# -------------------------------------------------------[]
 		except Exception as err:
 			print(f"Exception Error: '{err}'")
@@ -363,9 +403,9 @@ def watchDog():
 			errorLog(f"{err}")
 
 		finally:
-			print('\nChecking the synchronous logic state...')
+			print('\nWD: Updating Status...')
 			if rtError:
-				print('Reset connection request...')
+				print('WD: Reset connection request...')
 				rtError = False
 				continue
 
@@ -525,7 +565,7 @@ def watchDog():
 					print('\nSTATUS NOW:', state)
 					# Get this thread on a new process --------------------------------------------[]
 					inProgress = True  						# Set validation Bit
-					p2 = Process(target=autoLaunchViz) 		# Launch Visualisation Plot Screen ----[P]
+					p2 = Process(target=autoLaunchViz, daemon=True) 		# Launch Visualisation Plot Screen ----[P]
 					p2.start()								# Start on a new Thread/Processor
 					p2.join()
 					time.sleep(.5) 							# sleep for few millisec | p2.join()
@@ -611,7 +651,7 @@ def to_GUI(event):
 	uCalling = 2
 	pWON = today.strftime("%Y%m%d")
 	rt_p = 0	# [0 = DNV | 1 = MGM]
-	t3 = threading.Thread(target=rb.userMenu(uCalling, pWON, rt_p), name='OfflinePro')
+	t3 = threading.Thread(target=rb.userMenu(uCalling, pWON, rt_p), name='OfflinePro', daemon=True)
 	t3.start()
 	t3.join()
 
@@ -657,7 +697,7 @@ def to_AutoProcess(event):
 
 	uCalling = 1
 	pWON = won_NO
-	t3 = threading.Thread(target=rb.userMenu(uCalling, pWON, rt_p), name='OnlinePro')
+	t3 = threading.Thread(target=rb.userMenu(uCalling, pWON, rt_p), name='OnlinePro', daemon=True)
 	t3.start()			# Open visualisation canvas
 	t3.join()
 
@@ -680,34 +720,38 @@ def updateSCRres():
 
 
 def checkRes():
-    global scrZ
+	global scrZ
 
-    import ctypes
-    user32 = ctypes.windll.user32
-    user32.SetProcessDPIAware()
-    Width = user32.GetSystemMetrics(0)
-    Height = user32.GetSystemMetrics(1)
+	import ctypes
+	user32 = ctypes.windll.user32
+	user32.SetProcessDPIAware()
+	Width = user32.GetSystemMetrics(0)
+	Height = user32.GetSystemMetrics(1)
 
-    # -----------------------------------------------
-    print('Current Screen Res:', Width, 'by', Height)
-    # -----------------------------------------------
+	# -----------------------------------------------
+	print('Current Screen Res:', Width, 'by', Height)
+	# -----------------------------------------------
 
-    if Width == 2560 and Height == 1440:
-        print('Current Hardware resolution OK...')
-        scrZ = '2k'
+	if Width == 2560 and Height == 1440:
+		print('Current Hardware resolution OK...')
+		scrZ = '2k'
 
-    elif Width > 2560 and Height > 1440:
-        print('Current Hardware resolution is superb!')
-        scrZ = '4k'
+	elif Width == 2560 and Height == 1440:
+		print('Current Hardware resolution is superb!')
+		scrZ = '3k'
 
-    else:
-        print('\nScreen resolution?, Please wait...')
-        scrZ = '1k'
-        updateSCRres()
-        print('Screen resolution updated successful!')
-        print('Primary display not SPC Compliant..')
+	elif Width >= 3840 and Height >= 2160:
+		print('Current Hardware resolution is Excellent!')
+		scrZ = '4k'
 
-    return scrZ
+	else:
+		print('\nScreen resolution?, Please wait...')
+		scrZ = '1k'
+		updateSCRres()
+		print('Screen resolution updated successful!')
+		print('Primary display not SPC Compliant..')
+
+	return scrZ
 
 def sendM2M_ACK():
     # Send acknowledgement by raising M2MConACK on SCADA Process and activate watchdog ---[]
@@ -965,6 +1009,8 @@ def showDefaultScreen():
 def dScreen():
 	global tk_Owner, tkinter_time, tkinter_date, root, running
 
+	# checkRes()
+	updateSCRres()
 	if flag == 'High':
 		timer.cancel()				# Stop random screen saver
 		sleep(.2)					# allow arb system recovery
@@ -1013,3 +1059,5 @@ def dScreen():
 
 def st_autoPausePlay():
     return None
+
+watchDogController()
