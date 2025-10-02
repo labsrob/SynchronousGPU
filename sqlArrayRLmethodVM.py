@@ -23,9 +23,14 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
 
     n2fetch = int(nGZ)
     group_step = int(grp_step)
-    fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
-    print('=' * 53)
+    fetch_no = int(fetch_no)
+    if group_step == 1:
+        slideType = 'Smooth Edge'
+    else:
+        slideType = 'Non-overlapping'
+
+    print('\n[VMP] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
+    print('=' * 60)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
         if last_ts is None:
@@ -42,11 +47,11 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
             last_ts = data1[-1].id_col
         else:
             print('[VMP] Process EOF reached...')
-            print('[VMP] Halting for 5 Minutes...')
-            time.sleep(300)
+            print('[VMP] Halting for 30 sec...')
+            time.sleep(30)
 
     except Exception as e:
-        print("[VMP] Data trickling...")  # , e)
+        print("[VMP] Data trickling on IDX#:", last_ts)  # , e)
         time.sleep(2)
 
     t1.close()

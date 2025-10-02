@@ -6,7 +6,6 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 # -------------------------------------------------------------------------------------------------------- #
 Tape Temperature measured in Degree Celsius (°C)
 """
-# SQL New data column defined ------------------------[]
 
 def validCols(pParam):
 

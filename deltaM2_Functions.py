@@ -38,37 +38,68 @@ error_handlers = ['M2M connection failed, re-trying...', 'Fatal Error!, SPC Proc
                   "Connection now established!"]
 
 # Ensure you update these parameters if anything changes in the SCADA  state machine codes ---------------------------
-machineCode_Data = [40960, 40992, 41008, 41040, 41072, 41088, 43392, 43408, 45056, 45136, 45152, 45312, 45392, 45584,
-					45600, 45648, 45712, 45872, 45968, 46160, 46176, 46384, 46464, 46592, 47488, 47504, 49152, 49200,
-					49216, 49232, 49280, 49296, 49424, 49440, 49488, 49504, 49520, 49536, 49664, 51584, 51600, 53248,
-					53280, 53328, 53376, 53392, 53648, 53792, 53824, 53840, 53872, 53888, 53904, 54032, 54048, 54064,
-					54080, 55680, 55696, 57344, 57360, 57408, 57424, 57488, 57600, 57616, 57648, 59776, 59792, 49728,
-					-18032, 0, -19354, -19353, 59792]
+machineCode_Data = [40960, 40976, 40992, 41008, 41024, 41040, 41056, 41072, 41088, 41104, 43392, 43408, 45056, 45072,
+					45088, 45104, 45120, 45136, 45152, 45168, 45184, 45200, 45312, 45328, 45344, 45360, 45376, 45392,
+					45408, 45424, 45440, 45456, 45568, 45584, 45600, 45616, 45632, 45648, 45664, 45680, 45696, 45712,
+					45824, 45840, 45856, 45872, 45888, 45904, 45920, 45936, 45952, 45968, 46080, 46096, 46112, 46128,
+					46144, 46160, 46176, 46192, 46208, 46224, 46336, 46352, 46368, 46384, 46400, 46416, 46432, 46448,
+					46464, 46480, 46592, 47488, 47504, 49152, 49168, 49184, 49200, 49216, 49232, 49248, 49264, 49280,
+					49296, 49408, 49424, 49440, 49456, 49472, 49488, 49504, 49520, 49536, 49552, 49664, 49680, 49696,
+					49712, 49728, 51584, 51600, 53248, 53264, 53280, 53296, 53312, 53328, 53344, 53360, 53376, 53392,
+					53504, 53520, 53536, 53552, 53568, 53584, 53600, 53616, 53632, 53648, 53760, 53776, 53792, 53808,
+					53824, 53840, 53856, 53872, 53888, 53904, 54016, 54032, 54048, 54064, 54080, 54096, 54112, 55680,
+					55696, 57344, 57360, 57376, 57392, 57408, 57424, 57440, 57456, 57472, 57488, 57600, 57616, 57632,
+					57648, 59776, 59792, 0]
 
-codeDescript = ["StandBy State, Call Engineers ...", "Production Mode Confirmed", "Selecting Initial Direction",
-				"Operator Confirming Pipe Load Procedure", "Operator Confirming Pipe Parameters",
-				"Loading Pipe Parameter", "Startup Completed", "Unknown State!", "StandBy State...",
-				"Running Pipe Param Algorithm", "Setting Production Mode", "Initiating Pipe Reversal Sequence",
-				"Activating Chucks System", "Activating Pipe Reversal Mode", "Pipe in Reversing Motion…",
-				"Activating Haffner Change Procedure", "Haffner Replacement Procedure Completed", "Adjusting Pipe Position",
-				"Setting Polarised Camera to Position", "Setting Tape Feed to Start Position",
-				"Setting Laser Angle to Start Position", "Moving to Tape Tracking Referenced Positions",
-				"Moving Rings to Start Positions", "System Getting Ready", "System in Ready State …", "Unknown State!",
-				"StandBy State...", "Re-tracking Shrinkage Encoders", "Activating Tape Laying System", "Checking Tape Present",
-				"Feeding Tape under Rollers", "Setting Rollers Down ...", "Activating Lasers...", "Activating Auto-weld...",
-				"Starting Tape Wind…", "Soft Stop Induced by Laser System", "Soft Stop Induced by Subsystem",
-				"E-Stop OR Fault Activated Stop", "End of Tape Winding Procedure", "Pipe Running Algorithm Completed",
-				"Unknown State!", "StandBy State...", "Activation Stop Recovery...", "Activating Haffner Replacement Procedure",
-				"Positioning Rings for Haffner Replacement", "Haffner Replacement Procedure Completed", "Retracting Shrinkage Encoders",
-				"Moving to Tails Removal Position", "Acknowledging Tails Removal Procedure", "Activating Camera Alignment Recovery",
-				"Moving to Tape Tracking Ref Positions", "Referencing Tape Tracking Cameras", "Implementing Tape Tracking Recovery",
-				"Moving to Recovery Start Positions", "Activating Shrinkage Encoder After Recovery",
-				"Moving Tape Feed to Start Positions", "Moving Laser Angles to Start Positions",
-				"Recovery Procedure Executed Successfully", "Unknown State!", "StandBy State...", "Pipe Unloading Procedure Started",
-				"Positioning Rings for Haffner Replacement", "Haffner Replacement Completed", "Retracting KEYENCE Arms..",
-				"Retracting Shrinkage Encoders...", "Executing Pipe Release Procedure..", "Executing Pipe UNLOAD Procedure…",
-				"Pipe Build Completion Successful", "Unknown State!", "End of Pipe Layer", "Unknown State, ask the Operators",
-				"Unknown State Machine", "Not known", "Not known", 'Completion Error State']
+smcDescription = [ "No State or Undefined State ", "System health Check, please wait..", "Operator to confirm Production Mode.. ",
+				 "Operator to select initial direction ", "Updating safety PLC...", "Confirm pipe load procedure completed. ",
+				 "Commencing Pipe referencing procedure.. ", "Confirming valid pipe parameters..", "Loading Pipe Parameters … ",
+				 "Initialisation of Pipe data…", "Startup procedure completed ", "Startup error state, please wait… ",
+				 "No State or Undefined State ", "System health Check, please wait...", "Checking layer completion, please wait… ",
+				 "Operator verifying Pipe diameter..", "Checking the target diameter for disparity ",
+				 "Activating Pipe Parameter procedure ", "Confirming production mode", "Checking if Master Switchover is required ",
+				 "Haul Off Master Switchover", "Checking if Pipe reversal is required..", "Operator confirming pipe reversal procedure ",
+				 "Updating Position for Pipe Reversal..", "Position X Axis for reversal", "Position Y Axis for reversal ",
+				 "Position Haul off for adjust reversal", "Activating Chucks System", "Position Encoder Axes for reversal ",
+				 "Operator Enabling Clamp Tension..", "Enabler with Clamp Tension", "Preparing TLH clarance before reversal ",
+				 "S Axis clearance before reversal", "Operator confirming Pipe Reversal Position", "Pipe is reversing, please wait.. ",
+				 "Activating run per pass algorithm ", "Checking if Hafner Change is required ", "Confirming Hafner Change.. ",
+				 "Accessing TLH clearance for Hafner change ", "Moving TLH angles for Hafner Change ", "Positioning Rings for Hafner Change ",
+				 "Hafner Change completed ", "Check hafner change is successful", "Sorry, Hafner change is not successful ",
+				 "Resetting Tape Counters", "Confirming adjustment to Pipe Position", "Adjusting Pipe to X Axis Position ",
+				 "Adjusting Pipe to Y Axis Position", "Adjusting Haul off Pipe Position ", "Adjusting Encoder Axis to Pipe Position ",
+				 "Adjusting Pipe Position Axes ", "Adjusting Polarised Camera to pipe Position", "Tape Laying Head Clearance for Angle Move ",
+				 "Target Position TLH Angular Axes", "Pipe Position TLH Linear Axes", "Target Position TLH Axial Axes ",
+				 "Extending Keyance Arms, please wait", "Resetting Tape Feed to Start Position", "Moving Laser Angle to Start position",
+				 "System Check Recovery Pass", "Confirming Pipe Reference…", "Pipe Referencing Commencing", "Referencing tapeTracking Standard ",
+				 "Commencing Camera Alignment", "Computing Tape Tracking Reference Positions", "Moving Tape Tracking to Reference Positions",
+				 "Referencing Tape Tracking Recovery", "Tape Tracking Recovery Achieved", "Calculating Start Positions", "Moving to Start Position ",
+				 "Moving Rings to Start Positions", "Tow Pipe Position to Y-Axes", "All Clear, Ready to Run...", "System is Ready to Run ",
+				 "Pre-Check Error State detected", "No State or Undefined State..", "Awaiting HMI Acknowledgement", "Check Staggered Stopped Rings ",
+				 "Retracting Shrinkage Encoders ", "Activating Tape System", "Checking Tape Presence", "Tape Missing Acknowledge ",
+				 "Checking Auto Weld Mode ", "Feeding Tape under Rollers….", "Activating Rollers Active Position","Applying Masking Tape Procedure ",
+				 "Activating Lasers… ", "Activating AutoWeld", "Start Up Sounder Activation", "Synchronising Axes ", "Starting TapeWind ",
+				 "Soft Soft initiated without Laser", "Soft Soft initiated with Laser", "Detected Error or E-Stop Pressed on TapeWind ",
+				 "Initial State Recovery Machine", "End of Tape Wind Procedure", "Resetting Tape Tracking Data", "Updating Tapes Applied ",
+				 "Updating Recovery Pass Data", "Updating New Layer Count..", "Tape Running Now Completed", "Process Error State, please wait… ",
+				 "No State or Undefined State", "Activating Shrinkage Encoders", "Acknowledging Stop Recovery", "Computing Recovery Method, Please Wait ",
+				 "Checking Hafner Change is Required ", "Activating Hafner Replacement Procedure", "Preparing TLH clearance for Hafner Change ",
+				 "Moving TLH angles for Hafner Change..", "Positioning Rings for Hafner Replacement", "Hafner Replacement Procedure Completed",
+				 "Hafner Change Successful!", "Acknowledging Hafner Change Not successful..", "Resetting Tape Counters, Please wait… ",
+				 "Checking Target position (TLH) Angular Axes ", "Checking Pipe position with TLH Linear Axes ", "Enabling Clamp Tension procedure ",
+				 "Checking Rings after recovery", "Automatic clearance move, please wait..", "Obtaining shrinkage measurements.. ",
+				 "Retracting Shrinkage Encoders", "Referencing Tape Tracking Shrinkage", "Calculating Recovery Track Position Shrinkage ",
+				 "Moving to Tails Removal Position", "Activating Shrinkage Encoders after Tails Removal Move ", "Acknowledging Tails Removal Procedure",
+				 "Activating Camera Alignment Recovery", "Calculate Tape Tracking Reference Position", "Moving to Tracking Reference Position ",
+				 "Referencing Tape Tracking Camera", "Tape Tracking Recovery in Progress ", "Calculating Tape tracking Position ",
+				 "Moving to Recovery Start Position ", "Activating Encoders After Recovery", "Feeding Tape to Start Position ",
+				 "Moving Laser Angles to Start Position", "Further Recovery Acknowledge ", "Defining Recovery Method ", "System Recovery Completed ",
+				 "Recovery Error State, please wait… ", "No State or Undefined State ", "Confirming Pipe Unload Procedure ",
+				 "Moving Axes to Clearances ", "Preparing for Hafners Removal ", "Positioning Rings for Hafner Removal ",
+				 "Confirming Hafner Removal Completed", "Checking if Hafner Removal is Successful", "Acknowledging Hafner Change Not successful..",
+				 "Resetting Tape Counters ", "Retracting Keyance Arms ", "Retracking Shrinkage Encoders", "Commence with Releasing Pipe ",
+				 "Conduction Health Checks, Please Wait ", "Starting Pipe Unloading Procedure", "End of Pipe Lay Completed ",
+				 "EoP Error State, please wait…", "StandBy State, Call Engineers ..."]
 
 # -------------------------------------------------------------------------------------[]
 _Plc= snap7.client.Client()
@@ -137,7 +168,7 @@ def errorLog(err):
 
 
 def smc_status(rtc):			# Match MSC code with string description
-	rt_satus = dict(zip(machineCode_Data, codeDescript))
+	rt_satus = dict(zip(machineCode_Data, smcDescription))
 	status_rt = rt_satus[rtc]
 	if status_rt != 0:
 		print(status_rt)
@@ -153,9 +184,10 @@ def autoPausePlay():
 	Datatype dword consists in 8 bytes in the PLC
 	:return:
 	"""
-	print('Checking SMC readiness...')
+	print('\nChecking SMC readiness...')
 
 	try:
+		sleep(3)
 		sysRun = readBool(db_number, 0, 0)			# False/True
 		sysIdl = readBool(db_number, 0, 1)  			# System idling
 		sysRdy = readBool(db_number, 0, 2)  			# System Ready
@@ -165,7 +197,7 @@ def autoPausePlay():
 		cLayer = readInteger(db_number, 264,0) 		# Current achieved layer
 		pipPos = readLReal(117, 8, 0)  		# Current pipe Position
 		# Obtain State machine code description ----------------------------#
-		rt_stat = dict(zip(machineCode_Data, codeDescript))
+		rt_stat = dict(zip(machineCode_Data, smcDescription))
 
 	except Exception as err:
 		print(f"Exception Error: '{err}'")
@@ -177,22 +209,23 @@ def autoPausePlay():
 		msc_rt = 59792										# Machine No state / undefined state
 		cLayer = 0
 		pipPos = 0
-		rt_stat = dict(zip(machineCode_Data, codeDescript))
+		rt_stat = dict(zip(machineCode_Data, smcDescription))
 	mstatus = rt_stat[msc_rt]
 
 	return sysRun, sysIdl, sysRdy, msc_rt, cLayer, pipPos, mstatus
 
 
 def rt_autoPausePlay():
-	print('Checking SMC readiness...')
+	print('\nChecking SMC readiness...')
 	try:
+		sleep(3)
 		sRun = readBool(db_number, 0, 0)		# False/True
 		msc = readInteger(db_number, 2, 0)   # Machine State Code (msc)
 		if msc <= 0:
 			msc = 0
 		cLayr = readInteger(db_number, 264,0)
 		# pipPos = readLReal(db_number, 436, 0)  # Current pipe Position
-		rt_satus = dict(zip(machineCode_Data, codeDescript))
+		rt_satus = dict(zip(machineCode_Data, smcDescription))
 
 	except Exception as err:
 		print(f"Exception Error: '{err}'")
@@ -201,7 +234,7 @@ def rt_autoPausePlay():
 		sRun = False		# Machine Unreacheable
 		msc = 59792			# Machine No state / undefined state
 		cLayr = 0
-		rt_satus = dict(zip(machineCode_Data, codeDescript))
+		rt_satus = dict(zip(machineCode_Data, smcDescription))
 	# Obtain State machine code description -------------------
 	stat = rt_satus[msc]
 
@@ -266,14 +299,14 @@ def autoLaunchViz():			# obtain required variables for playing visualization
 			print('Auto-Launch: M2M Connection Established:', conPlc)
 
 		# Obtain runtime Process variable -------------------------[]
-		TT = readBool(db_number, s_offset[1], b_offset[2])
-		ST = readBool(db_number, s_offset[1], b_offset[3])
-		TG = readBool(db_number, s_offset[1], b_offset[4])
+		TT = readBool(db_number, start_offset[1], bit_offset[2])
+		ST = readBool(db_number, start_offset[1], bit_offset[3])
+		TG = readBool(db_number, start_offset[1], bit_offset[4])
 
 		# Monitor a parameter --------------------------------
-		LP = readBool(db_number, s_offset[5], b_offset[0])
-		TS = readBool(db_number, s_offset[5], b_offset[1])
-		LA = readBool(db_number, s_offset[5], b_offset[2])
+		LP = readBool(db_number, start_offset[5], bit_offset[0])
+		TS = readBool(db_number, start_offset[5], bit_offset[1])
+		LA = readBool(db_number, start_offset[5], bit_offset[2])
 
 		# Permutate the active Monitoring Parameter ---------------[]
 		if not LP and not TS and LA:
@@ -286,12 +319,12 @@ def autoLaunchViz():			# obtain required variables for playing visualization
 			MP = 0
 		print('\nLoading the monitoring parameter..', MP)
 		# ----------------------------------------------------
-		HeadA = readBool(db_number, s_offset[1], b_offset[6])		# View type A
-		HeadB = readBool(db_number, s_offset[1], b_offset[7])		# View type B
-		HeadC = readBool(db_number, s_offset[6], b_offset[0])		# FMC Grand View
+		HeadA = readBool(db_number, start_offset[1], bit_offset[6])		# View type A
+		HeadB = readBool(db_number, start_offset[1], bit_offset[7])		# View type B
+		HeadC = readBool(db_number, start_offset[6], bit_offset[0])		# FMC Grand View
 		vAPT4 = 0 													# DNV Grand View
-		sqlTbls = readBool(db_number, s_offset[6], b_offset[1])
-		plcTbls = readBool(db_number, s_offset[6], b_offset[2])
+		sqlTbls = readBool(db_number, start_offset[6], bit_offset[1])
+		plcTbls = readBool(db_number, start_offset[6], bit_offset[2])
 
 		# include retrospectivePlay, SQL date search start/end ----
 		ret, stad, stpd = 0, 0, 0		# required for real-time runtime visualization.
@@ -373,7 +406,7 @@ def watchDogController():
 	# pipPos = readLReal(db_number, 436, 0)  # Pipe Axial Position
 	time.sleep(10)  # 10 seconds non-blocking interval
 
-	rt_satus = dict(zip(machineCode_Data, codeDescript))
+	rt_satus = dict(zip(machineCode_Data, smcDescription))
 	msc_rt = rt_satus[msctcp]
 	print('\nTCP01 Status:', msc_rt)
 
@@ -438,141 +471,141 @@ def watchDog():
 
 			# When TCP is in Error, indicate the SMC to Vis Screen ------------------------[]
 			elif msctcp == 43408 or msctcp == 47504 or msctcp == 51600 or msctcp == 55696:
-				state = codeDescript[25]  # TCP in Categorised process Error state --------[]
+				state = smcDescription[25]  # TCP in Categorised process Error state --------[]
 				print('\nTCP in ' + state)
 
 			elif msctcp == 40960 or msctcp == 45056 or msctcp == 49152 or msctcp == 53248:
-				state = codeDescript[0]  # Unknown State, Call Engineering Team --------[]
+				state = smcDescription[0]  # Unknown State, Call Engineering Team --------[]
 				print('\nTCP in ' + state)
 
 			elif not inProgress and msctcp == machineCode_Data[5]:
-				state = codeDescript[5]		# Successful Pipe Load, Indicate on Vis -------[]
+				state = smcDescription[5]		# Successful Pipe Load, Indicate on Vis -------[]
 				print('\nTCP '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[29]:
-				state = codeDescript[29]		# Pipe Load reversing, Indicate on Vis ----[]
+				state = smcDescription[29]		# Pipe Load reversing, Indicate on Vis ----[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[33]:
-				state = codeDescript[33]		# Move rings to pos for Hafner change, ----[]
+				state = smcDescription[33]		# Move rings to pos for Hafner change, ----[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[34]:
-				state = codeDescript[34]		# Hafner change completed -----------------[]
+				state = smcDescription[34]		# Hafner change completed -----------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[36]:
-				state = codeDescript[36]		# Hafner change error, repeat. ------------[]
+				state = smcDescription[36]		# Hafner change error, repeat. ------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[38]:
-				state = codeDescript[38]		# Confirm ready for production ------------[]
+				state = smcDescription[38]		# Confirm ready for production ------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[48]:
-				state = codeDescript[48]		# Feeding Tape through heads --------------[]
+				state = smcDescription[48]		# Feeding Tape through heads --------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[49]:
-				state = codeDescript[49]		# Setting laser Angle ---------------------[]
+				state = smcDescription[49]		# Setting laser Angle ---------------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[53]:
-				state = codeDescript[53]		# Performing Camera Alignment -------------[]
+				state = smcDescription[53]		# Performing Camera Alignment -------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[60]:
-				state = codeDescript[60]		# Moving Rings to Start Pos ---------------[]
+				state = smcDescription[60]		# Moving Rings to Start Pos ---------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[63]:
-				state = codeDescript[63]		# Ready State machine is completed --------[]
+				state = smcDescription[63]		# Ready State machine is completed --------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[69]:
-				state = codeDescript[69]		# Tape Missing consent to recovery --------[]
+				state = smcDescription[69]		# Tape Missing consent to recovery --------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[71]:
-				state = codeDescript[71]		# Tape Feeding protocol begins ------------[]
+				state = smcDescription[71]		# Tape Feeding protocol begins ------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[72]:
-				state = codeDescript[72]		# Applying Tape Rollers -------------------[]
+				state = smcDescription[72]		# Applying Tape Rollers -------------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[73]:
-				state = codeDescript[73]		# Applying Masking Tapes ------------------[]
+				state = smcDescription[73]		# Applying Masking Tapes ------------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[75]:
-				state = codeDescript[75]		# Recovery State Machine Recovery ---------[]
+				state = smcDescription[75]		# Recovery State Machine Recovery ---------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[76]:
-				state = codeDescript[76]		# Tape Laying Process Completed -----------[]
+				state = smcDescription[76]		# Tape Laying Process Completed -----------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[81]:
-				state = codeDescript[81]		# Running State Machine completed ---------[]
+				state = smcDescription[81]		# Running State Machine completed ---------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[89]:
-				state = codeDescript[89]		# Hafner Change completed, Ok continue ----[]
+				state = smcDescription[89]		# Hafner Change completed, Ok continue ----[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[90]:
-				state = codeDescript[90]		# Hafner Change Unsuccessful, Repeat ------[]
+				state = smcDescription[90]		# Hafner Change Unsuccessful, Repeat ------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[103]:
-				state = codeDescript[103]		# Camera Alignment Procedure begins -------[]
+				state = smcDescription[103]		# Camera Alignment Procedure begins -------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[112]:
-				state = codeDescript[112]		# Recovery State machine Sequence completed[]
+				state = smcDescription[112]		# Recovery State machine Sequence completed[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[114]:
-				state = codeDescript[114]		# Ready for Pipe upload -------------------[]
+				state = smcDescription[114]		# Ready for Pipe upload -------------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[118]:
-				state = codeDescript[118]		# Hafner removal procedure completed ------[]
+				state = smcDescription[118]		# Hafner removal procedure completed ------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[119]:
-				state = codeDescript[119]		# Hafner removal unsuccessful -------------[]
+				state = smcDescription[119]		# Hafner removal unsuccessful -------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[123]:
-				state = codeDescript[123]		# Releasing the Pipe, please wait ---------[]
+				state = smcDescription[123]		# Releasing the Pipe, please wait ---------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[125]:
-				state = codeDescript[125]		# Activate Pipe unload operation ------------[]
+				state = smcDescription[125]		# Activate Pipe unload operation ------------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[126]:
-				state = codeDescript[126]		# Completion State Machine Sequence -------[]
+				state = smcDescription[126]		# Completion State Machine Sequence -------[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[129]:
-				state = codeDescript[129]		# Laser triggered soft stop in effect -----[]
+				state = smcDescription[129]		# Laser triggered soft stop in effect -----[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[130]:
-				state = codeDescript[130]		# Error triggered soft stop in effect -----[]
+				state = smcDescription[130]		# Error triggered soft stop in effect -----[]
 				print('\nTCP: '+state)
 
 			elif not inProgress and msctcp == machineCode_Data[131]:
-				state = codeDescript[131]		# Dynamic triggered soft soft in effect ---[]
+				state = smcDescription[131]		# Dynamic triggered soft soft in effect ---[]
 				print('\nTCP: '+state)
 
 			elif sysrdy and sysRun:   			# ----- PAUSE CONDITION -------------------[]
 				print("\nWatchDog: Real-Time visualization begins...", msctcp)
 				if not inProgress and msctcp == machineCode_Data[27]:		# Activating Tape laying Process
-					state = codeDescript[27]
+					state = smcDescription[27]
 					print('\nSTATUS NOW:', state)
 					# Get this thread on a new process --------------------------------------------[]
 					inProgress = True  						# Set validation Bit
@@ -582,47 +615,47 @@ def watchDog():
 					time.sleep(.5) 							# sleep for few millisec | p2.join()
 				# Pause Condition --------------------------#
 				elif inProgress and msctcp == machineCode_Data[28]:		# Laser triggered soft stop in effect"
-					state = codeDescript[28]
+					state = smcDescription[28]
 					print('\nTCP: ' + state)
 					inProgress = False
 
 				elif inProgress and msctcp == machineCode_Data[29]:		# Dynamic triggered soft soft in effect
-					state = codeDescript[29]
+					state = smcDescription[29]
 					print('\nTCP: ' + state)
 					inProgress = False	  								# Set validation Bit LOW
 
 				elif inProgress and msctcp == machineCode_Data[30]:
-					state = codeDescript[30]							# E-Stop
+					state = smcDescription[30]							# E-Stop
 					print('\nTCP: ' + state)
 					inProgress = False
 
 				elif inProgress and msctcp == machineCode_Data[31]:		# End of Tape Winding Procedure
-					state = codeDescript[31]
+					state = smcDescription[31]
 					print('\nTCP: ' + state)
 					inProgress = False
 
 				elif inProgress and msctcp == machineCode_Data[32]:		# End of Tape Winding Procedure
-					state = codeDescript[32]
+					state = smcDescription[32]
 					print('\nTCP: ' + state)
 					inProgress = False
 
 				elif inProgress and msctcp == machineCode_Data[33]:		# End of Tape Winding Procedure
-					state = codeDescript[33]
+					state = smcDescription[33]
 					print('\nTCP: ' + state)
 					inProgress = False
 
 				elif inProgress and msctcp == machineCode_Data[35]:		# End of Tape Winding Procedure
-					state = codeDescript[35]
+					state = smcDescription[35]
 					print('\nTCP: ' + state)
 					inProgress = False
 
 				elif inProgress and msctcp == machineCode_Data[36]:		# End of Tape Winding Procedure
-					state = codeDescript[36]
+					state = smcDescription[36]
 					print('\nTCP: ' + state)
 					inProgress = False
 
 				elif inProgress and msctcp == machineCode_Data[37]:		# End of Tape Winding Procedure
-					state = codeDescript[37]
+					state = smcDescription[37]
 					print('\nTCP: ' + state)
 					inProgress = False
 
