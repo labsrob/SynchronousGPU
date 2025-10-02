@@ -27,7 +27,7 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, fetch_no):
     group_step = int(grp_step)
     fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
     print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
-
+    print('=' * 50)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
         if last_t1 is None:
@@ -48,7 +48,7 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, fetch_no):
             time.sleep(300)
 
     except Exception as e:
-        print("[GEN_] Ramp Count Data trickling...")  # , e)
+        print("[mGEN_] Data trickling...")  # , e)
         time.sleep(2)
 
     t1.close()
@@ -69,11 +69,11 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, fetch_no):
                 dL2.append(result)
             last_t2 = data2[-1].tStamp
         else:
-            print('[TT] Process EOF reached...')
+            print('[mTT] Process EOF reached...')
             time.sleep(300)
 
     except Exception as e:
-        print("[TT] Ramp Count Data trickling...")  # , e)
+        print("[mRP1] Data trickling...")  # , e)
         time.sleep(2)
 
     t2.close()
@@ -94,11 +94,11 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, fetch_no):
                 dL3.append(result)
             last_t3 = data3[-1].tStamp
         else:
-            print('[RP1] Process EOF reached...')
+            print('[mRP2] Process EOF reached...')
             time.sleep(300)
 
     except Exception as e:
-        print("[RP2] Ramp Count Data trickling...")  # , e)
+        print("[mRP2] Data trickling...")  # , e)
         time.sleep(2)
 
     t3.close()

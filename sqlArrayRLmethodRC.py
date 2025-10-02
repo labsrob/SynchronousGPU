@@ -25,7 +25,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
     group_step = int(grp_step)
     fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
     print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
-
+    print('=' * 50)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
         if last_ts is None:
@@ -47,7 +47,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
             time.sleep(300)
 
     except Exception as e:
-        print("[cRC] Ramp Count Data trickling...")  # , e)
+        print("[cRC] Data trickling...")  # , e)
         time.sleep(2)
 
     t1.close()

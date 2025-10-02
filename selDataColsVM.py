@@ -8,16 +8,17 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 """
 
 
-def validCols(pParam, pWON=None):
+def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'VM_' +pWON:
+    if pParam[0:3] == 'VM_':
         columns = ['id_col', 'sCount', 'sCenter', 'AvgGap',
                    'MaxGap', 'cLayer', 'sDistance']
 
-    elif pParam == 'SPC_VM':
+    elif pParam[0:6] == 'SPC_VM':
         columns = ['sCount', 'sCentre', 'AvgGap', 'MaxGap', 'cLayer', 'sDistance']
 
     else:
+        columns = 0
         print('Invalid Columns or Query error...')
 
     return columns

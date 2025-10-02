@@ -24,8 +24,8 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
     n2fetch = int(nGZ)
     group_step = int(grp_step)
     fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
-
+    print('\n[TG-VM] SAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
+    print('='*53)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
         if last_t1 is None:
@@ -43,10 +43,10 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
             last_t1 = data1[-1].tStamp
         else:
             print('[TG] Process EOF reached...')
-            time.sleep(300)
+            time.sleep(30)
 
     except Exception as e:
-        print("[TG] Ramp Count Data trickling...")  # , e)
+        print("[TG] Data trickling...")  # , e)
         time.sleep(2)
 
     t1.close()

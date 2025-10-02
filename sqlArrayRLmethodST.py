@@ -24,15 +24,14 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
     n2fetch = int(nGZ)
     group_step = int(grp_step)
     fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
-
+    print('\n[ST] SAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
+    print('=' * 50)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
         if last_t1 is None:
             t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY cLayer ASC')
         else:
             t1.execute('SELECT * FROM ' + str(T1) + ' WHERE tStamp > ? ORDER BY cLayer ASC', last_t1)
-
         data1 = t1.fetchmany(n2fetch)
 
         # --------------- Re-assemble into dynamic buffer -----
@@ -40,17 +39,15 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
             for result in data1:
                 result = list(result)
                 dL1.append(result)
-            # print('\nTP1:', dL1)
             last_t1 = data1[-1].tStamp
         else:
-            print('[ST_1] Process EOF reached...')
-            print('[ST_1] Halting for 5 Minutes...')
-            time.sleep(300)
+            print('[ST1] Process EOF reached...')
+            print('[ST1] Halting for 5 Minutes...')
+            time.sleep(5)
 
     except Exception as e:
-        print("[ST_1] Ramp Count Data trickling...")  # , e)
+        print("[ST1] Data trickling...")  # , e)
         time.sleep(2)
-
     t1.close()
 
     # ------------------------------------------------------------------------------------[]
@@ -59,7 +56,6 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
             t2.execute('SELECT * FROM ' + str(T2) + ' ORDER BY cLayer ASC')
         else:
             t2.execute('SELECT * FROM ' + str(T2) + ' WHERE tStamp > ? ORDER BY cLayer ASC', last_t2)
-
         data2 = t2.fetchmany(n2fetch)
 
         # --------------- Re-assemble into dynamic buffer -----
@@ -67,15 +63,14 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
             for result in data2:
                 result = list(result)
                 dL2.append(result)
-            # print('\nTP2:', dL2)
             last_t2 = data2[-1].tStamp
         else:
-            print('[ST_2] Process EOF reached...')
-            print('[ST_2] Halting for 5 Minutes...')
-            time.sleep(300)
+            print('[ST2] Process EOF reached...')
+            print('[ST2] Halting for 5 Minutes...')
+            time.sleep(5)
 
     except Exception as e:
-        print("[ST_2] Ramp Count Data trickling...")  # , e)
+        print("[ST2] Data trickling...")  # , e)
         time.sleep(2)
 
     t2.close()

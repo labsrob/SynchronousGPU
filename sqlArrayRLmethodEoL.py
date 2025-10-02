@@ -64,8 +64,12 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
     # Provide critical and robust connection for End of Layer report
     if sq_con is None:
         tempo = rpt_SQLconnect()
+        mainStream = True
+        print('\nUsing a new param connection..')
     else:
+        mainStream = False
         tempo = sq_con
+        print('\nUsing mainstream connection..')
     # --------------------------------------
     t1, t2 = tempo.cursor(), tempo.cursor()
     t3, t4 = tempo.cursor(), tempo.cursor()
@@ -90,7 +94,7 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
     regm2 = round(stSR[0] * 0.3, )
     regm3 = round(tgSR[0] * 0.3, )      # % 60  # Modulo evaluation TG?
     regm4 = round(wsSR[0] * 0.3, )
-    print('TP0002', regm1, regm2, regm3,regm4)
+    # print('TP0002', regm1, regm2, regm3,regm4)
 
     # ------------------ Load randomised samples --------[TODO: Evaluate the impact oA]f these two methods on sys perf
     dataTT = t1.execute('Select TOP ' + str(regm1) + ' * FROM ' + str(T1) + ' where [cLyr] = '+ str(layerNo) + ' order by NEWID()').fetchall()
@@ -109,7 +113,9 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    t1.close()
+
+    if not mainStream:
+        t1.close()
 
     # Substrate Temperature --------------------------------------------------------------------------------[B]
     dataST = t2.execute('Select TOP ' + str(regm2) + ' * FROM ' + str(T2) + ' where [cLyr] = '+ str(layerNo) + ' order by NEWID()').fetchall()
@@ -128,7 +134,8 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    t2.close()
+    if not mainStream:
+        t2.close()
 
     # Tape Gap Procedure ------------------------------------------------------------------------------------[C]
     dataTG = t3.execute('Select TOP ' + str(regm3) + ' * FROM ' + str(T3) + ' where [cLyr] = '+ str(layerNo) + ' order by NEWID()').fetchall()
@@ -146,7 +153,9 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
         print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
-    t3.close()
+
+    if not mainStream:
+        t3.close()
 
     # Ramp Profile ------------------------------------------------------------------------------------------[D]
     dataWS = t4.execute('Select TOP ' + str(regm4) + ' * FROM ' + str(T4) + ' where [cLyr] = '+ str(layerNo) + ' order by NEWID()').fetchall()
@@ -165,7 +174,8 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-    t4.close()
+    if not mainStream:
+        t4.close()
 
     # Pipe Properties Profile ------------------------------------------------------------------------------------------[D]
     dataPP = t5.execute('Select * FROM ' + str(T5) + ' where [cLyr] = '+ str(layerNo)).fetchall()
@@ -184,8 +194,8 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layerNo):
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
-
-    t5.close()
+    if not mainStream:
+        t5.close()
 
     return rTT, rST, rTG, rWS, rPP
 # -------------------------------------------------------------------------------------------------------[XXXXXXX]

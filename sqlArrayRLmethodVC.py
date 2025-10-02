@@ -46,7 +46,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
             time.sleep(300)
 
     except Exception as e:
-        print("[cVC] Void Count Data trickling...")  # , e)
+        print("[cVC] Data trickling...")  # , e)
         time.sleep(2)
 
     t1.close()

@@ -8,12 +8,12 @@ Ramp data
 """
 
 
-def validCols(pParam, pWON=None):
+def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
-    if pParam == 'RMA_' + pWON:
+    if pParam[0:3] == 'RM_':
         columns = ['id_col', 'R1Pos', 'R2Pos', 'R3Pos', 'R4Pos', 'PipeDir', 'cLayer']
 
-    elif pParam == 'SPC_RM':
+    elif pParam[0:6] == 'SPC_RM':
         columns = ['R1Pos', 'R2Pos', 'R3Pos', 'R4Pos', 'PipeDir', 'cLayer']
 
     else:

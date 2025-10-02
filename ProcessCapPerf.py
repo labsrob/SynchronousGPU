@@ -1,13 +1,13 @@
 # Process capabilityu and proesss performance per monitoring params
 
 # Process capability ------------------[]
-A3 = [0.975, 0.789, 0.680, 0.606]  # 10, 15, 20, 25 sample sizes respectively
-B3 = [0.284, 0.428, 0.510, 0.565]  # 10, 15, 20, 25 sample sizes respectively
-B4 = [1.716, 1.572, 1.490, 1.435]
+A3 = [0.975, 0.789, 0.680, 0.606, 0.186]  # 10, 15, 20, 25, 30 sample sizes respectively
+B3 = [0.284, 0.428, 0.510, 0.565, 0.323]  # 10, 15, 20, 25, 30 sample sizes respectively
+B4 = [1.716, 1.572, 1.490, 1.435, 1.677]
 
 
-def processCap(meanP, stdDev, sampSiz):
-    # Evaluate constants with defined sample size --
+def processCap(meanP, stdDev, USL, LSL, sampSiz):
+    # Evaluate constants with defined sample size -- [Automatic derivates]
     if sampSiz == 10:
         const1 = A3[0]
         const2 = B3[0]
@@ -24,11 +24,16 @@ def processCap(meanP, stdDev, sampSiz):
         const1 = A3[3]
         const2 = B3[3]
         const3 = B4[3]
+    elif sampSiz == 30:
+        const1 = A3[4]
+        const2 = B3[4]
+        const3 = B4[4]
     else:
         print('Sample Size undefined!, Exiting...')
         exit()
 
     # ' Cpk indicate both the lower and upper limit values in the process'
+    print('\nTP1..', meanP, stdDev, sampSiz)
     if stdDev != 0 and meanP != 0:
         xUSL = meanP + (const1 * stdDev * 2)        # 3sigma *2 = 6 Sigma plus mean line
         xLSL = meanP - (const1 * stdDev * 2)        # 3sigma *2 = 6 Sigma plus mean line
@@ -44,35 +49,29 @@ def processCap(meanP, stdDev, sampSiz):
         CpkL = (meanP - xLSL) / (3 * stdDev)  # Ppkl, rational subgroup (miniTab)
         CpkU = (xUSL - meanP) / (3 * stdDev)  # Ppku, of rational subgroup (miniTab)
         Cpro = (xUSL - xLSL) / (6 * stdDev)   # Pp, StDev is for a subgroup of >11 (n=20)
-
+        Cpk = min(CpkL, CpkU)
     else:
-        # if Mean & Std Dev are Zero - Error handling -------------------[]
-        xUSL = meanP + (const1 * stdDev * 2)
-        xLSL = meanP - (const1 * stdDev * 2)
-        xUCL = meanP + (const1 * stdDev)
-        xLCL = meanP - (const1 * stdDev)
-        sUCL = (const3 * stdDev)                # 1.490
-        sLCL = (const2 * stdDev)                # 0.510
-        CpkL = (meanP - xLSL) / (3 * stdDev)
-        CpkU = (xUSL - meanP) / (3 * stdDev)
-        Cpro = (xUSL - xLSL) / (6 * stdDev)
+        # if Mean & Std Dev are Zero ------------[]
+        Cpk, Cpro = hisCap(meanP, stdDev, USL, LSL)
 
-    return xUSL, xLSL, xUCL, xLCL, sUCL, sLCL, CpkL, CpkU, Cpro
+    return Cpk, Cpro
 
 
-def hisCap(meanP, stdDev, LSL, USL):
+def hisCap(meanP, stdDev, USL, LSL):
 
     if stdDev != 0:
         # TODO - Ppk uses the OVERALL (historical) standard deviation
         PpkL = (meanP - LSL) / (3 * stdDev)           # Ppkl, rational subgroup
         PpkU = (USL - meanP) / (3 * stdDev)           # Ppku, of rational subgroup
-        Ppro = (USL - LSL) / (6 * stdDev)             # Pp, StDev is for a subgroup of >11 (n=20)
+        Pperf = (USL - LSL) / (6 * stdDev)             # Pp, StDev is for a subgroup of >11 (n=20)
     else:
         stdDev = 0.68
         meanP = 0.0
         # NaN Error handling -----------------------------------------------[]
         PpkL = (meanP - LSL) / (3 * stdDev)
         PpkU = (USL - meanP) / (3 * stdDev)
-        Ppro = (USL - LSL) / (6 * stdDev)
+        Pperf = (USL - LSL) / (6 * stdDev)
 
-    return PpkL, PpkU, Ppro
+    Ppk = min(PpkL, PpkU)
+
+    return Ppk, Pperf

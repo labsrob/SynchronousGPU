@@ -26,7 +26,7 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
     group_step = int(grp_step)                      # group size/ sample sze
     fetch_no = int(fetch_no)                        # dbfreq = TODO look into any potential conflict
     print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
-
+    print('=' * 50)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     if len(dL) < (nGZ - 1):
         n2fetch = nGZ                                       # fetch initial specified number

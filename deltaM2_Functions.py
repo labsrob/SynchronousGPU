@@ -43,7 +43,7 @@ machineCode_Data = [40960, 40992, 41008, 41040, 41072, 41088, 43392, 43408, 4505
 					49216, 49232, 49280, 49296, 49424, 49440, 49488, 49504, 49520, 49536, 49664, 51584, 51600, 53248,
 					53280, 53328, 53376, 53392, 53648, 53792, 53824, 53840, 53872, 53888, 53904, 54032, 54048, 54064,
 					54080, 55680, 55696, 57344, 57360, 57408, 57424, 57488, 57600, 57616, 57648, 59776, 59792, 49728,
-					-18032, 0]
+					-18032, 0, -19354, -19353, 59792]
 
 codeDescript = ["StandBy State, Call Engineers ...", "Production Mode Confirmed", "Selecting Initial Direction",
 				"Operator Confirming Pipe Load Procedure", "Operator Confirming Pipe Parameters",
@@ -68,7 +68,7 @@ codeDescript = ["StandBy State, Call Engineers ...", "Production Mode Confirmed"
 				"Positioning Rings for Haffner Replacement", "Haffner Replacement Completed", "Retracting KEYENCE Arms..",
 				"Retracting Shrinkage Encoders...", "Executing Pipe Release Procedure..", "Executing Pipe UNLOAD Procedure…",
 				"Pipe Build Completion Successful", "Unknown State!", "End of Pipe Layer", "Unknown State, ask the Operators",
-				"Unknown State Machine"]
+				"Unknown State Machine", "Not known", "Not known", 'Completion Error State']
 
 # -------------------------------------------------------------------------------------[]
 _Plc= snap7.client.Client()
@@ -118,7 +118,7 @@ def readInteger(db_number, start_offset, bit_offset):
 
 
 def readString(db_number, start_offset, bit_offset):
-	r_length = 2 # 16
+	r_length =  16 #4, 8, 16, 32, 64, 128, 256 (-2 Bytes)
 	reading = pCon.db_read(db_number, start_offset, r_length)
 	a = snap7.util.get_string(reading, 0)
 	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
@@ -147,15 +147,23 @@ def smc_status(rtc):			# Match MSC code with string description
 
 
 def autoPausePlay():
+	"""
+	NOTE: PLC real is represented in 4 bytes but the IEEE 754 encodes as binary32
+	Datatype int in the PLC is represented in two bytes
+	Datatype dword consists in 8 bytes in the PLC
+	:return:
+	"""
 	print('Checking SMC readiness...')
-	# while True:
+
 	try:
 		sysRun = readBool(db_number, 0, 0)			# False/True
 		sysIdl = readBool(db_number, 0, 1)  			# System idling
 		sysRdy = readBool(db_number, 0, 2)  			# System Ready
-		mscTcp = readInteger(db_number, 2, 0)   		# Machine State Code (msc)
-		cLayer = readInteger(db_number, 264, 0)  		# Current achieved layer
-		pipPos = readReal(db_number, 436, 0)  		# Current achieved layer
+		msc_rt = readInteger(db_number, 2, 0)   		# Machine State Code (msc)
+		if msc_rt <= 0:
+			msc_rt = 0
+		cLayer = readInteger(db_number, 264,0) 		# Current achieved layer
+		pipPos = readLReal(117, 8, 0)  		# Current pipe Position
 		# Obtain State machine code description ----------------------------#
 		rt_stat = dict(zip(machineCode_Data, codeDescript))
 
@@ -163,16 +171,16 @@ def autoPausePlay():
 		print(f"Exception Error: '{err}'")
 		errorLog(f"{err}")
 		print('Error loading autoplay..')
-		sysRun = False														# Machine Unreachable
+		sysRun = False										# Machine Unreachable
 		sysIdl = 0
 		sysRdy = 0
-		mscTcp = 59792															# Machine No state / undefined state
+		msc_rt = 59792										# Machine No state / undefined state
 		cLayer = 0
 		pipPos = 0
 		rt_stat = dict(zip(machineCode_Data, codeDescript))
-	mstatus = rt_stat[mscTcp]
+	mstatus = rt_stat[msc_rt]
 
-	return sysRun, sysIdl, sysRdy, mscTcp, cLayer, pipPos, mstatus
+	return sysRun, sysIdl, sysRdy, msc_rt, cLayer, pipPos, mstatus
 
 
 def rt_autoPausePlay():
@@ -180,7 +188,10 @@ def rt_autoPausePlay():
 	try:
 		sRun = readBool(db_number, 0, 0)		# False/True
 		msc = readInteger(db_number, 2, 0)   # Machine State Code (msc)
+		if msc <= 0:
+			msc = 0
 		cLayr = readInteger(db_number, 264,0)
+		# pipPos = readLReal(db_number, 436, 0)  # Current pipe Position
 		rt_satus = dict(zip(machineCode_Data, codeDescript))
 
 	except Exception as err:
@@ -1056,8 +1067,11 @@ def dScreen():
 
 	return
 
+#
+# def st_autoPausePlay():
+#     return None
 
-def st_autoPausePlay():
-    return None
-
-watchDogController()
+# watchDogController()
+# autoPausePlay()
+# sysRun(0.0), sysidl(0.1), sysrdy(0.2), msctcp(2.0), won_NO(4.0) =
+#liveProductionRdy()
