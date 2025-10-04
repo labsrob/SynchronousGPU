@@ -2959,7 +2959,7 @@ class common_rampCount(ttk.Frame):
         # var_plyr = df1["cLayer"].values[-1]       # valid
         # var_plyr = df1["cLayer"].tail(1).item()   # valid
         # ----------------------------------------
-        print('\nProcessing Layer:', var_plyr)
+        # print('\nProcessing Layer:', var_plyr)
         # uPosA = df1[(df1["cLayer"] == var_plyr) & (df1["R1Pos"] > 0) & (df1["sCentre"] > 0)]["R1Pos"].value_counts()
         # uPosB = df1[(df1["cLayer"] == var_plyr) & (df1["R2Pos"] > 0) & (df1["sCentre"] > 0)]["R2Pos"].value_counts()
         # uPosC = df1[(df1["cLayer"] == var_plyr) & (df1["R3Pos"] > 0) & (df1["sCentre"] > 0)]["R3Pos"].value_counts()
@@ -2969,11 +2969,11 @@ class common_rampCount(ttk.Frame):
         uPosB = df1[(df1["cLayer"] == var_plyr) & (df1["R2Pos"] > 0)].shape[0]
         uPosC = df1[(df1["cLayer"] == var_plyr) & (df1["R3Pos"] > 0)].shape[0]
         uPosD = df1[(df1["cLayer"] == var_plyr) & (df1["R4Pos"] > 0)].shape[0]
-        print('\nComputed Values:', uPosA, uPosB, uPosC, uPosD)
+        # print('\nComputed Values:', uPosA, uPosB, uPosC, uPosD)
         # print('\nComputed lengths:', len(uPosA), len(uPosB), len(uPosC), len(uPosD))
 
         RC = rmp.loadProcesValues(df1)  # Join data values under dataframe
-        print('\n[RC] Content', df1.tail())
+        # print('\n[RC] Content', df1.tail())
 
         if self.running:
             # ------- plot ramp count ----------------------------------#
@@ -3070,17 +3070,17 @@ class common_climateProfile(ttk.Frame):
         self.a3.tick_params(axis='y', labelcolor='red')
         self.a3.set_ylim(self.minH, self.maxH)
         # ----------------------------------------------------------#
-        self.im10, = self.a2.plot([], [], '--', label='Line 1 Temp', linewidth=0.4)
-        self.im11, = self.a2.plot([], [], '--', label='Line 2 Temp', linewidth=0.4)
-        self.im12, = self.a2.plot([], [], '--', label='Line 3 Temp', linewidth=0.4)
-        self.im13, = self.a2.plot([], [], '--', label='Line 4 Temp', linewidth=0.4)
-        self.im14, = self.a2.plot([], [], '--', label='Line 5 Temp', linewidth=0.4)
+        self.im10, = self.a2.plot([], [], 'o-', label='Line 1 Temp', linewidth=0.4)
+        self.im11, = self.a2.plot([], [], 'o-', label='Line 2 Temp', linewidth=0.4)
+        self.im12, = self.a2.plot([], [], 'o-', label='Line 3 Temp', linewidth=0.4)
+        self.im13, = self.a2.plot([], [], 'o-', label='Line 4 Temp', linewidth=0.4)
+        self.im14, = self.a2.plot([], [], 'o-', label='Line 5 Temp', linewidth=0.4)
 
-        self.im15, = self.a3.plot([], [], 'o-', label='Line 1 Humidity', linewidth=0.4)
-        self.im16, = self.a3.plot([], [], 'o-', label='Line 2 Humidity', linewidth=0.4)
-        self.im17, = self.a3.plot([], [], 'o-', label='Line 3 Humidity', linewidth=0.4)
-        self.im18, = self.a3.plot([], [], 'o-', label='Line 4 Humidity', linewidth=0.4)
-        self.im19, = self.a3.plot([], [], 'o-', label='Line 5 Humidity', linewidth=0.4)
+        self.im15, = self.a3.plot([], [], '--', label='Line 1 Humidity', linewidth=0.6)
+        self.im16, = self.a3.plot([], [], '--', label='Line 2 Humidity', linewidth=0.6)
+        self.im17, = self.a3.plot([], [], '--', label='Line 3 Humidity', linewidth=0.6)
+        self.im18, = self.a3.plot([], [], '--', label='Line 4 Humidity', linewidth=0.6)
+        self.im19, = self.a3.plot([], [], '--', label='Line 5 Humidity', linewidth=0.6)
 
         self.canvas = FigureCanvasTkAgg(self.f, self)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
@@ -3112,55 +3112,60 @@ class common_climateProfile(ttk.Frame):
         """
         # Initialise RT variables ---[]
         autoSpcRun = True
-        autoSpcPause = False
+        paused = False
         import keyboard  # for temporary use
 
-        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-        # sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-        # Define PLC/SMC error state -------------------------------------------#
         import sqlArrayRLmethodEV as sev
 
         while True:
-            time.sleep(5)
             # procedure must be valid either on PLC/SQL based runtime
-            if self.running and ev_con:
+            if UseSQL_DBS and self.running and ev_con:
                 inProgress = True  # True for RetroPlay mode
                 print('\n[cEV] Asynchronous controller activated...')
 
-                if keyboard.is_pressed("Alt+Q") and not inProgress:
-                    print('\nProduction is pausing...')
-                    if not autoSpcPause:
-                        autoSpcRun = not autoSpcRun
-                        autoSpcPause = True
-                        print("\n[cEV] Visualization in Paused Mode...")
-                    else:
-                        autoSpcPause = False
-                        print("[cEV] Visualization in Real-time Mode...")
+                if uCalling == 1 and not sysRun:
+                    print('\n[cEV] Production is pausing...')
+                    paused = True
+
+                    while paused:
+                        time.sleep(5)
+                        print("\n[cEV Viz] Visualization in Paused Mode...")
+                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                        if sysRun:
+                            paused = False
+                            print('[cEV] Visualisation Resumes...')
+                        time.sleep(0.2)
+
+                elif uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+                    paused = True
+
+                    while paused:
+                        time.sleep(5)
+                        print("\n[cEV Viz] Visualization in Paused Mode...")
+                        if keyboard.is_pressed("esc"):
+                            paused = False
+                            print('[cEV] Visualisation Resumes...')
+                        time.sleep(0.2)
                 else:
                     # Get list of relevant SQL Tables using conn() --------------------[]
                     self.evStr = sev.sqlExec(ev_con, s_fetch, stp_Sz, self.evT, frqC)
                     time.sleep(10)
-                    # ------ Inhibit iteration ----------------------------------------[]
-                """
-                # Set condition for halting real-time plots in watchdog class ---------------------
-                """
-                # TODO --- values for inhibiting the SQL processing
-                if keyboard.is_pressed("Alt+Q") or not self.evStr:  # Terminate file-fetch
-                    ev_con.close()
-                    print('[cEV] SQL End of File, connection closes after 30 mins...')
-                    time.sleep(60)
-                    continue
+                    # ------ Inhibit iteration ----------------------------------------[
+                    if  not self.evStr:  # Terminate file-fetch
+                        ev_con.close()
+                        print('[cEV] SQL End of File, connection closes after 30 mins...')
+                        time.sleep(60)
+                        continue
+                    else:
+                        print('\n[cEV] Updating....')
+                if ev_con:
+                    self.canvas.get_tk_widget().after(0, self.evDataPlot)  # Regime = every 5seconds
+                    frqC += 1
                 else:
-                    print('\n[cEV] Updating....')
-
+                    print('[cEV] sorry, instance not granted, trying again..')
+                    ev_con = sq.check_SQL_Status(5, 30)
             else:
                 print('\n[cEV] is active but no visualisation!')
-            if ev_con:
-                self.canvas.get_tk_widget().after(0, self.evDataPlot)  # Regime = every 5seconds
-                frqC += 1
-            else:
-                print('[cEV] sorry, instance not granted, trying again..')
-                ev_con = sq.check_SQL_Status(5, 30)
             print('[cEV] Waiting for refresh..')
 
     # ================== End of synchronous Method ===========================================================[]
@@ -3178,18 +3183,8 @@ class common_climateProfile(ttk.Frame):
             df1 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
 
             EV = ev.loadProcesValues(df1)                       # Join data values under dataframe
-            print('\nDataFrame Content', df1.tail(10))          # Preview Data frame head
+            # print('\nDataFrame Content', df1.tail(10))          # Preview Data frame head
             # print("Memory Usage:", df1.info(verbose=False))   # Check memory utilization
-
-            # ---------- Broadcast layer number
-            # processedLayer = EV[11]
-            # if not p_layer: # >= processedLayer:
-            #      p_layer.append(processedLayer)
-            # elif p_layer[-1] < processedLayer:
-            #     p_layer.append(processedLayer)
-            # else:
-            #     p_layer.append(0)
-            # --------------------------------
             uvIndex = 3.0
             # ------- plot ramp count ----------------------------------#
             self.a2.legend(loc='upper left', title='PO64PX Climate Profile')
@@ -3408,7 +3403,7 @@ class common_gapCount(ttk.Frame):
         uPosD = df1[(df1["cLayer"] == var_plyr) & (df1["VODPosD"] > 0) & (df1["sCentre"] > 0)].shape[0]
 
         VC = vc.loadProcesValues(df1)           # Join data values under dataframe
-        print('\n[cVC] Content', df1.head())     # Preview Data frame head
+        # print('\n[cVC] Content', df1.head())     # Preview Data frame head
         # print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
 
         if self.running:
@@ -7450,8 +7445,6 @@ class tapeGapPolTabb(ttk.Frame):
         # ------------------------------------------#
         if UseSQL_DBS and self.running:  # accessible through sql only!
             self.a4.legend(['Void Mapping Profile'], loc='upper right', fontsize="x-large")
-
-
             pScount = VM[1]                         # Sample count
             pCenter = np.array(VM[2] * 0.001)       # Sample centre -- X axis convert to mt
             pAvgGap = np.array(VM[3])               # Average Gap
