@@ -6,52 +6,52 @@ import loadSQLConfig as tx
 # Initialise relevant variables and load configuration settings ----------[]
 # server_IP, db_ref, isAtho, yekref = tx.load_configSQL('checksumError.ini')
 # print('ServerUse Details:', server_IP, db_ref, isAtho, yekref)
-
-server_IP = '10.0.3.172'
-db_ref = 'DAQ_sSPC'
-isAtho = 'TCP01'
-yekref = 'Testing27!'
-Encrypt = 'no'                  # Added today 06/08/2024 [optional]
-Certify = 'yes'                 # DITTO
-
-def EOLrpt_connect():
-    """
-    state: 1 connected, 0 Not connected
-    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
-    """
-    # print('\nDatasource Details:', server_IP, db_ref)
-    # -------- Actual SQL Connection request -----------------#
-    conn = None
-    # ---------------------------------------------------------#
-    if conn == None:
-        print('\n[EoL] Connecting to SQL server...')
-
-        try:
-            conn = pyodbc.connect('Driver={SQL Server};'
-                                  'Server=' + server_IP + ';'
-                                  'Database=' + db_ref + ';'
-                                  'Encrypt=' + Encrypt + ';'
-                                  'TrustServerCertificate=' + Certify + ';'
-                                  'uid=' + isAtho + ';'
-                                  'pwd=' + yekref + ';'
-                                  'MultipleActiveResultSets=True', timeout=5, autocommit=True)
-            # conn = True
-            print('\n[EoL] SQL Server connection active!\n')
-            return conn
-
-        except Exception as err:
-            print('\n[EoL] Connection issue: SQL Server is inaccessible!')
-
-    return None
-
-# # Determine EOL Random sampling regime ---------------------------------------------------------------[X]
-tempo = EOLrpt_connect()
-t1 = tempo.cursor()
-t2 = tempo.cursor()
-
-T1 = 'ZTT_20250923'
-T2 = 'ZST_20250923'
-layerNo = 1
+#
+# server_IP = '10.0.3.172'
+# db_ref = 'DAQ_sSPC'
+# isAtho = 'TCP01'
+# yekref = 'Testing27!'
+# Encrypt = 'no'                  # Added today 06/08/2024 [optional]
+# Certify = 'yes'                 # DITTO
+#
+# def EOLrpt_connect():
+#     """
+#     state: 1 connected, 0 Not connected
+#     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+#     """
+#     # print('\nDatasource Details:', server_IP, db_ref)
+#     # -------- Actual SQL Connection request -----------------#
+#     conn = None
+#     # ---------------------------------------------------------#
+#     if conn == None:
+#         print('\n[EoL] Connecting to SQL server...')
+#
+#         try:
+#             conn = pyodbc.connect('Driver={SQL Server};'
+#                                   'Server=' + server_IP + ';'
+#                                   'Database=' + db_ref + ';'
+#                                   'Encrypt=' + Encrypt + ';'
+#                                   'TrustServerCertificate=' + Certify + ';'
+#                                   'uid=' + isAtho + ';'
+#                                   'pwd=' + yekref + ';'
+#                                   'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+#             # conn = True
+#             print('\n[EoL] SQL Server connection active!\n')
+#             return conn
+#
+#         except Exception as err:
+#             print('\n[EoL] Connection issue: SQL Server is inaccessible!')
+#
+#     return None
+#
+# # # Determine EOL Random sampling regime ---------------------------------------------------------------[X]
+# tempo = EOLrpt_connect()
+# t1 = tempo.cursor()
+# t2 = tempo.cursor()
+#
+# T1 = 'ZTT_20250923'
+# T2 = 'ZST_20250923'
+# layerNo = 1
 
 # Query = 'Select count([R1SP]) AS ValidTotal from [' + str(T1) + '] where [cLyr] = ' + str(layerNo)
 # t1.execute(Query)
@@ -302,17 +302,54 @@ def padDT(x, ys, pad_value=0):
     # Pad each y-series
     ys_padded = np.vstack([np.pad(y, (0, max_len - len(y)), constant_values=pad_value) for y in ys])
     return x_padded, ys_padded
+#
+#
+# x = np.arange(32)
+# y1 = np.arange(28)      # shorter
+# y2 = np.arange(32)      # full length
+# y3 = np.arange(30)      # shorter
+# ys = [y1, y2, y3]
+#
+# x_pad, ys_pad = padDT(x, ys, pad_value=0)
+# print(x_pad.shape)  # (32,)
+# print(ys_pad.shape) # (3, 32)
+# print(ys_pad)
+# print('\nTP1', ys_pad[0])
+# print('\nTP2', ys_pad[1])
 
+# layerN = range(0, 70)
+# for layer in layerN:
+#     time.sleep(3)
+#     print(layer)
+#     # layerN = layer
+# import pandas as pd
+# import matplotlib.pyplot as plt
+#
+# # Example DataFrame
+# df = pd.DataFrame({
+#     "valueA": ["X", "X", "Y", "Y", "Z", "X", "Y", "Z"],
+#     "layerNo": [1, 2, 1, 2, 1, 1, 2, 2]
+# })
+#
+# # Count occurrences of valueA per layer
+# counts = pd.crosstab(df["layerNo"], df["valueA"])
+#
+# # Plot as line chart (one line per valueA)
+# counts.plot(kind="line", marker="o")
+#
+# plt.title("Distribution of valueA across layerNo")
+# plt.xlabel("Layer Number")
+# plt.ylabel("Counts")
+# plt.grid(True)
+# plt.legend(title="valueA")
+# plt.show()
 
-x = np.arange(32)
-y1 = np.arange(28)      # shorter
-y2 = np.arange(32)      # full length
-y3 = np.arange(30)      # shorter
-ys = [y1, y2, y3]
+mlis =[] # [2, 3, 8]
+# mlis.append(5)
+mlis.insert(0,8)
+print('New List', mlis)
 
-x_pad, ys_pad = padDT(x, ys, pad_value=0)
-print(x_pad.shape)  # (32,)
-print(ys_pad.shape) # (3, 32)
-print(ys_pad)
-print('\nTP1', ys_pad[0])
-print('\nTP2', ys_pad[1])
+# Example 2: Using the pop() method
+my_list = [1, 2, 3, 4, 5]
+last_element = my_list.pop()
+print(last_element)

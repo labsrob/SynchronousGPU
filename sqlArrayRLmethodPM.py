@@ -26,7 +26,7 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, fetch_no):
     n2fetch = int(nGZ)
     group_step = int(grp_step)
     fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
+    print('\n[PM] SAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
     print('=' * 50)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:

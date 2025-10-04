@@ -2803,7 +2803,7 @@ class common_rampCount(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=20)
-        self.running = True
+        self.running = False
 
         # prevents user possible double loading -----
         if not self.running:
@@ -2829,29 +2829,29 @@ class common_rampCount(ttk.Frame):
         plt.rcParams.update({'font.size': 9})                       # Reduce font size to 7pt for all legends
 
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minRP, YScale_maxRP = 0, 100                         # vCount# Ramp Count Profile (Per segment)
-        self.win_Xmin, self.win_Xmax = 0, pExLayer                  # windows view = visible data points
+        YScale_minRC, YScale_maxRC = 0, 1000                        # vCount# Ramp Count Profile (Per segment)
+        self.win_XminRC, self.win_XmaxRC = 0, 10                    # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
-        # if UseSQL_DBS:
-        self.T1 = 'RC_' + str(pWON)
-        # else:
-        #     self.T1 = SPC_RC
+        # self.T1 = 'RC_' + str(pWON) # replaced / switched to
+        self.T1 = 'RM_' + str(pWON)
         # ----------------------------------------------------------#
-        self.a1.legend(["Cumulative Ramp Count"], loc='upper right', fontsize="x-large")
+        self.a1.xaxis.set_major_locator(MultipleLocator(1))
+        self.a1.legend(["Layer Ramp Count"], loc='upper right', fontsize="x-large")
         self.a1.grid(color="0.5", linestyle='-', linewidth=0.5)
-        self.a1.set_xlabel("Cumulative Ramp / Segment")
+        self.a1.set_xlabel("Pipe Segment")
+        self.a1.set_ylabel("Ramp Count")
+
         # ----------------------------------------------------------#
-        self.a1.set_ylabel("Pipe Nominal Layer")
-        self.a1.set_ylim([YScale_minRP, YScale_maxRP], auto=True)
-        self.a1.set_xlim([self.win_Xmin, self.win_Xmax], auto=True)
+        self.a1.set_ylim([YScale_minRC, YScale_maxRC], auto=True)
+        self.a1.set_xlim([self.win_XminRC, self.win_XmaxRC], auto=True)
 
         # ------- plot ramp count ------------[]
-        self.im10, = self.a1.plot([], [], '-', label='Ring 1 Ramp')                  # ramp count all layers
-        self.im11, = self.a1.plot([], [], '-', label='Ring 2 Ramp')                  # ramp count all layers
-        self.im12, = self.a1.plot([], [], '-', label='Ring 3 Ramp')                  # ramp count all layers
-        self.im13, = self.a1.plot([], [], '-', label='Ring 4 Ramp')                  # ramp count all layers
-        self.im14, = self.a1.plot([], [], 'o-', label='Cumulative')                  # ramp count all layers
+        self.im10, = self.a1.plot([], [], 'o-', label='Total Ramp')                  # ramp count all layers
+        # self.im11, = self.a1.plot([], [], 'o-', label='Ring 2 Ramp')                  # ramp count all layers
+        # self.im12, = self.a1.plot([], [], 'o-', label='Ring 3 Ramp')                  # ramp count all layers
+        # self.im13, = self.a1.plot([], [], 'o-', label='Ring 4 Ramp')                  # ramp count all layers
+        # self.im14, = self.a1.plot([], [], 'o-', label='Cumulative')                  # ramp count all layers
 
         self.canvas = FigureCanvasTkAgg(self.f, self)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
@@ -2866,13 +2866,14 @@ class common_rampCount(ttk.Frame):
         # ---------------- EXECUTE SYNCHRONOUS METHOD --------------#
 
     def dataControlRC(self):           #  data_worker
-        global batch_RC
+        global batch_RC, s_fetch
 
         batch_RC = 1
-        s_fetch, stp_Sz = 100, 1        # entry value in string sql syntax
+        s_fetch, stp_Sz = 300, 1        # entry value in string sql syntax
 
         # Obtain Volatile Data from sql Host Server ---------------------------[]
         if self.running:
+            import sqlArrayRLmethodRM as rmp
             rc_con = sq.sql_connectRC()
         else:
             pass
@@ -2883,56 +2884,61 @@ class common_rampCount(ttk.Frame):
         """
         # Initialise RT variables ---[]
         autoSpcRun = True
-        autoSpcPause = False
+        paused = False
         import keyboard                     # for temporary use
 
-        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-        # sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-        # Define PLC/SMC error state -------------------------------------------#
-        import sqlArrayRLmethodRC as rC
-
         while True:
-            time.sleep(5)
             # This procedure must be valid either on PLC/SQL baseed runtime
-            if self.running and rc_con:
+            if UseSQL_DBS and self.running and rc_con:
+                print('\n[cRC] Asynchronous controller activated...')
 
-                inProgress = True  # True for RetroPlay mode
-                print('\nAsynchronous controller activated...')
-                print('DrLabs' + "' Runtime Optimisation is Enabled!")
+                if uCalling == 1 and not sysRun:
+                    print('\n[cRC] Production is pausing...')
+                    paused = True
 
-                if keyboard.is_pressed("Alt+Q") and not inProgress:
-                    print('\nProduction is pausing...')
-                    if not autoSpcPause:
-                        autoSpcRun = not autoSpcRun
-                        autoSpcPause = True
-                        print("\nVisualization in Paused Mode...")
-                    else:
-                        autoSpcPause = False
-                        print("Visualization in Real-time Mode...")
+                    while paused:
+                        time.sleep(5)
+                        print("\n[cRC Viz] Visualization in Paused Mode...")
+                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                        if sysRun:
+                            paused = False
+                            print('[cRC] Visualisation Resumes...')
+                        time.sleep(0.2)
+
+                elif uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+                    paused = True
+
+                    while paused:
+                        time.sleep(5)
+                        print("\n[cRC Viz] Visualization in Paused Mode...")
+                        if keyboard.is_pressed("esc"):
+                            paused = False
+                            print('[cRC] Visualisation Resumes...')
+                        time.sleep(0.2)
+
                 else:
                     # Get list of relevant SQL Tables using conn() --------------------[]
-                    self.rcP = rC.sqlExec(rc_con, s_fetch, stp_Sz, self.T1, batch_RC)
-                    time.sleep(5)
-                # ------ Inhibit iteration -----rm_con---------------------------------[]
-                """
-                # Set condition for halting real-time plots in watchdog class ---------------------
-                """
-                # TODO --- values for inhibiting the SQL processing
-                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                    rc_con.close()
-                    print('SQL End of File, connection closes after 30 mins...')
-                    time.sleep(60)
-                    continue
+                    self.rcP = rmp.sqlExec(rc_con, s_fetch, stp_Sz, self.T1, batch_RC)
+                    time.sleep(30)
+
+                    # ------ Inhibit iteration -----rm_con---------------------------------[]
+                    if not self.rcP:  # Terminate file-fetch
+
+                        print('[cRC] End of File, connection closes after 30 mins...')
+                        time.sleep(60)
+                        rc_con.close()
+                        continue
+                    else:
+                        print('\n[cRC] Updating....')
+
+                if rc_con:
+                    self.canvas.get_tk_widget().after(0, self.rcDataPlot) # Regime = every 10000 ms = 10seconds
+                    batch_RC += 1
                 else:
-                    print('\n[cRC] Updating....')
+                    print('[cRC] sorry, instance not granted, trying again..')
+                    rc_con = sq.check_SQL_Status(5, 40)
             else:
                 print('\n[cRC] is active but no visualisation!')
-            if rc_con:
-                self.canvas.get_tk_widget().after(0, self.rcDataPlot) # Regime = every 10000 ms = 10seconds
-                batch_RC += 10
-            else:
-                print('[cRC] sorry, instance not granted, trying again..')
-                rc_con = sq.check_SQL_Status(5, 40)
             print('[cRC] Waiting for refresh..')
 
     # ================== End of synchronous Method ==========================obal
@@ -2941,39 +2947,61 @@ class common_rampCount(ttk.Frame):
         timei = time.time()                                 # start timing the entire loop
 
         # Call data loader Method---------------------------#
-        import VarSQL_RC as rc                              # load SQL variables column names | rfVarSQL
+        import VarSQL_RM as rmp                             # load SQL variables column names | rfVarSQL
+        g1 = qrm.validCols(self.T1)                         # Construct Data Column selSqlColumnsTFM.py
+        df1 = pd.DataFrame(self.rcP, columns=g1)            # Import into python Dataframe
+        # ------------------------------------------
+        data1 = df1.select_dtypes(include=["number"])
+        df1 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+        # -----------------------------------------
+        # var_plyr = df1["cLayer"][-1:]             # not a scalar value
+        var_plyr = df1["cLayer"].iloc[-1]           # most efficient
+        # var_plyr = df1["cLayer"].values[-1]       # valid
+        # var_plyr = df1["cLayer"].tail(1).item()   # valid
+        # ----------------------------------------
+        print('\nProcessing Layer:', var_plyr)
+        # uPosA = df1[(df1["cLayer"] == var_plyr) & (df1["R1Pos"] > 0) & (df1["sCentre"] > 0)]["R1Pos"].value_counts()
+        # uPosB = df1[(df1["cLayer"] == var_plyr) & (df1["R2Pos"] > 0) & (df1["sCentre"] > 0)]["R2Pos"].value_counts()
+        # uPosC = df1[(df1["cLayer"] == var_plyr) & (df1["R3Pos"] > 0) & (df1["sCentre"] > 0)]["R3Pos"].value_counts()
+        # uPosD = df1[(df1["cLayer"] == var_plyr) & (df1["R4Pos"] > 0) & (df1["sCentre"] > 0)]["R4Pos"].value_counts()
+        # --------- Enable above method when Table is updated with sCentre column ----
+        uPosA = df1[(df1["cLayer"] == var_plyr) & (df1["R1Pos"] > 0)].shape[0]
+        uPosB = df1[(df1["cLayer"] == var_plyr) & (df1["R2Pos"] > 0)].shape[0]
+        uPosC = df1[(df1["cLayer"] == var_plyr) & (df1["R3Pos"] > 0)].shape[0]
+        uPosD = df1[(df1["cLayer"] == var_plyr) & (df1["R4Pos"] > 0)].shape[0]
+        print('\nComputed Values:', uPosA, uPosB, uPosC, uPosD)
+        # print('\nComputed lengths:', len(uPosA), len(uPosB), len(uPosC), len(uPosD))
+
+        RC = rmp.loadProcesValues(df1)  # Join data values under dataframe
+        print('\n[RC] Content', df1.tail())
 
         if self.running:
-            g1 = qrc.validCols(self.T1)                        # Construct Data Column selSqlColumnsTFM.py
-            df1 = pd.DataFrame(self.rcP, columns=g1)           # Import into python Dataframe
-            RC = rc.loadProcesValues(df1)                      # Join data values under dataframe
-            print('\nSQL Content', df1.tail(10))
-            # print("Memory Usage:", df1.info(verbose=False))   # Check memory utilization
-            total_cum = RC[2] + RC[4] + RC[6] + RC[8]           # sCentre[0] | RMCount[1] | PipeDir[6] | cLayer[7]
             # ------- plot ramp count ----------------------------------#
             self.a1.legend(loc='upper right', title='Cumulative Ramp Count')
             # ----------------------------------------------------------[]
-
             # Plot X-Axis data points -------- X Plot
             self.im10.set_xdata(np.arange(batch_RC))
-            self.im11.set_xdata(np.arange(batch_RC))
-            self.im12.set_xdata(np.arange(batch_RC))
-            self.im13.set_xdata(np.arange(batch_RC))
-            self.im14.set_xdata(np.arange(batch_RC))
+            # self.im11.set_xdata(np.arange(batch_RC))
+            # self.im12.set_xdata(np.arange(batch_RC))
+            # self.im13.set_xdata(np.arange(batch_RC))
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1]
-            self.im10.set_ydata((RC[2])[0:batch_RC])  # head 1
-            self.im11.set_ydata((RC[3])[0:batch_RC])  # head 1
-            self.im12.set_ydata((RC[4])[0:batch_RC])  # head 1
-            self.im13.set_ydata((RC[8])[0:batch_RC])  # head 1
-            self.im14.set_ydata((RC[12])[0:batch_RC])     # Cumulative count
+            # self.im10.set_ydata(uPosA)  # .rolling(window=s_fetch).mean().dropna()) #[0:batch_RC])  # head 1
+            # self.im11.set_ydata(uPosB)  #.rolling(window=s_fetch).mean().dropna()) #[0:batch_RC]) # head 1
+            # self.im12.set_ydata(uPosC)  #.rolling(window=s_fetch).mean().dropna()) #[0:batch_RC])  # head 1
+            # self.im13.set_ydata(uPosD)  #.rolling(window=s_fetch).mean().dropna()) #[0:batch_RC])  # head 1
+            # -----------------------Layer
+            self.im10.set_ydata(RC[0].rolling(window=s_fetch, min_periods=1).mean()[0:batch_RC])
+            # self.im11.set_ydata(RC[0].rolling(window=s_fetch, min_periods=1).mean()[0:batch_RC])
+            # self.im12.set_ydata(RC[0].rolling(window=s_fetch, min_periods=1).mean()[0:batch_RC])
+            # self.im13.set_ydata(RC[0].rolling(window=s_fetch, min_periods=1).sum()[0:batch_RC])
 
             # Setting up the parameters for moving windows Axes --[]
-            if batch_RC > self.win_Xmax:
-                self.a1.set_xlim(batch_RC - self.win_Xmax, batch_RC)
+            if batch_RC > self.win_XmaxRC:
+                self.a1.set_xlim(batch_RC - self.win_XmaxRC, batch_RC)
                 RC.pop(0)
             else:
-                self.a1.set_xlim(0, self.win_Xmax)
+                self.a1.set_xlim(0, self.win_XmaxRC)
             print('[cRC] Data Stream Buffer Size 2:', len(RC))
             self.canvas.draw_idle()
 
@@ -2992,7 +3020,7 @@ class common_climateProfile(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=pEvX, y=20)     # 915
-        self.running = True
+        self.running = False
 
         # prevents user possible double loading -----
         if not self.running:
@@ -3145,6 +3173,10 @@ class common_climateProfile(ttk.Frame):
         if self.running:
             g1 = qev.validCols(self.evT)                        # SQL Table
             df1 = pd.DataFrame(self.evStr, columns=g1)          # Import data into Dataframe
+
+            data1 = df1.select_dtypes(include=["number"])
+            df1 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+
             EV = ev.loadProcesValues(df1)                       # Join data values under dataframe
             print('\nDataFrame Content', df1.tail(10))          # Preview Data frame head
             # print("Memory Usage:", df1.info(verbose=False))   # Check memory utilization
@@ -3219,7 +3251,7 @@ class common_gapCount(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=pTgX, y=20)
-        self.running = True
+        self.running = False
 
         # prevents user possible double loading -----
         if not self.running:
@@ -3242,29 +3274,28 @@ class common_gapCount(ttk.Frame):
         plt.rcParams.update({'font.size': 7})  # Reduce font size to 7pt for all legends
 
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minGP, YScale_maxGP = 0, vCount
-        self.win_Xmin, self.win_Xmax = 0, pExLayer                      # windows view = visible data points
+        YScale_minVC, YScale_maxVC = 0, 1000
+        self.win_Xmin, self.win_Xmax = 0, 10                         # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
         # if UseSQL_DBS:
         self.gcT = 'VC_' + str(pWON)
-        # else:
-        #     self.gcT = SPC_VC
         # ----------------------------------------------------------#
-        self.a3.legend(["Cumulative Gap Count"], loc='upper right', fontsize="x-large")
+        self.a3.xaxis.set_major_locator(MultipleLocator(1))
+        self.a3.legend(["Layer Void Count"], loc='upper right', fontsize="x-large")
         self.a3.grid(color="0.5", linestyle='-', linewidth=0.5)
-        self.a3.set_ylabel("Pipe Nominal Layer")
-        self.a3.set_xlabel("Cumulative Tape Gap Count / Segment")
+        self.a3.set_xlabel("Pipe Segment")
+        self.a3.set_ylabel("Void Count")
 
         # ----------------------------------------------------------#
-        self.a3.set_ylim([YScale_minGP, YScale_maxGP], auto=True)
+        self.a3.set_ylim([YScale_minVC, YScale_maxVC], auto=True)
         self.a3.set_xlim([self.win_Xmin, self.win_Xmax])
         # ----------------------------------------------------------#
         self.im10, = self.a3.plot([], [], 'o-', label='Void Count Segment A')
         self.im11, = self.a3.plot([], [], 'o-', label='Void Count Segment B')
         self.im12, = self.a3.plot([], [], 'o-', label='Void Count Segment C')
         self.im13, = self.a3.plot([], [], 'o-', label='Void Count Segment D')
-        self.im14, = self.a3.plot([], [], 'o-', label='Cumulative Gap Count')
+        # self.im14, = self.a3.plot([], [], 'o-', label='Cumulative Gap Count')
 
         self.canvas = FigureCanvasTkAgg(self.f, self)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
@@ -3279,10 +3310,10 @@ class common_gapCount(ttk.Frame):
         # ---------------- EXECUTE SYNCHRONOUS METHOD ---------------#
 
     def dataControlCgc(self):
-        global batch_VC
+        global batch_VC, s_fetch
 
         batch_VC = 1
-        s_fetch, stp_Sz = 100, 1  # entry value in string sql syntax
+        s_fetch, stp_Sz = 300, 1  # entry value in string sql syntax
 
         # Obtain SQL Data Host Server ---------------------------[]
         if self.running:                          # Load CommsPlc class once
@@ -3297,85 +3328,106 @@ class common_gapCount(ttk.Frame):
         """
         # Initialise RT variables ---[]
         autoSpcRun = True
-        autoSpcPause = False
+        paused = False
         import keyboard  # for temporary use
 
-        # import spcWatchDog as wd ----------------------------------[OBTAIN MSC]
-        # sysRun, msctcp, msc_rt = False, 100, 'Unknown state, Check PLC & Watchdog...'
-        # Define PLC/SMC error state -------------------------------------------#
-
         while True:
-            time.sleep(5)
             if UseSQL_DBS and self.running and gc_con:
-
-                inProgress = True  # True for RetroPlay mode
                 print('\n[cVC] Asynchronous controller activated...')
 
-                if keyboard.is_pressed("Alt+Q") and not inProgress:
-                    print('\nProduction is pausing...')
-                    if not autoSpcPause:
-                        autoSpcRun = not autoSpcRun
-                        autoSpcPause = True
-                        print("\n[cVC] Visualization in Paused Mode...")
-                    else:
-                        autoSpcPause = False
-                        print("[cVC] Visualization in Real-time Mode...")
+                if uCalling == 1 and not sysRun:
+                    print('\n[cVC] Production is pausing...')
+                    paused = True
+
+                    while paused:
+                        time.sleep(5)
+                        print("\n[cVC Viz] Visualization in Paused Mode...")
+                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                        if sysRun:
+                            paused = False
+                            print('[cVC] Visualisation Resumes...')
+                        time.sleep(0.2)
+
+                elif uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+                    paused = True
+
+                    while paused:
+                        time.sleep(5)
+                        print("\n[cVC Viz] Visualization in Paused Mode...")
+                        if keyboard.is_pressed("esc"):
+                            paused = False
+                            print('[cVC] Visualisation Resumes...')
+                        time.sleep(0.2)
+
                 else:
                     # Get list of relevant SQL Tables using conn() --------------------[]
                     self.gcD = svc.sqlExec(gc_con, s_fetch, stp_Sz, self.gcT, batch_VC)
-                    time.sleep(5)
-                # ------ Inhibit iteration ----------------------------------------------------------[]
-                """
-                # Set condition for halting real-time plots in watchdog class ---------------------
-                """
-                # TODO --- values for inhibiting the SQL processing
-                if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                    gc_con.close()
-                    print('[cVC] SQL End of File, connection closes after 30 mins...')
-                    time.sleep(60)
-                    continue
+                    time.sleep(30)
+
+                    # ------ Inhibit iteration ----------------------------------------------------------[]
+                    if not self.gcD:  # Terminate file-fetch
+
+                        print('[cVC] SQL End of File, connection closes after 30 mins...')
+                        time.sleep(60)
+                        gc_con.close()
+                        continue
+                    else:
+                        print('\n[cVC] Updating....')
+
+                if gc_con:
+                    self.canvas.get_tk_widget().after(0, self.gcDataPlot)  # Regime = every 10seconds
+                    batch_VC += 1
                 else:
-                    print('\n[cVC] Updating....')
+                    print('[cVC] sorry, instance not granted, trying again..')
+                    gc_con = sq.check_SQL_Status(5, 60)  # Retry 5 times, wait 60 seconds
+
             else:
                 print('\n[cVC] is active but no visualisation!')
-            if gc_con:
-                self.canvas.get_tk_widget().after(0, self.gcDataPlot)  # Regime = every 10seconds
-                batch_VC += 10
-            else:
-                print('[cVC] sorry, instance not granted, trying again..')
-                gc_con = sq.check_SQL_Status(5, 60)  # Retry 5 times, wait 60 seconds
-            print('[cVC] waiting for a refresh..')
+            print('[cVC] protocol si being refreshed..')
 
     # ================== End of synchronous Method ==========================
 
     def gcDataPlot(self):
-        timei = time.time()                                # start timing the entire loop
+        timei = time.time()  # start timing the entire loop
 
         # Call data loader Method--------------------------#
         import VarSQL_VC as vc                          # load SQL variables column names | rfVarSQL
+        g1 = qvc.validCols(self.gcT)
+        df1 = pd.DataFrame(self.gcD, columns=g1)        # Import into python Dataframe vData
+        # ----------------------------------------
+        data1 = df1.select_dtypes(include=["number"])
+        df1 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+        # ----------------------------------------
+        # print('TP03', df1)
+        var_plyr = df1["cLayer"].iloc[-1]
+        # -------------------------
+        print('\nProcessing Layer:', var_plyr)
+        uPosA = df1[(df1["cLayer"] == var_plyr) & (df1["VODPosA"] > 0) & (df1["sCentre"] > 0)].shape[0]
+        uPosB = df1[(df1["cLayer"] == var_plyr) & (df1["VODPosB"] > 0) & (df1["sCentre"] > 0)].shape[0]
+        uPosC = df1[(df1["cLayer"] == var_plyr) & (df1["VODPosC"] > 0) & (df1["sCentre"] > 0)].shape[0]
+        uPosD = df1[(df1["cLayer"] == var_plyr) & (df1["VODPosD"] > 0) & (df1["sCentre"] > 0)].shape[0]
+
+        VC = vc.loadProcesValues(df1)           # Join data values under dataframe
+        print('\n[cVC] Content', df1.head())     # Preview Data frame head
+        # print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
 
         if self.running:
-            g1 = qvc.validCols(self.gcT)
-            df1 = pd.DataFrame(self.gcD, columns=g1)           # Import into python Dataframe vData
-            VC = vc.loadProcesValues(df1)                      # Join data values under dataframe
-            print('\nDataFrame Content', df1.head(10))         # Preview Data frame head
-            # print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
             # ------- plot ramp count ----------------------------------#
             self.a3.legend(loc='upper right', title='Cumulative Void Count')
             # ----------------------------------------------------------[]
-            # Plot X-Axis data points -------- X Plot
+            # Plot X-Axis data points -------- X Plot Pipe segement
             self.im10.set_xdata(np.arange(batch_VC))
             self.im11.set_xdata(np.arange(batch_VC))
             self.im12.set_xdata(np.arange(batch_VC))
             self.im13.set_xdata(np.arange(batch_VC))
-            self.im14.set_xdata(np.arange(batch_VC))
+            # self.im14.set_xdata(np.arange(batch_VC))
 
-            # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1]
-            self.im10.set_ydata(VC[1][0:batch_VC])   # Count under Ring 1
-            self.im11.set_ydata(VC[3][0:batch_VC])   # Count under Ring 2
-            self.im12.set_ydata(VC[5][0:batch_VC])   # Count under Ring 3
-            self.im13.set_ydata(VC[7][0:batch_VC])   # Count under Ring 4
-            self.im14.set_ydata(VC[11][0:batch_VC])   # Cumulative
+            # X Plot Y-Axis data points for XBar. Values -[Rings]
+            self.im10.set_ydata(VC[0].rolling(window=s_fetch, min_periods=1).mean()[0:batch_VC])   # Count under Ring 1
+            self.im11.set_ydata(VC[0].rolling(window=s_fetch, min_periods=1).mean()[0:batch_VC])   # Count under Ring 2
+            self.im12.set_ydata(VC[0].rolling(window=s_fetch, min_periods=1).mean()[0:batch_VC])   # Count under Ring 3
+            self.im13.set_ydata(VC[0].rolling(window=s_fetch, min_periods=1).mean()[0:batch_VC])   # Count under Ring 4
+            # self.im14.set_ydata(VC[11][0:batch_VC])   # Cumulative
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if batch_VC > self.win_Xmax:
@@ -5677,7 +5729,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             self.T2 = 'TT2_' + str(pWON)
         elif UsePLC_DBS:
             self.T1 = SPC_TT
-        self.T3 = 'RM_' + str(pWON)
+        # self.T3 = 'RM_' + str(pWON) # replaced / switched to
+        self.T3 = 'RC_' + str(pWON)
         # ----------------------------------------------------------#
 
         # Initialise runtime limits --------------------------------#
@@ -5759,9 +5812,9 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
         # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(self.canvas, self)
-        # toolbar.update()
-        # self.canvas._tkcanvas.pack(expand=True)
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
 
         # --------- call data block -------------------------------------#
         pTT = threading.Thread(target=self.dataControlTT, daemon=True)
@@ -5897,7 +5950,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
         if UseSQL_DBS and self.running:
-            import sqlArrayRLmethodRM as rmp
+            import sqlArrayRLmethodRC as rC
             rmp_con = sq.sql_connectRMP()
         else:
             rmp_con = None
@@ -5938,7 +5991,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                                 print('[RMP] Visualisation Resumes...')
                             time.sleep(0.2)
                     else:
-                        self.rmD3 = rmp.sqlExec(rmp_con, s_fetch, stp_Sz, self.T3, batch_RMP)
+                        self.rmD3 = rC.sqlExec(rmp_con, s_fetch, stp_Sz, self.T3, batch_RMP)
                         time.sleep(10)
                         print("[RMP] Visualization in Play Mode...")
 
@@ -6192,7 +6245,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             self.canvas.draw_idle()
 
             # Set trip line for individual time-series plot -----------------------------------[R1]
-            sigma = gma.trigViolations(a1, uCalling, TT, self.y_minTT, self.y_maxTT, ttUCL, ttLCL, ttUSL, ttLSL, ttMean, ttDev)
+            # sigma = gma.trigViolations(self.a1, uCalling, TT, self.y_minTT, self.y_maxTT, ttUCL, ttLCL, ttUSL, ttLSL, ttMean, ttDev)
 
 
         else:
@@ -6213,15 +6266,15 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         # Call data loader Method-----------------------#
         if UseSQL_DBS and self.runRMP:
-            import VarSQL_RM as rmp
-            g3 = qrm.validCols(self.T3)
+            import VarSQL_RC as rc
+            g3 = qrc.validCols(self.T3)
             d3 = pd.DataFrame(self.rmD3, columns=g3)
             # Do some data cleansing ------------[Perform back or forward fill interpolation if Nans occurs]
             data1 = d3.apply(pd.to_numeric, errors="coerce")
             df3 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
             print(df3.dtypes)
             # --------------------------------------#
-            RM = rmp.loadProcesValues(df3)
+            RM = rc.loadProcesValues(df3)
             # --------------------------------------#
 
         else:
@@ -6233,15 +6286,15 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             self.a3.legend(loc='upper right', title='Ramp Profile')
             # -------------------------------------[]
             # Plot X-Axis data points -------- X Plot
-            self.im42.set_xdata(RM[1][0:self.win_XmaxRM])
-            self.im43.set_xdata(RM[2][0:self.win_XmaxRM])
-            self.im44.set_xdata(RM[3][0:self.win_XmaxRM])
-            self.im45.set_xdata(RM[4][0:self.win_XmaxRM])
+            self.im42.set_xdata(RM[2][0:self.win_XmaxRM])
+            self.im43.set_xdata(RM[4][0:self.win_XmaxRM])
+            self.im44.set_xdata(RM[6][0:self.win_XmaxRM])
+            self.im45.set_xdata(RM[8][0:self.win_XmaxRM])
             # Compute entire Process Capability -----------#
-            self.im42.set_ydata(RM[6])  # Layer Number reached
-            self.im43.set_ydata(RM[6])
-            self.im44.set_ydata(RM[6])
-            self.im45.set_ydata(RM[6])
+            self.im42.set_ydata(RM[11])  # Layer Number reached
+            self.im43.set_ydata(RM[11])
+            self.im44.set_ydata(RM[11])
+            self.im45.set_ydata(RM[11])
 
             # Setting up RMP parameters for static zoomable windows Axes --------------[]
             if batch_RMP > self.win_XmaxRM: # unlikely !
@@ -6823,7 +6876,7 @@ class tapeGapPolTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = False
+        self.running = True
         self.runVMP = False
         self.gapPercent = True
         self.toggle_state = True
@@ -7210,11 +7263,12 @@ class tapeGapPolTabb(ttk.Frame):
         while True:
             if UseSQL_DBS and vmp_con:
                 print('\n[VMP] PostProd Mode controller activated...')
+
                 if not UsePLC_DBS and UseSQL_DBS:
                     print('[VMP] is requesting for SMC status...')
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
-                if keyboard.is_pressed("Alt+Q") and uCalling == 1 and not sysRun:
+                if uCalling == 1 and not sysRun:
                     print('\n[VMP] Production is pausing...')
                     paused = True
 
@@ -7226,9 +7280,10 @@ class tapeGapPolTabb(ttk.Frame):
                             paused = False
                             print('[VMP] Visualisation Resumes...')
                         time.sleep(0.2)
-                else:
-                    if uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+
+                elif uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
                         paused = True
+
                         while paused:
                             time.sleep(5)
                             print("\n[VMP Viz] Visualization in Paused Mode...")
@@ -7236,27 +7291,28 @@ class tapeGapPolTabb(ttk.Frame):
                                 paused = False
                                 print('[VMP] Visualisation Resumes...')
                             time.sleep(0.2)
+                else:
+                    # USe SQL repository for VMP stream ------[]
+                    self.vmD3 = vmp.sqlExec(vmp_con, s_fetch, stp_Sz, self.T2, batch_VMP)
+                    time.sleep(10)
+                    print("[VMP] Visualization in Play Mode...")
+                    # set condition for temporary halt if running PPA ----------
+                    if not self.vmD3:           # No new data coming through
+                        print('SQL End of File, [VMP] connection closes after 30 min...')
+                        time.sleep(60)
+                        vmp_con.close()       # close connection
+                        continue
                     else:
-                        self.vmD3 = vmp.sqlExec(vmp_con, s_fetch, stp_Sz, self.T2, batch_VMP)
-                        time.sleep(10)
-                        print("[VMP] Visualization in Play Mode...")
-
-                        if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
-                            vmp_con.close()  # close connection
-                            print('SQL End of File, [VMP] connection closes after 30 secs...')
-                            time.sleep(60)
-                            continue
-                        else:
-                            print('\n[VMP] Updating....')
+                        print('\n[VMP] Updating....')
+                # ------------------------------------------------------------
+                if vmp_con:
+                    self.canvas.get_tk_widget().after(0, self.vmDataPlot)
+                    batch_VMP += 1
+                else:
+                    print('[VMP] sorry, instance not granted, trying again..')
+                    vmp_con = sq.check_SQL_Status(5, 60)
             else:
                 print('\n[VMP] is active but no visualisation!')
-            # ------------------------------------------------------------
-            if vmp_con:
-                self.canvas.get_tk_widget().after(0, self.vmDataPlot)
-                batch_VMP += 1
-            else:
-                print('[VMP] sorry, instance not granted, trying again..')
-                vmp_con = sq.check_SQL_Status(5, 60)
             print('[VM] protocol is being refreshed...')
 
     # ================== End of synchronous Method ==========================--------------------[]
@@ -7406,6 +7462,7 @@ class tapeGapPolTabb(ttk.Frame):
             # ---------------------------------------------------------------------[VOID]
             coords = np.column_stack((pCenter, vLayerN))  # shape (N, 2)
             self.im26.set_offsets(coords)
+            # --------------------------------------------------------------#
             if self.gapPercent:
                 self.im26.set_array(gap_vol[0:batch_VMP])  #
                 self.im26.set_clim(vmin=gap_vol.min(), vmax=gap_vol.max())
@@ -7436,7 +7493,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = False
+        self.running = True
         self.create_widgets()
 
     def create_widgets(self):
@@ -10936,4 +10993,4 @@ def userMenu(cMode, WON, vMode=None):     # listener, myplash
 
 # uCalled: 1. PLC 2, SQL, 3. User  Triggered
 # vMode: [1. Cascade, 2. Tab Views]
-userMenu(1, '20250923', 2)
+userMenu(3, '20250923', 2)

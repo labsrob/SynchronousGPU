@@ -28,7 +28,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
     else:
         slideType = 'Non-overlapping'
 
-    print('\n[RMP] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
+    print('\n[cRC] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
     print('=' * 60)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
@@ -37,7 +37,6 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
         else:
             t1.execute('SELECT * FROM ' + str(T1) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_ts)
         data1 = t1.fetchmany(n2fetch)
-
         # ---- Re-assemble into dynamic buffer -----[]
         if len(data1) != 0:
             for result in data1:
@@ -45,12 +44,12 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
                 dL.append(result)
             last_ts = data1[-1].id_col
         else:
-            print('[RMP] Process EOF reached...')
-            print('[RMP] Halting for 30 sec...')
+            print('[cRC] Process EOF reached...')
+            print('[cRC] Halting for 30 sec...')
             time.sleep(30)
 
     except Exception as e:
-        print("[RMP] Data trickling on IDX#:", last_ts)  # , e)
+        print("[cRC] Data trickling on IDX#:", last_ts)  # , e)
         time.sleep(2)
 
     t1.close()
