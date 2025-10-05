@@ -353,3 +353,65 @@ print('New List', mlis)
 my_list = [1, 2, 3, 4, 5]
 last_element = my_list.pop()
 print(last_element)
+
+try:
+    import cupy as np
+    GPU_ENABLED = True
+except ImportError:
+    import numpy as np
+    GPU_ENABLED = False
+# make numpy compatible with cupy API
+np.asnumpy = lambda x: x
+import cudf
+
+try:
+    import cupy as cp
+    import numpy as np
+    GPU_ENABLED = False
+
+    # Check if a CUDA device is available and usable
+    try:
+        num_gpus = cp.cuda.runtime.getDeviceCount()
+        if num_gpus > 0:
+            free_mem, total_mem = cp.cuda.runtime.memGetInfo()
+            if free_mem / total_mem > 0.1:  # at least 10% free memory
+                np = cp                # ✅ use CuPy as NumPy
+                GPU_ENABLED = True
+                print(f"✅ Using GPU (CuPy) | Free memory: {free_mem / 1e9:.2f} GB")
+            else:
+                print("⚠️ GPU memory low — falling back to CPU (NumPy).")
+        else:
+            print("⚠️ No GPU found — using CPU (NumPy).")
+    except cp.cuda.runtime.CUDARuntimeError:
+        print("⚠️ CUDA not available — using CPU (NumPy).")
+
+except ImportError:
+    import numpy as np
+    GPU_ENABLED = False
+    print("⚠️ CuPy not installed — using CPU (NumPy).")
+
+# Always ensure np.asnumpy() is defined (for cross-compatibility)
+if not hasattr(np, "asnumpy"):
+    np.asnumpy = lambda x: x
+
+# NumPy array on CPU
+np_arr = np.arange(5)
+print("NumPy:", type(np_arr))
+
+# Convert to CuPy array (on GPU)
+cp_arr = np.asarray(np_arr)
+print("CuPy:", type(cp_arr))
+
+# Convert back to NumPy
+np_arr2 = cp_arr.get()
+print("Back to NumPy:", type(np_arr2))
+
+# works on GPU if available, otherwise CPU
+x = np.arange(10)
+y = np.sin(x)
+
+# convert back to CPU safely
+y_cpu = np.asnumpy(y)
+print(type(y_cpu))
+
+# --------------------------------------------------------------------------[]

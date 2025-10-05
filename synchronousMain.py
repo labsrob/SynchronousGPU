@@ -5,11 +5,9 @@
 # Copyright (C) 2023-2025, Robbie Labs
 #
 # -------------------- Primary User Graphic Interface ----------------------#
-# from cgitb import reset
 
-import numpy as np
+# from cgitb import reset
 import pandas as pd
-import psutil
 import deltaM2_Functions as wd
 import ctypes
 
@@ -47,8 +45,8 @@ import selDataColsWA as qwa        # winding angle
 # import selDataColsOE as qoe      # OEE TechnipFMC
 
 # -------------------------#
-import GPUtil as gp
-import screeninfo as m
+# import GPUtil as gp
+# import screeninfo as m
 from random import randint
 import threading
 
@@ -100,15 +98,83 @@ import CommsSql as sq
 
 
 # ------------------------[]
-# Try GPU (CuPy), else fall back to NumPy
+# # Try GPU (CuPy), else fall back to NumPy
+# try:
+#     import cupy as np
+#     GPU_ENABLED = True
+# except ImportError:
+#     import numpy as np
+#     GPU_ENABLED = False
+# # make numpy compatible with cupy API
+# np.asnumpy = lambda x: x
+import warnings
+import subprocess
+import json
+import shutil
+
+def get_nvidia_info():
+    """Return GPU info (name, memory, utilization, temperature) if available."""
+    if not shutil.which("nvidia-smi"):
+        return None
+
+    try:
+        query = "--query-gpu=name,memory.total,memory.used,utilization.gpu,temperature.gpu --format=csv,noheader,nounits"
+        result = subprocess.run(["nvidia-smi"] + query.split(), capture_output=True, text=True)
+        lines = result.stdout.strip().split("\n")
+        if not lines:
+            return None
+        fields = lines[0].split(", ")
+        return {
+            "name": fields[0],
+            "mem_total": float(fields[1]),
+            "mem_used": float(fields[2]),
+            "utilization": float(fields[3]),
+            "temp": float(fields[4]),
+        }
+    except Exception:
+        return None
+
 try:
-    import cupy as xp
-    GPU_ENABLED = True
-except ImportError:
+    import cupy as cp
     import numpy as np
     GPU_ENABLED = False
-    # make numpy compatible with cupy API
-    xp.asnumpy = lambda x: x
+
+    try:
+        num_gpus = cp.cuda.runtime.getDeviceCount()
+        if num_gpus > 0:
+            gpu_info = get_nvidia_info()
+            free_mem, total_mem = cp.cuda.runtime.memGetInfo()
+            free_gb = free_mem / 1e9
+            total_gb = total_mem / 1e9
+            used_pct = (1 - free_mem / total_mem) * 100
+
+            if free_mem / total_mem > 0.1:
+                np = cp
+                GPU_ENABLED = True
+                print(f"✅ Using GPU (CuPy)")
+                if gpu_info:
+                    print(f"   GPU: {gpu_info['name']}")
+                    print(f"   Temp: {gpu_info['temp']}°C | Utilization: {gpu_info['utilization']}%")
+                    print(f"   Memory: {gpu_info['mem_used'] / 1024:.2f} / {gpu_info['mem_total'] / 1024:.2f} GB")
+                else:
+                    print(f"   Free: {free_gb:.2f} / {total_gb:.2f} GB  ({used_pct:.1f}% used)")
+            else:
+                warnings.warn(f"⚠️ GPU memory too low ({free_gb:.2f} GB free). Falling back to CPU (NumPy).")
+        else:
+            warnings.warn("⚠️ No CUDA GPUs found. Using CPU (NumPy).")
+
+    except cp.cuda.runtime.CUDARuntimeError:
+        warnings.warn("⚠️ CUDA runtime error. Using CPU (NumPy).")
+
+except ImportError:
+    import numpy as np
+
+    GPU_ENABLED = False
+    warnings.warn("⚠️ CuPy not installed. Using CPU (NumPy).")
+
+# --- Make np.asnumpy safe for both backends ---
+if not hasattr(np, "asnumpy"):
+    np.asnumpy = lambda x: x
 
 # ------------------------[]
 # Cross-platform simple beep
@@ -495,8 +561,8 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
 
         elif pRecipe == 'DNV':
             if x == 0:
-                proID = 'Tape Temperature'
-                rID = 'TT'  # report ID
+                proID = 'Laser Power'
+                rID = 'LP'  # report ID
                 ringD1 = ring1[0]
                 ringD2 = ring2[0]
                 ringD3 = ring3[0]
@@ -522,8 +588,8 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
                 tolDat4 = Tvalu[0][3]
 
             elif x == 1:
-                proID = 'Substrate Temperature'
-                rID = 'ST'  # report ID
+                proID = 'Tape Temperature'
+                rID = 'TT'  # report ID
                 ringD1 = ring1[1]
                 ringD2 = ring2[1]
                 ringD3 = ring3[1]
@@ -546,8 +612,8 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
                 tolDat4 = Tvalu[1][3]
 
             elif x == 2:
-                proID = 'Gap Measurement'
-                rID = 'TG'
+                proID = 'Substrate Temperature'
+                rID = 'ST'
                 ringD1 = ring1[2]
                 ringD2 = ring2[2]
                 ringD3 = ring3[2]
@@ -570,8 +636,8 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
                 tolDat4 = Tvalu[2][3]
 
             elif x == 3:
-                proID = 'Winding Speed'
-                rID = 'WS'
+                proID = 'Gap Measurement' # Winding Speed
+                rID = 'TG'
                 ringD1 = ring1[3]
                 ringD2 = ring2[3]
                 ringD3 = ring3[3]
@@ -594,13 +660,37 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
                 tolDat4 = Tvalu[3][3]
 
             elif x == 4:
+                proID = 'Winding Speed'  #
+                rID = 'WS'
+                ringD1 = ring1[4]
+                ringD2 = ring2[4]
+                ringD3 = ring3[4]
+                ringD4 = ring4[4]
+                sPoint1 = SetPt[16]
+                sPoint2 = SetPt[17]
+                sPoint3 = SetPt[18]
+                sPoint4 = SetPt[19]
+                sValue1 = Value[16]
+                sValue2 = Value[17]
+                sValue3 = Value[18]
+                sValue4 = Value[19]
+                sStdev1 = Stdev[16]
+                sStdev2 = Stdev[17]
+                sStdev3 = Stdev[18]
+                sStdev4 = Stdev[19]
+                tolDat1 = Tvalu[4][0]
+                tolDat2 = Tvalu[4][1]
+                tolDat3 = Tvalu[4][2]
+                tolDat4 = Tvalu[4][3]
+
+            elif x == 5:
                 proID = 'OD Properties'
                 rID = 'PP'
                 # ------------------------------------------
-                ringD1 = ring1[4]       # Pipe Diameter [rolling series]
-                ringD2 = ring2[4]       # AVG Ramp Count
-                ringD3 = ring3[4]       # AVG Hafner Tape Change
-                ringD4 = ring4[4]       # AVG Cell ension
+                ringD1 = ring1[5]       # Pipe Diameter [rolling series]
+                ringD2 = ring2[5]       # AVG Ramp Count
+                ringD3 = ring3[5]       # AVG Hafner Tape Change
+                ringD4 = ring4[5]       # AVG Cell ension
                 # ----------------------#
                 sPoint1 = sDat1     # Pipe Position  [Series]
                 sPoint2 = sDat2     # Pipe Ovality   [Series]
@@ -614,10 +704,10 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
                 sStdev2 = 0
                 sStdev3 = 0
                 sStdev4 = 0
-                tolDat1 = Tvalu[4][0]   # Tape Width
-                tolDat2 = Tvalu[4][1]
-                tolDat3 = Tvalu[4][2]
-                tolDat4 = Tvalu[4][3]
+                tolDat1 = Tvalu[5][0]   # Tape Width
+                tolDat2 = Tvalu[5][1]
+                tolDat3 = Tvalu[5][2]
+                tolDat4 = Tvalu[5][3]
             else:
                 print('End of Layer (EoL) Report successfully generated!\n')
                 progressB.stop()
@@ -631,7 +721,7 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
 
         # ----------------------------------------------
         df = pd.DataFrame()
-        if x == 4 or x == 6:
+        if x == 5 or x == 6:
             df['RingID'] = ['Ring1', 'Ring2', 'Ring3', 'Ring4']  # [ringA, ringB, ringC, ringD]
             df["SetPoint"] = [ringD2, ringD2, ringD2, ringD2]
             df["Nominal"] = [sPoint3[0], sPoint3[0], sPoint3[0], sPoint3[0]]
@@ -668,7 +758,7 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
                 D = 'CHECK'
             df["Status"] = [A, B, C, D]
 
-        if x == 4 or x == 6:
+        if x == 5 or x == 6:
             # -- Construct new validation method ------------------[B]
             plt.title('Layer # ' + str(lID) + " Summary")  # Report ID + 'Report'
             plt.xlabel('Sample Distance')
@@ -732,7 +822,7 @@ def generate_pdf(rptID, cPipe, custm, usrID, layrN, ring1, ring2, ring3, ring4, 
         pdf.cell(40)
         pdf.cell(90, 10, " ", 0, 2, 'C')
 
-        if x == 4 or x == 6:
+        if x == 5 or x == 6:
             # draw a rectangle over the text area for Report header ----
             pdf.rect(x=20.0, y=20.5, w=150.0, h=50, style='')
             # construct report header ----------------------------------
@@ -885,11 +975,13 @@ def get_data(layerN):
     layrN = layerN
     # ---------- Based on Group's URS ------------------#
     if pRecipe == 'DNV':
-        T1 = 'ZTT_' + str(pWON)       # Identify EOL_TT Table
-        T2 = 'ZST_' + str(pWON)       # Identify EOL_ST Table
-        T3 = 'ZTG_' + str(pWON)       # Identify EOL_TG Table
-        T4 = 'ZWS_' + str(pWON)       # Winding Speed
-        T5 = 'ZPP_' + str(pWON)       # Identify RampCount Table - not visualised but reckoned on pdf report
+        T1 = 'ZLP_' + str(pWON)       # Laser Power
+        T2 = 'ZTT_' + str(pWON)       # Identify EOL_TT Table
+        T3 = 'ZST_' + str(pWON)       # Identify EOL_ST Table
+        T4 = 'ZTG_' + str(pWON)       # Identify EOL_TG Table
+        T5 = 'ZWS_' + str(pWON)       # Winding Speed
+        T6 = 'ZPP_' + str(pWON)       # Identify RampCount Table - not visualised but reckoned on pdf report
+
     else:
         T1 = 'ZLP_' + pWON      # Identify Laser Power EOL Table
         T2 = 'ZLA_' + pWON      # Identify Laser Angle EOL Table
@@ -925,7 +1017,8 @@ def get_data(layerN):
         else:
             print('\nProcessing DNV Reports.....')
             # ----------------------------------------
-            zTT, zST, zTG, zWS, zPP = pdfrp.dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, layrN)
+            zLP, zTT, zST, zTG, zWS, zPP = pdfrp.dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layrN)
+            coluF = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']
             coluA = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']
             coluB = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']
             coluC = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']
@@ -943,8 +1036,9 @@ def get_data(layerN):
             df7 = pd.DataFrame(zPP, columns=coluG)
             rpData = [df1, df2, df3, df4, df5, df6, df7]
         elif pRecipe == 'DNV':
-            df1 = pd.DataFrame(zTT, columns=coluA)   # Dataframe level resampling is disabled. Table level is enabled
-            # df1 = df1.sample(frac=0.3, axis='rows', random_state=9)   # resampled to regime values
+            df6 = pd.DataFrame(zLP, columns=coluF)      # New structural update. Add Laser Power to Report
+            df1 = pd.DataFrame(zTT, columns=coluA)      # Dataframe level resampling is disabled. Table level is enabled
+            # df1 = df1.sample(frac=0.3, axis='rows', random_state=9)
             df2 = pd.DataFrame(zST, columns=coluB)
             # df2 = df2.sample(frac=0.3, axis='rows', random_state=9)
             df3 = pd.DataFrame(zTG, columns=coluC)
@@ -954,7 +1048,7 @@ def get_data(layerN):
             # ------ Saphire Pipe Property ------#
             df5 = pd.DataFrame(zPP, columns=coluE)
             # ---------------------------------------
-            rpData = [df1, df2, df3, df4, df5]                   # Dynamic aggregated List
+            rpData = [df6, df1, df2, df3, df4, df5]                   # Dynamic aggregated List
         else:
             print('Unknown Process not defined...')
         # ---------------------------------------
@@ -969,20 +1063,32 @@ def get_data(layerN):
         for i in range(len(rpData)):
             if pRecipe == 'DNV':
                 if i == 0:
-                    cProc = 'Tape Temperature'          # Process ID
-                    rPage = '1of5'
+                    cProc = 'Laser Power'                   # Process ID
+                    rPage = '1of6'
                     Tvalu = [0.057, 0.057, 0.057, 0.057]    # Tolerance
-                    ring1A = rpData[i]['R1SP']         # Actual value (SP)
-                    ring1B = rpData[i]['R1NV']         # Measured values = Real value  = (NV)
-                    ring2A = rpData[i]['R2SP']         #
-                    ring2B = rpData[i]['R2NV']         #
-                    ring3A = rpData[i]['R3SP']         #
-                    ring3B = rpData[i]['R3NV']         #
-                    ring4A = rpData[i]['R4SP']         #
+                    ring1A = rpData[i]['R1SP']              # Actual value (SP)
+                    ring1B = rpData[i]['R1NV']              # Measured values = Real value  = (NV)
+                    ring2A = rpData[i]['R2SP']
+                    ring2B = rpData[i]['R2NV']
+                    ring3A = rpData[i]['R3SP']
+                    ring3B = rpData[i]['R3NV']
+                    ring4A = rpData[i]['R4SP']
                     ring4B = rpData[i]['R4NV']
                 elif i == 1:
+                    cProc = 'Tape Temperature'              # Process ID
+                    rPage = '2of6'
+                    Tvalu = [0.057, 0.057, 0.057, 0.057]    # Tolerance
+                    ring1A = rpData[i]['R1SP']              # Actual value (SP)
+                    ring1B = rpData[i]['R1NV']              # Measured values = Real value  = (NV)
+                    ring2A = rpData[i]['R2SP']
+                    ring2B = rpData[i]['R2NV']
+                    ring3A = rpData[i]['R3SP']
+                    ring3B = rpData[i]['R3NV']
+                    ring4A = rpData[i]['R4SP']
+                    ring4B = rpData[i]['R4NV']
+                elif i == 2:
                     cProc = 'Substrate Temperature'     # Process ID
-                    rPage = '2of5'
+                    rPage = '3of6'
                     Tvalu = [0.07, 0.07, 0.07, 0.07]     # Tolerance
                     ring1A = rpData[i]['R1SP']          # Actual value (SP)
                     ring1B = rpData[i]['R1NV']          # Measured values = Real value  = (NV)
@@ -992,9 +1098,9 @@ def get_data(layerN):
                     ring3B = rpData[i]['R3NV']          #
                     ring4A = rpData[i]['R4SP']          #
                     ring4B = rpData[i]['R4NV']
-                elif i == 2:
+                elif i == 3:
                     cProc = 'Gap Measurement'           # Process ID
-                    rPage = '3of5'
+                    rPage = '4of6'
                     Tvalu = [0.05, 0.05, 0.05, 0.05]    # Awaiting Tolerance values from QA
                     ring1A = rpData[i]['R1SP']          # Actual value (SP)
                     ring1B = rpData[i]['R1NV']          # Measured values = Real value  = (NV)
@@ -1004,9 +1110,9 @@ def get_data(layerN):
                     ring3B = rpData[i]['R3NV']          #
                     ring4A = rpData[i]['R4SP']          #
                     ring4B = rpData[i]['R4NV']
-                elif i == 3:
+                elif i == 4:
                     cProc = 'Winding Speed'             # Process ID
-                    rPage = '4of5'
+                    rPage = '5of6'
                     Tvalu = [0.05, 0.05, 0.05, 0.05]    # Set Tolerance (axis=1 columns)
                     ring1A = rpData[i]['R1SP']          # Actual value (SP)
                     ring1B = rpData[i]['R1NV']          # Measured values = Real value  = (NV)
@@ -1016,10 +1122,10 @@ def get_data(layerN):
                     ring3B = rpData[i]['R3NV']          #
                     ring4A = rpData[i]['R4SP']          #
                     ring4B = rpData[i]['R4NV']          #
-                elif i == 4:
+                elif i == 5:
                     # 'LyID', 'PipePos', 'PipeDiam', 'Ovality', 'RampCnt', 'VoidCnt', 'TChange', 'TpWidth', 'Tension'
                     cProc = 'OD Properties'
-                    rPage = '5of5'
+                    rPage = '6of6'
                     Tvalu = [0.05, 0.05, 0.05, 0.05]
                     ring1A = rpData[i]['PipePos']
                     ring1B = rpData[i]['PipeDiam']
@@ -1762,7 +1868,7 @@ class PDFViewer(ScrolledText):
         images = []
         print('\nLoading the following PDF report(s):')
         for page in pdfs:
-            if len(pdfs) <= 5:
+            if len(pdfs) <= 6:          # set limits to number of paged report
                 print(page)
             images.append(page)
 
@@ -1772,7 +1878,7 @@ class PDFViewer(ScrolledText):
         # --------------------------------------
         if len(images) == 1:
             w, h = 600, 850
-        elif len(images) == 5:
+        elif len(images) == 6:
             w, h = 1800, 850
         else:
             w, h = 1200, 850
@@ -1847,10 +1953,35 @@ class PDFViewer(ScrolledText):
             pdf4.grid(row=1, column=1, sticky='nsew')
             pdf4.show(images[3])
 
+            # 5th Page with column span option -----
             pdf5 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
             pdf5.grid(row=0, column=2, columnspan=1, rowspan=2, sticky='nsew')
             pdf5.show(images[4])
 
+        elif len(images) == 6:
+            pdf1 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf1.grid(row=0, column=0, sticky='nsew')
+            pdf1.show(images[0])
+
+            pdf2 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf2.grid(row=0, column=1, sticky='nsew')
+            pdf2.show(images[1])
+
+            pdf3 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf3.grid(row=1, column=0, sticky='nsew')
+            pdf3.show(images[2])
+
+            pdf4 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf4.grid(row=1, column=1, sticky='nsew')
+            pdf4.show(images[3])
+
+            pdf5 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf5.grid(row=0, column=2, sticky='nsew')
+            pdf5.show(images[4])
+
+            pdf6 = PDFViewer(qawin, width=72, height=20, spacing3=5, bg='blue')
+            pdf6.grid(row=1, column=2, sticky='nsew')
+            pdf6.show(images[5])
         else:
             pdfViewError()
             print('You are loading more pages than allowed..')
@@ -2300,10 +2431,10 @@ class collectiveEoL(ttk.Frame):
         # ---------------- EXECUTE SYNCHRONOUS METHOD -------------------------#
 
     def dataControlEoL(self):
-        global layerN, msctcp, sysRun, batch_EoL, viz_con
+        global layerN, msctcp, sysRun, batch_EoL, viz_con, s_fetch
 
         batch_EoL = 1
-        s_fetch, stp_Sz = 100, 1  # 100 data points per Pipe's meter length
+        s_fetch, stp_Sz = 100, 1  # 100 data points per Pipe's 1 meter length
 
         # Initialise SQL Data connection per listed Table --------------------[]
         if self.running and UseSQL_DBS:
@@ -2321,37 +2452,14 @@ class collectiveEoL(ttk.Frame):
         paused = False
         sysRun = False
         msctcp = 0
-        print('Who called?', uCalling)
 
         while True:
             print('[\nEOL Viz] now running....')
-            # Condition for termination of EoL procedural visualisation-[Case 1]
-            if UsePLC_DBS or UseSQL_DBS:
-                sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                layerN = cLayr
-                if msctcp == 59776: # End of Pipe lay
-                    continue                    # keep looping on the spot until operator action
-            else:
-                if not pdf_layer:
-                    pdf_layer.append(1)         # start at layer 1
-                print('pdf layer', pdf_layer)
-                if len(pdf_layer) > 1:
-                    layerN = pdf_layer[-2]
-                else:
-                    layerN = pdf_layer[0]
+            if uCalling == 1:                                           # Running Live Analysis
+                sysRun, sysIdl, sysRdy, msc_rt, cLayer, pipPos, mstatus = wd.autoPausePlay()
 
-            # Trigger EoL report -----------------------------------------[2]
-            if UsePLC_DBS and msctcp == 49728 or msctcp == 49712:
-                # Use one: update layer count = 49728, End of Tape Wind 49664
-                layerProcess(layerN)                                    # Process EoL Data
-            # -------------------------------------------------------------#
-
-            # Trigger EoL report -----------------------------------------[3]
-            if self.running and viz_con:
-                print('\n[EoL Viz] Asynchronous controller activated...')
-
-                if keyboard.is_pressed("Alt+Q") or not sysRun and uCalling == 1:
-                    print('\nProduction is pausing...', sysRun, uCalling)
+                if not sysRun and not paused or sysIdl or sysRdy:
+                    print('\n[EoL] Production is pausing...')
                     paused = True
 
                     while paused:
@@ -2363,10 +2471,45 @@ class collectiveEoL(ttk.Frame):
                             print('[EoL] Visualisation Resumes...')
                         time.sleep(0.2)
 
+                # Activate End of Layer Report ------------------------------------------#
+                elif not sysRun and msc_rt == 49728 or msc_rt == 49712 or msc_rt == 49664:
+                    layerN = cLayer
+                    if not pdf_layer:
+                        pdf_layer.append(layerN)  # start at layer 1
+                    if len(pdf_layer) > 1:
+                        layerN = pdf_layer[-2]
+                    else:
+                        layerN = pdf_layer[0]
+                    # Trigger EoL report -- Verify MSC State machine Code update
+                    layerProcess(layerN)
+
+                elif not sysRun and msc_rt == 59776:            # End of Pipe lay
+                    # trigger EoP Report                        # TODO Wrapp up this method asap.
+                    continue                                    # keep looping on the spot until operator action
+
+                else:
+                    layerN = cLayer
+                    print('[EoL Viz] Visualisation in progress, please wait....')
+                    self.rpTT, self.rpST, self.rpTG, self.rpWS = sel.dnv_sqlExec(viz_con, s_fetch, stp_Sz, self.T1,
+                                                                                 self.T2, self.T3, self.T4, batch_EoL)
+                    time.sleep(10)  # pools 100dp of data every 10 seconds. Equivalent to 1mtr @ 6mt/min & 10hz
+
+            elif uCalling == 2 or uCalling == 3:
+                if keyboard.is_pressed("Alt+Q"):
+                    paused = True
+
+                    while paused:
+                        time.sleep(5)
+                        print("\n[EoL Viz] Visualization in Paused Mode...")
+                        if keyboard.is_pressed("esc"):
+                            paused = False
+                            print('[EoL Viz] Visualisation Resumes...')
+                        time.sleep(0.2)
                 else:
                     print('[EoL Viz] Visualisation in progress, please wait....')
-                    self.rpTT, self.rpST, self.rpTG, self.rpWS = sel.dnv_sqlExec(viz_con, s_fetch, stp_Sz, self.T1, self.T2, self.T3, self.T4, batch_EoL)
-                    time.sleep(10)  # pool data every 10 seconds. Equivalent to 1mtr @ 6mt/min
+                    self.rpTT, self.rpST, self.rpTG, self.rpWS = sel.dnv_sqlExec(viz_con, s_fetch, stp_Sz, self.T1,
+                                                                                 self.T2, self.T3, self.T4, batch_EoL)
+                    time.sleep(10)  # pools 100dp of data every 10 seconds. Equivalent to 1mtr @ 6mt/min & 10hz
 
                     if keyboard.is_pressed("Alt+Q"):
                         viz_con.close()
@@ -2375,6 +2518,7 @@ class collectiveEoL(ttk.Frame):
                         continue
                     else:
                         print('\nUpdating....')
+
             if viz_con:
                 self.canvas.get_tk_widget().after(0, self.eolDataPlot)
                 batch_EoL += 1
@@ -2389,7 +2533,6 @@ class collectiveEoL(ttk.Frame):
 
         # sliding window -------
         lastLayer = 1 # pdf_layer[0]
-        ttS, stS, tgS, wsS = 32, 32, 32, 32
         regm1, regm2, regm3, regm4 = 0.3, 0.3, 0.3, 0.3
         # --------------------------------------------------# , , ,
         # declare asynchronous variables ------------------[]
@@ -2397,36 +2540,51 @@ class collectiveEoL(ttk.Frame):
             import VarSQL_EoLTT as rptt
             import VarSQL_EoLST as rpst
             import VarSQL_EoLTG as rptg
-            import VarSQL_EoLWS as rptws
+            import VarSQL_EoLWS as rpws
             # load SQL variables column names | rfVarSQL
 
             g1 = ott.validCols(self.T1)                          # Construct Table Column (Tape Temp)
             d1 = pd.DataFrame(self.rpTT, columns=g1)
+            print('\nFetched In:', d1.shape[0])
+            if d1.shape[0] >= s_fetch * 2:
+                d1.drop(d1.index[0:s_fetch])
+            print('Fetched Out:', len(d1), d1.shape[0])
             # Setting a Seed for Random Reproducibility --[ Seed of 9, FYI:TP]
-            d1 = d1.sample(frac=regm1, axis='rows', random_state=9)
+            d1 = d1.sample(frac=regm1, axis='rows', random_state=9) # Do random sapling
             zTT = rptt.loadProcesValues(d1)
+            tt_wsize = int(d1.shape[0] * regm1)
             # print('\n[EoL TT Viz] Content', d1.head(10))
 
             g2 = ost.validCols(self.T2)                          # Construct Table Column (Sub Temp)
             d2 = pd.DataFrame(self.rpST, columns=g2)
+            if d2.shape[0] >= s_fetch * 2:
+                d2.drop(d2.index[0:s_fetch])
             # Setting a Seed for Random Reproducibility --[ Seed of 9, FYI:TP]
             d2 = d2.sample(frac=regm2, axis='rows', random_state=9)
             zST = rpst.loadProcesValues(d2)
+            st_wsize = int(d2.shape[0] * regm2)
             # print('\n[EoL ST Viz] Content', d2.head(10))
 
             g3 = otg.validCols(self.T3)                          # Construct Table Column (Tape Gap)
             d3 = pd.DataFrame(self.rpTG, columns=g3)
+            if d3.shape[0] >= s_fetch * 2:
+                d3.drop(d3.index[0:s_fetch])
             # Setting a Seed for Random Reproducibility --[ Seed of 9, FYI:TP]
             d3 = d3.sample(frac=regm3, axis='rows', random_state=9)
             zTG = rptg.loadProcesValues(d3)
+            tg_wsize = int(d3.shape[0] * regm3)
             # print('\n[EoL TG Viz] Content', d3.head(10))
 
             g4 = ows.validCols(self.T4)                             # Construct Table Column (Tape Gap)
             d4 = pd.DataFrame(self.rpWS, columns=g4)                # EoL_reached > 0 or layerN
+            if d4.shape[0] >= s_fetch * 2:
+                d4.drop(d4.index[0:s_fetch])
             # Setting a Seed for Random Reproducibility --[ Seed of 9, FYI:TP]
             d4 = d4.sample(frac=regm4, axis='rows', random_state=9)
-            zWS = rptws.loadProcesValues(d4)
+            zWS = rpws.loadProcesValues(d4)
+            ws_wsize = int(d4.shape[0] * regm4)
             # Concatenate all columns ----------------------[]
+            print('\nNew Windows Samples:', tt_wsize, st_wsize, tg_wsize, ws_wsize)
             # update layer count number on PPA Mode --------[]
             if zTT[1].any() > 1 and uCalling == 3 or uCalling == 2:
                 pdf_layer[1].append(zTT[1].any())
@@ -2440,6 +2598,7 @@ class collectiveEoL(ttk.Frame):
             print('[EoL] Unknown Protocol...')
 
         if self.running:
+            _fetch = 30
             self.a1.legend(loc='upper right', title='Tape Temp')
             self.a5.legend(loc='upper right', title='Sigma')
             self.a2.legend(loc='upper right', title='Sub Temp')
@@ -2504,96 +2663,47 @@ class collectiveEoL(ttk.Frame):
             # ------------------------------- S Plot ST
             if pRecipe == 'DNV':
                 # X Plot Y-Axis data points for XBar --------[ Mean TT ]
-                im10.set_ydata((zTT[3]).rolling(window=ttS, min_periods=1).mean()[0:batch_EoL])  # head 1
-                im11.set_ydata((zTT[5]).rolling(window=ttS, min_periods=1).mean()[0:batch_EoL])  # head 2
-                im12.set_ydata((zTT[7]).rolling(window=ttS, min_periods=1).mean()[0:batch_EoL])  # head 3
-                im13.set_ydata((zTT[9]).rolling(window=ttS, min_periods=1).mean()[0:batch_EoL])  # head 4
-                im14.set_ydata((zTT[3]).rolling(window=ttS, min_periods=1).std()[0:batch_EoL])  # head 1
-                im15.set_ydata((zTT[5]).rolling(window=ttS, min_periods=1).std()[0:batch_EoL])  # head 2
-                im16.set_ydata((zTT[7]).rolling(window=ttS, min_periods=1).std()[0:batch_EoL])  # head 3
-                im17.set_ydata((zTT[9]).rolling(window=ttS, min_periods=1).std()[0:batch_EoL])  # head 4
+                im10.set_ydata((zTT[3]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 1
+                im11.set_ydata((zTT[5]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 2
+                im12.set_ydata((zTT[7]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 3
+                im13.set_ydata((zTT[9]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 4
+                # ----------------------------------
+                im14.set_ydata((zTT[3]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 1
+                im15.set_ydata((zTT[5]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 2
+                im16.set_ydata((zTT[7]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3
+                im17.set_ydata((zTT[9]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 4
                 # ------------------ Substrate Temperature ----[ ST ]
-                im18.set_ydata((zST[3]).rolling(window=stS, min_periods=1).mean()[0:batch_EoL])  # head 1
-                im19.set_ydata((zST[5]).rolling(window=stS, min_periods=1).mean()[0:batch_EoL])  # head 2
-                im20.set_ydata((zST[7]).rolling(window=stS, min_periods=1).mean()[0:batch_EoL])  # head 3
-                im21.set_ydata((zST[9]).rolling(window=stS, min_periods=1).mean()[0:batch_EoL])  # head 4
-                im22.set_ydata((zST[3]).rolling(window=stS, min_periods=1).std()[0:batch_EoL])  # head 1
-                im23.set_ydata((zST[5]).rolling(window=stS, min_periods=1).std()[0:batch_EoL])  # head 3S
-                im24.set_ydata((zST[7]).rolling(window=stS, min_periods=1).std()[0:batch_EoL])  # head 3
-                im25.set_ydata((zST[9]).rolling(window=stS, min_periods=1).std()[0:batch_EoL])
+                im18.set_ydata((zST[3]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 1
+                im19.set_ydata((zST[5]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 2
+                im20.set_ydata((zST[7]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 3
+                im21.set_ydata((zST[9]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 4
+                # ---------------------------------
+                im22.set_ydata((zST[3]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 1
+                im23.set_ydata((zST[5]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3S
+                im24.set_ydata((zST[7]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3
+                im25.set_ydata((zST[9]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])
                 # ------------------ Tape Gap Polarisation ---
 
-                im26.set_ydata((zTG[3]).rolling(window=tgS).mean()[0:batch_EoL])  # head 1
-                im27.set_ydata((zTG[5]).rolling(window=tgS).mean()[0:batch_EoL])  # head 2
-                im28.set_ydata((zTG[7]).rolling(window=tgS).mean()[0:batch_EoL])  # head 3
-                im29.set_ydata((zTG[9]).rolling(window=tgS).mean()[0:batch_EoL])  # head 4
-                im30.set_ydata((zTG[3]).rolling(window=tgS).std()[0:batch_EoL])  # head 1
-                im31.set_ydata((zTG[5]).rolling(window=tgS).std()[0:batch_EoL])  # head 2
-                im32.set_ydata((zTG[7]).rolling(window=tgS).std()[0:batch_EoL])  # head 3
-                im33.set_ydata((zTG[9]).rolling(window=tgS).std()[0:batch_EoL])
+                im26.set_ydata((zTG[3]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 1
+                im27.set_ydata((zTG[5]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 2
+                im28.set_ydata((zTG[7]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 3
+                im29.set_ydata((zTG[9]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 4
+                # ---------------------------------------
+                im30.set_ydata((zTG[3]).rolling(window=_fetch).std()[0:batch_EoL])  # head 1
+                im31.set_ydata((zTG[5]).rolling(window=_fetch).std()[0:batch_EoL])  # head 2
+                im32.set_ydata((zTG[7]).rolling(window=_fetch).std()[0:batch_EoL])  # head 3
+                im33.set_ydata((zTG[9]).rolling(window=_fetch).std()[0:batch_EoL])
                 # ---------------------------------------[Winding Speed S]
-                im34.set_ydata((zWS[3]).rolling(window=wsS).mean()[0:batch_EoL])
-                im35.set_ydata((zWS[5]).rolling(window=wsS).mean()[0:batch_EoL])
-                im36.set_ydata((zWS[7]).rolling(window=wsS).mean()[0:batch_EoL])
-                im37.set_ydata((zWS[9]).rolling(window=wsS).mean()[0:batch_EoL])
-                im38.set_ydata((zWS[3]).rolling(window=wsS).std()[0:batch_EoL])
-                im39.set_ydata((zWS[5]).rolling(window=wsS).std()[0:batch_EoL])
-                im40.set_ydata((zWS[7]).rolling(window=wsS).std()[0:batch_EoL])
-                im41.set_ydata((zWS[9]).rolling(window=wsS).std()[0:batch_EoL])
+                im34.set_ydata((zWS[3]).rolling(window=_fetch).mean()[0:batch_EoL])
+                im35.set_ydata((zWS[5]).rolling(window=_fetch).mean()[0:batch_EoL])
+                im36.set_ydata((zWS[7]).rolling(window=_fetch).mean()[0:batch_EoL])
+                im37.set_ydata((zWS[9]).rolling(window=_fetch).mean()[0:batch_EoL])
+                # ------------------------------------------
+                im38.set_ydata((zWS[3]).rolling(window=_fetch).std()[0:batch_EoL])
+                im39.set_ydata((zWS[5]).rolling(window=_fetch).std()[0:batch_EoL])
+                im40.set_ydata((zWS[7]).rolling(window=_fetch).std()[0:batch_EoL])
+                im41.set_ydata((zWS[9]).rolling(window=_fetch).std()[0:batch_EoL])
 
-            # elif pRecipe == 'MGM':
-            #     # X Plot Y-Axis data points for XBar ------------------------------[Laser Power]
-            #     im10.set_ydata((eolRPT[0]).rolling(window=lpS).mean())  # head 1
-            #     im11.set_ydata((eolRPT[1]).rolling(window=lpS).mean())  # head 2
-            #     im12.set_ydata((eolRPT[2]).rolling(window=lpS).mean())  # head 3
-            #     im13.set_ydata((eolRPT[3]).rolling(window=lpS).mean())  # head 4
-            #     im14.set_ydata((eolRPT[4]).rolling(window=lpS).mean())  # head 1
-            #     im15.set_ydata((eolRPT[5]).rolling(window=lpS).mean())  # head 2
-            #     im16.set_ydata((eolRPT[6]).rolling(window=lpS).mean())  # head 3
-            #     im17.set_ydata((eolRPT[7]).rolling(window=lpS).mean())  # head 4
-            #     im18.set_ydata((eolRPT[8]).rolling(window=lpS).mean())  # head 1
-            #     im19.set_ydata((eolRPT[9]).rolling(window=lpS).mean())  # head 2
-            #     im20.set_ydata((eolRPT[10]).rolling(window=lpS).mean())  # head 3
-            #     im21.set_ydata((eolRPT[11]).rolling(window=lpS).mean())  # head 4
-            #     im22.set_ydata((eolRPT[12]).rolling(window=lpS).mean())  # head 1
-            #     im23.set_ydata((eolRPT[13]).rolling(window=lpS).mean())  # head 2
-            #     im24.set_ydata((eolRPT[14]).rolling(window=lpS).mean())  # head 3
-            #     im25.set_ydata((eolRPT[15]).rolling(window=lpS).mean())  # head 4
-            #     # ---------------------------------------[T1 std Dev]
-            #     im26.set_ydata((eolRPT[0]).rolling(window=lpS).std()[0:batch_EoL])
-            #     im27.set_ydata((eolRPT[1]).rolling(window=lpS).std()[0:batch_EoL])
-            #     im28.set_ydata((eolRPT[2]).rolling(window=lpS).std())
-            #     im29.set_ydata((eolRPT[3]).rolling(window=lpS).std())
-            #     im30.set_ydata((eolRPT[4]).rolling(window=lpS).std())
-            #     im31.set_ydata((eolRPT[5]).rolling(window=lpS).std())
-            #     im32.set_ydata((eolRPT[6]).rolling(window=lpS).std())
-            #     im33.set_ydata((eolRPT[7]).rolling(window=lpS).std())
-            #     im34.set_ydata((eolRPT[8]).rolling(window=lpS).std())
-            #     im35.set_ydata((eolRPT[9]).rolling(window=lpS).std())
-            #     im36.set_ydata((eolRPT[10]).rolling(window=lpS).std())
-            #     im37.set_ydata((eolRPT[11]).rolling(window=lpS).std())
-            #     im38.set_ydata((eolRPT[12]).rolling(window=lpS).std())
-            #     im39.set_ydata((eolRPT[13]).rolling(window=lpS).std())
-            #     im40.set_ydata((eolRPT[14]).rolling(window=lpS).std())
-            #     im41.set_ydata((eolRPT[15]).rolling(window=lpS).std())
-            #     # ---------------------------------------------------------------[Laser Angle T2]
-            #     im42.set_ydata((eolRPT[16]).rolling(window=laS).mean())
-            #     im43.set_ydata((eolRPT[17]).rolling(window=laS).mean())
-            #     im44.set_ydata((eolRPT[18]).rolling(window=laS).mean())
-            #     im45.set_ydata((eolRPT[19]).rolling(window=laS).mean())
-            #     im46.set_ydata((eolRPT[20]).rolling(window=laS).mean())
-            #     im47.set_ydata((eolRPT[21]).rolling(window=laS).mean())
-            #     im48.set_ydata((eolRPT[22]).rolling(window=laS).mean())
-            #     im49.set_ydata((eolRPT[23]).rolling(window=laS).mean())
-            #     im50.set_ydata((eolRPT[24]).rolling(window=laS).mean())
-            #     im51.set_ydata((eolRPT[25]).rolling(window=laS).mean())
-            #     im52.set_ydata((eolRPT[26]).rolling(window=laS).mean())
-            #     im53.set_ydata((eolRPT[27]).rolling(window=laS).mean())
-            #     im54.set_ydata((eolRPT[28]).rolling(window=laS).mean())
-            #     im55.set_ydata((eolRPT[29]).rolling(window=laS).mean())
-            #     im56.set_ydata((eolRPT[30]).rolling(window=laS).mean())
-            #     im57.set_ydata((eolRPT[31]).rolling(window=laS).mean())
-                # ---------------------------------------[T2 std Dev]
             # ------------------------------------------------------ Std Dev
             if batch_EoL > self.win_Xmax:
                 self.a1.set_xlim(batch_EoL - self.win_Xmax, batch_EoL)
@@ -2892,44 +3002,52 @@ class common_rampCount(ttk.Frame):
             if UseSQL_DBS and self.running and rc_con:
                 print('\n[cRC] Asynchronous controller activated...')
 
-                if uCalling == 1 and not sysRun:
-                    print('\n[cRC] Production is pausing...')
-                    paused = True
+                if uCalling == 1:
+                    sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
 
-                    while paused:
-                        time.sleep(5)
-                        print("\n[cRC Viz] Visualization in Paused Mode...")
-                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                        if sysRun:
-                            paused = False
-                            print('[cRC] Visualisation Resumes...')
-                        time.sleep(0.2)
+                    if not sysRun and not paused:
+                        print('\n[cRC] Production is pausing...')
+                        paused = True
 
-                elif uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
-                    paused = True
-
-                    while paused:
-                        time.sleep(5)
-                        print("\n[cRC Viz] Visualization in Paused Mode...")
-                        if keyboard.is_pressed("esc"):
-                            paused = False
-                            print('[cRC] Visualisation Resumes...')
-                        time.sleep(0.2)
-
-                else:
-                    # Get list of relevant SQL Tables using conn() --------------------[]
-                    self.rcP = rmp.sqlExec(rc_con, s_fetch, stp_Sz, self.T1, batch_RC)
-                    time.sleep(30)
-
-                    # ------ Inhibit iteration -----rm_con---------------------------------[]
-                    if not self.rcP:  # Terminate file-fetch
-
-                        print('[cRC] End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        rc_con.close()
-                        continue
+                        while paused:
+                            time.sleep(5)
+                            print("\n[cRC Viz] Visualization in Paused Mode...")
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
+                                paused = False
+                                print('[cRC] Visualisation Resumes...')
+                            time.sleep(0.2)
                     else:
-                        print('\n[cRC] Updating....')
+                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        self.rcP = rmp.sqlExec(rc_con, s_fetch, stp_Sz, self.T1, batch_RC)
+                        time.sleep(30)
+
+                elif uCalling == 2 or uCalling == 3:
+                    if keyboard.is_pressed("Alt+Q"):
+                        paused = True
+
+                        while paused:
+                            time.sleep(5)
+                            print("\n[cRC Viz] Visualization in Paused Mode...")
+                            if keyboard.is_pressed("esc"):
+                                paused = False
+                                print('[cRC] Visualisation Resumes...')
+                            time.sleep(0.2)
+
+                    else:
+                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        self.rcP = rmp.sqlExec(rc_con, s_fetch, stp_Sz, self.T1, batch_RC)
+                        time.sleep(30)
+
+                        # ------ Inhibit iteration -----rm_con---------------------------------[]
+                        if not self.rcP:  # Terminate file-fetch
+
+                            print('[cRC] End of File, connection closes after 30 mins...')
+                            time.sleep(60)
+                            rc_con.close()
+                            continue
+                        else:
+                            print('\n[cRC] Updating....')
 
                 if rc_con:
                     self.canvas.get_tk_widget().after(0, self.rcDataPlot) # Regime = every 10000 ms = 10seconds
@@ -3095,7 +3213,7 @@ class common_climateProfile(ttk.Frame):
         # ---------------- EXECUTE SYNCHRONOUS METHOD --------------#
 
     def dataControlEV(self):
-        global frqC
+        global frqC, s_fetch
 
         frqC = 1
         s_fetch, stp_Sz = 30, 1        # entry value in string sql syntax 30=14, 60=13,
@@ -3120,44 +3238,52 @@ class common_climateProfile(ttk.Frame):
         while True:
             # procedure must be valid either on PLC/SQL based runtime
             if UseSQL_DBS and self.running and ev_con:
-                inProgress = True  # True for RetroPlay mode
                 print('\n[cEV] Asynchronous controller activated...')
 
-                if uCalling == 1 and not sysRun:
-                    print('\n[cEV] Production is pausing...')
-                    paused = True
+                if uCalling == 1:
+                    sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
 
-                    while paused:
-                        time.sleep(5)
-                        print("\n[cEV Viz] Visualization in Paused Mode...")
-                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                        if sysRun:
-                            paused = False
-                            print('[cEV] Visualisation Resumes...')
-                        time.sleep(0.2)
+                    if not sysRun and not paused:
+                        print('\n[cEV] Production is pausing...')
+                        paused = True
 
-                elif uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
-                    paused = True
-
-                    while paused:
-                        time.sleep(5)
-                        print("\n[cEV Viz] Visualization in Paused Mode...")
-                        if keyboard.is_pressed("esc"):
-                            paused = False
-                            print('[cEV] Visualisation Resumes...')
-                        time.sleep(0.2)
-                else:
-                    # Get list of relevant SQL Tables using conn() --------------------[]
-                    self.evStr = sev.sqlExec(ev_con, s_fetch, stp_Sz, self.evT, frqC)
-                    time.sleep(10)
-                    # ------ Inhibit iteration ----------------------------------------[
-                    if  not self.evStr:  # Terminate file-fetch
-                        ev_con.close()
-                        print('[cEV] SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        continue
+                        while paused:
+                            time.sleep(5)
+                            print("\n[cEV Viz] Visualization in Paused Mode...")
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
+                                paused = False
+                                print('[cEV] Visualisation Resumes...')
+                            time.sleep(0.2)
                     else:
-                        print('\n[cEV] Updating....')
+                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        self.evStr = sev.sqlExec(ev_con, s_fetch, stp_Sz, self.evT, frqC)
+                        time.sleep(10)
+
+                elif uCalling == 2 or uCalling == 3:
+                    if keyboard.is_pressed("Alt+Q"):
+                        paused = True
+
+                        while paused:
+                            time.sleep(5)
+                            print("\n[cEV Viz] Visualization in Paused Mode...")
+                            if keyboard.is_pressed("esc"):
+                                paused = False
+                                print('[cEV] Visualisation Resumes...')
+                            time.sleep(0.2)
+                    else:
+                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        self.evStr = sev.sqlExec(ev_con, s_fetch, stp_Sz, self.evT, frqC)
+                        time.sleep(10)
+                        # ------ Inhibit iteration ----------------------------------------[
+                        if  not self.evStr:  # Terminate file-fetch
+                            ev_con.close()
+                            print('[cEV] SQL End of File, connection closes after 30 mins...')
+                            time.sleep(60)
+                            continue
+                        else:
+                            print('\n[cEV] Updating....')
+
                 if ev_con:
                     self.canvas.get_tk_widget().after(0, self.evDataPlot)  # Regime = every 5seconds
                     frqC += 1
@@ -3192,7 +3318,7 @@ class common_climateProfile(ttk.Frame):
 
             self.a3.legend(loc='upper right', title="UV-Index:" + str(uvIndex))
             self.a3.grid(color="0.5", linestyle='-', linewidth=0.5)
-            smp_Sz = 32
+
             # --------------------------------
             # rRg = len(EV[1])    # 32,
             # Plot X-Axis data points -------- X Plot
@@ -3209,23 +3335,23 @@ class common_climateProfile(ttk.Frame):
 
             # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1]
             # im10.set_ydata((EV[2]).rolling(window=smp_Sz).mean()[0:db_freq])      # time stamp
-            self.im10.set_ydata((EV[1]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # oven tempA
-            self.im11.set_ydata((EV[2]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # oven temp B
-            self.im12.set_ydata((EV[3]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # Cell Rel Temperature
-            self.im13.set_ydata((EV[4]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # Cell Rel Humidity
-            self.im14.set_ydata((EV[5]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # Factory Dew Point Temp
-            self.im15.set_ydata((EV[6]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # Factory Humidity
-            self.im16.set_ydata((EV[7]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # Cell Rel Temperature
-            self.im17.set_ydata((EV[8]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # Cell Rel Humidity
-            self.im18.set_ydata((EV[9]).rolling(window=smp_Sz).mean().dropna()[0:frqC])           # Factory Dew Point Temp
-            self.im19.set_ydata((EV[10]).rolling(window=smp_Sz).mean().dropna()[0:frqC])
+            self.im10.set_ydata((EV[1]).rolling(window=s_fetch).mean()[0:frqC])           # oven tempA
+            self.im11.set_ydata((EV[2]).rolling(window=s_fetch).mean()[0:frqC])           # oven temp B
+            self.im12.set_ydata((EV[3]).rolling(window=s_fetch).mean()[0:frqC])           # Cell Rel Temperature
+            self.im13.set_ydata((EV[4]).rolling(window=s_fetch).mean()[0:frqC])           # Cell Rel Humidity
+            self.im14.set_ydata((EV[5]).rolling(window=s_fetch).mean()[0:frqC])           # Factory Dew Point Temp
+            self.im15.set_ydata((EV[6]).rolling(window=s_fetch).mean()[0:frqC])           # Factory Humidity
+            self.im16.set_ydata((EV[7]).rolling(window=s_fetch).mean()[0:frqC])           # Cell Rel Temperature
+            self.im17.set_ydata((EV[8]).rolling(window=s_fetch).mean()[0:frqC])           # Cell Rel Humidity
+            self.im18.set_ydata((EV[9]).rolling(window=s_fetch).mean()[0:frqC])           # Factory Dew Point Temp
+            self.im19.set_ydata((EV[10]).rolling(window=s_fetch).mean()[0:frqC])
             # im20.set_ydata((CT[12]).rolling(window=smp_Sz).mean()[0:db_freq])  # UVIndex
             # step=smp_St
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if frqC > self.win_Xmax:
                 self.a2.set_xlim(frqC - self.win_Xmax, frqC)
-                self.a3.set_xlim(frqC - self.win_Xmax, frqC)
+                # self.a3.set_xlim(frqC - self.win_Xmax, frqC)
                 EV.pop(0)
             else:
                 self.a2.set_xlim(0, self.win_Xmax)
@@ -3322,7 +3448,7 @@ class common_gapCount(ttk.Frame):
         Load watchdog function with synchronous function every seconds
         """
         # Initialise RT variables ---[]
-        autoSpcRun = True
+        sysRun = False
         paused = False
         import keyboard  # for temporary use
 
@@ -3330,44 +3456,52 @@ class common_gapCount(ttk.Frame):
             if UseSQL_DBS and self.running and gc_con:
                 print('\n[cVC] Asynchronous controller activated...')
 
-                if uCalling == 1 and not sysRun:
-                    print('\n[cVC] Production is pausing...')
-                    paused = True
+                if uCalling == 1:       # Running Live Analysis
+                    sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
 
-                    while paused:
-                        time.sleep(5)
-                        print("\n[cVC Viz] Visualization in Paused Mode...")
-                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                        if sysRun:
-                            paused = False
-                            print('[cVC] Visualisation Resumes...')
-                        time.sleep(0.2)
+                    if not sysRun and not paused:
+                        print('\n[cVC] Production is pausing...')
+                        paused = True
 
-                elif uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
-                    paused = True
-
-                    while paused:
-                        time.sleep(5)
-                        print("\n[cVC Viz] Visualization in Paused Mode...")
-                        if keyboard.is_pressed("esc"):
-                            paused = False
-                            print('[cVC] Visualisation Resumes...')
-                        time.sleep(0.2)
-
-                else:
-                    # Get list of relevant SQL Tables using conn() --------------------[]
-                    self.gcD = svc.sqlExec(gc_con, s_fetch, stp_Sz, self.gcT, batch_VC)
-                    time.sleep(30)
-
-                    # ------ Inhibit iteration ----------------------------------------------------------[]
-                    if not self.gcD:  # Terminate file-fetch
-
-                        print('[cVC] SQL End of File, connection closes after 30 mins...')
-                        time.sleep(60)
-                        gc_con.close()
-                        continue
+                        while paused:
+                            time.sleep(5)
+                            print("\n[cVC Viz] Visualization in Paused Mode...")
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
+                                paused = False
+                                print('[cVC] Visualisation Resumes...')
+                            time.sleep(0.2)
                     else:
-                        print('\n[cVC] Updating....')
+                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        self.gcD = svc.sqlExec(gc_con, s_fetch, stp_Sz, self.gcT, batch_VC)
+                        time.sleep(30)
+
+                elif uCalling == 2 or uCalling == 3:
+                    if keyboard.is_pressed("Alt+Q"):
+                        paused = True
+
+                        while paused:
+                            time.sleep(5)
+                            print("\n[cVC Viz] Visualization in Paused Mode...")
+                            if keyboard.is_pressed("esc"):
+                                paused = False
+                                print('[cVC] Visualisation Resumes...')
+                            time.sleep(0.2)
+
+                    else:
+                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        self.gcD = svc.sqlExec(gc_con, s_fetch, stp_Sz, self.gcT, batch_VC)
+                        time.sleep(30)
+
+                        # ------ Inhibit iteration ----------------------------------------------------------[]
+                        if not self.gcD:  # Terminate file-fetch
+
+                            print('[cVC] SQL End of File, connection closes after 30 mins...')
+                            time.sleep(60)
+                            gc_con.close()
+                            continue
+                        else:
+                            print('\n[cVC] Updating....')
 
                 if gc_con:
                     self.canvas.get_tk_widget().after(0, self.gcDataPlot)  # Regime = every 10seconds
@@ -5510,7 +5644,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
         self.runRMP = False
 
         # prevents user possible double loading -----
@@ -5850,14 +5984,14 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
 
         while True:
             # ------------------------------#
-            if UsePLC_DBS and self.running:
-                sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
-                if sysRun:
-                    inProgress = True                               # True for RetroPlay mode
-                    print('\n[TT] Live mode controller activated...')
+            if UseSQL_DBS or UsePLC_DBS and self.running:
+                print('\n[TT] Synchronous controller activated...')
 
-                    if keyboard.is_pressed("Alt+Q") or not msc_rt == 49296 and not sysRun and not inProgress:  # Terminate file-fetch
-                        print('\nProduction is pausing...')
+                if uCalling == 1:
+                    sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
+
+                    if not sysRun and not paused or msc_rt == 49296:
+                        print('\n[TT] Live mode controller pausing...')
                         paused = True
 
                         while paused:
@@ -5869,49 +6003,28 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                                 print('[TT] Visualisation Resumes...')
                             time.sleep(0.2)
                     else:
-                        paused = False
                         print("[TT] Visualization in Real-time Mode...")
                         self.ttD1, self.rmD3 = ttb.plcExec(self.T1, self.T3, s_fetch, stp_Sz, batch_TT)
                         time.sleep(3)
-
-                    # --- Add batch loop here ----------------------------
+                    # Closing up the Loop with batch_ var
                     self.canvas.get_tk_widget().after(0, self.ttDataPlot)
                     batch_TT += 1
 
-                else:
-                    continue
-
-            elif UseSQL_DBS and tt_con:
-                print('\n[TT] PostProd Mode controller activated...')
-                if not UsePLC_DBS and UseSQL_DBS:
-                    print('[TT] is requesting for SMC status...')
-                    sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
-
-                if uCalling == 1 and not sysRun:
-                    print('\n[TT] Production is pausing...')
-                    paused = True
-
-                    while paused:
-                        time.sleep(5)
-                        print("\n[TT Viz] Visualization in Paused Mode...")
-                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                        if sysRun:
-                            paused = False
-                            print('[TT] Visualisation Resumes...')
-                        time.sleep(0.2)
-                else:
-                    if uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+                elif uCalling == 2 or uCalling == 3 and tt_con:
+                    if keyboard.is_pressed("Alt+Q"):
                         paused = True
+
                         while paused:
                             time.sleep(5)
                             print("\n[TT Viz] Visualization in Paused Mode...")
-                            if keyboard.is_pressed("esc"):
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
                                 paused = False
                                 print('[TT] Visualisation Resumes...')
                             time.sleep(0.2)
 
                     else:
-                        # self.gD1 = tta.sqlExec(tt_con, s_fetch, stp_Sz, self.T1, batch_TG)
+                        print("[TT] Visualization in Real-time Mode...")
                         self.ttD1, self.ttD2 = tta.sqlExec(tt_con, s_fetch, stp_Sz, self.T1, self.T2, batch_TT)
                         time.sleep(3)
                         # Treat EOF as event ---------------------
@@ -5921,18 +6034,17 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                             time.sleep(60)
                             continue
                         else:
-                            print('\n[TT] Updating....')
-                # ---------- Add batch loop here -----------------[]
-                if tt_con:
-                    self.canvas.get_tk_widget().after(0, self.ttDataPlot)
-                    batch_TT += 1
-                else:
-                    print('[TT] sorry, instance not granted, trying again..')
-                    tt_con = sq.check_SQL_Status(5, 10)
+                                print('\n[TT] Updating....')
+                    # ---------- Add batch loop here -----------------[]
+                    if tt_con:
+                        self.canvas.get_tk_widget().after(0, self.ttDataPlot)
+                        batch_TT += 1
+                    else:
+                        print('[TT] sorry, instance not granted, trying again..')
+                        tt_con = sq.check_SQL_Status(5, 10)
 
             else:
                 print('\n[TT] is active but no visualisation!')
-            # ------------------------------------------------------------
             print('[TT] protocol is refreshed, the wait is over...')
 
     # ================== End of synchronous Method ==========================--------------------[]
@@ -5951,33 +6063,37 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             rmp_con = None
 
         # Initialise RT variables ---[]
-        autoSpcRun = True
         paused = False
-        sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = 0, 0, 0, 0, 0, 0, 'Pipe Position Not Specified'
 
-        # ----------------------------------------------#
+        # ----------------------------------------------Only pulling from SQL Stream
         while True:
             if UseSQL_DBS and rmp_con:
                 print('\n[RMP] PostProd Mode controller activated...')
-                if not UsePLC_DBS and UseSQL_DBS:
-                    print('[RMP] is requesting for SMC status...')
+
+                if uCalling == 1:
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
-                if keyboard.is_pressed("Alt+Q") and uCalling == 1 and not sysRun:
-                    print('\n[RMP] Production is pausing...')
-                    paused = True
-
-                    while paused:
-                        time.sleep(5)
-                        print("\n[RMP Viz] Visualization in Paused Mode...")
-                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                        if sysRun:
-                            paused = False
-                            print('[RMP] Visualisation Resumes...')
-                        time.sleep(0.2)
-                else:
-                    if uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+                    if not sysRun and not paused:
+                        print('[RMP] Live is pausing...')
                         paused = True
+
+                        while paused:
+                            time.sleep(5)
+                            print("\n[RMP Viz] Visualization in Paused Mode...")
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
+                                paused = False
+                                print('[RMP] Visualisation Resumes...')
+                            time.sleep(0.2)
+                    else:
+                        self.rmD3 = rC.sqlExec(rmp_con, s_fetch, stp_Sz, self.T3, batch_RMP)
+                        time.sleep(10)
+                        print("[RMP] Visualization in Play Mode...")
+
+                elif uCalling == 2 or uCalling == 3:
+                    if keyboard.is_pressed("Alt+Q"):
+                        paused = True
+
                         while paused:
                             time.sleep(5)
                             print("\n[RMP Viz] Visualization in Paused Mode...")
@@ -5988,57 +6104,32 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                     else:
                         self.rmD3 = rC.sqlExec(rmp_con, s_fetch, stp_Sz, self.T3, batch_RMP)
                         time.sleep(10)
-                        print("[RMP] Visualization in Play Mode...")
-
-                        if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
+                        print("[RMP] Visualization in Live Mode...")
+                        # ------ Inhibit iteration ----------------------------------------[]
+                        if not self.rmD3:  # Terminate file-fetch
                             rmp_con.close()  # close connection
                             print('SQL End of File, [RMP] connection closes after 30 secs...')
                             time.sleep(60)
                             continue
                         else:
                             print('\n[RMP] Updating....')
+                # -------------------------------------------------------------------------[]
+                if rmp_con:
+                    self.canvas.get_tk_widget().after(0, self.rmDataPlot)
+                    batch_RMP += 1
+                else:
+                    print('[RMP] sorry, instance not granted, trying again..')
+                    rmp_con = sq.check_SQL_Status(5, 60)
+
             else:
                 print('\n[RMP] is active but no visualisation!')
-            # ------------------------------------------------------------
-            if rmp_con:
-                self.canvas.get_tk_widget().after(0, self.rmDataPlot)
-                batch_RMP += 1
-            else:
-                print('[RMP] sorry, instance not granted, trying again..')
-                rmp_con = sq.check_SQL_Status(5, 60)
             print('[RMP] protocol is being refreshed...')
 
-    # ================== End of synchronous Method ==========================--------------------[]
+    # ================== End of synchronous Method ==========================--------------[]
 
     def ttDataPlot(self):
         timei = time.time()         # start timing the entire loop
 
-        def fix_lengthA(arr, target_len=(batch_TT)):
-            arr = list(arr.any())
-            if len(arr) < target_len.any():
-                arr = arr + [np.nan] * (target_len - len(arr))  # pad
-            elif len(arr) > target_len.any():
-                arr = arr[:target_len.any()]  # truncate
-            return arr
-
-
-        def fix_length(arr, target_len=batch_TT):
-            # Convert to a list first
-            if hasattr(arr, "__iter__") and not isinstance(arr, str):
-                arr = list(arr)  # ensures slicing works
-            else:
-                arr = [arr]  # scalar → list
-
-            # Pad with NaN if too short
-            if len(arr) < target_len.any():
-                arr = arr + [np.nan] * (target_len - len(arr))
-            # Truncate if too long
-            elif len(arr) > target_len.any():
-                arr = arr[:target_len.any()]
-
-            return arr
-
-        # --------------------------------------------------#
         # Call data loader Method-----------------------#
         if UsePLC_DBS and self.running:
             import VarPLC_TT as tt
@@ -6046,9 +6137,15 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             g1 = qtt.validCols(self.T1)                                 # Load PLC-dB [SPC_TT]
             df1 = pd.DataFrame(self.ttD1, columns=g1)                   # Include table data into python Dataframe
             # ------------------------------------------#
-            TT = tt.loadProcesValues(df1)                               # Join data values under dataframe
-            print('\nSQL Content', df1.head(self.ttS))
-            # print("Memory Usage:", df1.info(verbose=False))             # Check memory utilization
+            # Do some data cleansing & interpolation if Nans occurs
+            data1 = df1.select_dtypes(include=["number"])
+            df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+            # Convert pandas -> cuDF
+            if GPU_ENABLED:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                TT = tt.loadProcesValues(gpu_df1)
+            else:
+                TT = tt.loadProcesValues(df1_interp)                    # Join data values under dataframe
 
         elif UseSQL_DBS and self.running:
             import VarSQL_TT as tt                                      # load SQL variables column names | rfVarSQL
@@ -6057,26 +6154,33 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             # Do some data cleansing ------------[Perform back or forward fill interpolation if Nans occurs]
             # data1 = data1.apply(pd.to_numeric, errors="coerce")
             data1 = data1.select_dtypes(include=["number"])
-            df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill() # column-wise
+            df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+            if GPU_ENABLED:
+                # Convert pandas -> cuDF
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                TA = tt.loadPVT1(gpu_df1)
+            else:
+                TA = tt.loadPVT1(df1_interp)
 
-            print(df1_interp.dtypes)
-            print('TP02', df1_interp)
-            TA = tt.loadPVT1(df1_interp)
-
-            # ---------------------------------------------
+            # ---------------------------------------------[]
             g2 = qtt.validCols(self.T2)
             data2 = pd.DataFrame(self.ttD2, columns=g2)
             # data2 = data2.apply(pd.to_numeric, errors="coerce")
             data2 = data2.select_dtypes(include=["number"])
             df2_interp = data2.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-            TB = tt.loadPVT2(df2_interp)
-            # ----------------------------------
+            if GPU_ENABLED:
+                # Convert pandas → cuDF
+                gpu_df2 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                TB = tt.loadPVT2(gpu_df2)
+            else:
+                TB = tt.loadPVT2(df2_interp)
+            # --------------------------------------------[]
             # print("Memory Usage:", p_data.info(verbose=False))
             # print("Stats Usage:", tData1.describe())
             # print("Stats Usage:", tData2.describe())
             # print("Memory Usage:", p_data.head())
             # print('\nTP-In:', p_data.head())
-            # --------------------------------------#
+            # --------------------------------------------[]
         else:
             TA = 0
             TB = 0
@@ -6085,7 +6189,6 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         # ------------------------------------------#
         if self.running:
             # print('Observations DataPoint:', len(TA[3]))
-            print('Observations DataPoint:', len(TB[3]))
             self.a1.legend(loc='upper right', title='Tape Temp')
             self.a2.legend(loc='upper right', title='Sigma curve')
             # -------------------------------------[]
@@ -6123,7 +6226,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             self.im39.set_xdata(np.arange(batch_TT))
             self.im40.set_xdata(np.arange(batch_TT))
             self.im41.set_xdata(np.arange(batch_TT))
-            # s_fetch, stp_Sz
+
+            # Compute rolling mean on GPU or CPU -
             if UsePLC_DBS:
                 # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1 TT]
                 self.im10.set_ydata((TT[1]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
@@ -6225,8 +6329,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             self.a2.axhspan(sUCLtt, self.sBar_maxTT, facecolor='#8d8794', edgecolor='#CCCCFF')  # upper grey area
             self.a2.axhspan(self.sBar_minTT, sLCLtt, facecolor='#8d8794', edgecolor='#CCCCFF')  # Lower grey area
             # Copy dynamic arrays ------
-            x_limits = self.a2.get_xlim()
-            print('Current View Size:', x_limits)
+            # x_limits = self.a2.get_xlim()
+            # print('Current View Size:', x_limits)
 
             # Setting up the parameters for moving windows Axes ---------------------------------[]
             if batch_TT > self.win_Xmax:
@@ -6267,7 +6371,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             # Do some data cleansing ------------[Perform back or forward fill interpolation if Nans occurs]
             data1 = d3.apply(pd.to_numeric, errors="coerce")
             df3 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-            print(df3.dtypes)
+            # print(df3.dtypes)
             # --------------------------------------#
             RM = rc.loadProcesValues(df3)
             # --------------------------------------#
@@ -6574,56 +6678,43 @@ class substTempTabb(ttk.Frame):
         sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = 0, 0, 0, 0, 0, 0, 'Pipe Position Not Specified'
 
         while True:
-            if UsePLC_DBS and self.running:          # Using PLC Data
-                sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
-                if sysRun:
-                    inProgress = True                    # True for RetroPlay mode
-                    print('\n[ST] Synchronous controller activated...')
+            if UseSQL_DBS or UsePLC_DBS and self.running:
+                print('\n[ST] Synchronous controller activated...')
 
-                    # Either of the 2 combo variables are assigned to trigger routine pause
-                    if keyboard.is_pressed("Alt+Q") or not msctcp == 49296 and not inProgress:  # Terminate file-fetch
+                if uCalling == 1:
+                    sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
+
+                    if not sysRun and not paused or msc_rt == 49296:  # Terminate file-fetch
                         print('\n[ST] Production is pausing...')
-                        if not paused:
-                            autoSpcRun = not autoSpcRun
-                            paused = True
+                        paused = True
+
+                        while paused:
+                            time.sleep(5)
                             print("\n[ST] Visualization in Paused Mode...")
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
+                                paused = False
+                                print('[ST] Visualisation Resumes...')
+                            time.sleep(0.2)
                     else:
-                        paused = False
                         print("[ST] Visualization in Real-time Mode...")
                         # -----------------------------------------------------------------[]
                         self.stDta = stB.plcExec(self.T1, s_fetch, stp_Sz, s_regm)
                         time.sleep(3)
-                else:
-                    continue
+                    self.canvas.get_tk_widget().after(0, self.stDataPlot)
+                    batch_ST += 1
 
-            elif UseSQL_DBS and st_con:
-                print('\n[ST] Asynchronous controller activated...')
-                if not UsePLC_DBS and UseSQL_DBS:
-                    print('[ST] is requesting for SMC status...')
-                    sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
-                    # xpiPos.insert(0, piPos)
-
-                if keyboard.is_pressed("Alt+Q") and uCalling == 1 and not sysRun:
-                    print('\n[ST] Production is pausing...')
-                    paused = True
-
-                    while paused:
-                        time.sleep(5)
-                        print("\n[ST Viz] Visualization in Paused Mode...")
-                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                        if sysRun:
-                            paused = False
-                            print('[ST] Visualisation Resumes...')
-                        time.sleep(0.2)
-                else:
-                    if uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+                elif uCalling == 2 or uCalling == 3 and st_con:
+                    if keyboard.is_pressed("Alt+Q"):
                         paused = True
+
                         while paused:
                             time.sleep(5)
-                            print("\n[TG Viz] Visualization in Paused Mode...")
-                            if keyboard.is_pressed("esc"):
+                            print("\n[ST Viz] Visualization in Paused Mode...")
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
                                 paused = False
-                                print('[TG] Visualisation Resumes...')
+                                print('[ST] Visualisation Resumes...')
                             time.sleep(0.2)
                     else:
                         self.stDta, self.stDtb = stA.sqlExec(st_con, s_fetch, stp_Sz, self.T1, self.T2, batch_ST)
@@ -6636,23 +6727,15 @@ class substTempTabb(ttk.Frame):
                             continue
                         else:
                             print('\n[ST] Updating....')
+                    if st_con:
+                        self.canvas.get_tk_widget().after(0, self.stDataPlot)
+                        batch_ST += 1
+                    else:
+                        print('[ST] sorry, instance not granted, trying again..')
+                        st_con = sq.check_SQL_Status(5, 10)
 
             else:
                 print('[ST] is active but no visualisation!\n')
-            # ------------------------------------------------------------
-            if UseSQL_DBS:
-                if st_con:
-                    self.canvas.get_tk_widget().after(0, self.stDataPlot)
-                    batch_ST += 1
-                else:
-                    print('[ST] sorry, instance not granted, trying again..')
-                    st_con = sq.check_SQL_Status(5, 10)
-            elif UsePLC_DBS:
-                self.canvas.get_tk_widget().after(0, self.stDataPlot)
-                batch_ST += 1
-            else:
-                print('[ST] sorry, ST instance is not granted...')
-                # self.canvas.get_tk_widget().after(0, self.stDataPlot)
             print('[ST] protocol is refreshed, the wait is over...')
 
     # ================== End of synchronous Method ==========================
@@ -6664,11 +6747,19 @@ class substTempTabb(ttk.Frame):
         if UsePLC_DBS and self.running:
             import VarPLC_ST as st
             # Call synchronous data function ---------[]
-            g1 = qst.validCols(self.T1)                          # Load defined valid columns for PLC Data
-            df1 = pd.DataFrame(self.stDta, columns=g1)      # Include table data into python Dataframe
+            g1 = qst.validCols(self.T1)                         # Load defined valid columns for PLC Data
+            df1 = pd.DataFrame(self.stDta, columns=g1)          # Include table data into python Dataframe
             # ------------------------------------------#
-            ST = st.loadProcesValues(df1)                    # Join data values under dataframe
-            print("Memory Usage:", df1.info(verbose=False))
+            # Do some data cleansing & interpolation if Nans occurs
+            data1 = df1.select_dtypes(include=["number"])
+            df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+            # Convert pandas -> cuDF
+            if GPU_ENABLED:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                ST = st.loadProcesValues(gpu_df1)                    # Join data values under dataframe
+            else:
+                ST = st.loadProcesValues(df1_interp)                 # Join data values under dataframe
+            # print("Memory Usage:", df1.info(verbose=False))
 
         elif UseSQL_DBS and self.running:
             import VarSQL_ST as st
@@ -6679,9 +6770,17 @@ class substTempTabb(ttk.Frame):
 
             p_data = pd.concat([d1, d2], axis=1)
             # ----------------------------------
-            ST = st.loadProcesValues(p_data)                 # Join data values under dataframe
+            # Do some data cleansing & interpolation if Nans occurs
+            data1 = p_data.select_dtypes(include=["number"])
+            df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+            # Convert pandas -> cuDF
+            if GPU_ENABLED:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                ST = st.loadProcesValues(gpu_df1)
+            else:
+                ST = st.loadProcesValues(df1_interp)
             # ---------------------------------
-            print('\nSQL Content [ST]', p_data.head())
+            # print('\nSQL Content [ST]', p_data.head())
             # print("Memory Usage:", p_data.info(verbose=False))
             # --------------------------------------#
         else:
@@ -6847,7 +6946,6 @@ class substTempTabb(ttk.Frame):
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)
-            print('[ST] Data Stream Buffer Size 2:', len(ST))
             self.canvas.draw_idle()
 
         else:
@@ -7138,72 +7236,57 @@ class tapeGapPolTabb(ttk.Frame):
 
         elif UsePLC_DBS:
             if self.running:
-                import plcArrayRLmethodTG as pdC
+                import plcArrayRLmethodTG as pdD
                 print('\n[TG] Activating watchdog...')  # primary connection to watch dog
             else:
                 # Dtt_ready = True
                 print('[TG] Data Source selection is Unknown')
-
         else:
             print('[TG] Data Source selection is Unknown')
 
         # Initialise RT variables ---[]
-        autoSpcRun = True
         paused = False
-        sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = 0, 0, 0, 0, 0, 0, 'Pipe Position Not Specified'
 
         while True:
             # ------------------------------#
-            if UsePLC_DBS and self.running:                                                      # Not Using PLC Data
-                sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
-                if sysRun:
-                    inProgress = True  # True for RetroPlay mode
-                    print('\n[TG] Synchronous controller activated...')
-
-                    # Either of the 2 combo variables are assigned to trigger routine pause
-                    if keyboard.is_pressed("Alt+Q") or not msc_rt == 49296 and not sysRun and not inProgress:  # Terminate file-fetch
-                        print('\n[TG] Production is pausing...')
-                        if not paused:
-                            autoSpcRun = not autoSpcRun
-                            paused = True
-                            print("\n[TG] Visualization in Paused Mode...")
-                    else:
-                        paused = False
-                        print("[TG] Visualization in Real-time Mode...")
-                        # -----------------------------------------------------------------[]
-                        self.stDta = pdC.plcExec(self.T1, s_fetch, stp_Sz, s_regm)
-                        time.sleep(60)
-                else:
-                    continue
-
-            elif UseSQL_DBS and tg_con:
+            if UsePLC_DBS or UseSQL_DBS and self.running:
                 print('\n[TG] Synchronous controller activated...')
-                if not UsePLC_DBS and UseSQL_DBS:
-                    print('[TG] is requesting for SMC status...')
+
+                if uCalling == 1:
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
-                if uCalling == 1 and not sysRun:
-                    print('\n[TG] Production is pausing...')
-                    paused = True
-
-                    while paused:
-                        time.sleep(5)
-                        print("\n[TG Viz] Visualization in Paused Mode...")
-                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                        if sysRun:
-                            paused = False
-                            print('[TG] Visualisation Resumes...')
-                        time.sleep(0.2)
-                else:
-                    if uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+                    if not sysRun and not paused or msc_rt == 49296:
+                        print('[TG] is requesting for SMC status...')
                         paused = True
+
                         while paused:
                             time.sleep(5)
                             print("\n[TG Viz] Visualization in Paused Mode...")
-                            if keyboard.is_pressed("esc"):
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
                                 paused = False
                                 print('[TG] Visualisation Resumes...')
                             time.sleep(0.2)
+
+                    else:
+                        print("[TG] Visualization in Real-time Mode...")
+                        # -----------------------------------------------------------------[]
+                        self.stDta = pdD.plcExec(self.T1, s_fetch, stp_Sz, s_regm)
+                        time.sleep(60)
+                    self.canvas.get_tk_widget().after(0, self.tgDataPlot)
+                    batch_TG += 1
+
+                elif uCalling == 2 or uCalling == 3 and tg_con:
+                    if keyboard.is_pressed("Alt+Q"):
+                        paused = True
+
+                        while paused:
+                            time.sleep(5)
+                            print("\n[TG Viz] Visualization in Paused Mode...")
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
+                                paused = False
+                                print('[TG] Visualisation Resumes...')
                     else:
                         self.gD1 = pdC.sqlExec(tg_con, s_fetch, stp_Sz, self.T1, batch_TG)
                         time.sleep(60)
@@ -7215,23 +7298,14 @@ class tapeGapPolTabb(ttk.Frame):
                             continue
                         else:
                             print('\n[TG] Updating....')
-
+                    if tg_con:
+                        self.canvas.get_tk_widget().after(0, self.tgDataPlot)
+                        batch_TG += 1
+                    else:
+                        print('[TG] sorry, instance not granted, trying again..')
+                        tg_con = sq.check_SQL_Status(5, 10)
             else:
                 print('[TG] is active but no visualisation!\n')
-            # ------------------------------------------------------------
-            if UseSQL_DBS:
-                if tg_con:
-                    self.canvas.get_tk_widget().after(0, self.tgDataPlot)
-                    batch_TG += 1
-                else:
-                    print('[TG] sorry, instance not granted, trying again..')
-                    tg_con = sq.check_SQL_Status(5, 10)
-            elif UsePLC_DBS:
-                self.canvas.get_tk_widget().after(0, self.tgDataPlot)
-                batch_TG += 1
-            else:
-                print('[TG] sorry, TG instance is not granted...')
-                self.canvas.get_tk_widget().after(0, self.tgDataPlot)
             print('[TG] protocol is refreshed, the wait is over...')
 
     # ------------------------------------------------------------------
@@ -7250,33 +7324,35 @@ class tapeGapPolTabb(ttk.Frame):
             vmp_con = None
 
         # Initialise RT variables ---[]
-        autoSpcRun = True
         paused = False
-        sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = 0, 0, 0, 0, 0, 0, 'Pipe Position Not Specified'
 
         # ----------------------------------------------#
         while True:
             if UseSQL_DBS and vmp_con:
                 print('\n[VMP] PostProd Mode controller activated...')
 
-                if not UsePLC_DBS and UseSQL_DBS:
-                    print('[VMP] is requesting for SMC status...')
+                if uCalling == 1 and not sysRun:
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
-                if uCalling == 1 and not sysRun:
-                    print('\n[VMP] Production is pausing...')
-                    paused = True
+                    if not sysRun and not paused:
+                        print('\n[VMP] Live is pausing...')
+                        paused = True
 
-                    while paused:
-                        time.sleep(5)
-                        print("\n[VMP Viz] Visualization in Paused Mode...")
-                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
-                        if sysRun:
-                            paused = False
-                            print('[VMP] Visualisation Resumes...')
-                        time.sleep(0.2)
+                        while paused:
+                            time.sleep(5)
+                            print("\n[VMP Viz] Visualization in Paused Mode...")
+                            sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+                            if sysRun:
+                                paused = False
+                                print('[VMP] Visualisation Resumes...')
+                            time.sleep(0.2)
+                    else:
+                        # USe SQL repository for VMP stream ------[]
+                        self.vmD3 = vmp.sqlExec(vmp_con, s_fetch, stp_Sz, self.T2, batch_VMP)
+                        time.sleep(10)
 
-                elif uCalling == 2 or uCalling == 3 and keyboard.is_pressed("Alt+Q"):
+                elif uCalling == 2 or uCalling == 3:
+                    if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
                         while paused:
@@ -7286,19 +7362,19 @@ class tapeGapPolTabb(ttk.Frame):
                                 paused = False
                                 print('[VMP] Visualisation Resumes...')
                             time.sleep(0.2)
-                else:
-                    # USe SQL repository for VMP stream ------[]
-                    self.vmD3 = vmp.sqlExec(vmp_con, s_fetch, stp_Sz, self.T2, batch_VMP)
-                    time.sleep(10)
-                    print("[VMP] Visualization in Play Mode...")
-                    # set condition for temporary halt if running PPA ----------
-                    if not self.vmD3:           # No new data coming through
-                        print('SQL End of File, [VMP] connection closes after 30 min...')
-                        time.sleep(60)
-                        vmp_con.close()       # close connection
-                        continue
                     else:
-                        print('\n[VMP] Updating....')
+                        # USe SQL repository for VMP stream ------[]
+                        self.vmD3 = vmp.sqlExec(vmp_con, s_fetch, stp_Sz, self.T2, batch_VMP)
+                        time.sleep(10)
+                        print("[VMP] Visualization in Live Mode...")
+                        # ------ Inhibit iteration ----------------------------------------[]
+                        if not self.vmD3:           # No new data coming through
+                            print('SQL End of File, [VMP] connection closes after 30 min...')
+                            time.sleep(60)
+                            vmp_con.close()       # close connection
+                            continue
+                        else:
+                            print('\n[VMP] Updating....')
                 # ------------------------------------------------------------
                 if vmp_con:
                     self.canvas.get_tk_widget().after(0, self.vmDataPlot)
@@ -7320,21 +7396,35 @@ class tapeGapPolTabb(ttk.Frame):
             stream = 1
             dcA = qtg.validCols(self.T1)                     # Load defined valid columns for PLC Data
             df1 = pd.DataFrame(self.gD1, columns=dcA)        # Include table data into python Dataframe
+            # -----------------------------------------------#
+            # Do some data cleansing & interpolation if Nans occurs
+            data1 = df1.select_dtypes(include=["number"])
+            df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+            # Convert pandas -> cuDF
+            if GPU_ENABLED:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                TG = tg.loadProcesValues(gpu_df1)
+            else:
+                TG = tg.loadProcesValues(df1_interp)            # Join data values under dataframe
+
             # ----------------------------------------------#
-            TG = tg.loadProcesValues(df1)                    # Join data values under dataframe
-            # ----------------------------------------------#
-            # print('\nDataFrame Content', df1.head(10))     # Preview Data frame head
-            print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
+            # print('\nDataFrame Content', df1.head(10))        # Preview Data frame head
 
         elif UseSQL_DBS and self.running:
             import VarSQL_TG as tg                          # load SQL variables column names | rfVarSQL
             g1 = qtg.validCols(self.T1)                     # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(self.gD1, columns=g1)        # Import into python Dataframe
             # ----------------------------------------------#
-            TG = tg.loadProcesValues(df1)                   # Join data values under dataframe
+            data1 = df1.select_dtypes(include=["number"])
+            df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()
+            if GPU_ENABLED:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                TG = tg.loadProcesValues(gpu_df1)
+            else:
+                TG = tg.loadProcesValues(df1_interp)        # Join data values under dataframe
             # ----------------------------------------------#
-            # print('\nDataFrame Content', df1.head(10))     # Preview Data frame head
-            print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
+            # print('\nDataFrame Content', df1.head(10))
+            # print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
             # --------------------------------------#
         else:
             TG = 0

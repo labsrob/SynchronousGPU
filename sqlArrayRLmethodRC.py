@@ -24,8 +24,13 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
     n2fetch = int(nGZ)
     group_step = int(grp_step)
     fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
-    print('\n[RMP] SAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
-    print('=' * 50)
+    if group_step == 1:
+        slideType = 'Smooth Edge'
+    else:
+        slideType = 'Non-overlapping'
+
+    print('\n[RMP] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
+    print('=' * 60)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
         if last_ts is None:

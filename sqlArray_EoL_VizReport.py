@@ -25,8 +25,12 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
     n2fetch = int(nGZ)
     group_step = int(grp_step)
     fetch_no = int(fetch_no)                            # dbfreq = TODO look into any potential conflict
-    print('\n[EoL Viz] SAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
-    print('='*43)
+    if group_step == 1:
+        slideType = 'Smooth Edge'
+    else:
+        slideType = 'Non-overlapping'
+    print('\n[EoL Viz] SAMPLE SIZE:', nGZ, '| SLIDE Mode:', slideType, '| BATCH:', fetch_no)
+    print('='*60)
 
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
