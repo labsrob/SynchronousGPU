@@ -51,7 +51,7 @@ def writeSQLconfig(a, b, c, d):
     info4 = d
     d1, d2, d3, d4 = obfuscate(info1, info2, info3, info4)
 
-    with open("checksumError.ini", 'w') as configfile:
+    with open("C:\\synchronousGPU\\INI_Files\\checksumError.ini", 'w') as configfile:
 
         if not config.has_section("3e2e29372a3f24243c2720233c"):
             config.add_section("3e2e29372a3f24243c2720233c")

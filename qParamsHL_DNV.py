@@ -88,6 +88,111 @@ def errorNote():
     messagebox.showerror('Key Error', 'Work Order config Not found')
     return
 
+def qpHLrp(pop, gSize, tgxUCL, tgxLCL, tgsUCL, tgsLCL, WONID):
+    global processID, val1, val2, val3, val4, val25, val26
+
+    processID = WONID
+    # ------------------
+    sReg, pReg = IntVar(pop), IntVar(pop)
+
+    # Function performs dynamic calculations ---[]
+    def calculation(event=None):
+        global testVarRPa, testVarRPb
+
+        try:
+            # Compute XBar mean / center line ----------------------[LP]
+            if tgxUCL.get() and tgxLCL.get():
+                xBarMa = float(tgxLCL.get()) + ((float(tgxUCL.get()) - float(tgxLCL.get())) / 2)
+                sUCLa, sLCLa, sBarMa = loadConst(float(tgxUCL.get()), xBarMa, gSize)  # Compute S-Chart Mean
+                xUSLa = xBarMa + (float(tgxUCL.get()) - xBarMa) / 3 * 6
+                xLSLa = xBarMa - (xBarMa - float(tgxLCL.get())) / 3 * 6
+
+                # print('\nTape Speed: xMean/xUSL/xLSL:', xBarMa, xUSLa, xLSLa)
+                # print('Computed sMean/sUCL/sLCL:', sBarMa, sUCLa, sLCLa)
+                # Archiving values into dynamic List
+                testVarTG = (dt_string, '**', tgxUCL.get(), tgxLCL.get(), tgsUCL.get(), tgsLCL.get(), round(xBarMa, 3), round(sBarMa, 3), round(xUSLa,3), round(xLSLa,3), '**')
+                # print('TG Historical:', testVarTG)
+
+                # -------------------------------------------------------[for Tom Preston]
+                def click(event):
+                    cSelect = 1
+                    cSelectVar.append(cSelect)
+                    # print('Focus is selected......', cSelect)
+                    val3.config(state=NORMAL)
+                    val3.delete(0, END)
+                    val4.config(state=NORMAL)
+                    val4.delete(0, END)
+                    # allow new manual entry ----
+                    val3.get()
+                    val4.get()
+                val3.bind('<Button-1>', click)
+
+                # copy calculated values into user entry and allow edit--
+                if not cSelectVar:
+                    # print('Focus is NOT selected...')
+                    # val3.insert(0, round(sUCLa, 3))       # Allow static values
+                    tgsUCL.set(round(sUCLa, 3))             # allow dynamic updated values
+                    val3.config(state='readonly')
+                    tgsLCL.set(round(sLCLa, 3))
+                    val4.config(state='readonly')
+
+                else:
+                    print('Focus is selected......')
+                    val3.get()  # delete(0, 'end')
+                    val4.get()
+                # -----------------------[End of function Tom Preston]
+
+                # Display values on user screen mat ----------------[1]
+                val1A["text"] = round(xBarMa, 3)
+                val2A["text"] = round(sBarMa, 3)
+                val3A["text"] = round(xUSLa, 3)
+                val4A["text"] = round(xLSLa, 3)
+
+        except ValueError:
+            errorEntry()        # call error alert on entry errors
+
+    # clear the content and allow entry of historical limits -----------[]
+    # TODO -------------[LOAD METRICS FROM ENCRYPTED FILE]
+
+    # -----------[Compute stats UCL/LCL] -----------[ Laser Power]
+    val1 = Entry(pop, width=8, state='normal', textvariable=tgxUCL)
+    val1.place(x=70, y=80)
+    val2 = Entry(pop, width=8, state='normal', textvariable=tgxLCL)
+    val2.place(x=130, y=80)
+    # ----------------------
+    val3 = Entry(pop, width=8, state='normal', textvariable=tgsUCL)
+    val3.place(x=190, y=80)
+    val4 = Entry(pop, width=8, state='normal', textvariable=tgsLCL)
+    val4.place(x=250, y=80)
+    # ------------------------------------------------------------------[]
+    val25 = Entry(pop, width=4, state='normal', textvariable=sReg, bg='yellow', bd=4)
+    val25.place(x=105, y=200)
+    sReg.set('600dp')
+    # ------------------------------------------------------------------[]
+    val26 = Entry(pop, width=4, state='normal', textvariable=pReg, bg='green2', bd=4)
+    val26.place(x=245, y=200)
+    pReg.set('60dp')
+
+    # Binder Label --------------------------------------------------------#
+    # Compute derived mean values for XBar/Sbar Plot & fill dynamically ----
+    val1A = Label(pop, width=7, state='normal', font=("bold", 10))
+    val1A.place(x=308, y=80)
+    val2A = Label(pop, width=7, state='normal', font=("bold", 10))
+    val2A.place(x=368, y=80)
+    # --------------------
+    val3A = Label(pop, width=7, state='normal', font=("bold", 10))
+    val3A.place(x=428, y=80)
+    val4A = Label(pop, width=7, state='normal', font=("bold", 10))
+    val4A.place(x=488, y=80)
+
+    # ------------------ Binding properties ----------------------[]
+    val1.bind("<KeyRelease>", calculation)
+    val2.bind("<KeyRelease>", calculation)
+    val3.bind("<KeyRelease>", calculation)
+    val4.bind("<KeyRelease>", calculation)
+    # -------
+
+    return processID
 
 
 def qpHLtt(pop, gSize, ttxUCL, ttxLCL, ttsUCL, ttsLCL, ttxUCL1, ttxLCL1,  ttsUCL1, ttsLCL1, ttxUCL2, ttxLCL2, ttsUCL2,\
@@ -967,11 +1072,11 @@ def qpHLtg(pop, gSize, tgxUCL, tgxLCL, tgsUCL, tgsLCL, WONID):
     # ------------------------------------------------------------------[]
     val25 = Entry(pop, width=4, state='normal', textvariable=sReg, bg='yellow', bd=4)
     val25.place(x=105, y=200)
-    sReg.set('60dp')
+    sReg.set('600dp')
     # ------------------------------------------------------------------[]
     val26 = Entry(pop, width=4, state='normal', textvariable=pReg, bg='green2', bd=4)
     val26.place(x=245, y=200)
-    pReg.set('06dp')
+    pReg.set('60dp')
 
     # Binder Label --------------------------------------------------------#
     # Compute derived mean values for XBar/Sbar Plot & fill dynamically ----
@@ -999,6 +1104,28 @@ def qpHLtg(pop, gSize, tgxUCL, tgxLCL, tgsUCL, tgsLCL, WONID):
 def saveMetricsQP(processID, WON, sSize, gType, enHL, enAL, enFO):
 
     # ------------------------------[]
+    if processID == "RP":
+        rpA = testVarRPa
+        rpB = testVarRPb
+        rpC = ""
+        rpD = ""
+        rpE = ""
+        # --------------- set rows data to readonly i.e. lock down before save
+        canvasBlank = [val1, val2, val3, val4, val5, val6, val7, val8, val9, val10,
+                       val11, val12, val13, val14, val15, val16, val17, val18, val19, val20]
+
+        for line in canvasBlank:
+            line.config(state="readonly")
+        # ------------------------ Codefy ----------------[]
+        try:
+            # print("Attempting to encrypt config values...")
+            encryptMetricsQP(WON, processID, sSize, gType, val25.get(), val26.get(), enHL, enAL, enFO, rpA, rpB, rpC, rpD, rpE)
+
+        except ValueError:
+            print(processID + ' - Error: Encryption utility encounters error!')
+            errorNote()             # response to save button when entry field is empty
+
+
     if processID == "TT":
         ttA = testVarTTa
         ttB = testVarTTb

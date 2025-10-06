@@ -15,7 +15,7 @@ today = date.today()
 import time
 
 # Initialise relevant variables and load configuration settings ----------[]
-server_IP, db_ref, isAtho, yekref = tx.load_configSQL('checksumError.ini')
+server_IP, db_ref, isAtho, yekref = tx.load_configSQL('C:\\synchronousGPU\\INI_Files\\checksumError.ini')
 # print('ServerUse Details:', server_IP, db_ref, isAtho, yekref)
 Encrypt = 'no'                  # Added today 06/08/2024 [optional]
 Certify = 'yes'                 # DITTO

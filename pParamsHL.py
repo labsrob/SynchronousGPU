@@ -17,6 +17,7 @@ B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]  # 10, 15, 20, 23, 25, 30
 # -----------------------------------------------[]
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+INIPath = 'C:\\synchronousGPU\\INI_Files\\'
 # -----------------------------------------------[]
 
 
@@ -64,7 +65,7 @@ def checkhistDev(xUCL, MeanP, sampSiz):
     return UCL, LCL, stdDev
 
 # processWON[0], rMode, sel_SS, sel_gT, LA, LP, CT, OT, RP, WS, sSta, sEnd, xlp, xla, xtp, xrf, xtt, xst, xtg
-def saveMetricspP(WorkOrderID, rMode, sel_SS, sel_gT, sLA, sLP, sCT, sOT, sRP, sWS, shiftS, shiftE, LP, LA, TP, RF, TT, ST, TG):
+def saveMetricspP(WorkOrderID, rMode, sel_SS, sel_gT, sLA, sLP, sCT, sOT, sRP, sWS, shiftS, shiftE, LP, LA, TP, RP, TT, ST, TG):
     shfS = shiftS.get()
     shfE = shiftE.get()
     print('Details of Monitors to save:', sLA, sLP, sCT, sOT, sRP, sWS)
@@ -73,7 +74,7 @@ def saveMetricspP(WorkOrderID, rMode, sel_SS, sel_gT, sLA, sLP, sCT, sOT, sRP, s
     # ----------------------------------------------------------------[]
     try:
         print("Attempting to encrypt config values...")
-        encryptMetricspP(WorkOrderID, rMode, sel_SS, sel_gT, sLA, sLP, sCT, sOT, sRP, sWS, shfS, shfE, LP, LA, TP, RF, TT, ST, TG)
+        encryptMetricspP(WorkOrderID, rMode, sel_SS, sel_gT, sLA, sLP, sCT, sOT, sRP, sWS, shfS, shfE, LP, LA, TP, RP, TT, ST, TG)
 
     except ValueError:
         errorNote()     # response to save button when entry field is empty
@@ -83,7 +84,7 @@ def saveMetricspP(WorkOrderID, rMode, sel_SS, sel_gT, sLA, sLP, sCT, sOT, sRP, s
 # --------------------------------------------------------------------[]
 
 
-def encryptMetricspP(WON, eDM, eSS, SgT, eLA, eLP, eCT, eOT, eRP, eWS, shiftS, shiftE, LP, LA, TP, RF, TT, ST, TG):
+def encryptMetricspP(WON, eDM, eSS, SgT, eLA, eLP, eCT, eOT, eRP, eWS, shiftS, shiftE, LP, LA, TP, RP, TT, ST, TG):
     WONID = WON
     # objective of cryptography is to provide basic security concepts in data exchange & integrity
     print('\nWriting encryption into archive...')
@@ -108,14 +109,14 @@ def encryptMetricspP(WON, eDM, eSS, SgT, eLA, eLP, eCT, eOT, eRP, eWS, shiftS, s
     cf5 = onetimepad.encrypt(str(LP), 'random')
     cf6 = onetimepad.encrypt(str(LA), 'random')
     cf7 = onetimepad.encrypt(str(TP), 'random')
-    cf8 = onetimepad.encrypt(str(RF), 'random')
+    cf8 = onetimepad.encrypt(str(RP), 'random')
     cf9 = onetimepad.encrypt(str(TT), 'random')
     cfA = onetimepad.encrypt(str(ST), 'random')
     cfB = onetimepad.encrypt(str(TG), 'random')
 
     # Open text file and save historical details -----------#
-    with open("histProdParams.INI", 'a') as configfile:            # append mode.
-        # Prevent duplicated instance ------ [TODO]
+    with open(INIPath+"histProdParams.INI", 'a') as configfile:            # append mode.
+
         if not config.has_section("CommonStatistic_" + WONID):
             config.add_section("CommonStatistic_" + WONID)
             # Plot type Min/Max or Control Charts ----------#
@@ -145,7 +146,7 @@ def encryptMetricspP(WON, eDM, eSS, SgT, eLA, eLP, eCT, eOT, eRP, eWS, shiftS, s
             config.set("ActiveParams_" + WONID, "Laser_pwr", str(cf5))
             config.set("ActiveParams_" + WONID, "Laser_ang", str(cf6))
             config.set("ActiveParams_" + WONID, "Tape_plac", str(cf7))
-            config.set("ActiveParams_" + WONID, "Roller_fc", str(cf8))
+            config.set("ActiveParams_" + WONID, "Roller_pr", str(cf8))
             # ------ ------------------------------------
             config.set("ActiveParams_" + WONID, "Tape_Temp", str(cf9))
             config.set("ActiveParams_" + WONID, "Subs_temp", str(cfA))
@@ -161,11 +162,11 @@ def decryptMetricsGeneral(WONID):
     import os.path
 
     # initialise object instance ------------------[]
-    processFile = os.path.exists("histProdParams.INI")
+    processFile = os.path.exists("C:\\synchronousGPU\\INI_Files\\")
 
     # Read the file and check for duplicate keys --[]
     if processFile:
-        config_object.read("histProdParams.INI")     # TODO detect duplicate Section and Keys and iterate accordingly
+        config_object.read('histProdParams.INI')     # TODO detect duplicate Section and Keys and iterate accordingly
 
         try:
             # Load the content ------------------------------------------------[]
@@ -192,7 +193,7 @@ def decryptMetricsGeneral(WONID):
             LP = onetimepad.decrypt(limpParams["Laser_pwr"], 'random')
             LA = onetimepad.decrypt(limpParams["Laser_ang"], 'random')
             TP = onetimepad.decrypt(limpParams["Tape_plac"], 'random')
-            RF = onetimepad.decrypt(limpParams["Roller_fc"], 'random')
+            RP = onetimepad.decrypt(limpParams["Roller_pr"], 'random')
             TT = onetimepad.decrypt(limpParams["Tape_Temp"], 'random')
             ST = onetimepad.decrypt(limpParams["Subs_temp"], 'random')
             TG = onetimepad.decrypt(limpParams["Tape_void"], 'random')
@@ -213,7 +214,7 @@ def decryptMetricsGeneral(WONID):
             LP = 0
             LA = 0
             TP = 0
-            RF = 0
+            RP = 0
             TT = 0
             ST = 0
             TG = 0
@@ -235,11 +236,11 @@ def decryptMetricsGeneral(WONID):
         LP = 0
         LA = 0
         TP = 0
-        RF = 0
+        RP = 0
         TT = 1
         ST = 1
         TG = 1
 
     # print('Fetch Data:','\n', dCT, '\n', dOT, '\n', sStart, '\n', sStops, '\n',  RF, '\n', TT)
 
-    return cDM, cSS, cGS, dLA, dLP, dCT, dOT, dRP, dWS, sStart, sStops, LP, LA, TP, RF, TT, ST, TG
+    return cDM, cSS, cGS, dLA, dLP, dCT, dOT, dRP, dWS, sStart, sStops, LP, LA, TP, RP, TT, ST, TG

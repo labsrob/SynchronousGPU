@@ -6,7 +6,7 @@ import qParamsHL_DNV as mx
 pa1, pa2 = 0, 0
 
 # Initialise example FIXME -- Work order number must be obtained from SQL or PLC
-WON = "275044"
+WON = "DEFAULT"
 
 
 def save_mMetrics():
@@ -18,16 +18,25 @@ def save_mMetrics():
 
 
 def editPHL():
-    if pTy == 'TT':                       # Tape Temp
+    if pTy == 'RP':
+        s_data.config(state="normal")
+        sRegime.config(state="normal")  # enable data entry
+        mx.qpHLtt(popmodal, sSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1, sUCL1, sLCL1, xUCL2, xLCL2, sUCL2, sLCL2,
+                  xUCL3, xLCL3, sUCL3, sLCL3, xUCL4, xLCL4, sUCL4, sLCL4, WON)
+        e_data.config(state="disabled")
+
+    elif pTy == 'TT':                       # Tape Temp
         s_data.config(state="normal")
         sRegime.config(state="normal")      # enable data entry
         mx.qpHLtt(popmodal, sSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, xUCL2, xLCL2,  sUCL2, sLCL2, xUCL3, xLCL3,  sUCL3, sLCL3, xUCL4, xLCL4, sUCL4, sLCL4, WON)
         e_data.config(state="disabled")
+
     elif pTy == 'ST':                       # Substrate Temp
         s_data.config(state="normal")
         sRegime.config(state="normal")      # enable data entry
         mx.qpHLst(popmodal, sSize, xUCL, xLCL, sUCL, sLCL, xUCL1, xLCL1,  sUCL1, sLCL1, xUCL2, xLCL2,  sUCL2, sLCL2, xUCL3, xLCL3,  sUCL3, sLCL3, xUCL4, xLCL4, sUCL4, sLCL4, WON)
         e_data.config(state="disabled")
+
     elif pTy == 'TG':                       # Tape Gap
         s_data.config(state="normal")
         sRegime.config(state="normal")      # enable data entry
