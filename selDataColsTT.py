@@ -10,11 +10,11 @@ Tape Temperature measured in Degree Celsius (°C)
 def validCols(pParam):
 
     if pParam[0:4] == 'TT1_':
-        columns = ['id_col','tStamp', 'cLayer', 'R1H1TT', 'R1H2TT', 'R1H3TT',
+        columns = ['id_col', 'cLayer', 'R1H1TT', 'R1H2TT', 'R1H3TT',
                    'R1H4TT', 'R2H1TT', 'R2H2TT', 'R2H3TT', 'R2H4TT']
 
     elif pParam[0:4] == 'TT2_':
-        columns = ['id_col', 'tStamp', 'cLayer', 'R3H1TT', 'R3H2TT', 'R3H3TT',
+        columns = ['id_col', 'cLayer', 'R3H1TT', 'R3H2TT', 'R3H3TT',
                    'R3H4TT', 'R4H1TT', 'R4H2TT', 'R4H3TT', 'R4H4TT']
 
     elif pParam[0:6] == 'SPC_TT':

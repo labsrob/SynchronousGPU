@@ -362,7 +362,7 @@ except ImportError:
     GPU_ENABLED = False
 # make numpy compatible with cupy API
 np.asnumpy = lambda x: x
-import cudf
+# import cudf
 
 try:
     import cupy as cp
@@ -375,20 +375,20 @@ try:
         if num_gpus > 0:
             free_mem, total_mem = cp.cuda.runtime.memGetInfo()
             if free_mem / total_mem > 0.1:  # at least 10% free memory
-                np = cp                # ✅ use CuPy as NumPy
+                np = cp                     # use CuPy as NumPy
                 GPU_ENABLED = True
-                print(f"✅ Using GPU (CuPy) | Free memory: {free_mem / 1e9:.2f} GB")
+                print(f"Using GPU (CuPy) | Free memory: {free_mem / 1e9:.2f} GB")
             else:
-                print("⚠️ GPU memory low — falling back to CPU (NumPy).")
+                print("GPU memory low — falling back to CPU (NumPy).")
         else:
-            print("⚠️ No GPU found — using CPU (NumPy).")
+            print("No GPU found — using CPU (NumPy).")
     except cp.cuda.runtime.CUDARuntimeError:
-        print("⚠️ CUDA not available — using CPU (NumPy).")
+        print("CUDA not available — using CPU (NumPy).")
 
 except ImportError:
     import numpy as np
     GPU_ENABLED = False
-    print("⚠️ CuPy not installed — using CPU (NumPy).")
+    print("CuPy not installed — using CPU (NumPy).")
 
 # Always ensure np.asnumpy() is defined (for cross-compatibility)
 if not hasattr(np, "asnumpy"):
@@ -415,3 +415,6 @@ y_cpu = np.asnumpy(y)
 print(type(y_cpu))
 
 # --------------------------------------------------------------------------[]
+
+import cupy
+print(cupy.Series([1, 2, 3]))

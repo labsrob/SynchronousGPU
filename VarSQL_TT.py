@@ -15,6 +15,10 @@ def loadPVT1(df1):
              df1['R1H1TT'], df1['R1H2TT'], df1['R1H3TT'], df1['R1H4TT'],
              df1['R2H1TT'], df1['R2H2TT'], df1['R2H3TT'], df1['R2H4TT']]
 
+    # sqlT1 = [df1[ : 0], df1[ : 1],
+    #          df1[ : 2], df1[ : 3], df1[ : 4], df1[ : 5],
+    #          df1[ : 6], df1[ : 7], df1[ : 8], df1[ : 9]]
+
     return sqlT1
 
 
@@ -22,5 +26,9 @@ def loadPVT2(df1):
     sqlT2 = [df1['id_col'], df1['cLayer'],
             df1['R3H1TT'], df1['R3H2TT'], df1['R3H3TT'], df1['R3H4TT'],
             df1['R4H1TT'], df1['R4H2TT'], df1['R4H3TT'], df1['R4H4TT']]
+
+    # sqlT2 = [df1[ : 0], df1[ : 1],
+    #          df1[ : 2], df1[ : 3], df1[ : 4], df1[ : 5],
+    #          df1[ : 6], df1[ : 7], df1[ : 8], df1[ : 9]]
 
     return sqlT2

@@ -11,8 +11,8 @@ YTape Void count data
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'GEN_' + pWON:
-        columns = ['tStamp', 'cTensX', 'oTempA', 'oTempB', 'iTempA', 'iTempB',
-                   'wSpedA', 'wSpedB', 'wSpedC', 'wSpedD', 'PipeDi', 'cLayer']
+        columns = ['id_col', 'cTensX', 'oTempA', 'oTempB', 'iTempA', 'iTempB',
+                   'iTempC', 'iTempD','wSpedA', 'wSpedB', 'wSpedC', 'wSpedD', 'cLayer']
 
     elif pParam == 'SPC_GEN':
         columns = ['tStamp', 'cTensX', 'oTempA', 'oTempB', 'iTempA', 'iTempB',

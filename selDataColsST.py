@@ -11,11 +11,11 @@ Substrate Temperature measured in Degree Celsius (°C)
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam[0:4] == 'ST1_':
-        columns = ['id_col', 'tStamp', 'cLayer', 'R1H1ST', 'R1H2ST', 'R1H3ST',
+        columns = ['id_col', 'cLayer', 'R1H1ST', 'R1H2ST', 'R1H3ST',
                    'R1H4ST', 'R2H1ST', 'R2H2ST', 'R2H3ST', 'R2H4ST']
 
     elif pParam[0:4] == 'ST2_':
-        columns = ['id_col', 'tStamp', 'cLayer', 'R3H1ST', 'R3H2ST', 'R3H3ST',
+        columns = ['id_col', 'cLayer', 'R3H1ST', 'R3H2ST', 'R3H3ST',
                    'R3H4ST', 'R4H1ST', 'R4H2ST', 'R4H3ST', 'R4H4ST']
 
     elif pParam[0:4] == 'SPC_ST':

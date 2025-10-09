@@ -8,79 +8,93 @@ import time
 import timeit
 import os
 
-UseRowIndex = True
-idx = count()
-now = datetime.now()
+last_t1 = None
+last_t2 = None
 
-dataList0 = []
-Idx, Idx, dL = [], [], []
-st_id = 0                                           # SQL start index unless otherwise stated by the index tracker!
+st_id = 0
+dL1, dL2, dL3 = [], [], []           # SQL start index unless otherwise stated by the index tracker!
 
 
-def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
+def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
+    global last_t1, last_t2, last_t3
     """
     NOTE:
     """
-    # idx = str(idx)                                  # convert Query Indexes to string concatenation
+    t1, t2 = daq.cursor(), daq.cursor()
 
-    group_step = int(grp_step)                      # group size/ sample sze
-    fetch_no = int(fetch_no)                        # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
-    print('=' * 50)
-    # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
-    if len(dL) < (nGZ - 1):
-        n2fetch = nGZ                                       # fetch initial specified number
-        print('\nRows to Fetch:', n2fetch)
-        print('Processing SQL Row #:', int(idx) + fetch_no + 1, 'to', (int(idx) + fetch_no + 1) + n2fetch)
-
-    elif group_step == 1 and len(dL) >= nGZ:
-        print('\nSINGLE STEP SLIDE')
-        print('=================')
-        n2fetch = (nGZ + fetch_no)                          # fetch just one line to on top of previous fetch
-        idxA = int(idx) + (((fetch_no + 1) - 2) * nGZ) + 1
-        if len(Idx) > 1:
-            del Idx[:1]
-        Idx.append(idxA)
-        print('Processing SQL Row #:', 'T1:', idxA)
-
-    # ------------------------------------------------------------------------------------[]
-    # data1 = daq1.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    data1 = daq.execute('SELECT * FROM ' + rT1).fetchmany(n2fetch)
-    if len(data1) != 0:
-        for result in data1:
-            result = list(result)
-            if UseRowIndex:
-                dataList0.append(next(idx))
-            else:
-                now = time.strftime("%H:%M:%S")
-                dataList0.append(time.strftime(now))
-            dL.append(result)
-
-            # Purgatory logic to free up active buffer ----------------------[Dr labs Technique]
-            # Step processing rate >1 ---[static window]
-            if group_step > 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:  # Retain group and step size
-                del dL[0:(len(dL) - nGZ)]
-
-            # Step processing rate >1 ---[moving window]
-            elif group_step > 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dL[0:(len(dL) - fetch_no)]
-
-            # Step processing rate =1 ---[static window]
-            elif group_step == 1 and len(dL) >= (nGZ + n2fetch) and fetch_no <= 21:
-                del dL[0:(len(dL) - nGZ)]  # delete overflow data
-
-            # Step processing rate =1 ---[moving window]
-            elif group_step == 1 and (fetch_no + 1) >= 22:  # After windows limit (move)
-                del dL[0:(len(dL) - fetch_no)]
-
-            else:  # len(dL1) < nGZ:
-                pass
-        # print("Step List1:", len(dL1), dL1)       FIXME:
+    n2fetch = int(nGZ)
+    group_step = int(grp_step)
+    fetch_no = int(fetch_no)
+    if group_step == 1:
+        slideType = 'Smooth Edge'
     else:
-        print('Process EOF reached...')
-        print('SPC Halting for 5 Minutes...')
-        time.sleep(5)
-    daq.close()
+        slideType = 'Non-overlapping'
 
-    return dL
-# -----------------------------------------------------------------------------------[Dr Labs]
+    print('\n[RP] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
+    print('='*58)
+    # --------------- Re-assemble into dynamic buffer -----
+    if group_step == 1:
+        if len(dL1) >= n2fetch or len(dL2) >= n2fetch:
+            del dL1[:n2fetch - 1]
+            del dL2[:n2fetch - 1]
+            n2fetch = int(nGZ) - 1
+
+    elif group_step == 2:
+        if len(dL1) == (n2fetch * 2) or len(dL2) == (n2fetch * 2):
+            del dL1[:n2fetch]
+            del dL2[:n2fetch]
+            n2fetch = int(nGZ)
+    else:
+        print('Undefined Window Group Slide')
+    # -----------------------------------------------------
+    try:
+        if last_t1 is None:
+            t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY cLayer ASC')
+        else:
+            t1.execute('SELECT * FROM ' + str(T1) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_t1)
+        data1 = t1.fetchmany(n2fetch)
+        if len(data1) != 0:
+            for result in data1:
+                result = list(result)
+                dL1.append(result)
+            last_t1 = data1[-1].id_col
+
+        else:
+            print('[RP1] Process EOF reached...')
+            print('[RP1] Halting for 30 sec...')
+            time.sleep(30)
+
+    except Exception as e:
+        print("[RP1] Data trickling on IDX#:", last_t1)  # , e)
+        time.sleep(2)
+
+    t1.close()
+
+    # ------------------------------------------------------------------------------------[] print('\nArray B4 Purge', len(dL1))
+    try:
+        if last_t2 is None:
+            t2.execute('SELECT * FROM ' + str(T2) + ' ORDER BY cLayer ASC')
+        else:
+            t2.execute('SELECT * FROM ' + str(T2) + ' WHERE id_col > ? ORDER BY cLayer ASC', last_t2)
+        data2 = t2.fetchmany(n2fetch)
+
+        # --------------- Re-assemble into dynamic buffer -----
+        if len(data2) != 0:
+            for result in data2:
+                result = list(result)
+                dL2.append(result)
+            last_t2 = data2[-1].id_col
+
+        else:
+            print('[RP2] Process EOF reached...')
+            print('[RP1] Halting for 30 sec...')
+            time.sleep(30)
+
+    except Exception as e:
+        print("[RP2] Data trickling on IDX#:", last_t2)  # , e)
+        time.sleep(2)
+
+    t2.close()
+
+    return dL1, dL2
+    # -----------------------------------------------------------------------------------[Dr Labs]

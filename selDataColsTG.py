@@ -11,7 +11,7 @@ Tape Gap Measured in millimeters (mm)
 def validCols(pParam):
     # print('Detected RingHead Combo:', configH)
     if pParam[0:3] == 'TG_':
-        columns = ['id_col', 'tStamp', 'cLayer', 'sCount', 'sCenter', 'PipePos',
+        columns = ['id_col', 'cLayer', 'sCount', 'sCenter', 'PipePos',
                    'GaugeA1', 'GaugeA2', 'GaugeA3', 'GaugeA4',
                    'GaugeB1', 'GaugeB2', 'GaugeB3', 'GaugeB4', 'PipeDir']
 
