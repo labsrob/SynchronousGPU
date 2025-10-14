@@ -112,13 +112,11 @@ import cupy as cp
 
 import shutil
 import warnings
-# import cudf
 
-cudf = False
-import cupy as cp
-import pandas as pd
-from cupyx.scipy.ndimage import uniform_filter1d
+# import cupy as cp
+# import pandas as pd
 
+# ---------------------------------------------------------------------------------------------[]
 
 def get_nvidia_info():
     """Return GPU info (name, memory, utilization, temperature) if available."""
@@ -143,11 +141,10 @@ def get_nvidia_info():
         return None
 
 # ------------------------------------------------------------------[]
-try:
-
+def enableGPU():
     if cp.cuda.runtime.getDeviceCount() > 0:
         print("GPU is available and CuPy can use it!")
-        GPU_ENABLED = False
+        gpu_ready = False
         # -----------------------------------------------------------[]
         try:
             num_gpus = cp.cuda.runtime.getDeviceCount()
@@ -161,7 +158,7 @@ try:
                 if free_mem / total_mem > 0.1:
                     # np = cp
                     import numpy as np
-                    # GPU_ENABLED = True
+                    gpu_ready = True
                     print(f"Using GPU (CuPy)")
                     if gpu_info:
                         print(f"GPU: {gpu_info['name']}")
@@ -176,25 +173,50 @@ try:
 
         except cp.cuda.runtime.CUDARuntimeError:
             warnings.warn("CUDA runtime error. Using CPU (NumPy).")
-
     else:
-        is_CuDF = False
         print("CuPy is installed, but no GPU devices detected.")
 
+    return gpu_ready
+
+# --- DETECT GPU CAPABILITY ---CuDF 1st Priority ----------[]
+try:
+    CUDF_ENABLED = False
+    import cudf
+    gr = enableGPU()
+    if gr:
+        GPU_ENABLED = True
+        is_CuDF = True
+    print("cuDF available — GPU DataFrames enabled")
 except ImportError:
-    print("CuDF is NOT installed, using Numpy arrays...")
-    warnings.warn("CuPy not installed. Using CPU (NumPy).")
+    GPU_ENABLED = False
+    is_CuDF = False
+    import numpy as np # xp
+    is_NumPy = True
+    import pandas as pd
+    print("cuDF not found — using NumPy Pandas DataFrames")
+
+# --------------------------CuPy 2nd Priority ------------[]
+try:
+    import cupy as cp # xp
+    from cupyx.scipy.ndimage import uniform_filter1d
+    is_CuPy = True
+    gr_now = enableGPU()
+    if gr_now:
+        GPU_ENABLED = True
+        is_CuPy = True
+    print("CuPy detected — using GPU arrays for vectorisation..")
+except ImportError:
+    GPU_ENABLED = False
+    is_CuPy = False
+    import numpy as np
+    is_NumPy = True
+    print("CuPy not found — falling back to NumPy (CPU)")
 
 # --- Make np.asnumpy safe for both backends ---
-# if not hasattr(np, "asnumpy"):
-#     np.asnumpy = lambda x: x
-# -------------------
-is_CuDF = False
-is_CuPy = True
-is_NumPy = False
-# -------------------
-GPU_ENABLED = True
-# ------------------------[]
+if not hasattr(np, "asnumpy"):
+    np.asnumpy = lambda x: x
+# ------------------------------------------------------------#
+
 # Cross-platform simple beep
 def beep():
     try:
@@ -3394,8 +3416,8 @@ class common_climateProfile(ttk.Frame):
                 self.a3.set_xlim(0, self.win_Xmax)
             self.a2.relim()  # Recalculate limits
             self.a2.autoscale()  # Apply the new limits
-            self.a3.relim()  # Recalculate limits
-            self.a3.autoscale()  # Apply the new limits
+            # self.a3.relim()  # Recalculate limits
+            # self.a3.autoscale()  # Apply the new limits
             self.canvas.draw_idle()
 
         else:
@@ -3604,8 +3626,7 @@ class common_gapCount(ttk.Frame):
                 VC.pop(0)
             else:
                 self.a3.set_xlim(0, self.win_Xmax)
-            self.a3.relim()         # Recalculate limits
-            self.a3.autoscale()     # Apply the new limits
+            self.a3.autoscale(enable=True, axis='y')
             self.canvas.draw_idle()
 
         else:
@@ -5955,7 +5976,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         global s_fetch, stp_Sz, batch_TT, sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus
 
         batch_TT = 1
-        s_fetch, stp_Sz = 30, 1
+        s_fetch, stp_Sz = 30, 2
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
@@ -6175,11 +6196,11 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             df_clean = df_data.select_dtypes(include=["number"])
             df1_interp = df_clean.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
             # --------------------------------------
-            if GPU_ENABLED and is_CuDF: # Convert pandas -> cuDF on GPU
+            if is_CuDF: # Convert pandas -> cuDF on GPU
                 gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 TT = tt.loadProcessValue(gpu_df1)
             # --------------------------------------
-            elif GPU_ENABLED and is_CuPy:
+            elif is_CuPy:
                 # ----- Convert dataframe to CuPy -----
                 data_np = df1_interp.to_numpy().astype(np.float32)      # NumPy first
                 data_cp = cp.asarray(data_np)                           # Then to CuPy
@@ -6571,6 +6592,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)
+            self.a1.autoscale(enable=True, axis='y')
+            self.a2.autoscale(enable=True, axis='y')
             self.canvas.draw_idle()
 
             # Set trip line for individual time-series plot -----------------------------------[R1]
@@ -6603,11 +6626,11 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             df1 = d3.apply(pd.to_numeric, errors="coerce")
             df1_interp = df1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
 
-            if GPU_ENABLED and is_CuDF:  # Convert pandas -> cuDF on GPU
+            if is_CuDF:  # Convert pandas -> cuDF on GPU
                 gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 RM = rc.loadProcesValues(gpu_df1)
 
-            elif GPU_ENABLED and is_CuPy:
+            elif is_CuPy:
                 # ----- Convert dataframe to CuPy -----
                 data_np = df1_interp.to_numpy().astype(np.float32)  # NumPy first
                 data_cp = cp.asarray(data_np)                       # Then to CuPy
@@ -6896,7 +6919,7 @@ class substTempTabb(ttk.Frame):
         global batch_ST, sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus
 
         batch_ST = 1
-        s_fetch, stp_Sz, s_regm = 30, self.stTy, self.olS      # entry value in string sql syntax ttS, ttTy,
+        s_fetch, stp_Sz, s_regm = 30, 2, self.olS      # entry value in string sql syntax ttS, ttTy,
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
@@ -7002,11 +7025,11 @@ class substTempTabb(ttk.Frame):
             df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
 
             # Convert pandas -> cuDF
-            if GPU_ENABLED and is_CuDF:
+            if is_CuDF:
                 gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 ST = st.loadProcesValues(gpu_df1)                    # Join data values under dataframe
 
-            elif GPU_ENABLED and is_CuPy:
+            elif is_CuPy:
                 # ----- Convert dataframe to CuPy -----
                 data_np = df1_interp.to_numpy().astype(np.float32)  # NumPy first
                 data_cp = cp.asarray(data_np)  # Then to CuPy
@@ -7228,7 +7251,7 @@ class substTempTabb(ttk.Frame):
                     Cp, Cpk = tz.processCap(stMean, stDev, stUSL, stLSL, self.stS)  # ST pCap (Pp/Cpk)
 
                 # ------------------------------------------------------------------------------[]
-                elif GPU_ENABLED and is_CuPy:  # Live Stream on GPU
+                elif is_CuPy:  # Live Stream on GPU
                     # X Plot Y-Axis data points for XBar ---------------------------------[Ring 1 TT]
                     self.im10.set_ydata((xST[:, 1])[0:batch_ST])  # head 1
                     self.im11.set_ydata((xST[:, 2])[0:batch_ST])  # head 2
@@ -7358,7 +7381,7 @@ class substTempTabb(ttk.Frame):
                 if GPU_ENABLED and is_CuDF:
                     pass        # Not yet implemented
 
-                elif GPU_ENABLED and is_CuPy:
+                elif is_CuPy:
                     # X Plot Y-Axis data points for XBar ---------------------------------[Ring 1 TT]
                     self.im10.set_ydata((xST[:, 1])[0:batch_ST])  # head 1
                     self.im11.set_ydata((xST[:, 2])[0:batch_ST])  # head 2
@@ -7652,6 +7675,8 @@ class substTempTabb(ttk.Frame):
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)
+            self.a1.autoscale(enable=True, axis='y')
+            self.a2.autoscale(enable=True, axis='y')
             self.canvas.draw_idle()
 
         else:
@@ -7677,7 +7702,7 @@ class tapeGapPolTabb(ttk.Frame):
         self.running = False
         self.runVMP = False
         self.gapPercent = True
-        self.toggle_state = True
+        self.toggle_state = False
 
         # prevents user possible double loading -----
         if not self.running:
@@ -7757,7 +7782,7 @@ class tapeGapPolTabb(ttk.Frame):
 
     def createProcessTG(self):
         """Create the widgets for the GUI"""
-        global tgUCL, tgLCL, tgMean, tgDev, sUCLtg, sLCLtg, tgUSL, tgLSL
+        global tgUCL, tgLCL, tgMean, tgDev, sUCLtg, sLCLtg, tgUSL, tgLSL, cbar
 
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
@@ -7905,17 +7930,18 @@ class tapeGapPolTabb(ttk.Frame):
         # Attach colorbar to scatter ------------
         cbar = self.f.colorbar(self.im26, ax=self.a4)
         if self.gapPercent:
-            cbar.set_label("Percentage Void")
+            cbar.set_label("Percentage void per metre")
         else:
-            cbar.set_label("AvgGap value")
+            cbar.set_label("Average void per metre")
+
         # self.canvas = FigureCanvasTkAgg(self.f, master=root) ----------#
         self.canvas = FigureCanvasTkAgg(self.f, self)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
         # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(self.canvas, self)
-        # toolbar.update()
-        # self.canvas._tkcanvas.pack(expand=True)
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
 
         # --------- call data block -------------------------------------#
         pTG = threading.Thread(target=self.dataControlTG, daemon=True) # .start()
@@ -7927,7 +7953,7 @@ class tapeGapPolTabb(ttk.Frame):
         global batch_TG
 
         batch_TG = 1
-        s_fetch, stp_Sz, s_regm = 600, 1, 10  # @ 6m/min & 10Hz res,
+        s_fetch, stp_Sz, s_regm = 600, 2, 10  # @ 6m/min & 10Hz res,
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
@@ -8017,7 +8043,7 @@ class tapeGapPolTabb(ttk.Frame):
         global batch_VMP, sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus
 
         batch_VMP = 1
-        s_fetch, stp_Sz = 10, 1
+        s_fetch, stp_Sz = 100, 1
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
@@ -8105,11 +8131,11 @@ class tapeGapPolTabb(ttk.Frame):
             data1 = df1.select_dtypes(include=["number"])
             df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
             # ------------------------------------------#
-            if GPU_ENABLED and is_CuDF:
+            if is_CuDF:
                 gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 TG = tg.loadProcesValues(gpu_df1)
 
-            elif GPU_ENABLED and is_CuPy:
+            elif is_CuPy:
                 # ----- Convert dataframe to CuPy -----
                 data_np = df1_interp.to_numpy().astype(np.float32)      # NumPy first
                 data_cp = cp.asarray(data_np)                           # Then to CuPy
@@ -8303,6 +8329,8 @@ class tapeGapPolTabb(ttk.Frame):
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a3.set_xlim(0, self.win_Xmax)
+            self.a1.autoscale(enable=True, axis='y')
+            self.a3.autoscale(enable=True, axis='y')
             self.canvas.draw_idle()
 
         else:
@@ -8368,7 +8396,7 @@ class tapeGapPolTabb(ttk.Frame):
                 # Adjust column address when CuPy array is implemented.
                 pScount = np.array(VM[0])  # Sample count
                 pCenter = np.array(VM[1] * 0.001)   # Sample centre -- X axis convert to mt
-                pAvgGap = np.array(VM[2]*10)        # Average Gap
+                pAvgGap = np.array(VM[2])           # Average Gap
                 pMaxGap = np.array(VM[3])  # Max Gap
                 vLayerN = np.array(VM[4])  # current Layer  - y axis
                 sLength = np.array(VM[5])  # Sample length
@@ -8377,16 +8405,20 @@ class tapeGapPolTabb(ttk.Frame):
             coords = np.column_stack((pCenter, vLayerN))  # shape (N, 2)
             self.im26.set_offsets(coords)
             # --------------------------------------------------------------#
+
             if self.gapPercent:
+                cbar.set_label("Percentage void per metre")
                 self.im26.set_array(gap_vol[0:batch_VMP])  #
                 self.im26.set_clim(vmin=gap_vol.min(), vmax=gap_vol.max())
             else:
+                cbar.set_label("Average void per metre")
                 self.im26.set_array(pAvgGap[0:batch_VMP]) #
                 self.im26.set_clim(vmin=pAvgGap.min(), vmax=pAvgGap.max())
 
             # Setting up VMP parameters for static zoomable windows Axes ------------------------[]
             if batch_VMP > self.win_Xmax:
                 pCenter.pop(0)
+            self.a3.autoscale(enable=True, axis='y')
             self.canvas.draw_idle()
 
         else:
@@ -8972,7 +9004,7 @@ class MonitorTabb(ttk.Frame):
         global batch_PM
 
         batch_PM = 1
-        s_fetch, stp_Sz = 600, 1        #i.e. 6 mtr worth of data every minute
+        s_fetch, stp_Sz = 30, 2        #i.e. 6 mtr worth of data every minute
 
         # Obtain RT Monitoring Data ---------------------------[]
         # if UseSQL_DBS:
@@ -9007,7 +9039,7 @@ class MonitorTabb(ttk.Frame):
                 else:
                     # Get list of relevant SQL Tables using conn() and execute real-time query --------------------[]
                     self.gEN, self.RPa, self.RPb = spm.dnv_sqlExec(mt_con, s_fetch, stp_Sz, self.T1, self.T2, self.T3, batch_PM)
-                    time.sleep(60)
+                    time.sleep(3)
                 # ------ Inhibit iteration ----------------------------------------------------------[]
                 """
                 # Set condition for halting real-time plots in watchdog class ---------------------
@@ -9200,14 +9232,10 @@ class MonitorTabb(ttk.Frame):
                 self.a2.set_xlim(0, self.win_Xmax)
                 self.a3.set_xlim(0, self.win_Xmax)
                 self.a4.set_xlim(0, self.win_Xmax)
-            self.a1.relim()         # Recalculate limits
-            self.a1.autoscale()     # Apply the new limits
-            self.a2.relim()         # Recalculate limits
-            self.a2.autoscale()     # Apply the new limits
-            self.a3.relim()         # Recalculate limits
-            self.a3.autoscale()     # Apply the new limits
-            self.a4.relim()         # Recalculate limits
-            self.a4.autoscale()     # Apply the new limits
+            self.a1.autoscale(enable=True, axis='y')
+            self.a2.autoscale(enable=True, axis='y')
+            self.a3.autoscale(enable=True, axis='y')
+            self.a4.autoscale(enable=True, axis='y')
             self.canvas.draw_idle()
 
         else:
