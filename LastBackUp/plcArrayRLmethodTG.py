@@ -1,0 +1,189 @@
+# This script is called in from Main program to load SQL execution syntax command and return a list in LisDat
+# Author: Dr Labs, RB
+from collections import deque
+from itertools import count
+from datetime import datetime, timedelta
+import time
+import timeit
+import os
+import snap7
+
+arrayTG, tg_list, Idx1, y_common, array2D = [], [], [], [], []
+db_number, start_offset, bit_offset = 208, 0, 0
+start_address = 0  					# starting address
+r_length = 4  						# double word (4 Bytes)
+b_length = 1  						# boolean size = 1 Byte
+r_data = 52.4
+pCon = snap7.client.Client()
+
+
+# ---------------------- Collective Functions ---------------------------------------
+
+def readReal(db_number, start_offset, bit_offset):
+	reading = pCon.db_read(db_number, start_offset, r_length)
+	a = snap7.util.get_real(reading, 0)
+	# print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
+	return a
+
+def readInteger(db_number, start_offset, bit_offset):
+	reading = pCon.db_read(db_number, start_offset, r_length)
+	a = snap7.util.get_int(reading, 0)
+	# print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
+	return a
+
+def writeReal(db_number, start_offset, r_data):
+	# reading = plc.db_read(db_number, start_offset, r_length)
+	data = bytearray(4)
+	snap7.util.set_real(data, 0, r_data)
+	pCon.db_write(db_number, start_offset, data)
+	return
+
+def writeInteger(db_number, start_offset, r_data):
+	# reading = plc.db_read(db_number, start_offset, r_length)
+	data = bytearray(4)
+	snap7.util.set_int(data, 0, r_data)
+	pCon.db_write(db_number, start_offset, data)
+	return
+
+# --------------------------------------------------------------------------------------------------------------------[]
+
+
+def plcExec(nGZ, grp_step, DB, fetch_no):
+	"""
+	nGZ     : User defined Sample size
+	grp_step: Group Sample step
+	fetch_no: Animation Fetch Cycle
+	"""
+	db_number = DB
+	# Get contiguous data from PLC Stream --- Dealing with very volatile data frame.
+	start_offset = [0, 2, 4, 6, 14, 22, 26, 30, 38, 42, 46, 50, 54]
+	bit_offset = [0, 1, 2]
+	id1 = str(0)
+	# ------------------------------------------------------------------------
+	n2fetch = int(nGZ)
+	group_step = int(grp_step)
+	fetch_no = int(fetch_no)
+	if group_step == 1:
+		slideType = 'Smooth Edge*'
+	else:
+		slideType = 'Non-overlapping*'
+
+	print('\n[TG] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
+	print('=' * 60)
+	# ------------- Consistency Logic ensure list is filled with predetermined elements --------------
+	if group_step == 1:
+		print('Array length:', len(arrayTG), 'Fetch Value', fetch_no)
+		if len(arrayTG) == nGZ and fetch_no > 0:
+			print('TP A')
+			n2fetch = fetch_no
+		elif len(arrayTG) == nGZ and fetch_no < 1:
+			print('TP B')
+			n2fetch = 1
+		elif len(arrayTG) >= nGZ and fetch_no > 0:
+			print('TP C')
+			n2fetch = (len(arrayTG) + fetch_no)
+		elif len(arrayTG) >= nGZ and fetch_no < 1:
+			print('TP D')
+			n2fetch = 0
+		else:
+			print('TP E')
+			n2fetch = nGZ
+		print('Fetching...:', n2fetch)
+		# Evaluate rows in each tables ---------------------[]
+		idxA = int(id1) + fetch_no + 1
+		if len(Idx1) > 1:
+			del Idx1[:1]
+		Idx1.append(idxA)
+		print('Processing Query #:', idxA)
+
+	elif group_step > 1:
+		if fetch_no != 0 and len(arrayTG) >= nGZ:
+			n2fetch = nGZ # (nGZ * fetch_no)
+		else:
+			n2fetch = nGZ  # fetch twice
+		print('Fetching..', n2fetch)
+		# Evaluate rows in each tables ---------------------[]
+		idxA = int(id1) + (((fetch_no + 1) - 2) * nGZ) + 1
+		if len(Idx1) > 1:
+			del Idx1[:1]
+		Idx1.append(idxA)
+		print('Processing SQL Row #:', idxA)
+
+	while True:
+		try:
+			# --------------------------------- Tape Gap Measurement Data ---------------------[14 columns]
+			TG1 = readInteger(db_number, start_offset[0], bit_offset[0])  		# time stamp
+			tg_list.append(TG1)
+			TG2 = readInteger(db_number, start_offset[2], bit_offset[0])  		# Current Layr
+			tg_list.append(TG2)
+			TG3 = readInteger(db_number, start_offset[4], bit_offset[0])  		# Sample Count
+			tg_list.append(TG3)
+			TG4 = readReal(db_number, start_offset[6], bit_offset[0])  			# Sample Centre
+			tg_list.append(TG4)
+			TG5 = readReal(db_number, start_offset[14], bit_offset[0])  		# Pipe Position
+			tg_list.append(TG5)
+			TG6 = readReal(db_number, start_offset[22], bit_offset[0])  		# Gauge A1
+			tg_list.append(TG6)
+			TG7 = readReal(db_number, start_offset[26], bit_offset[0])  		# Gauge A2
+			tg_list.append(TG7)
+			TG8 = readReal(db_number, start_offset[30], bit_offset[0])  		# Gauge A3
+			tg_list.append(TG8)
+			LP1 = readReal(db_number, start_offset[34], bit_offset[0])  		# Gauge A4
+			tg_list.append(LP1)
+			LP2 = readReal(db_number, start_offset[38], bit_offset[0])  		# Gauge B1
+			tg_list.append(LP2)
+			LP3 = readReal(db_number, start_offset[42], bit_offset[0])  		# Gauge B2
+			tg_list.append(LP3)
+			LP4 = readReal(db_number, start_offset[46], bit_offset[0])  		# Gauge B3
+			tg_list.append(LP4)
+			LA1 = readReal(db_number, start_offset[50], bit_offset[0])  	 	# Gauge B4
+			tg_list.append(LA1)
+			LA2 = readInteger(db_number, start_offset[54], bit_offset[0])  		# Pipe Direction
+			tg_list.append(LA2)
+
+			# Deposit list column content into rows array ----------[]
+			if len(tg_list) > 14:
+				del tg_list[0:(len(tg_list) - 14)]				# trim columns to shape
+				print('\nResetting Column Size...', len(tg_list))
+
+			arrayTG.append(tg_list)
+			print('\nLIST COLUMN:', len(tg_list))
+			print('LIST D_ROWS:', len(arrayTG))
+			print('Next Break @:', (n2fetch + nGZ) - len(arrayTG))
+
+			if group_step == 1:
+				# Beautiful Purgatory Procedure ------------------------------[]
+				if len(arrayTG) >= n2fetch and fetch_no <= 30:
+					del arrayTG[0:(len(arrayTG) - nGZ)]  			# [static window]
+					print('Resetting Rows on Static.', len(arrayTG))
+					break
+				elif len(arrayTG) >= 31 and (fetch_no + 1) >= 31:
+					del arrayTG[0:(len(arrayTG) - fetch_no)]  		# [moving window]
+					print('Resetting Rows on Move..', len(arrayTG))
+					break
+				else:
+					pass
+			else:
+				if group_step > 1 and len(arrayTG) == n2fetch and fetch_no <= 30:
+					print('Keeping No of Rows on Static... Array Size:', len(arrayTG))
+					break
+				if group_step > 1 and len(arrayTG) >= (nGZ + n2fetch) and fetch_no <= 31:
+					del arrayTG[0:(len(arrayTG) - nGZ)]
+					print('Resetting Rows on Static... Array Size:', len(arrayTG))
+					break
+				elif group_step > 1 and len(arrayTG) >= (nGZ + n2fetch) and fetch_no >= 31:
+					del arrayTG[0:(len(arrayTG) - fetch_no)]
+					print('Resetting Rows on Move.... Array Size:', len(arrayTG))
+					break
+				print('Breaking at..', (n2fetch + nGZ), ' Array Length:', len(arrayTG))
+				# break
+			tg_list.clear()  							# Clear content of the list for new round trip
+
+		except Exception as err:
+			print(f"Exception Error: '{err}'")
+
+		finally:
+			timef = time.time()
+			print(f"Data Fetch Time: {timef - timei} sec", 'Fetch No:', fetch_no, '\n')
+
+	return arrayTG
