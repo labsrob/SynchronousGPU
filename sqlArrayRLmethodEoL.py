@@ -80,6 +80,7 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     NOTE: SQL Server Regression Issues acknowledge by Microsoft.
     Table level resampling enabled. 
     """
+    print('Processing Layer Number:', layerNo)
     lpSR = t1.execute('Select count([R1SP]) AS ValidTotal from ' + str(T1) +' where [cLyr] = ' + str(layerNo)).fetchone()
     # close sel link -------[ZLP_]
     ttSR = t2.execute('Select count([R1SP]) AS ValidTotal from ' + str(T2) +' where [cLyr] = ' + str(layerNo)).fetchone()

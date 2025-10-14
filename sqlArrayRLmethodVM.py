@@ -30,7 +30,6 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
         slideType = 'Non-overlapping'
 
     print('\n[VMP] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
-    print('=' * 60)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
         if last_ts is None:

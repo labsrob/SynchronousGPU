@@ -12,8 +12,8 @@ def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'ZLA_' + pWON:
         columns = [ # Tape Temperature --------------[]
-                   'tStmg', 'LyIDg', 'R1SPg', 'R1NVg', 'R2SPg',
-                   'R2NVg', 'R3SPg', 'R3NVg', 'R4SPg',  'R4NVg']
+                   'id_col', 'LyID', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
 
     else:
         print('Invalid Columns or Query error...')

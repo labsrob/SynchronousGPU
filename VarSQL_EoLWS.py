@@ -11,7 +11,7 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqpWS = [df1['id_col'], df1['cLyr'], df1['R1SP'], df1['R1NV'],
+    sqpWS = [df1['cLyr'], df1['R1SP'], df1['R1NV'],
              df1['R2SP'], df1['R2NV'], df1['R3SP'],
              df1['R3NV'], df1['R4SP'], df1['R4NV']]
 

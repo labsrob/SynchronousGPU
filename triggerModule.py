@@ -17,12 +17,12 @@ def trigViolations(a1, md, procID, minYScale, maxYScale, xUCL, xLCL, xUSL, xLSL,
     else:
         import realTPostSQLupdate as pq                         # Using SQL Query
 
-    ringValue = (procID[0], procID[1], procID[2], procID[3])    # check and avoid null values    
+    ringValue = (procID[0][0], procID[0][1], procID[0][2], procID[0][3])    # check and avoid null values
     if sum(ringValue) > 0:
-        Trig1 = (procID[0]).mean()                              # Ring 1 Roller Pressure
-        Trig2 = (procID[1]).mean()                              # raRF[1].mean()
-        Trig3 = (procID[2]).mean()
-        Trig4 = (procID[3]).mean()
+        Trig1 = procID[0][0] # .mean()                              # Ring 1 Roller Pressure
+        Trig2 = procID[0][1] # .mean()                              # raRF[1].mean()
+        Trig3 = procID[0][2] # .mean()
+        Trig4 = procID[0][3] # .mean()
         # Provide visualisation: Evaluate trig values with Sigma Limits --------[]
         fcT1 = sx.trippWire(Trig1, xUCL, xLCL, xUSL, xLSL)      # Evaluate using process mean/dev values
         fcT2 = sx.trippWire(Trig2, xUCL, xLCL, xUSL, xLSL)
@@ -54,12 +54,12 @@ def trigViolations(a1, md, procID, minYScale, maxYScale, xUCL, xLCL, xUSL, xLSL,
             a1.axhspan(xUSL, window_y2max, facecolor='#FFFFFF', edgecolor='#FFFFFF')     # white
             a1.axhspan(window_y2min, xLSL, facecolor='#FFFFFF', edgecolor='#FFFFFF')     # white
 
-    ringValue = (procID[4], procID[5], procID[6], procID[7])  # check and avoid null values
+    ringValue = (procID[1][0], procID[1][1], procID[1][2], procID[1][3])  # check and avoid null values
     if sum(ringValue) > 0:
-        Trig5 = (procID[4]).mean()      # Ring 1 Roller Pressure TODO: 4 TRIGS PER RING
-        Trig6 = (procID[5]).mean()      # raRF[1].mean()
-        Trig7 = (procID[6]).mean()
-        Trig8 = (procID[7]).mean()
+        Trig5 = (procID[1][0]) # .mean()      # TODO: 4 TRIGS PER RING
+        Trig6 = (procID[1][1]) # .mean()      # raRF[1].mean()
+        Trig7 = (procID[1][2]) # .mean()
+        Trig8 = (procID[1][3]) # .mean()
         # Provide visualisation: Evaluate trig values with Sigma Limits -----[]
         fcT5 = sx.trippWire(Trig5, xUCL, xLCL, xUSL, xLSL)
         fcT6 = sx.trippWire(Trig6, xUCL, xLCL, xUSL, xLSL)
@@ -92,12 +92,12 @@ def trigViolations(a1, md, procID, minYScale, maxYScale, xUCL, xLCL, xUSL, xLSL,
             a1.axhspan(xUSL, window_y2max, facecolor='#FFFFFF', edgecolor='#FFFFFF')     # white
             a1.axhspan(window_y2min, xLSL, facecolor='#FFFFFF', edgecolor='#FFFFFF')     # white
 
-    ringValue = (procID[8], procID[9], procID[10], procID[11])  # check and avoid null values
+    ringValue = (procID[2][0], procID[2][1], procID[2][2], procID[2][3])  # check and avoid null values
     if sum(ringValue) > 0:
-        Trig9 = (procID[8]).mean()                            # Ring 1 Roller Pressure TODO: 4 TRIGS PER RING
-        Trig10 = (procID[9]).mean()                           # raRF[1].mean()
-        Trig11 = (procID[10]).mean()
-        Trig12 = (procID[11]).mean()
+        Trig9 = (procID[2][0])      #.mean()                            #TODO: 4 TRIGS PER RING
+        Trig10 = (procID[2][1])     #.mean()
+        Trig11 = (procID[2][2])     #.mean()
+        Trig12 = (procID[2][3])     #.mean()
         # Provide visualisation: Evaluate trig values with Sigma Limits -----[]
         fcT9 = sx.trippWire(Trig9, xUCL, xLCL, xUSL, xLSL)
         fcT10 = sx.trippWire(Trig10, xUCL, xLCL, xUSL, xLSL)
@@ -127,12 +127,12 @@ def trigViolations(a1, md, procID, minYScale, maxYScale, xUCL, xLCL, xUSL, xLSL,
             a1.axhspan(xUSL, window_y2max, facecolor='#FFFFFF', edgecolor='#FFFFFF')     # white
             a1.axhspan(window_y2min, xLSL, facecolor='#FFFFFF', edgecolor='#FFFFFF')     # white
 
-    ringValue = (procID[12], procID[13], procID[14], procID[15])  # check and avoid null values
+    ringValue = (procID[3][0], procID[3][1], procID[3][2], procID[3][3])  # check and avoid null values
     if sum(ringValue) > 0:
-        Trig13 = (procID[12]).mean()      # Ring 1 Roller Pressure TODO: 4 TRIGS PER RING
-        Trig14 = (procID[13]).mean()      # raRF[1].mean()
-        Trig15 = (procID[14]).mean()
-        Trig16 = (procID[15]).mean()
+        Trig13 = (procID[3][0]) # .mean()      # TODO: 4 TRIGS PER RING
+        Trig14 = (procID[3][1]) # .mean()
+        Trig15 = (procID[3][2]) # .mean()
+        Trig16 = (procID[3][3]) # .mean()
         # Provide visualisation: Evaluate trig values with Sigma Limits -----[]
         fcT13 = sx.trippWire(Trig13, xUCL, xLCL, xUSL, xLSL)
         fcT14 = sx.trippWire(Trig14, xUCL, xLCL, xUSL, xLSL)

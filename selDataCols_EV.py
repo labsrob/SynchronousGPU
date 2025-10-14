@@ -11,7 +11,7 @@ YTape Void count data
 def validCols(pParam):
 
     if pParam[0:3] == 'EV_':
-        columns = ['tStamp', 'cLayer', 'Line1Temp', 'Line2Temp',
+        columns = ['id_col', 'cLayer', 'Line1Temp', 'Line2Temp',
                    'Line3Temp', 'Line4Temp', 'Line5Temp', 'Line1Humi',
                     'Line2Humi', 'Line3Humi', 'Line4Humi', 'Line5Humi']
 

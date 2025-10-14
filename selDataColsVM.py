@@ -9,13 +9,14 @@ Author: Dr Robert B Labs (PhD), TFMC-Magma Global Ltd.
 
 
 def validCols(pParam):
-    # print('Detected RingHead Combo:', configH)
+    # print('Detected RingHead Combo:', configH) 'id_col',
     if pParam[0:3] == 'VM_':
         columns = ['id_col', 'sCount', 'sCenter', 'AvgGap',
                    'MaxGap', 'cLayer', 'sDistance']
 
     elif pParam[0:6] == 'SPC_VM':
-        columns = ['sCount', 'sCentre', 'AvgGap', 'MaxGap', 'cLayer', 'sDistance']
+        columns = ['sCount', 'sCentre', 'AvgGap', 'MaxGap',
+                   'cLayer', 'sDistance']
 
     else:
         columns = 0

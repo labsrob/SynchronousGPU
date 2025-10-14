@@ -18,12 +18,12 @@ import selDataColsLA as qla     # Laser Angle
 import selDataColsLP as qlp     # Laser Power
 import selDataColsRC as qrc     # Ramp Count
 import selDataColsRF as qrf     # Roller Force
-import selDataColsRM as qrm     # Ramp Mapping
+import selDataCols_RM as qrm     # Ramp Mapping
 import selDataColsST as qst     # Substrate Temperature
 import selDataColsTG as qtg     # Tape Gap Void
 import selDataColsTP as qtp     # Tape Placement error
 import selDataColsTT as qtt     # Tape Temperature
-import selDataColsVC as qvc     # void (gap) count
+import selDataCols_VC as qvc     # void (gap) count
 import selDataColsVM as qvm     # Void mapping
 import selDataColsRP as qrp     # Roller Pressure
 
@@ -55,13 +55,11 @@ from fpdf import FPDF
 import time
 import os
 import sys
-import math
 from datetime import datetime, date
 from time import gmtime, strftime
 from pynput.keyboard import Key, Listener
 import signal
 import triggerModule as gma
-import tkinter as tk
 from tkinter import *
 from threading import *
 from multiprocessing import Process
@@ -85,7 +83,6 @@ from matplotlib.ticker import MultipleLocator
 # --------------------------[]
 import pParamsHL as dd
 import pWON_finder as wo
-
 # -------------------------[]
 import qParametersDNV as hla
 import qParametersMGM as hlb
@@ -96,22 +93,37 @@ import fitz
 from tkinter import filedialog
 from tkinter import simpledialog
 import CommsSql as sq
-
-
+import cupy as cp
 # ------------------------[]
 # # Try GPU (CuPy), else fall back to NumPy
 # try:
-#     import cupy as np
-#     GPU_ENABLED = True
+#     import cupy as cp
+#     from cupyx.scipy.ndimage import uniform_filter1d
+#
 # except ImportError:
+#     is_cupy = False
 #     import numpy as np
-#     GPU_ENABLED = False
-# # make numpy compatible with cupy API
-# np.asnumpy = lambda x: x
-import warnings
-import subprocess
-import json
+#     import pandas as pd
+#
+# else:
+#     is_cupy = True
+#     import numpy as np
+# ------------------------
+
 import shutil
+import warnings
+# import cudf
+cudf = False
+
+import cupy as cp
+import pandas as pd
+from cupyx.scipy.ndimage import uniform_filter1d
+# -------------------
+is_CuDF = False
+is_CuPy = True
+is_NumPy = False
+# -------------------
+GPU_ENABLED = True
 
 def get_nvidia_info():
     """Return GPU info (name, memory, utilization, temperature) if available."""
@@ -135,54 +147,54 @@ def get_nvidia_info():
     except Exception:
         return None
 
+# ------------------------------------------------------------------[]
 try:
-    import cupy as cp
-    import numpy as np
-    GPU_ENABLED = False
 
-    try:
-        num_gpus = cp.cuda.runtime.getDeviceCount()
-        if num_gpus > 0:
-            gpu_info = get_nvidia_info()
-            free_mem, total_mem = cp.cuda.runtime.memGetInfo()
-            free_gb = free_mem / 1e9
-            total_gb = total_mem / 1e9
-            used_pct = (1 - free_mem / total_mem) * 100
+    if cp.cuda.runtime.getDeviceCount() > 0:
+        print("GPU is available and CuPy can use it!")
+        GPU_ENABLED = False
+        # -----------------------------------------------------------[]
+        try:
+            num_gpus = cp.cuda.runtime.getDeviceCount()
+            if num_gpus > 0:
+                gpu_info = get_nvidia_info()
+                free_mem, total_mem = cp.cuda.runtime.memGetInfo()
+                free_gb = free_mem / 1e9
+                total_gb = total_mem / 1e9
+                used_pct = (1 - free_mem / total_mem) * 100
 
-            if free_mem / total_mem > 0.1:
-                np = cp
-                GPU_ENABLED = True
-                print(f"Using GPU (CuPy)")
-                if gpu_info:
-                    print(f"GPU: {gpu_info['name']}")
-                    print(f"Temp: {gpu_info['temp']}°C | Utilization: {gpu_info['utilization']}%")
-                    print(f"Memory: {gpu_info['mem_used'] / 1024:.2f} / {gpu_info['mem_total'] / 1024:.2f} GB")
+                if free_mem / total_mem > 0.1:
+                    # np = cp
+                    import numpy as np
+                    # GPU_ENABLED = True
+                    print(f"Using GPU (CuPy)")
+                    if gpu_info:
+                        print(f"GPU: {gpu_info['name']}")
+                        print(f"Temp: {gpu_info['temp']}°C | Utilization: {gpu_info['utilization']}%")
+                        print(f"Memory: {gpu_info['mem_used'] / 1024:.2f} / {gpu_info['mem_total'] / 1024:.2f} GB")
+                    else:
+                        print(f"Free: {free_gb:.2f} / {total_gb:.2f} GB  ({used_pct:.1f}% used)")
                 else:
-                    print(f"Free: {free_gb:.2f} / {total_gb:.2f} GB  ({used_pct:.1f}% used)")
+                    warnings.warn(f"GPU memory too low ({free_gb:.2f} GB free). Falling back to CPU (NumPy).")
             else:
-                warnings.warn(f"GPU memory too low ({free_gb:.2f} GB free). Falling back to CPU (NumPy).")
-        else:
-            warnings.warn("No CUDA GPUs found. Using CPU (NumPy).")
+                warnings.warn("No CUDA GPUs found. Using CPU (NumPy).")
 
-    except cp.cuda.runtime.CUDARuntimeError:
-        warnings.warn("CUDA runtime error. Using CPU (NumPy).")
+        except cp.cuda.runtime.CUDARuntimeError:
+            warnings.warn("CUDA runtime error. Using CPU (NumPy).")
+
+    else:
+        is_CuDF = False
+        print("CuPy is installed, but no GPU devices detected.")
 
 except ImportError:
-    import numpy as np
-
-    GPU_ENABLED = False
+    print("CuDF is NOT installed, using Numpy arrays...")
     warnings.warn("CuPy not installed. Using CPU (NumPy).")
 
 # --- Make np.asnumpy safe for both backends ---
-if not hasattr(np, "asnumpy"):
-    np.asnumpy = lambda x: x
+# if not hasattr(np, "asnumpy"):
+#     np.asnumpy = lambda x: x
 
 # ------------------------[]
-def tab_state(notebook, tab_index):
-    state = notebook.tab(tab_index, 'state')
-    print(f"Tab at index {tab_index} is: {state}")
-    return state
-
 # Cross-platform simple beep
 def beep():
     try:
@@ -194,10 +206,8 @@ def beep():
     except Exception:
         pass
 
-
 # matplotlib.use("TkAgg")
 # -------------------------[]
-
 sptDat, valuDat, stdDat, tolDat, pgeDat, psData, r1Data, r2Data, r3Data, r4Data = [], [], [], [], [], [], [], [], [], []
 sDat1, sDat2, sDat3, sDat4 = [], [], [], []
 tabConfig, vppA, vpkA = [], [], []
@@ -232,7 +242,6 @@ Dtr_ready = []
 Dol_ready = []
 Dop_ready = []
 # ---------------------
-
 xpiPos = []
 xcLayer = []
 
@@ -254,7 +263,7 @@ SPC_VC = 117
 SPC_RM = 114
 SCP_VM = 115
 SPC_RP = 151
-SPC_WS = 216    # not Tape speed
+SPC_WS = 216
 SPC_WA = 214
 # ------------------------------------------#
 
@@ -316,8 +325,6 @@ B4 = [1.716, 1.572, 1.490, 1.4548, 1.435, 1.3956]       # 10, 15, 20, 23, 25, 30
 # ----------------------------------------------[]
 
 plcConnex = []
-# UsePLC_DBS = False                                      # specify SQl Query or PLC DB Query is in use
-# UseSQL_DBS = True
 ql_alive = False
 rm_alive = False
 
@@ -1013,13 +1020,13 @@ def get_data(layerN):
             print('\nProcessing MGM Reports.....')
             # ----------------------------------------
             zLP, zLA, zTT, zST, zTG, zWA, zPP = pdfrp.mgm_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layrN)
-            coluA = ['cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # LP
-            coluB = ['cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # LA
-            coluC = ['cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # TT
-            coluD = ['cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # ST
-            coluE = ['cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # TG
-            coluF = ['cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # WA
-            coluG = ['cLyr', 'PipePos', 'PipeDiam', 'Ovality', 'RampCnt', 'VoidCnt', 'TChange', 'TpWidth', 'Tension']  # PP
+            coluA = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # LP
+            coluB = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # LA
+            coluC = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # TT
+            coluD = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # ST
+            coluE = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # TG
+            coluF = ['id_col', 'cLyr', 'R1SP', 'R1NV', 'R2SP', 'R2NV', 'R3SP', 'R3NV', 'R4SP', 'R4NV']  # WA
+            coluG = ['id_col', 'cLyr', 'PipePos', 'PipeDiam', 'Ovality', 'RampCnt', 'VoidCnt', 'TChange', 'TpWidth', 'Tension']  # PP
         else:
             print('\nProcessing DNV Reports.....')
             # ----------------------------------------
@@ -1066,16 +1073,17 @@ def get_data(layerN):
         usrID = 'Operator ID'                   # User ID
         layrNO = layrN                          # Layer ID
         # --------------------------------------#
+        if 1 <= int(layrNO) <= 40:
+            cvalu = [4.5, 4.5, 4.5, 4.5]        # 22mm Tape
+        elif 41 <= int(layrNO) <= 100:
+            cvalu = [3.5, 3.5, 3.5, 3.5]        # 18mm Tape
+        # --------------------------------------#
         for i in range(len(rpData)):
             if pRecipe == 'DNV':
                 if i == 0:
                     cProc = 'Roller Pressure'               # Process ID
                     rPage = '1of6'
-                    if cpLayerNo == range(1, 40):
-                        Tvalu = [4.5, 4.5, 4.5, 4.5]        # 22mm Tape
-                    elif cpLayerNo == range(41, 100):
-                        Tvalu = [3.5, 3.5, 3.5, 3.5]        # 18mm Tape
-
+                    Tvalu = cvalu
                     ring1A = rpData[i]['R1SP']              # Actual value (SP)
                     ring1B = rpData[i]['R1NV']              # Measured values = Real value  = (NV)
                     ring2A = rpData[i]['R2SP']
@@ -1640,7 +1648,7 @@ def tabbed_cascadeMode(pWON, cType):
 # -------- Controls --------
 
 def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[TABBED]
-    global hostConn, pRecipe, pMode, actTabb, notebook
+    global hostConn, pRecipe, pMode, nootebook
     """
     https://stackoverflow.com/questions/73088304/styling-a-single-tkinter-notebook-tab
     :return:
@@ -1735,7 +1743,7 @@ def tabbed_canvas(cMode, cType):   # Tabbed Common Classes -------------------[T
     # Create DNV tab frames properties -------------[]
     if pRecipe == 'DNV':
         rollerPreTabb(master=tab1).grid(column=0, row=0, padx=10, pady=10)
-        notebook.hide(tab1) # comment to enable visibility of roller pressure Tabb
+        notebook.hide(tab1)
         tapeTempTabb(master=tab2).grid(column=0, row=0, padx=10, pady=10)
         substTempTabb(master=tab3).grid(column=0, row=0, padx=10, pady=10)
         tapeGapPolTabb(master=tab4).grid(column=0, row=0, padx=10, pady=10)
@@ -2008,7 +2016,7 @@ class collectiveEoL(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
         self.loadEoL = False
         self.toggle_state = True
         # self.createEoLViz()
@@ -2474,7 +2482,7 @@ class collectiveEoL(ttk.Frame):
             if uCalling == 1:                                           # Running Live Analysis
                 sysRun, sysIdl, sysRdy, msc_rt, cLayer, pipPos, mstatus = wd.autoPausePlay()
 
-                if not sysRun and not paused or sysIdl or sysRdy:
+                if not sysRun and sysIdl or sysRdy:
                     print('\n[EoL] Production is pausing...')
                     paused = True
 
@@ -2487,9 +2495,11 @@ class collectiveEoL(ttk.Frame):
                             print('[EoL] Visualisation Resumes...')
                         time.sleep(0.2)
 
-                # Activate End of Layer Report ------------------------------------------#
-                elif not sysRun and msc_rt == 49728 or msc_rt == 49712 or msc_rt == 49664:
+                # Activate End of Layer Report -------------------------------------#
+                elif sysRun and msc_rt == 49728:
                     layerN = cLayer
+                    time.sleep(60)
+                    # ----------------[]
                     if not pdf_layer:
                         pdf_layer.append(layerN)  # start at layer 1
                     if len(pdf_layer) > 1:
@@ -2499,7 +2509,7 @@ class collectiveEoL(ttk.Frame):
                     # Trigger EoL report -- Verify MSC State machine Code update
                     layerProcess(layerN)
 
-                elif not sysRun and msc_rt == 59776:            # End of Pipe lay
+                elif not sysRun and msc_rt == 59776:            # End of Pipe lay?
                     # trigger EoP Report                        # TODO Wrapp up this method asap.
                     continue                                    # keep looping on the spot until operator action
 
@@ -2549,7 +2559,7 @@ class collectiveEoL(ttk.Frame):
 
         # sliding window -------
         lastLayer = 1 # pdf_layer[0]
-        regm1, regm2, regm3, regm4 = 0.3, 0.3, 0.3, 0.3
+        regm1, regm2, regm3, regm4 = 0.33, 0.33, 0.33, 0.33
         # --------------------------------------------------# , , ,
         # declare asynchronous variables ------------------[]
         if UseSQL_DBS or UsePLC_DBS:
@@ -2559,48 +2569,49 @@ class collectiveEoL(ttk.Frame):
             import VarSQL_EoLWS as rpws
             # load SQL variables column names | rfVarSQL
 
-            g1 = ott.validCols(self.T1)                          # Construct Table Column (Tape Temp)
+            g1 = ott.validCols(self.T1)                          # Tape Temp)
             d1 = pd.DataFrame(self.rpTT, columns=g1)
-            print('\nFetched In:', d1.shape[0])
+            # print('\nFetched In:', d1.shape[0])
             if d1.shape[0] >= s_fetch * 2:
                 d1.drop(d1.index[0:s_fetch])
-            print('Fetched Out:', len(d1), d1.shape[0])
-            # Setting a Seed for Random Reproducibility --[ Seed of 9, FYI:TP]
-            d1 = d1.sample(frac=regm1, axis='rows', random_state=9) # Do random sapling
+            # print('Fetched Out:', len(d1), d1.shape[0])
+            # -------------------------------------------------------------------[seed = 9]
+            d1 = d1.sample(frac=regm1, axis='rows', random_state=9)
             zTT = rptt.loadProcesValues(d1)
             tt_wsize = int(d1.shape[0] * regm1)
             # print('\n[EoL TT Viz] Content', d1.head(10))
 
-            g2 = ost.validCols(self.T2)                          # Construct Table Column (Sub Temp)
+            g2 = ost.validCols(self.T2)                          # (Sub Temp)
             d2 = pd.DataFrame(self.rpST, columns=g2)
             if d2.shape[0] >= s_fetch * 2:
                 d2.drop(d2.index[0:s_fetch])
-            # Setting a Seed for Random Reproducibility --[ Seed of 9, FYI:TP]
+            # -------------------------------------------------------------------[seed = 9]
             d2 = d2.sample(frac=regm2, axis='rows', random_state=9)
             zST = rpst.loadProcesValues(d2)
             st_wsize = int(d2.shape[0] * regm2)
             # print('\n[EoL ST Viz] Content', d2.head(10))
 
-            g3 = otg.validCols(self.T3)                          # Construct Table Column (Tape Gap)
+            g3 = otg.validCols(self.T3)
             d3 = pd.DataFrame(self.rpTG, columns=g3)
             if d3.shape[0] >= s_fetch * 2:
                 d3.drop(d3.index[0:s_fetch])
-            # Setting a Seed for Random Reproducibility --[ Seed of 9, FYI:TP]
+            # -------------------------------------------------------------------[seed = 9]
             d3 = d3.sample(frac=regm3, axis='rows', random_state=9)
             zTG = rptg.loadProcesValues(d3)
             tg_wsize = int(d3.shape[0] * regm3)
             # print('\n[EoL TG Viz] Content', d3.head(10))
 
-            g4 = ows.validCols(self.T4)                             # Construct Table Column (Tape Gap)
-            d4 = pd.DataFrame(self.rpWS, columns=g4)                # EoL_reached > 0 or layerN
+            g4 = ows.validCols(self.T4)
+            d4 = pd.DataFrame(self.rpWS, columns=g4)
             if d4.shape[0] >= s_fetch * 2:
                 d4.drop(d4.index[0:s_fetch])
-            # Setting a Seed for Random Reproducibility --[ Seed of 9, FYI:TP]
+            # -------------------------------------------------------------------[seed = 9]
             d4 = d4.sample(frac=regm4, axis='rows', random_state=9)
             zWS = rpws.loadProcesValues(d4)
             ws_wsize = int(d4.shape[0] * regm4)
             # Concatenate all columns ----------------------[]
-            print('\nNew Windows Samples:', tt_wsize, st_wsize, tg_wsize, ws_wsize)
+
+            # print('\nNew Windows Samples:', tt_wsize, st_wsize, tg_wsize, ws_wsize)
             # update layer count number on PPA Mode --------[]
             if zTT[1].any() > 1 and uCalling == 3 or uCalling == 2:
                 pdf_layer[1].append(zTT[1].any())
@@ -2679,46 +2690,46 @@ class collectiveEoL(ttk.Frame):
             # ------------------------------- S Plot ST
             if pRecipe == 'DNV':
                 # X Plot Y-Axis data points for XBar --------[ Mean TT ]
-                im10.set_ydata((zTT[3]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 1
-                im11.set_ydata((zTT[5]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 2
-                im12.set_ydata((zTT[7]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 3
-                im13.set_ydata((zTT[9]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 4
+                im10.set_ydata((zTT[2]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 1
+                im11.set_ydata((zTT[4]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 2
+                im12.set_ydata((zTT[6]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 3
+                im13.set_ydata((zTT[8]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 4
                 # ----------------------------------
-                im14.set_ydata((zTT[3]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 1
-                im15.set_ydata((zTT[5]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 2
-                im16.set_ydata((zTT[7]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3
-                im17.set_ydata((zTT[9]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 4
+                im14.set_ydata((zTT[2]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 1
+                im15.set_ydata((zTT[4]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 2
+                im16.set_ydata((zTT[6]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3
+                im17.set_ydata((zTT[8]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 4
                 # ------------------ Substrate Temperature ----[ ST ]
-                im18.set_ydata((zST[3]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 1
-                im19.set_ydata((zST[5]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 2
-                im20.set_ydata((zST[7]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 3
-                im21.set_ydata((zST[9]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 4
+                im18.set_ydata((zST[2]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 1
+                im19.set_ydata((zST[4]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 2
+                im20.set_ydata((zST[6]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 3
+                im21.set_ydata((zST[8]).rolling(window=_fetch, min_periods=1).mean()[0:batch_EoL])  # head 4
                 # ---------------------------------
-                im22.set_ydata((zST[3]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 1
-                im23.set_ydata((zST[5]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3S
-                im24.set_ydata((zST[7]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3
-                im25.set_ydata((zST[9]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])
+                im22.set_ydata((zST[2]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 1
+                im23.set_ydata((zST[4]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3S
+                im24.set_ydata((zST[6]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])  # head 3
+                im25.set_ydata((zST[8]).rolling(window=_fetch, min_periods=1).std()[0:batch_EoL])
                 # ------------------ Tape Gap Polarisation ---
 
-                im26.set_ydata((zTG[3]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 1
-                im27.set_ydata((zTG[5]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 2
-                im28.set_ydata((zTG[7]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 3
-                im29.set_ydata((zTG[9]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 4
+                im26.set_ydata((zTG[2]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 1
+                im27.set_ydata((zTG[4]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 2
+                im28.set_ydata((zTG[6]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 3
+                im29.set_ydata((zTG[8]).rolling(window=_fetch).mean()[0:batch_EoL])  # head 4
                 # ---------------------------------------
-                im30.set_ydata((zTG[3]).rolling(window=_fetch).std()[0:batch_EoL])  # head 1
-                im31.set_ydata((zTG[5]).rolling(window=_fetch).std()[0:batch_EoL])  # head 2
-                im32.set_ydata((zTG[7]).rolling(window=_fetch).std()[0:batch_EoL])  # head 3
-                im33.set_ydata((zTG[9]).rolling(window=_fetch).std()[0:batch_EoL])
+                im30.set_ydata((zTG[2]).rolling(window=_fetch).std()[0:batch_EoL])  # head 1
+                im31.set_ydata((zTG[4]).rolling(window=_fetch).std()[0:batch_EoL])  # head 2
+                im32.set_ydata((zTG[6]).rolling(window=_fetch).std()[0:batch_EoL])  # head 3
+                im33.set_ydata((zTG[8]).rolling(window=_fetch).std()[0:batch_EoL])
                 # ---------------------------------------[Winding Speed S]
-                im34.set_ydata((zWS[3]).rolling(window=_fetch).mean()[0:batch_EoL])
-                im35.set_ydata((zWS[5]).rolling(window=_fetch).mean()[0:batch_EoL])
-                im36.set_ydata((zWS[7]).rolling(window=_fetch).mean()[0:batch_EoL])
-                im37.set_ydata((zWS[9]).rolling(window=_fetch).mean()[0:batch_EoL])
+                im34.set_ydata((zWS[2]).rolling(window=_fetch).mean()[0:batch_EoL])
+                im35.set_ydata((zWS[4]).rolling(window=_fetch).mean()[0:batch_EoL])
+                im36.set_ydata((zWS[6]).rolling(window=_fetch).mean()[0:batch_EoL])
+                im37.set_ydata((zWS[8]).rolling(window=_fetch).mean()[0:batch_EoL])
                 # ------------------------------------------
-                im38.set_ydata((zWS[3]).rolling(window=_fetch).std()[0:batch_EoL])
-                im39.set_ydata((zWS[5]).rolling(window=_fetch).std()[0:batch_EoL])
-                im40.set_ydata((zWS[7]).rolling(window=_fetch).std()[0:batch_EoL])
-                im41.set_ydata((zWS[9]).rolling(window=_fetch).std()[0:batch_EoL])
+                im38.set_ydata((zWS[2]).rolling(window=_fetch).std()[0:batch_EoL])
+                im39.set_ydata((zWS[4]).rolling(window=_fetch).std()[0:batch_EoL])
+                im40.set_ydata((zWS[6]).rolling(window=_fetch).std()[0:batch_EoL])
+                im41.set_ydata((zWS[8]).rolling(window=_fetch).std()[0:batch_EoL])
 
             # ------------------------------------------------------ Std Dev
             if batch_EoL > self.win_Xmax:
@@ -2743,7 +2754,16 @@ class collectiveEoL(ttk.Frame):
                 self.a6.set_xlim(0, self.win_Xmax)
                 self.a7.set_xlim(0, self.win_Xmax)
                 self.a8.set_xlim(0, self.win_Xmax)
+                self.a1.autoscale(enable=True, axis='y')
+                self.a2.autoscale(enable=True, axis='y')
+                self.a3.autoscale(enable=True, axis='y')
+                self.a4.autoscale(enable=True, axis='y')
+                self.a5.autoscale(enable=True, axis='y')
+                self.a6.autoscale(enable=True, axis='y')
+                self.a7.autoscale(enable=True, axis='y')
+                self.a8.autoscale(enable=True, axis='y')
             self.canvas.draw_idle()
+
         else:
             if pRecipe == 'MGM':
                 self.a1.text(0.200, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a1.transAxes)
@@ -2768,12 +2788,14 @@ class collectiveEoL(ttk.Frame):
                 self.a6.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a6.transAxes)
                 self.a7.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a7.transAxes)
                 self.a8.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left', transform=self.a8.transAxes)
+        self.canvas.draw_idle()
         timef = time.time()
         lapsedT = timef - timei
         print(f"[EoL] Process Interval: {lapsedT} sec\n")
+        # -----Canvas update --------------------------------------------[]
 
 # ------- Defines the collective screen structure ------------------------[EOP Reports]
-class collectiveEoP(ttk.Frame):
+class collectiveEoP(ttk.Frame):                                # End of Layer Progressive Report Tabb
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
@@ -2785,7 +2807,7 @@ class collectiveEoP(ttk.Frame):
             threading.Thread(target=self.createEoPViz, daemon=True).start()
 
 
-def createEoPViz(self):
+    def createEoPViz(self):
         label = ttk.Label(self, text="End of Pipe Report", font=LARGE_FONT)
         label.place(x=400, y=10)
 
@@ -2918,9 +2940,10 @@ def createEoPViz(self):
         toolbar.update()
         self.canvas._tkcanvas.pack(expand=True)
 
-# ---------------End of Collective Reporting Functions ----------------------------[]
-# ********  These set of functions defines the common canvas Area  *****************
-# ---------------------------------- COMMON VIEW CLASS OBJECTS ------[Ramp Count Plot]
+# ---------------------------- End of Collective Reporting Functions ----------------------------[]
+
+# ************   These set of functions defines the common canvas Area  *******************
+# ---------------------------------- COMMON VIEW CLASS OBJECTS ---------[Ramp Count Plot]
 class common_rampCount(ttk.Frame):
     # compute ram Count against cumulative layers ramp count --------[A]
     def __init__(self, master=None):
@@ -3145,7 +3168,7 @@ class common_rampCount(ttk.Frame):
         print(f"[cRC] Process Interval: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
-# ---------------------------------- COMMON VIEW CLASS OBJECTS ------[Environmental ]
+# ---------------------------------- COMMON VIEW CLASS OBJECTS ------[Climatic Variables]
 class common_climateProfile(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -3311,16 +3334,16 @@ class common_climateProfile(ttk.Frame):
         timei = time.time()                                 # start timing the entire loop
 
         # Call data loader Method---------------------------#
-        import VarSQL_EV as ev                          # load SQL variables column names | rfVarSQL
+        import VarSQL_EV as ev
 
         if self.running:
-            g1 = qev.validCols(self.evT)                        # SQL Table
-            df1 = pd.DataFrame(self.evStr, columns=g1)          # Import data into Dataframe
-
+            g1 = qev.validCols(self.evT)
+            df1 = pd.DataFrame(self.evStr, columns=g1)
+            # --------------------------------------
             data1 = df1.select_dtypes(include=["number"])
             df1 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-
-            EV = ev.loadProcesValues(df1)                       # Join data values under dataframe
+            # --------------------------------------
+            EV = ev.loadProcesValues(df1)
             # print('\nDataFrame Content', df1.tail(10))          # Preview Data frame head
             # print("Memory Usage:", df1.info(verbose=False))   # Check memory utilization
             uvIndex = 3.0
@@ -3379,7 +3402,7 @@ class common_climateProfile(ttk.Frame):
         print(f"[cEV] Process Interval: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
-# ---------------------------------- COMMON VIEW CLASS OBJECTS ------[Gap Count Plot]
+# ---------------------------------- COMMON VIEW CLASS OBJECTS -----------[Gap Count Plot]
 class common_gapCount(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -3412,7 +3435,7 @@ class common_gapCount(ttk.Frame):
 
         # Load SQL Query Table -------------------------------------#
         # if UseSQL_DBS:
-        self.gcT = 'VC_' + str(pWON)
+        self.T3 = 'VC_' + str(pWON)
         # ----------------------------------------------------------#
         self.a3.xaxis.set_major_locator(MultipleLocator(1))
         self.a3.legend(["Layer Void Count"], loc='upper right', fontsize="x-large")
@@ -3502,7 +3525,7 @@ class common_gapCount(ttk.Frame):
 
                     else:
                         # Get list of relevant SQL Tables using conn() --------------------[]
-                        self.gcD = svc.sqlExec(gc_con, s_fetch, stp_Sz, self.gcT, batch_VC)
+                        self.gcD = svc.sqlExec(gc_con, s_fetch, stp_Sz, self.T3, batch_VC)
                         time.sleep(30)
 
                         # ------ Inhibit iteration ----------------------------------------------------------[]
@@ -3533,8 +3556,9 @@ class common_gapCount(ttk.Frame):
 
         # Call data loader Method--------------------------#
         import VarSQL_VC as vc                          # load SQL variables column names | rfVarSQL
-        g1 = qvc.validCols(self.gcT)
+        g1 = qvc.validCols(self.T3)
         df1 = pd.DataFrame(self.gcD, columns=g1)        # Import into python Dataframe vData
+        # print('TP07', df1)
         # ----------------------------------------
         data1 = df1.select_dtypes(include=["number"])
         df1 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
@@ -3588,9 +3612,9 @@ class common_gapCount(ttk.Frame):
         print(f"[cVC] Process Interval: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
-# ************************* END  OF COMMON CANVAS **********************************
+# *************************** END  OF COMMON CANVAS ************************************
 
-# -----------------------------------------------------------------[Laser Power Tab]
+# ---------------------------------------------------------------------[Laser Power Tab]
 class laserPowerTabb(ttk.Frame):
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
@@ -4082,7 +4106,7 @@ class laserPowerTabb(ttk.Frame):
         lapsedT = timef - timei
         print(f"Process Interval LP: {lapsedT} sec\n")
 
-# -----------------------------------------------------------------[Laser Angle Tab]
+# ---------------------------------------------------------------------[Laser Angle Tab]
 class laserAngleTabb(ttk.Frame):
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
@@ -4573,7 +4597,7 @@ class laserAngleTabb(ttk.Frame):
         print(f"Process Interval LA: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
-# -----------------------------------------------------------------[Roller Force]
+# ---------------------------------------------------------------------[Roller Force]
 class rollerForceTabb(ttk.Frame):
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
@@ -5061,17 +5085,16 @@ class rollerForceTabb(ttk.Frame):
         print(f"Process Interval RF: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
-# -----------------------------------------------------------------[Roller Pressure]
+# ---------------------------------------------------------------------[Roller Pressure]
 class rollerPreTabb(ttk.Frame):
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.status = tab_state(notebook, 0)
-        self.running = False
+        self.running = True
 
         # prevents user possible double loading -----
-        if not self.running and self.status != 'hidden':
+        if not self.running:
             self.running = True
             threading.Thread(target=self.createProcessRP, daemon=True).start()
             print('[RP] is now running....')
@@ -5304,21 +5327,22 @@ class rollerPreTabb(ttk.Frame):
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
-        if uCalling == 2 and UseSQL_DBS:
+        if UseSQL_DBS:
             if self.running:
                 import sqlArrayRLmethodRP as rpA
                 rp_con = sq.sql_connectST()
             else:
                 rp_con = None
-        elif uCalling == 1 and UsePLC_DBS:
+
+        elif UsePLC_DBS:
             if self.running:
                 import plcArrayRLmethodRP as rpB
-                print('\n[RP] Activating watchdog...')
+                print('\n[ST] Activating watchdog...')
             else:
                 # dtST_ready = True
-                print('[RP] Data Source selection is Unknown')
+                print('[ST] Data Source selection is Unknown')
         else:
-            print('[RP] Unknown Protocol...')
+            print('[ST] Unknown Protocol...')
 
         # Initialise RT variables ---[]
         autoSpcRun = True
@@ -5379,12 +5403,12 @@ class rollerPreTabb(ttk.Frame):
                         self.canvas.get_tk_widget().after(0, self.rpDataPlot)
                         batch_RP += 1
                     else:
-                        print('[ST] sorry, instance not granted, trying again..')
+                        print('[RP] sorry, instance not granted, trying again..')
                         st_con = sq.check_SQL_Status(5, 10)
 
             else:
                 print('[ST] is active but no visualisation!\n')
-            print('[ST] protocol is refreshed, the wait is over...')
+            print('[RP] protocol is refreshed, the wait is over...')
 
     # ================== End of synchronous Method ==========================
 
@@ -5608,17 +5632,18 @@ class rollerPreTabb(ttk.Frame):
         print(f"\n[RP] Process Interval: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
-# -----------------------------------------------------------------[Tape Temperature]
+# ---------------------------------------------------------------------[Tape Temperature]
 class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Tape Temperature --[]
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = False
+        # self.status = tab_status(notebook, 0)
+        self.running = True
         self.runRMP = False
 
         # prevents user possible double loading -----
-        if not self.running:
+        if not self.running:# and self.status != 'hidden':
             self.running = True
             threading.Thread(target=self.createProcessTT, daemon=True).start()
             print('[TT] is now running...')
@@ -5779,13 +5804,13 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                 ttLSL = (ttMean - ttLCL) / 3 * 6
                 # -------------------------------
         else:  # Use default Limit values
-            ttUCL = 600
-            ttLCL = 200
-            ttMean = 400
-            ttDev = 300
-            sUCLtt = 450
-            sLCLtt = 150
-            ttUSL = 700
+            ttUCL = 620
+            ttLCL = 254
+            ttMean = 450.0
+            ttDev = 280.5
+            sUCLtt = 400.0
+            sLCLtt = 160
+            ttUSL = 720
             ttLSL = 100
             # ttPerf = '$Cp_{k' + str(self.ttS) + '}$'  # Using Automatic group Mean
             # ttlabel = 'Cp'
@@ -5929,14 +5954,14 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
-        if UseSQL_DBS:
+        if UseSQL_DBS and uCalling == 2 or uCalling == 3:
             if self.running:
                 import sqlArrayRLmethodTT as tta
                 tt_con = sq.sql_connectTT()
             else:
                 tt_con = None
 
-        elif UsePLC_DBS:
+        elif UsePLC_DBS and uCalling == 1:
             if self.running:
                 import plcArrayRLmethodTT as ttb
                 print('\n[TT] Activating watchdog...')      # primary connection to watch dog
@@ -5949,7 +5974,6 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         # Initialise RT variables ---[]
         autoSpcRun = True
         paused = False
-        sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = 0, 0, 0, 0, 0, 0, 'Pipe Position Not Specified'
         # ----------------------------------------------------------------------------#
 
         while True:
@@ -6101,69 +6125,79 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         timei = time.time()         # start timing the entire loop
 
         # Call data loader Method-----------------------#
-        if UsePLC_DBS and self.running:
+        if UsePLC_DBS and uCalling == 1 and self.running:
+            import cummulatedSigmaPLC as xig
             import VarPLC_TT as tt
-            print('Running PLC Data frame...')
+
             # Call synchronous data PLC function ------[A]
-            g1 = qtt.validCols(self.T1)                                 # Load PLC-dB [SPC_TT]
-            df1 = pd.DataFrame(self.ttD1, columns=g1)                   # Include table data into python Dataframe
+            g1 = qtt.validCols(self.T1)
+            df1 = pd.DataFrame(self.ttD1, columns=g1)
             # ------------------------------------------#
-            # Do some data cleansing & interpolation if Nans occurs
             data1 = df1.select_dtypes(include=["number"])
             df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-            # Convert pandas -> cuDF
-            if GPU_ENABLED:
-                gpu_df1 = cp. asarray(df1_interp.select_dtypes(include="number").to_numpy())
-                # gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+            # ------------------------------------------#
+            if GPU_ENABLED and is_CuDF:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                # ----------------------------------------------------#
                 TT = tt.loadProcesValues(gpu_df1)
-            else:
-                TT = tt.loadProcesValues(df1_interp)                    # Join data values under dataframe
+            elif GPU_ENABLED and is_CuPy:
+                # ----- Convert dataframe to CuPy -----
+                data_np = df1_interp.to_numpy().astype(np.float32)      # NumPy first
+                data_cp = cp.asarray(data_np)                           # Then to CuPy
+                # Using uniform_filter1d for efficient rolling mean
+                mean_cp = uniform_filter1d(data_cp, size=s_fetch, axis=0, mode='reflect')
+                squared_cp = uniform_filter1d(data_cp ** 2, size=s_fetch, axis=0, mode='reflect')
+                std_cp = cp.sqrt(squared_cp - mean_cp ** 2)
+                # Transfer results back to CPU
+                xTT = cp.asnumpy(mean_cp)   # xTT[:, 2]
+                sTT = cp.asnumpy(std_cp)    # sTT[:, 2]
+            elif is_NumPy:
+                TT = tt.loadProcesValues(df1_interp)
 
-        elif UseSQL_DBS and self.running:
-            import VarSQL_TT as tt                                      # load SQL variables column names | rfVarSQL
-            g1 = qtt.validCols(self.T1)
-            data1 = pd.DataFrame(self.ttD1, columns=g1)
-            # Do some data cleansing ------------[Perform back or forward fill interpolation if Nans occurs]
-            # data1 = data1.apply(pd.to_numeric, errors="coerce")
-            data1 = data1.select_dtypes(include=["number"])
-            df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-            if GPU_ENABLED:
-                # Convert pandas -> cuDF
-                # gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
-                gpu_df1 = cp.asarray(df1_interp.select_dtypes(include="number").to_numpy())
-                TA = tt.loadPVT1(gpu_df1)
-            else:
-                TA = tt.loadPVT1(df1_interp)
 
-            # ---------------------------------------------[]
-            g2 = qtt.validCols(self.T2)
-            data2 = pd.DataFrame(self.ttD2, columns=g2)
-            # data2 = data2.apply(pd.to_numeric, errors="coerce")
-            data2 = data2.select_dtypes(include=["number"])
-            df2_interp = data2.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-            if GPU_ENABLED:
-                # Convert pandas → cuDF
-                # gpu_df2 = cudf.from_pandas(df2_interp.select_dtypes(include="number"))
-                gpu_df2 = cp.asarray(df2_interp.select_dtypes(include="number").to_numpy())
-                TB = tt.loadPVT2(gpu_df2)
-            else:
-                TB = tt.loadPVT2(df2_interp)
-            print('Test:', TB)
-            # --------------------------------------------[]
-            # print("Memory Usage:", p_data.info(verbose=False))
-            # print("Stats Usage:", tData1.describe())
-            # print("Stats Usage:", tData2.describe())
-            # print("Memory Usage:", p_data.head())
-            # print('\nTP-In:', p_data.head())
+        elif UseSQL_DBS and self.running and uCalling == 2 or uCalling == 3:
+            import cummulatedSigmaSQL as xig
+            import VarSQL_TT as tt
+
+            d1 = qtt.validCols(self.T1)
+            df1 = pd.DataFrame(self.ttD1, columns=d1)
+            d2 = qtt.validCols(self.T2)
+            df2 = pd.DataFrame(self.ttD2, columns=d2)
+            # --------------------------------------
+            df_data = pd.concat([df1, df2], axis=1)
+            # --------------------------------------
+            # Do some data cleansing & fill interpolation if Nans occurs
+            df_clean = df_data.select_dtypes(include=["number"])
+            df1_interp = df_clean.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+            # --------------------------------------
+            if GPU_ENABLED and is_CuDF: # Convert pandas -> cuDF on GPU
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                TT = tt.loadProcessValue(gpu_df1)
+            # --------------------------------------
+            elif GPU_ENABLED and is_CuPy:
+                # ----- Convert dataframe to CuPy -----
+                data_np = df1_interp.to_numpy().astype(np.float32)      # NumPy first
+                data_cp = cp.asarray(data_np)                           # Then to CuPy
+                # Using uniform_filter1d for efficient rolling mean
+                mean_cp = uniform_filter1d(data_cp, size=s_fetch, axis=0, mode='reflect')
+                squared_cp = uniform_filter1d(data_cp ** 2, size=s_fetch, axis=0, mode='reflect')
+                std_cp = cp.sqrt(squared_cp - mean_cp ** 2)
+                # Transfer results back to CPU
+                xTT = cp.asnumpy(mean_cp)   # xTT[:, 2]
+                sTT = cp.asnumpy(std_cp)    # sTT[:, 2]
+            # --------------------------------------
+            elif is_NumPy:
+                TT = tt.loadProcessValue(df1_interp)
+            # print("Memory Usage:", df_data.info(verbose=False))
+            # print("Stats Usage:", df_data.describe())
+            # print("Memory Usage:", df_data.head())
             # --------------------------------------------[]
         else:
-            TA = 0
-            TB = 0
+            TT = 0
             print('[TT] Unknown Protocol...')
 
         # ------------------------------------------#
         if self.running:
-            # print('Observations DataPoint:', len(TA[3]))
             self.a1.legend(loc='upper right', title='Tape Temp')
             self.a2.legend(loc='upper right', title='Sigma curve')
             # -------------------------------------[]
@@ -6203,94 +6237,307 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             self.im41.set_xdata(np.arange(batch_TT))
 
             # Compute rolling mean on GPU or CPU -
-            if UsePLC_DBS:
-                # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1 TT]
-                self.im10.set_ydata((TT[1]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
-                self.im11.set_ydata((TT[2]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
-                self.im12.set_ydata((TT[3]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
-                self.im13.set_ydata((TT[4]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
-                # S Plot Y-Axis data points for StdDev ----------------------------------------[S Plot]
-                self.im14.set_ydata((TT[1]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im15.set_ydata((TT[2]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im16.set_ydata((TT[3]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im17.set_ydata((TT[4]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+            if uCalling == 1:   # Live Stream on GPU
+                pID = 'TT'
+                if is_CuDF or is_NumPy:
+                    # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1 TT]
+                    self.im10.set_ydata((TT[1]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
+                    self.im11.set_ydata((TT[2]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
+                    self.im12.set_ydata((TT[3]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
+                    self.im13.set_ydata((TT[4]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
+                    # S Plot Y-Axis data points for StdDev ----------------------------------------[S Plot]
+                    self.im14.set_ydata((TT[1]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im15.set_ydata((TT[2]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im16.set_ydata((TT[3]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im17.set_ydata((TT[4]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
 
-                # X Bar Plot for Ring 2 --------------------------------------------------------[ Ring 2 TT]
-                self.im18.set_ydata((TT[5]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
-                self.im19.set_ydata((TT[6]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
-                self.im20.set_ydata((TT[7]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
-                self.im21.set_ydata((TT[8]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
-                # S Plot for Ring 2 -------------------------------------------------------------[S Plot]
-                self.im22.set_ydata((TT[5]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im23.set_ydata((TT[6]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im24.set_ydata((TT[7]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im25.set_ydata((TT[8]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 1'
+                    head1 = TT[1].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head2 = TT[2].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head3 = TT[3].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head4 = TT[4].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    # ------------------------------------------------------------  # Ring 1 Alarms --#
+                    if ttLCL <= head1 <= ttUCL or ttLCL <= head2 <= ttUCL or ttLCL <= head3 <= ttUCL or ttLCL <= head4 <= ttUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif ttLSL <= head1 <= ttUSL or ttLSL <= head2 <= ttUSL or ttLSL <= head3 <= ttUSL or ttLSL <= head4 <= ttUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
 
-                # X Bar Plot for Ring 3 --------------------------------------------------------[ Ring 3 TT]
-                self.im26.set_ydata((TT[9]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
-                self.im27.set_ydata((TT[10]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
-                self.im28.set_ydata((TT[11]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
-                self.im29.set_ydata((TT[12]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
-                # ------ Evaluate Pp for Ring 3 ---------#
-                self.im30.set_ydata((TT[9]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im31.set_ydata((TT[10]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im32.set_ydata((TT[11]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im33.set_ydata((TT[12]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    # X Bar Plot for Ring 2 --------------------------------------------------------[ Ring 2 TT]
+                    self.im18.set_ydata((TT[5]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
+                    self.im19.set_ydata((TT[6]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
+                    self.im20.set_ydata((TT[7]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
+                    self.im21.set_ydata((TT[8]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
+                    # S Plot for Ring 2 -------------------------------------------------------------[S Plot]
+                    self.im22.set_ydata((TT[5]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im23.set_ydata((TT[6]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im24.set_ydata((TT[7]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im25.set_ydata((TT[8]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
 
-                # X Bar Plot for Ring 4 --------------------------------------------------------[ Ring 4 TT]
-                self.im34.set_ydata((TT[13]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
-                self.im35.set_ydata((TT[14]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
-                self.im36.set_ydata((TT[15]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
-                self.im37.set_ydata((TT[16]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
-                # ------ Evaluate Pp for Ring 4 ---------#
-                self.im38.set_ydata((TT[13]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im39.set_ydata((TT[14]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im40.set_ydata((TT[15]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im41.set_ydata((TT[16]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-            else:
-                # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1 TT]
-                self.im10.set_ydata((TA[2]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
-                self.im11.set_ydata((TA[3]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
-                self.im12.set_ydata((TA[4]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
-                self.im13.set_ydata((TA[5]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
-                # S Plot Y-Axis data points for StdDev ----------------------------------------[S Plot]
-                self.im14.set_ydata((TA[2]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im15.set_ydata((TA[3]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im16.set_ydata((TA[4]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im17.set_ydata((TA[5]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 2'
+                    head1 = TT[5].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head2 = TT[6].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head3 = TT[7].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head4 = TT[8].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    # -------------------------------------------------  # Ring 2 Alarms --#
+                    if ttLCL <= head1 <= ttUCL or ttLCL <= head2 <= ttUCL or ttLCL <= head3 <= ttUCL or ttLCL <= head4 <= ttUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif ttLSL <= head1 <= ttUSL or ttLSL <= head2 <= ttUSL or ttLSL <= head3 <= ttUSL or ttLSL <= head4 <= ttUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
 
-                # X Bar Plot for Ring 2 --------------------------------------------------------[ Ring 2 TT]
-                self.im18.set_ydata((TA[6]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
-                self.im19.set_ydata((TA[7]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
-                self.im20.set_ydata((TA[8]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
-                self.im21.set_ydata((TA[9]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
-                # S Plot for Ring 2 -------------------------------------------------------------[S Plot]
-                self.im22.set_ydata((TA[6]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im23.set_ydata((TA[7]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im24.set_ydata((TA[8]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im25.set_ydata((TA[9]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    # X Bar Plot for Ring 3 --------------------------------------------------------[ Ring 3 TT]
+                    self.im26.set_ydata((TT[9]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
+                    self.im27.set_ydata((TT[10]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
+                    self.im28.set_ydata((TT[11]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
+                    self.im29.set_ydata((TT[12]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
+                    # ------ Evaluate Pp for Ring 3 ---------#
+                    self.im30.set_ydata((TT[9]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im31.set_ydata((TT[10]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im32.set_ydata((TT[11]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im33.set_ydata((TT[12]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
 
-                # X Bar Plot for Ring 3 --------------------------------------------------------[ Ring 3 TT]
-                self.im26.set_ydata((TB[2]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
-                self.im27.set_ydata((TB[3]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
-                self.im28.set_ydata((TB[4]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
-                self.im29.set_ydata((TB[5]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
-                # ------ Evaluate Pp for Ring 3 ---------#
-                self.im30.set_ydata((TB[2]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im31.set_ydata((TB[3]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im32.set_ydata((TB[4]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im33.set_ydata((TB[5]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 3'
+                    head1 = TT[9].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head2 = TT[10].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head3 = TT[11].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head4 = TT[12].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    # -------------------------------------------------  # Ring 3 Alarms --#
+                    if ttLCL <= head1 <= ttUCL or ttLCL <= head2 <= ttUCL or ttLCL <= head3 <= ttUCL or ttLCL <= head4 <= ttUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif ttLSL <= head1 <= ttUSL or ttLSL <= head2 <= ttUSL or ttLSL <= head3 <= ttUSL or ttLSL <= head4 <= ttUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
 
-                # X Bar Plot for Ring 4 --------------------------------------------------------[ Ring 4 TT]
-                self.im34.set_ydata((TB[6]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
-                self.im35.set_ydata((TB[7]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
-                self.im36.set_ydata((TB[8]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
-                self.im37.set_ydata((TB[9]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
-                # ------ Evaluate Pp for Ring 4 ---------#
-                self.im38.set_ydata((TB[6]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im39.set_ydata((TB[7]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im40.set_ydata((TB[8]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
-                self.im41.set_ydata((TB[9]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    # X Bar Plot for Ring 4 --------------------------------------------------------[ Ring 4 TT]
+                    self.im34.set_ydata((TT[13]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
+                    self.im35.set_ydata((TT[14]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
+                    self.im36.set_ydata((TT[15]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
+                    self.im37.set_ydata((TT[16]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
+                    # ------ Evaluate Pp for Ring 4 ---------#
+                    self.im38.set_ydata((TT[13]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im39.set_ydata((TT[14]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im40.set_ydata((TT[15]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im41.set_ydata((TT[16]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 4'
+                    head1 = TT[13].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head2 = TT[14].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head3 = TT[15].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    head4 = TT[16].rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT]
+                    # -------------------------------------------------  # Ring 4 Alarms --#
+                    if ttLCL <= head1 <= ttUCL or ttLCL <= head2 <= ttUCL or ttLCL <= head3 <= ttUCL or ttLCL <= head4 <= ttUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif ttLSL <= head1 <= ttUSL or ttLSL <= head2 <= ttUSL or ttLSL <= head3 <= ttUSL or ttLSL <= head4 <= ttUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+
+                # ------------------------------------------------------------------------------[]
+                elif GPU_ENABLED and is_CuPy:  # Live Stream on GPU
+                    # X Plot Y-Axis data points for XBar ---------------------------------[Ring 1 TT]
+                    self.im10.set_ydata((xTT[:, 1])[0:batch_TT])  # head 1
+                    self.im11.set_ydata((xTT[:, 2])[0:batch_TT])  # head 2
+                    self.im12.set_ydata((xTT[:, 3])[0:batch_TT])  # head 3
+                    self.im13.set_ydata((xTT[:, 4])[0:batch_TT])  # head 4
+                    # S Plot Y-Axis data points for StdDev -------------------------------[S Plot]
+                    self.im14.set_ydata((sTT[:, 1])[0:batch_TT])
+                    self.im15.set_ydata((sTT[:, 2])[0:batch_TT])
+                    self.im16.set_ydata((sTT[:, 3])[0:batch_TT])
+                    self.im17.set_ydata((sTT[:, 4])[0:batch_TT])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals -----------[]
+                    rID = 'Ring 1'
+                    head1 = xTT[:, 1][0:batch_TT]
+                    head2 = xTT[:, 2][0:batch_TT]
+                    head3 = xTT[:, 3][0:batch_TT]
+                    head4 = xTT[:, 4][0:batch_TT]
+                    # ------------------------------------------------------------  # Ring 1 Alarms
+                    if ttLCL <= head1 <= ttUCL or ttLCL <= head2 <= ttUCL or ttLCL <= head3 <= ttUCL or ttLCL <= head4 <= ttUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif ttLSL <= head1 <= ttUSL or ttLSL <= head2 <= ttUSL or ttLSL <= head3 <= ttUSL or ttLSL <= head4 <= ttUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+
+                    # X Bar Plot for Ring 2 -----------------------------------------[ Ring 2 TT]
+                    self.im18.set_ydata((xTT[:, 5])[0:batch_TT])  # head 1
+                    self.im19.set_ydata((xTT[:, 6])[0:batch_TT])  # head 2
+                    self.im20.set_ydata((xTT[:, 7])[0:batch_TT])  # head 3
+                    self.im21.set_ydata((xTT[:, 8])[0:batch_TT])  # head 4
+                    # S Plot for Ring 2 ---------------------------------------------[S Plot]
+                    self.im22.set_ydata((sTT[:, 5])[0:batch_TT])
+                    self.im23.set_ydata((sTT[:, 6])[0:batch_TT])
+                    self.im24.set_ydata((sTT[:, 7])[0:batch_TT])
+                    self.im25.set_ydata((sTT[:, 8])[0:batch_TT])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals -------[]
+                    rID = 'Ring 2'
+                    head1 = xTT[:, 5][0:batch_TT]
+                    head2 = xTT[:, 6][0:batch_TT]
+                    head3 = xTT[:, 7][0:batch_TT]
+                    head4 = xTT[:, 8][0:batch_TT]
+                    # ------------------------------------------------------------  # Ring 2 Alarms
+                    if ttLCL <= head1 <= ttUCL or ttLCL <= head2 <= ttUCL or ttLCL <= head3 <= ttUCL or ttLCL <= head4 <= ttUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif ttLSL <= head1 <= ttUSL or ttLSL <= head2 <= ttUSL or ttLSL <= head3 <= ttUSL or ttLSL <= head4 <= ttUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+
+                    # X Bar Plot for Ring 3 -----------------------------------------[ Ring 3 TT]
+                    self.im26.set_ydata((TT[:, 10])[0:batch_TT])  # head 1
+                    self.im27.set_ydata((TT[:, 11])[0:batch_TT])  # head 2
+                    self.im28.set_ydata((TT[:, 12])[0:batch_TT])  # head 3
+                    self.im29.set_ydata((TT[:, 13])[0:batch_TT])  # head 4
+                    # ------ Evaluate Pp for Ring 3 ---------#
+                    self.im30.set_ydata((TT[:, 10])[0:batch_TT])
+                    self.im31.set_ydata((TT[:, 11])[0:batch_TT])
+                    self.im32.set_ydata((TT[:, 12])[0:batch_TT])
+                    self.im33.set_ydata((TT[:, 13])[0:batch_TT])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 3'
+                    head1 = xTT[:, 10][0:batch_TT]
+                    head2 = xTT[:, 11][0:batch_TT]
+                    head3 = xTT[:, 12][0:batch_TT]
+                    head4 = xTT[:, 13][0:batch_TT]
+                    # ------------------------------------------------------------  # Ring 3 Alarms
+                    if ttLCL <= head1 <= ttUCL or ttLCL <= head2 <= ttUCL or ttLCL <= head3 <= ttUCL or ttLCL <= head4 <= ttUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif ttLSL <= head1 <= ttUSL or ttLSL <= head2 <= ttUSL or ttLSL <= head3 <= ttUSL or ttLSL <= head4 <= ttUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+
+                    # X Bar Plot for Ring 4 -------------------------------------------[ Ring 4 TT]
+                    self.im34.set_ydata((xTT[:, 14])[0:batch_TT])  # head 1
+                    self.im35.set_ydata((xTT[:, 15])[0:batch_TT])  # head 2
+                    self.im36.set_ydata((xTT[:, 16])[0:batch_TT])  # head 3
+                    self.im37.set_ydata((xTT[:, 17])[0:batch_TT])  # head 4
+                    # ------ Evaluate Pp for Ring 4 ---------#
+                    self.im38.set_ydata((sTT[:, 14])[0:batch_TT])
+                    self.im39.set_ydata((sTT[:, 15])[0:batch_TT])
+                    self.im40.set_ydata((sTT[:, 16])[0:batch_TT])
+                    self.im41.set_ydata((sTT[:, 17])[0:batch_TT])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 4'
+                    head1 = xTT[:, 14][0:batch_TT]
+                    head2 = xTT[:, 15][0:batch_TT]
+                    head3 = xTT[:, 16][0:batch_TT]
+                    head4 = xTT[:, 17][0:batch_TT]
+                    # ------------------------------------------------------------  # Ring 4 Alarms
+                    if ttLCL <= head1 <= ttUCL or ttLCL <= head2 <= ttUCL or ttLCL <= head3 <= ttUCL or ttLCL <= head4 <= ttUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif ttLSL <= head1 <= ttUSL or ttLSL <= head2 <= ttUSL or ttLSL <= head3 <= ttUSL or ttLSL <= head4 <= ttUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+
+            elif UseSQL_DBS and uCalling == 2 or uCalling == 3: # No alarms / warning on PPA
+                if GPU_ENABLED and is_CuDF:
+                    pass        # Not implemented yet
+
+                elif GPU_ENABLED and is_CuPy:
+                    self.im10.set_ydata((xTT[:, 1])[0:batch_TT])  # head 1
+                    self.im11.set_ydata((xTT[:, 2])[0:batch_TT])  # head 2
+                    self.im12.set_ydata((xTT[:, 3])[0:batch_TT])  # head 3
+                    self.im13.set_ydata((xTT[:, 4])[0:batch_TT])  # head 4
+                    # S Plot Y-Axis data points for StdDev ------------------------[S Plot]
+                    self.im14.set_ydata((sTT[:, 1])[0:batch_TT])
+                    self.im15.set_ydata((sTT[:, 2])[0:batch_TT])
+                    self.im16.set_ydata((sTT[:, 3])[0:batch_TT])
+                    self.im17.set_ydata((sTT[:, 4])[0:batch_TT])
+                    # ---
+                    head1 = xTT[:, 1][0:batch_TT]
+                    head2 = xTT[:, 2][0:batch_TT]
+                    head3 = xTT[:, 3][0:batch_TT]
+                    head4 = xTT[:, 4][0:batch_TT]
+                    meanR1 = [head1, head2, head3, head4]
+                    # X Bar Plot for Ring 2 --------------------------------------[ Ring 2 TT]
+                    self.im18.set_ydata((xTT[:, 5])[0:batch_TT])  # head 1
+                    self.im19.set_ydata((xTT[:, 6])[0:batch_TT])  # head 2
+                    self.im20.set_ydata((xTT[:, 7])[0:batch_TT])  # head 3
+                    self.im21.set_ydata((xTT[:, 8])[0:batch_TT])  # head 4
+                    # S Plot for Ring 2 ------------------------------------------[S Plot]
+                    self.im22.set_ydata((sTT[:, 5])[0:batch_TT])
+                    self.im23.set_ydata((sTT[:, 6])[0:batch_TT])
+                    self.im24.set_ydata((sTT[:, 7])[0:batch_TT])
+                    self.im25.set_ydata((sTT[:, 8])[0:batch_TT])
+                    # ---
+                    head1 = xTT[:, 5][0:batch_TT]
+                    head2 = xTT[:, 6][0:batch_TT]
+                    head3 = xTT[:, 7][0:batch_TT]
+                    head4 = xTT[:, 8][0:batch_TT]
+                    meanR2 = [head1, head2, head3, head4]
+
+                    # X Bar Plot for Ring 3 --------------------------------------[Ring 3 TT]
+                    self.im26.set_ydata((xTT[:, 10])[0:batch_TT])  # head 1
+                    self.im27.set_ydata((xTT[:, 11])[0:batch_TT])  # head 2
+                    self.im28.set_ydata((xTT[:, 12])[0:batch_TT])  # head 3
+                    self.im29.set_ydata((xTT[:, 13])[0:batch_TT])  # head 4
+                    # ------ Evaluate Pp for Ring 3 ---------#
+                    self.im30.set_ydata((sTT[:, 10])[0:batch_TT])
+                    self.im31.set_ydata((sTT[:, 11])[0:batch_TT])
+                    self.im32.set_ydata((sTT[:, 12])[0:batch_TT])
+                    self.im33.set_ydata((sTT[:, 13])[0:batch_TT])
+                    # ---
+                    head1 = xTT[:, 10][0:batch_TT]
+                    head2 = xTT[:, 11][0:batch_TT]
+                    head3 = xTT[:, 12][0:batch_TT]
+                    head4 = xTT[:, 13][0:batch_TT]
+                    meanR3 = [head1, head2, head3, head4]
+
+                    # X Bar Plot for Ring 4 -------------------------------------[ Ring 4 TT]
+                    self.im34.set_ydata((xTT[:, 14])[0:batch_TT])  # head 1
+                    self.im35.set_ydata((xTT[:, 15])[0:batch_TT])  # head 2
+                    self.im36.set_ydata((xTT[:, 16])[0:batch_TT])  # head 3
+                    self.im37.set_ydata((xTT[:, 17])[0:batch_TT])  # head 4
+                    # ------ Evaluate Pp for Ring 4 ---------#
+                    self.im38.set_ydata((sTT[:, 14])[0:batch_TT])
+                    self.im39.set_ydata((sTT[:, 15])[0:batch_TT])
+                    self.im40.set_ydata((sTT[:, 16])[0:batch_TT])
+                    self.im41.set_ydata((sTT[:, 17])[0:batch_TT])
+                    # ---
+                    head1 = xTT[:, 14][0:batch_TT]
+                    head2 = xTT[:, 15][0:batch_TT]
+                    head3 = xTT[:, 16][0:batch_TT]
+                    head4 = xTT[:, 17][0:batch_TT]
+                    meanR4 = [head1, head2, head3, head4]
+
+                elif is_NumPy:
+                    # X Plot Y-Axis data points for XBar --------------------------------------------[Ring 1 TT]
+                    self.im10.set_ydata((TT[1]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
+                    self.im11.set_ydata((TT[2]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
+                    self.im12.set_ydata((TT[3]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
+                    self.im13.set_ydata((TT[4]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
+                    # S Plot Y-Axis data points for StdDev ----------------------------------------[S Plot]
+                    self.im14.set_ydata((TT[1]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im15.set_ydata((TT[2]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im16.set_ydata((TT[3]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im17.set_ydata((TT[4]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+
+                    # X Bar Plot for Ring 2 --------------------------------------------------------[ Ring 2 TT]
+                    self.im18.set_ydata((TT[5]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
+                    self.im19.set_ydata((TT[6]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
+                    self.im20.set_ydata((TT[7]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
+                    self.im21.set_ydata((TT[8]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
+                    # S Plot for Ring 2 -------------------------------------------------------------[S Plot]
+                    self.im22.set_ydata((TT[5]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im23.set_ydata((TT[6]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im24.set_ydata((TT[7]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im25.set_ydata((TT[8]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+
+                    # X Bar Plot for Ring 3 --------------------------------------------------------[ Ring 3 TT]
+                    self.im26.set_ydata((TT[10]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
+                    self.im27.set_ydata((TT[11]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
+                    self.im28.set_ydata((TT[12]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
+                    self.im29.set_ydata((TT[13]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
+                    # ------ Evaluate Pp for Ring 3 ---------#
+                    self.im30.set_ydata((TT[10]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im31.set_ydata((TT[11]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im32.set_ydata((TT[12]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im33.set_ydata((TT[13]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+
+                    # X Bar Plot for Ring 4 --------------------------------------------------------[ Ring 4 TT]
+                    self.im34.set_ydata((TT[14]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 1
+                    self.im35.set_ydata((TT[15]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 2
+                    self.im36.set_ydata((TT[16]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 3
+                    self.im37.set_ydata((TT[17]).rolling(window=s_fetch, min_periods=1).mean()[0:batch_TT])  # head 4
+                    # ------ Evaluate Pp for Ring 4 ---------#
+                    self.im38.set_ydata((TT[14]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im39.set_ydata((TT[15]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im40.set_ydata((TT[16]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+                    self.im41.set_ydata((TT[17]).rolling(window=s_fetch, min_periods=1).std()[0:batch_TT])
+
 
             # Declare Plots attributes --------------------------------------------------------[]
             # XBar Mean Plot
@@ -6311,16 +6558,20 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             if batch_TT > self.win_Xmax:
                 self.a1.set_xlim(batch_TT - self.win_Xmax, batch_TT)
                 self.a2.set_xlim(batch_TT - self.win_Xmax, batch_TT)
-                TA.pop(0) # reset batch no
-                TB.pop(0)
+                if is_CuPy:
+                    xTT.pop(0)
+                    sTT.pop(0)
+                else:
+                    TT.pop(0) # reset batch no
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)
             self.canvas.draw_idle()
 
             # Set trip line for individual time-series plot -----------------------------------[R1]
-            # sigma = gma.trigViolations(self.a1, uCalling, TT, self.y_minTT, self.y_maxTT, ttUCL, ttLCL, ttUSL, ttLSL, ttMean, ttDev)
-
+            if uCalling == 1:
+                meanSig = [meanR1, meanR2, meanR3, meanR4]
+                sigma = gma.trigViolations(self.a1, uCalling, meanSig, self.y_minTT, self.y_maxTT, ttUCL, ttLCL, ttUSL, ttLSL, ttMean, ttDev)
 
         else:
             print('[TT] in standby mode, no active session...')
@@ -6339,16 +6590,31 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         timei = time.time()  # start timing the entire loop
 
         # Call data loader Method-----------------------#
-        if UseSQL_DBS and self.runRMP:
+        if self.runRMP:
             import VarSQL_RC as rc
             g3 = qrc.validCols(self.T3)
             d3 = pd.DataFrame(self.rmD3, columns=g3)
-            # Do some data cleansing ------------[Perform back or forward fill interpolation if Nans occurs]
-            data1 = d3.apply(pd.to_numeric, errors="coerce")
-            df3 = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-            # print(df3.dtypes)
-            # --------------------------------------#
-            RM = rc.loadProcesValues(df3)
+            # Do some data cleansing [Perform back or forward fill interpolation if Nans occurs]
+            df1 = d3.apply(pd.to_numeric, errors="coerce")
+            df1_interp = df1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+
+            if GPU_ENABLED and is_CuDF:  # Convert pandas -> cuDF on GPU
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                RM = rc.loadProcesValues(gpu_df1)
+
+            elif GPU_ENABLED and is_CuPy:
+                # ----- Convert dataframe to CuPy -----
+                data_np = df1_interp.to_numpy().astype(np.float32)  # NumPy first
+                data_cp = cp.asarray(data_np)                       # Then to CuPy
+
+                # Using uniform_filter1d for efficient rolling mean
+                # insert any transformation if required: e.g. 3d annimation, etc
+
+                # Transfer results back to CPU
+                RM = rc.loadProcesValues(df1_interp)
+                # ----------------------------------
+            elif is_NumPy:
+                RM = rc.loadProcesValues(df1_interp)
             # --------------------------------------#
 
         else:
@@ -6387,7 +6653,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         print(f"[RMP] Process Interval: {lapsedT} sec\n")
     # -----Canvas update ----------------------------------------[]
 
-# -----------------------------------------------------------------[Substrate Temperature]
+# ---------------------------------------------------------------------[Subst Temperature]
 class substTempTabb(ttk.Frame):
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
@@ -6404,7 +6670,7 @@ class substTempTabb(ttk.Frame):
     # ------------------------ Ramp Profiling Static Data Call/Stop Call ------------------[]
     def createProcessST(self):
         """Create the widgets for the GUI"""
-        global xUCL, xLCL, xMean, sDev, sUCL, sLCL, xUSL, xLSL
+        global stUCL, stLCL, stMean, stDev, sUCLst, sLCLst, stUSL, stLSL, YScale_minST, YScale_maxST
 
         # Load Quality Historical Values -----------[]
         if pRecipe == 'DNV':
@@ -6441,72 +6707,72 @@ class substTempTabb(ttk.Frame):
             dLayer5 = Fiv[10].strip("' ")
             # Load historical limits for the process--------#
             if cpTapeW == dTape1 and cpLayerNo <= 1:        # '22mm'|'18mm',  1-40 | 41+
-                xUCL = float(One[2].strip("' "))           # Strip out the element of the list
-                xLCL = float(One[3].strip("' "))
-                xMean = float(One[4].strip("' "))
-                sDev = float(One[5].strip("' "))
+                stUCL = float(One[2].strip("' "))           # Strip out the element of the list
+                stLCL = float(One[3].strip("' "))
+                stMean = float(One[4].strip("' "))
+                stDev = float(One[5].strip("' "))
                 # --------------------------------
-                sUCL = float(One[6].strip("' "))
-                sLCL = float(One[7].strip("' "))
+                sUCLst = float(One[6].strip("' "))
+                sLCLst = float(One[7].strip("' "))
                 # --------------------------------
-                xUSL = (xUCL - xMean) / 3 * 6
-                xLSL = (xMean - xLCL) / 3 * 6
+                stUSL = (stUCL - stMean) / 3 * 6
+                stLSL = (stMean - stLCL) / 3 * 6
                 # --------------------------------
             elif cpTapeW == dTape2 and cpLayerNo == 2:
-                xUCL = float(Two[2].strip("' "))           # Strip out the element of the list
-                xLCL = float(Two[3].strip("' "))
-                xMean = float(Two[4].strip("' "))
+                stUCL = float(Two[2].strip("' "))           # Strip out the element of the list
+                stLCL = float(Two[3].strip("' "))
+                stMean = float(Two[4].strip("' "))
                 sDev = float(Two[5].strip("' "))
                 # --------------------------------
-                sUCL = float(Two[6].strip("' "))
-                sLCL = float(Two[7].strip("' "))
+                sUCLst = float(Two[6].strip("' "))
+                sLCLst = float(Two[7].strip("' "))
                 # --------------------------------
-                xUSL = (xUCL - xMean) / 3 * 6
-                xLSL = (xMean - xLCL) / 3 * 6
+                stUSL = (stUCL - stMean) / 3 * 6
+                stLSL = (stMean - stLCL) / 3 * 6
             elif cpTapeW == dTape3 and cpLayerNo == range(3, 40):
-                xUCL = float(Thr[2].strip("' "))           # Strip out the element of the list
-                xLCL = float(Thr[3].strip("' "))
-                xMean = float(Thr[4].strip("' "))
-                sDev = float(Thr[5].strip("' "))
+                stUCL = float(Thr[2].strip("' "))           # Strip out the element of the list
+                stLCL = float(Thr[3].strip("' "))
+                stMean = float(Thr[4].strip("' "))
+                stDev = float(Thr[5].strip("' "))
                 # --------------------------------
-                sUCL = float(Thr[6].strip("' "))
-                sLCL = float(Thr[7].strip("' "))
+                sUCLst = float(Thr[6].strip("' "))
+                sLCLst = float(Thr[7].strip("' "))
                 # --------------------------------
-                xUSL = (xUCL - xMean) / 3 * 6
-                xLSL = (xMean - xLCL) / 3 * 6
+                stUSL = (stUCL - stMean) / 3 * 6
+                stLSL = (stMean - stLCL) / 3 * 6
             elif cpTapeW == dTape4 and cpLayerNo == 41:
-                xUCL = float(For[2].strip("' "))           # Strip out the element of the list
-                xLCL = float(For[3].strip("' "))
-                xMean = float(For[4].strip("' "))
-                sDev = float(For[5].strip("' "))
+                stUCL = float(For[2].strip("' "))           # Strip out the element of the list
+                stLCL = float(For[3].strip("' "))
+                stMean = float(For[4].strip("' "))
+                stDev = float(For[5].strip("' "))
                 # --------------------------------
-                sUCL = float(For[6].strip("' "))
-                sLCL = float(For[7].strip("' "))
+                sUCLst = float(For[6].strip("' "))
+                sLCLst = float(For[7].strip("' "))
                 # --------------------------------
-                xUSL = (xUCL - xMean) / 3 * 6
-                xLSL = (xMean - xLCL) / 3 * 6
+                stUSL = (stUCL - stMean) / 3 * 6
+                stLSL = (stMean - stLCL) / 3 * 6
             else:
-                xUCL = float(Fiv[2].strip("' "))           # Strip out the element of the list
-                xLCL = float(Fiv[3].strip("' "))
-                xMean = float(Fiv[4].strip("' "))
-                sDev = float(Fiv[5].strip("' "))
+                stUCL = float(Fiv[2].strip("' "))           # Strip out the element of the list
+                stLCL = float(Fiv[3].strip("' "))
+                stMean = float(Fiv[4].strip("' "))
+                stDev = float(Fiv[5].strip("' "))
                 # --------------------------------
-                sUCL = float(Fiv[6].strip("' "))
-                sLCL = float(Fiv[7].strip("' "))
+                sUCLst = float(Fiv[6].strip("' "))
+                sLCLst = float(Fiv[7].strip("' "))
                 # --------------------------------
-                xUSL = (xUCL - xMean) / 3 * 6
-                xLSL = (xMean - xLCL) / 3 * 6
+                stUSL = (stUCL - stMean) / 3 * 6
+                stLSL = (stMean - stLCL) / 3 * 6
                 # -------------------------------
         else:  # Computes Shewhart constants (Automatic Limits)
             print('Loading arbitrary values for the plot..')
-            xUCL = 500
-            xLCL = 100
-            xMean = 250
-            sDev = 100
-            sUCL = 200
-            sLCL = 10
-            xUSL = 550
-            xLSL = 5
+            stUCL = 500
+            stLCL = 100
+            stMean = 250
+            stDev = 100
+            sUCLst = 200
+            sLCLst = 10
+            stUSL = 550
+            stLSL = 5
             self.stPerf = '$Cp_{k' + str(self.stS) + '}$'           # Using Automatic group Mean
             self.stlabel = 'Cp'
 
@@ -6524,8 +6790,8 @@ class substTempTabb(ttk.Frame):
         # Declare Plots attributes --------------------------------[]
         plt.rcParams.update({'font.size': 7})                       # Reduce font size to 7pt for all legends
         # Calibrate limits for X-moving Axis -----------------------#
-        YScale_minST, YScale_maxST = xLSL - 8.5, xUSL + 8.5
-        self.sBar_minST, self.sBar_maxST = sLCL - 80, sUCL + 80     # Calibrate Y-axis for S-Plot
+        YScale_minST, YScale_maxST = stLSL - 8.5, stUSL + 8.5
+        self.sBar_minST, self.sBar_maxST = sLCLst - 80, sUCLst + 80     # Calibrate Y-axis for S-Plot
         self.win_Xmin, self.win_Xmax = 0, 120                       # windows view = visible data points
 
         # Load SQL Query Table -------------------------------------#
@@ -6718,41 +6984,69 @@ class substTempTabb(ttk.Frame):
         timei = time.time()                                 # start timing the entire loop
 
         # Call data loader Method---------------------#
-        if UsePLC_DBS and self.running:
+        if UsePLC_DBS and uCalling == 1 and self.running:
+            import cummulatedSigmaPLC as xig
             import VarPLC_ST as st
+
             # Call synchronous data function ---------[]
-            g1 = qst.validCols(self.T1)                         # Load defined valid columns for PLC Data
-            df1 = pd.DataFrame(self.stDta, columns=g1)          # Include table data into python Dataframe
+            g1 = qst.validCols(self.T1)
+            df1 = pd.DataFrame(self.stDta, columns=g1)
             # ------------------------------------------#
             # Do some data cleansing & interpolation if Nans occurs
             data1 = df1.select_dtypes(include=["number"])
             df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+
             # Convert pandas -> cuDF
-            if GPU_ENABLED:
+            if GPU_ENABLED and is_CuDF:
                 gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 ST = st.loadProcesValues(gpu_df1)                    # Join data values under dataframe
-            else:
-                ST = st.loadProcesValues(df1_interp)                 # Join data values under dataframe
-            # print("Memory Usage:", df1.info(verbose=False))
 
-        elif UseSQL_DBS and self.running:
+            elif GPU_ENABLED and is_CuPy:
+                # ----- Convert dataframe to CuPy -----
+                data_np = df1_interp.to_numpy().astype(np.float32)  # NumPy first
+                data_cp = cp.asarray(data_np)  # Then to CuPy
+                # Using uniform_filter1d for efficient rolling mean
+                mean_cp = uniform_filter1d(data_cp, size=s_fetch, axis=0, mode='reflect')
+                squared_cp = uniform_filter1d(data_cp ** 2, size=s_fetch, axis=0, mode='reflect')
+                std_cp = cp.sqrt(squared_cp - mean_cp ** 2)
+                # Transfer results back to CPU
+                xST = cp.asnumpy(mean_cp)  # xTT[:, 2]
+                sST = cp.asnumpy(std_cp)  # sTT[:, 2]
+            elif is_NumPy:
+                ST = st.loadProcesValues(df1_interp)                 # Join data values under dataframe
+
+        elif UseSQL_DBS and self.running and uCalling == 2 or uCalling == 3:
             import VarSQL_ST as st
             g1 = qst.validCols(self.T1)                     # Construct Data Column selSqlColumnsTFM.py
             d1 = pd.DataFrame(self.stDta, columns=g1)       # Import into python Dataframe
             g2 = qst.validCols(self.T2)
             d2 = pd.DataFrame(self.stDtb, columns=g2)
-
+            # --------------------------------------
             p_data = pd.concat([d1, d2], axis=1)
-            # ----------------------------------
+            # --------------------------------------
             # Do some data cleansing & interpolation if Nans occurs
             data1 = p_data.select_dtypes(include=["number"])
             df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-            # Convert pandas -> cuDF
-            if not GPU_ENABLED:
-                gpu_df1 = cp.asarray(df1_interp.select_dtypes(include="number").to_numpy())
-                # gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+            # --------------------------------------
+            if is_CuDF: # GPU_Enabled for CuDF-CUDA
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 ST = st.loadProcesValues(gpu_df1)
-            else:
+                # --------------------------------------
+            elif is_CuPy:  # GPU_Enabled for CuPy-CUDA
+                data_np = df1_interp.to_numpy().astype(np.float32)  # NumPy first
+                data_cp = cp.asarray(data_np)
+                mean_cp = uniform_filter1d(data_cp, size=s_fetch, axis=0, mode='reflect')
+                squared_cp = uniform_filter1d(data_cp ** 2, size=s_fetch, axis=0, mode='reflect')
+                std_cp = cp.sqrt(squared_cp - mean_cp ** 2)
+                # Transfer results back to CPU ------
+                xST = cp.asnumpy(mean_cp)   # xTT[:, 2]
+                sST = cp.asnumpy(std_cp)    # sTT[:, 2]
+
+                # You can flatten the 2D array if you like
+                values_list = xST.flatten().tolist()
+                # print('TP02', values_list)
+            # --------------------------------------
+            elif is_NumPy:      # CPU fall back
                 ST = st.loadProcesValues(df1_interp)
             # ---------------------------------
             # print('\nSQL Content [ST]', p_data.head())
@@ -6801,82 +7095,510 @@ class substTempTabb(ttk.Frame):
             self.im39.set_xdata(np.arange(batch_ST))
             self.im40.set_xdata(np.arange(batch_ST))
             self.im41.set_xdata(np.arange(batch_ST))
-            # X Plot Y-Axis data points for XBar --------------------------------------------[# Ring 1 ]
-            self.im10.set_ydata((ST[3]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
-            self.im11.set_ydata((ST[4]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
-            self.im12.set_ydata((ST[5]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
-            self.im13.set_ydata((ST[6]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
-            # S Plot Y-Axis data points for StdDev ----------------------------------------------
-            self.im14.set_ydata((ST[3]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im15.set_ydata((ST[4]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im16.set_ydata((ST[5]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im17.set_ydata((ST[6]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            # ------ Evaluate Pp for Ring 1 ---------#
-            rMa = ((ST[3]).mean() + (ST[4]).mean() + (ST[5]).mean() + (ST[6]).mean()).mean()
-            sda = [ST[3].std(), ST[4].std(), ST[5].std(), ST[6].std()]
-            sMa = np.std(sda)
-            PpA, PkA = tz.processCap(rMa, sMa, xUSL, xLSL, self.stS)
-            # ---------------------------------------#
-            self.im18.set_ydata((ST[7]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
-            self.im19.set_ydata((ST[8]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
-            self.im20.set_ydata((ST[9]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
-            self.im21.set_ydata((ST[10]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
-            # # S Plot Y-Axis data points for StdDev ---------------------------------------#
-            self.im22.set_ydata((ST[7]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im23.set_ydata((ST[8]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im24.set_ydata((ST[9]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im25.set_ydata((ST[10]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            # ------ Evaluate Pp for Ring 2 ---------#
-            rMb = ((ST[7]).mean() + (ST[8]).mean() + (ST[9]).mean() + (ST[10]).mean()).mean()
-            sdb = [ST[7].std(), ST[8].std(), ST[9].std(), ST[10].std()]
-            sMb = np.std(sdb)
-            PpB, PkB = tz.processCap(rMb, sMb, xUSL, xLSL, self.stS)
-            # ---------------------------------------#
-            self.im26.set_ydata((ST[14]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
-            self.im27.set_ydata((ST[15]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
-            self.im28.set_ydata((ST[16]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
-            self.im29.set_ydata((ST[17]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
-            # # S Plot Y-Axis data points for StdDev ---------------------------------------#
-            self.im30.set_ydata((ST[14]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im31.set_ydata((ST[15]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im32.set_ydata((ST[16]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im33.set_ydata((ST[17]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            # ------ Evaluate Pp for Ring 3 ---------#
-            rMc = ((ST[14]).mean() + (ST[15]).mean() + (ST[16]).mean() + (ST[17]).mean()).mean()
-            sdc = [ST[14].std(), ST[15].std(), ST[16].std(), ST[17].std()]
-            sMc = np.std(sdc)
-            PpC, PkC = tz.processCap(rMc, sMc, xUSL, xLSL, self.stS)
-            # ---------------------------------------#
-            self.im34.set_ydata((ST[18]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
-            self.im35.set_ydata((ST[19]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
-            self.im36.set_ydata((ST[20]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
-            self.im37.set_ydata((ST[21]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
-            # S Plot Y-Axis data points for StdDev --------------------------------------------#
-            self.im38.set_ydata((ST[18]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im39.set_ydata((ST[19]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im40.set_ydata((ST[20]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            self.im41.set_ydata((ST[21]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
-            # ------ Evaluate Pp for Ring 4 ---------#
-            rMd = ((ST[18]).mean() + (ST[19]).mean() + (ST[20]).mean() + (ST[21]).mean()).mean()
-            sdd = [ST[18].std(), ST[19].std(), ST[20].std(), ST[21].std()]
-            sMd = np.std(sdd)
-            PpD, PkD = tz.processCap(rMd, sMd, xUSL, xLSL, self.stS)
-            # ---------------------------------------#
-            # Compute for ST Process PP/Cpk ------------#
-            # Cp, Cpk = tz.hisCap(stMean, stDev, stUSL, stLSL)
-            Cp, Cpk = tz.processCap(xMean, sDev, xUSL, xLSL, self.stS)
+
+            if uCalling == 1:
+                pID = 'ST'
+                if is_CuDF or is_NumPy: # Live Stream from GPU with fallback on CPU
+                    # X Plot Y-Axis data points for XBar --------------------------------------------[# Ring 1 ]
+                    self.im10.set_ydata((ST[1]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
+                    self.im11.set_ydata((ST[2]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
+                    self.im12.set_ydata((ST[3]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
+                    self.im13.set_ydata((ST[4]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
+                    # S Plot Y-Axis data points for StdDev ----------------------------------------------
+                    self.im14.set_ydata((ST[1]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im15.set_ydata((ST[2]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im16.set_ydata((ST[3]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im17.set_ydata((ST[4]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    # ------ Evaluate Pp for Ring 1 ---------#
+                    rID = 'Ring 1'
+                    head1 = ST[1].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head2 = ST[2].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head3 = ST[3].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head4 = ST[4].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    # ----------Std [std(x) = sqrt(mean(x^2) - mean(x)^2)] ----------------#
+                    head_1 = ST[1].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_2 = ST[2].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_3 = ST[3].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_4 = ST[4].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    # ------------ Compute for Process Performace on Ring 1 ---------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpA, PkA = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 1 PCap
+                    # ------------------------------------------------------------  # Ring 1 Alarms --#
+                    if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    # ---------------------------------------#
+                    self.im18.set_ydata((ST[5]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
+                    self.im19.set_ydata((ST[6]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
+                    self.im20.set_ydata((ST[7]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
+                    self.im21.set_ydata((ST[8]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
+                    # # S Plot Y-Axis data points for StdDev ---------------------------------------#
+                    self.im22.set_ydata((ST[5]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im23.set_ydata((ST[6]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im24.set_ydata((ST[7]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im25.set_ydata((ST[8]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    # ------ Evaluate Pp for Ring 2 ---------------------------------------#
+                    rID = 'Ring 2'
+                    head1 = ST[5].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head2 = ST[6].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head3 = ST[7].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head4 = ST[8].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    # ----------Std [std(x) = sqrt(mean(x^2) - mean(x)^2)] ----------------#
+                    head_1 = ST[5].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_2 = ST[6].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_3 = ST[7].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_4 = ST[8].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    # ------------ Compute for Process Performace on Ring 2 ---------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpB, PkB = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 2 PCap
+                    # ------------------------------------------------------------  # Ring 2 Alarms --#
+                    if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    # ---------------------------------------#
+                    self.im26.set_ydata((ST[9]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
+                    self.im27.set_ydata((ST[10]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
+                    self.im28.set_ydata((ST[11]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
+                    self.im29.set_ydata((ST[12]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
+                    # # S Plot Y-Axis data points for StdDev ---------------------------------------#
+                    self.im30.set_ydata((ST[9]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im31.set_ydata((ST[10]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im32.set_ydata((ST[11]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im33.set_ydata((ST[12]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    # ------ Evaluate Pp for Ring 3 -----------------------------------------#
+                    rID = 'Ring 3'
+                    head1 = ST[9].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head2 = ST[10].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head3 = ST[11].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head4 = ST[12].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    # ----------Std [std(x) = sqrt(mean(x^2) - mean(x)^2)] ----------------#
+                    head_1 = ST[9].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_2 = ST[10].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_3 = ST[11].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_4 = ST[12].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    # ------------ Compute for Process Performace on Ring 3 ----------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpC, PkC = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 3 PCap
+                    # ------------------------------------------------------------  # Ring 3 Alarms --#
+                    if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    # --------------------------------------------------------------------------------#
+                    self.im34.set_ydata((ST[13]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
+                    self.im35.set_ydata((ST[14]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
+                    self.im36.set_ydata((ST[15]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
+                    self.im37.set_ydata((ST[16]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
+                    # S Plot Y-Axis data points for StdDev --------------------------------------------#
+                    self.im38.set_ydata((ST[13]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im39.set_ydata((ST[14]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im40.set_ydata((ST[15]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im41.set_ydata((ST[16]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    # ------ Evaluate Pp for Ring 4 ---------#
+                    rID = 'Ring 4'
+                    head1 = ST[13].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head2 = ST[14].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head3 = ST[15].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head4 = ST[16].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    # ----------Std [std(x) = sqrt(mean(x^2) - mean(x)^2)] ----------------#
+                    head_1 = ST[13].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_2 = ST[14].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_3 = ST[15].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_4 = ST[16].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 4 --------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpD, PkD = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 4 PCap
+                    # ------------------------------------------------------------  # Ring 4 Alarms
+                    if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    # -------------------# Compute Cp, Cpk for Substrate Temperature Process ------#
+                    Cp, Cpk = tz.processCap(stMean, stDev, stUSL, stLSL, self.stS)  # ST pCap (Pp/Cpk)
+
+                # ------------------------------------------------------------------------------[]
+                elif GPU_ENABLED and is_CuPy:  # Live Stream on GPU
+                    # X Plot Y-Axis data points for XBar ---------------------------------[Ring 1 TT]
+                    self.im10.set_ydata((xST[:, 1])[0:batch_ST])  # head 1
+                    self.im11.set_ydata((xST[:, 2])[0:batch_ST])  # head 2
+                    self.im12.set_ydata((xST[:, 3])[0:batch_ST])  # head 3
+                    self.im13.set_ydata((xST[:, 4])[0:batch_ST])  # head 4
+                    # S Plot Y-Axis data points for StdDev -------------------------------[S Plot]
+                    self.im14.set_ydata((sST[:, 1])[0:batch_ST])
+                    self.im15.set_ydata((sST[:, 2])[0:batch_ST])
+                    self.im16.set_ydata((sST[:, 3])[0:batch_ST])
+                    self.im17.set_ydata((sST[:, 4])[0:batch_ST])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals -----------[]
+                    rID = 'Ring 1'
+                    head1 = xST[:, 1][0:batch_ST]
+                    head2 = xST[:, 2][0:batch_ST]
+                    head3 = xST[:, 3][0:batch_ST]
+                    head4 = xST[:, 4][0:batch_ST]
+                    #----------------------------
+                    head_1 = sST[:, 1][0:batch_ST]
+                    head_2 = sST[:, 2][0:batch_ST]
+                    head_3 = sST[:, 3][0:batch_ST]
+                    head_4 = sST[:, 4][0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 1 --------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpA, PkA = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 1 PCap
+                    # ------------------------------------------------------------  # Ring 1 Alarms
+                    if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+
+                    # X Bar Plot for Ring 2 --------------------------------------------------------[ Ring 2 TT]
+                    self.im18.set_ydata((xST[:, 5])[0:batch_ST])  # head 1
+                    self.im19.set_ydata((xST[:, 6])[0:batch_ST])  # head 2
+                    self.im20.set_ydata((xST[:, 7])[0:batch_ST])  # head 3
+                    self.im21.set_ydata((xST[:, 8])[0:batch_ST])  # head 4
+                    # S Plot for Ring 2 -------------------------------------------------------------[S Plot]
+                    self.im22.set_ydata((sST[:, 5])[0:batch_ST])
+                    self.im23.set_ydata((sST[:, 6])[0:batch_ST])
+                    self.im24.set_ydata((sST[:, 7])[0:batch_ST])
+                    self.im25.set_ydata((sST[:, 8])[0:batch_ST])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 2'
+                    head1 = xST[:, 5][0:batch_ST]
+                    head2 = xST[:, 6][0:batch_ST]
+                    head3 = xST[:, 7][0:batch_ST]
+                    head4 = xST[:, 8][0:batch_ST]
+                    # ----------------------------
+                    head_1 = sST[:, 5][0:batch_ST]
+                    head_2 = sST[:, 6][0:batch_ST]
+                    head_3 = sST[:, 7][0:batch_ST]
+                    head_4 = sST[:, 8][0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 2 --------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpB, PkB = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 2 PCap
+                    # ------------------------------------------------------------  # Ring 2 Alarms
+                    if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    # -----------------------------------------------------------------[]
+                    # X Bar Plot for Ring 3 --------------------------------------------------------[ Ring 3 TT]
+                    self.im26.set_ydata((ST[:, 10])[0:batch_ST])  # head 1
+                    self.im27.set_ydata((ST[:, 11])[0:batch_ST])  # head 2
+                    self.im28.set_ydata((ST[:, 12])[0:batch_ST])  # head 3
+                    self.im29.set_ydata((ST[:, 13])[0:batch_ST])  # head 4
+                    # ------ Evaluate Pp for Ring 3 ---------#
+                    self.im30.set_ydata((ST[:, 10])[0:batch_ST])
+                    self.im31.set_ydata((ST[:, 11])[0:batch_ST])
+                    self.im32.set_ydata((ST[:, 12])[0:batch_ST])
+                    self.im33.set_ydata((ST[:, 13])[0:batch_ST])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 3'
+                    head1 = xST[:, 10][0:batch_ST]
+                    head2 = xST[:, 11][0:batch_ST]
+                    head3 = xST[:, 12][0:batch_ST]
+                    head4 = xST[:, 13][0:batch_ST]
+                    # ----------------------------
+                    head_1 = sST[:, 10][0:batch_ST]
+                    head_2 = sST[:, 11][0:batch_ST]
+                    head_3 = sST[:, 12][0:batch_ST]
+                    head_4 = sST[:, 13][0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 3 --------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpC, PkC = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 3 PCap
+                    # ------------------------------------------------------------  # Ring 3 Alarms
+                    if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+
+                    # X Bar Plot for Ring 4 --------------------------------------------------------[ Ring 4 TT]
+                    self.im34.set_ydata((xST[:, 14])[0:batch_ST])  # head 1
+                    self.im35.set_ydata((xST[:, 15])[0:batch_ST])  # head 2
+                    self.im36.set_ydata((xST[:, 16])[0:batch_ST])  # head 3
+                    self.im37.set_ydata((xST[:, 17])[0:batch_ST])  # head 4
+                    # ------ Evaluate Pp for Ring 4 ---------#
+                    self.im38.set_ydata((sST[:, 14])[0:batch_ST])
+                    self.im39.set_ydata((sST[:, 15])[0:batch_ST])
+                    self.im40.set_ydata((sST[:, 16])[0:batch_ST])
+                    self.im41.set_ydata((sST[:, 17])[0:batch_ST])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 4'
+                    head1 = xST[:, 14][0:batch_ST]
+                    head2 = xST[:, 15][0:batch_ST]
+                    head3 = xST[:, 16][0:batch_ST]
+                    head4 = xST[:, 17][0:batch_ST]
+                    # ----------------------------
+                    head_1 = sST[:, 14][0:batch_ST]
+                    head_2 = sST[:, 15][0:batch_ST]
+                    head_3 = sST[:, 16][0:batch_ST]
+                    head_4 = sST[:, 17][0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 4 --------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpD, PkD = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 4 PCap
+                    # ------------------------------------------------------------  # Ring 4 Alarms
+                    if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+                    elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                        xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
+
+            elif UseSQL_DBS and uCalling == 2 or uCalling == 3:
+                pID = 'ST'
+                if GPU_ENABLED and is_CuDF:
+                    pass        # Not yet implemented
+
+                elif GPU_ENABLED and is_CuPy:
+                    # X Plot Y-Axis data points for XBar ---------------------------------[Ring 1 TT]
+                    self.im10.set_ydata((xST[:, 1])[0:batch_ST])  # head 1
+                    self.im11.set_ydata((xST[:, 2])[0:batch_ST])  # head 2
+                    self.im12.set_ydata((xST[:, 3])[0:batch_ST])  # head 3
+                    self.im13.set_ydata((xST[:, 4])[0:batch_ST])  # head 4
+                    # S Plot Y-Axis data points for StdDev -------------------------------[S Plot]
+                    self.im14.set_ydata((sST[:, 1])[0:batch_ST])
+                    self.im15.set_ydata((sST[:, 2])[0:batch_ST])
+                    self.im16.set_ydata((sST[:, 3])[0:batch_ST])
+                    self.im17.set_ydata((sST[:, 4])[0:batch_ST])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals -----------[]
+                    rID = 'Ring 1'
+                    head1 = xST[:, 1][0:batch_ST]
+                    head2 = xST[:, 2][0:batch_ST]
+                    head3 = xST[:, 3][0:batch_ST]
+                    head4 = xST[:, 4][0:batch_ST]
+                    # ----------------------------
+                    head_1 = sST[:, 1][0:batch_ST]
+                    head_2 = sST[:, 2][0:batch_ST]
+                    head_3 = sST[:, 3][0:batch_ST]
+                    head_4 = sST[:, 4][0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 1 --------------#
+                    rMd = np.mean([head1[0], head2[0], head3[0], head4[0]])
+                    sMd = np.std([head_1[0], head_2[0], head_3[0], head_4[0]])
+                    PpA, PkA = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)  # Ring 1 PCap
+                    # ------------------------------------------------------------  # Ring 1 Alarms
+                    # if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                    #     xig.ST_igma(pID, rID, head1, head2, head3, head4)
+                    # elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                    #     xig.ST_Sigma(pID, rID, head1, head2, head3, head4)
+
+                    # X Bar Plot for Ring 2 --------------------------------------------------------[ Ring 2 TT]
+                    self.im18.set_ydata((xST[:, 5])[0:batch_ST])  # head 1
+                    self.im19.set_ydata((xST[:, 6])[0:batch_ST])  # head 2
+                    self.im20.set_ydata((xST[:, 7])[0:batch_ST])  # head 3
+                    self.im21.set_ydata((xST[:, 8])[0:batch_ST])  # head 4
+                    # S Plot for Ring 2 -------------------------------------------------------------[S Plot]
+                    self.im22.set_ydata((sST[:, 5])[0:batch_ST])
+                    self.im23.set_ydata((sST[:, 6])[0:batch_ST])
+                    self.im24.set_ydata((sST[:, 7])[0:batch_ST])
+                    self.im25.set_ydata((sST[:, 8])[0:batch_ST])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 2'
+                    head1 = xST[:, 5][0:batch_ST]
+                    head2 = xST[:, 6][0:batch_ST]
+                    head3 = xST[:, 7][0:batch_ST]
+                    head4 = xST[:, 8][0:batch_ST]
+                    # ----------------------------
+                    head_1 = sST[:, 5][0:batch_ST]
+                    head_2 = sST[:, 6][0:batch_ST]
+                    head_3 = sST[:, 7][0:batch_ST]
+                    head_4 = sST[:, 8][0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 2 --------------#
+                    rMd = np.mean([head1[0], head2[0], head3[0], head4[0]])
+                    sMd = np.std([head_1[0], head_2[0], head_3[0], head_4[0]])
+                    PpB, PkB = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 2 PCap
+                    # ------------------------------------------------------------  # Ring 2 Alarms
+                    # if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                    #     xig.ST_Sigma(pID, rID, head1, head2, head3, head4)
+                    # elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                    #     xig.ST_Sigma(pID, rID, head1, head2, head3, head4)
+                    # -----------------------------------------------------------------[]
+                    # X Bar Plot for Ring 3 --------------------------------------------------------[ Ring 3 TT]
+                    self.im26.set_ydata((xST[:, 10])[0:batch_ST])  # head 1
+                    self.im27.set_ydata((xST[:, 11])[0:batch_ST])  # head 2
+                    self.im28.set_ydata((xST[:, 12])[0:batch_ST])  # head 3
+                    self.im29.set_ydata((xST[:, 13])[0:batch_ST])  # head 4
+                    # ------ Evaluate Pp for Ring 3 ---------#
+                    self.im30.set_ydata((sST[:, 10])[0:batch_ST])
+                    self.im31.set_ydata((sST[:, 11])[0:batch_ST])
+                    self.im32.set_ydata((sST[:, 12])[0:batch_ST])
+                    self.im33.set_ydata((sST[:, 13])[0:batch_ST])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 3'
+                    head1 = xST[:, 10][0:batch_ST]
+                    head2 = xST[:, 11][0:batch_ST]
+                    head3 = xST[:, 12][0:batch_ST]
+                    head4 = xST[:, 13][0:batch_ST]
+                    # ----------------------------
+                    head_1 = sST[:, 10][0:batch_ST]
+                    head_2 = sST[:, 11][0:batch_ST]
+                    head_3 = sST[:, 12][0:batch_ST]
+                    head_4 = sST[:, 13][0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 3 ------------#
+                    rMd = np.mean([head1[0], head2[0], head3[0], head4[0]])
+                    sMd = np.std([head_1[0], head_2[0], head_3[0], head_4[0]])
+                    PpC, PkC = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)      # Ring 3 PCap
+                    # ------------------------------------------------------------  # Ring 3 Alarms
+                    # if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                    #     xig.ST_Sigma(pID, rID, head1, head2, head3, head4)
+                    # elif stLSL <= head1 <= stUSL or stLSL <= head2 <= stUSL or stLSL <= head3 <= stUSL or stLSL <= head4 <= stUSL:
+                    #     xig.ST_Sigma(pID, rID, head1, head2, head3, head4)
+
+                    # X Bar Plot for Ring 4 --------------------------------------------------------[ Ring 4 TT]
+                    self.im34.set_ydata((xST[:, 14])[0:batch_ST])  # head 1
+                    self.im35.set_ydata((xST[:, 15])[0:batch_ST])  # head 2
+                    self.im36.set_ydata((xST[:, 16])[0:batch_ST])  # head 3
+                    self.im37.set_ydata((xST[:, 17])[0:batch_ST])  # head 4
+                    # ------ Evaluate Pp for Ring 4 ---------#
+                    self.im38.set_ydata((sST[:, 14])[0:batch_ST])
+                    self.im39.set_ydata((sST[:, 15])[0:batch_ST])
+                    self.im40.set_ydata((sST[:, 16])[0:batch_ST])
+                    self.im41.set_ydata((sST[:, 17])[0:batch_ST])
+                    # Provide SCADA Feedback Warning & Critical Alarm Signals ---------[]
+                    rID = 'Ring 4'
+                    head1 = xST[:, 14][0:batch_ST]
+                    head2 = xST[:, 15][0:batch_ST]
+                    head3 = xST[:, 16][0:batch_ST]
+                    head4 = xST[:, 17][0:batch_ST]
+                    # ----------------------------
+                    head_1 = sST[:, 14][0:batch_ST]
+                    head_2 = sST[:, 15][0:batch_ST]
+                    head_3 = sST[:, 16][0:batch_ST]
+                    head_4 = sST[:, 17][0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 4 --------------#
+                    rMd = np.mean([head1[0], head2[0], head3[0], head4[0]])
+                    sMd = np.std([head_1[0], head_2[0], head_3[0], head_4[0]])
+                    PpD, PkD = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)  # Ring 4 PCap
+                    # ------------------------------------------------------------  # Ring 4 Alarms
+                    # if stLCL <= head1 <= stUCL or stLCL <= head2 <= stUCL or stLCL <= head3 <= stUCL or stLCL <= head4 <= stUCL:
+                    #     xig.ST_Sigma(pID, rID, head1, head2, head3, head4)
+                    # elif (((head1 == range(YScale_minST, stLSL) or  head1 == range(stUSL, YScale_minST) or
+                    #       head2 == range(YScale_minST, stLSL) or  head2 == range(stUSL, YScale_minST)) or
+                    #       head3 == range(YScale_minST, stLSL) or  head3 == range(stUSL, YScale_minST)) or
+                    #       head4 == range(YScale_minST, stLSL) or  head4 == range(stUSL, YScale_minST)):
+                    #     xig.ST_Sigma(pID, rID, head1, head2, head3, head4)
+
+                elif is_NumPy:
+                    # X Plot Y-Axis data points for XBar --------------------------------------------[# Ring 1 ]
+                    self.im10.set_ydata((ST[1]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
+                    self.im11.set_ydata((ST[2]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
+                    self.im12.set_ydata((ST[3]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
+                    self.im13.set_ydata((ST[4]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
+                    # S Plot Y-Axis data points for StdDev ----------------------------------------------
+                    self.im14.set_ydata((ST[1]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im15.set_ydata((ST[2]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im16.set_ydata((ST[3]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im17.set_ydata((ST[4]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    # ------ Evaluate Pp for Ring 1 ---------#
+                    rID = 'Ring 1'
+                    head1 = ST[1].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head2 = ST[2].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head3 = ST[3].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head4 = ST[4].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    # ----------Std [std(x) = sqrt(mean(x^2) - mean(x)^2)] ----------------#
+                    head_1 = ST[1].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_2 = ST[2].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_3 = ST[3].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_4 = ST[4].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 1 ---------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpA, PkA = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)  # Ring 1 PCap
+
+                    # ---------------------------------------#
+                    self.im18.set_ydata((ST[5]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
+                    self.im19.set_ydata((ST[6]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
+                    self.im20.set_ydata((ST[7]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
+                    self.im21.set_ydata((ST[8]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
+                    # # S Plot Y-Axis data points for StdDev ---------------------------------------#
+                    self.im22.set_ydata((ST[5]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im23.set_ydata((ST[6]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im24.set_ydata((ST[7]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im25.set_ydata((ST[8]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    # ------ Evaluate Pp for Ring 2 ---------------------------------------#
+                    rID = 'Ring 2'
+                    head1 = ST[5].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head2 = ST[6].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head3 = ST[7].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head4 = ST[8].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    # ----------Std [std(x) = sqrt(mean(x^2) - mean(x)^2)] ----------------#
+                    head_1 = ST[5].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_2 = ST[6].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_3 = ST[7].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_4 = ST[8].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    # ------------ Compute for Process Performace on Ring 2 ---------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpB, PkB = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)  # Ring 2 PCap
+
+                    # ---------------------------------------#
+                    self.im26.set_ydata((ST[10]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
+                    self.im27.set_ydata((ST[11]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
+                    self.im28.set_ydata((ST[12]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
+                    self.im29.set_ydata((ST[13]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
+                    # # S Plot Y-Axis data points for StdDev ---------------------------------------#
+                    self.im30.set_ydata((ST[10]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im31.set_ydata((ST[11]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im32.set_ydata((ST[12]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im33.set_ydata((ST[13]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    # ------ Evaluate Pp for Ring 3 -----------------------------------------#
+                    rID = 'Ring 3'
+                    head1 = ST[10].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head2 = ST[11].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head3 = ST[12].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head4 = ST[13].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    # ----------Std [std(x) = sqrt(mean(x^2) - mean(x)^2)] ----------------#
+                    head_1 = ST[10].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_2 = ST[11].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_3 = ST[12].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_4 = ST[13].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    # ------------ Compute for Process Performace on Ring 3 ----------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpC, PkC = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)  # Ring 3 PCap
+
+                    # --------------------------------------------------------------------------------#
+                    self.im34.set_ydata((ST[14]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 1
+                    self.im35.set_ydata((ST[15]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 2
+                    self.im36.set_ydata((ST[16]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 3
+                    self.im37.set_ydata((ST[17]).rolling(window=self.stS, min_periods=1).mean()[0:batch_ST])  # head 4
+                    # S Plot Y-Axis data points for StdDev --------------------------------------------#
+                    self.im38.set_ydata((ST[14]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im39.set_ydata((ST[15]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im40.set_ydata((ST[16]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    self.im41.set_ydata((ST[17]).rolling(window=self.stS, min_periods=1).std()[0:batch_ST])
+                    # ------ Evaluate Pp for Ring 4 -----------------------------------------#
+                    rID = 'Ring 4'
+                    head1 = ST[14].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head2 = ST[15].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head3 = ST[16].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    head4 = ST[17].rolling(window=s_fetch, min_periods=1).mean()[0:batch_ST]
+                    # ----------Std [std(x) = sqrt(mean(x^2) - mean(x)^2)] ----------------#
+                    head_1 = ST[14].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_2 = ST[15].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_3 = ST[16].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    head_4 = ST[17].rolling(window=s_fetch, min_periods=1).std()[0:batch_ST]
+                    # ------------ Compute for Process Performance on Ring 4 --------------#
+                    rMd = np.mean([head1, head2, head3, head4])
+                    sMd = np.std([head_1, head_2, head_3, head_4])
+                    PpD, PkD = tz.processCap(rMd, sMd, stUSL, stLSL, self.stS)  # Ring 4 PCap
+                    # -------------------# Compute Cp, Cpk for Substrate Temperature Process ------#
+            Cp, Cpk = tz.processCap(stMean, stDev, stUSL, stLSL, self.stS)  # ST pCap (Pp/Cpk)
 
             # XBar Mean Plot ------------------------#
-            self.a1.axhline(y=xMean, color="red", linestyle="--", linewidth=0.8)
-            self.a1.axhspan(xLCL, xUCL, facecolor='#F9C0FD', edgecolor='#F9C0FD')             # 3 Sigma span (Purple)
-            self.a1.axhspan(xUCL, xUSL, facecolor='#8d8794', edgecolor='#8d8794')             # grey area
-            self.a1.axhspan(xLSL, xLCL, facecolor='#8d8794', edgecolor='#8d8794')
+            self.a1.axhline(y=stMean, color="red", linestyle="--", linewidth=0.8)
+            self.a1.axhspan(stLCL, stUCL, facecolor='#F9C0FD', edgecolor='#F9C0FD')             # 3 Sigma span (Purple)
+            self.a1.axhspan(stUCL, stUSL, facecolor='#8d8794', edgecolor='#8d8794')             # grey area
+            self.a1.axhspan(stLSL, stLCL, facecolor='#8d8794', edgecolor='#8d8794')
             # ---------------------- sBar_minST, sBar_maxST -------[]
             # Define Legend's Attributes  ----
-            self.a2.axhline(y=sDev, color="blue", linestyle="--", linewidth=0.8)
-            self.a2.axhspan(sLCL, sUCL, facecolor='#F9C0FD', edgecolor='#F9C0FD')           # 1 Sigma Span
-            self.a2.axhspan(sLCL, self.sBar_maxST, facecolor='#CCCCFF', edgecolor='#CCCCFF')  # 1 Sigma above the Mean
-            self.a2.axhspan(self.sBar_minST, sLCL, facecolor='#CCCCFF', edgecolor='#CCCCFF')
+            self.a2.axhline(y=stDev, color="blue", linestyle="--", linewidth=0.8)
+            self.a2.axhspan(sLCLst, sUCLst, facecolor='#F9C0FD', edgecolor='#F9C0FD')           # 1 Sigma Span
+            self.a2.axhspan(sLCLst, self.sBar_maxST, facecolor='#CCCCFF', edgecolor='#CCCCFF')  # 1 Sigma above the Mean
+            self.a2.axhspan(self.sBar_minST, sLCLst, facecolor='#CCCCFF', edgecolor='#CCCCFF')
 
             # -----------------------------------------------------------------------------------[]
             self.a3.cla()
@@ -6917,7 +7639,11 @@ class substTempTabb(ttk.Frame):
             if batch_ST > self.win_Xmax:
                 self.a1.set_xlim(batch_ST - self.win_Xmax, batch_ST)
                 self.a2.set_xlim(batch_ST - self.win_Xmax, batch_ST)
-                ST.pop(0)
+                if is_CuPy:
+                    xST.pop(0)
+                    sST.pop(0)
+                else:
+                    ST.pop(0)
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)
@@ -6935,7 +7661,7 @@ class substTempTabb(ttk.Frame):
         print(f"\n[ST] Process Interval: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
-# -----------------------------------------------------------------[Tape Gap Tab]
+# ---------------------------------------------------------------------[Tape Gap Tab]
 class tapeGapPolTabb(ttk.Frame):
 
     """ Application to convert feet to meters or vice versa. """
@@ -6943,7 +7669,7 @@ class tapeGapPolTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
         self.runVMP = False
         self.gapPercent = True
         self.toggle_state = True
@@ -7182,9 +7908,9 @@ class tapeGapPolTabb(ttk.Frame):
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
         # Activate Matplot tools ------------------[Uncomment to activate]
-        toolbar = NavigationToolbar2Tk(self.canvas, self)
-        toolbar.update()
-        self.canvas._tkcanvas.pack(expand=True)
+        # toolbar = NavigationToolbar2Tk(self.canvas, self)
+        # toolbar.update()
+        # self.canvas._tkcanvas.pack(expand=True)
 
         # --------- call data block -------------------------------------#
         pTG = threading.Thread(target=self.dataControlTG, daemon=True) # .start()
@@ -7200,7 +7926,7 @@ class tapeGapPolTabb(ttk.Frame):
         # Evaluate conditions for SQL Data Fetch ------------------------------[A]
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
-        if UseSQL_DBS:
+        if UseSQL_DBS and uCalling == 2 or uCalling == 3:
             if self.running:
                 import sqlArrayRLmethodTG as pdC
                 tg_con = sq.sql_connectTG()
@@ -7208,12 +7934,11 @@ class tapeGapPolTabb(ttk.Frame):
                 print('[TG] Data Source selection is Unknown')
                 tg_con = None
 
-        elif UsePLC_DBS:
+        elif UsePLC_DBS and uCalling == 1:
             if self.running:
                 import plcArrayRLmethodTG as pdD
                 print('\n[TG] Activating watchdog...')  # primary connection to watch dog
             else:
-                # Dtt_ready = True
                 print('[TG] Data Source selection is Unknown')
         else:
             print('[TG] Data Source selection is Unknown')
@@ -7344,7 +8069,7 @@ class tapeGapPolTabb(ttk.Frame):
                         # ------ Inhibit iteration ----------------------------------------[]
                         if not self.vmD3:           # No new data coming through
                             print('SQL End of File, [VMP] connection closes after 30 min...')
-                            time.sleep(60)
+                            time.sleep(3)
                             vmp_con.close()       # close connection
                             continue
                         else:
@@ -7365,38 +8090,61 @@ class tapeGapPolTabb(ttk.Frame):
         timei = time.time()                                   # start timing the entire loop
 
         # Bi-stream Data Pooling Method ----------------------#
-        if UsePLC_DBS and self.running:
+        if UsePLC_DBS and uCalling == 1 and self.running:
             import VarPLC_TG as tg
-            stream = 1
-            dcA = qtg.validCols(self.T1)                     # Load defined valid columns for PLC Data
-            df1 = pd.DataFrame(self.gD1, columns=dcA)        # Include table data into python Dataframe
+
+            # Call synchronous data PLC function ------[A]
+            dcA = qtg.validCols(self.T1)
+            df1 = pd.DataFrame(self.gD1, columns=dcA)
             # -----------------------------------------------#
-            # Do some data cleansing & interpolation if Nans occurs
             data1 = df1.select_dtypes(include=["number"])
             df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
-            # Convert pandas -> cuDF
-            if GPU_ENABLED:
-                gpu_df1 = cp.asarray(df1_interp.select_dtypes(include="number").to_numpy())
-                # gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+            # ------------------------------------------#
+            if GPU_ENABLED and is_CuDF:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 TG = tg.loadProcesValues(gpu_df1)
-            else:
-                TG = tg.loadProcesValues(df1_interp)            # Join data values under dataframe
 
-            # ----------------------------------------------#
-            # print('\nDataFrame Content', df1.head(10))        # Preview Data frame head
+            elif GPU_ENABLED and is_CuPy:
+                # ----- Convert dataframe to CuPy -----
+                data_np = df1_interp.to_numpy().astype(np.float32)      # NumPy first
+                data_cp = cp.asarray(data_np)                           # Then to CuPy
+                # Using uniform_filter1d for efficient rolling mean
+                mean_cp = uniform_filter1d(data_cp, size=s_fetch, axis=0, mode='reflect')
+                squared_cp = uniform_filter1d(data_cp ** 2, size=s_fetch, axis=0, mode='reflect')
+                std_cp = cp.sqrt(squared_cp - mean_cp ** 2)
+                # Transfer results back to CPU
+                xTG = cp.asnumpy(mean_cp)   # xTT[:, 2]
+                sTG = cp.asnumpy(std_cp)    # sTT[:, 2]
 
-        elif UseSQL_DBS and self.running:
+            elif is_NumPy:
+                TG = tg.loadProcesValues(df1_interp)
+
+        elif UseSQL_DBS and self.running and uCalling == 2 or uCalling == 3:
             import VarSQL_TG as tg                          # load SQL variables column names | rfVarSQL
             g1 = qtg.validCols(self.T1)                     # Construct Data Column selSqlColumnsTFM.py
             df1 = pd.DataFrame(self.gD1, columns=g1)        # Import into python Dataframe
             # ----------------------------------------------#
             data1 = df1.select_dtypes(include=["number"])
             df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()
-            if GPU_ENABLED:
-                gpu_df1 = cp.asarray(df1_interp.select_dtypes(include="number").to_numpy())
-                # gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+            # ----------------------------------------------#
+            if is_CuDF:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 TG = tg.loadProcesValues(gpu_df1)
-            else:
+
+            elif is_CuPy:
+                # ----- Convert dataframe to CuPy -----
+                data_np = df1_interp.to_numpy().astype(np.float32)      # NumPy first
+                data_cp = cp.asarray(data_np)                           # Then to CuPy
+                # Using uniform_filter1d for efficient rolling mean
+                mean_cp = uniform_filter1d(data_cp, size=s_fetch, axis=0, mode='reflect')
+                squared_cp = uniform_filter1d(data_cp ** 2, size=s_fetch, axis=0, mode='reflect')
+                std_cp = cp.sqrt(squared_cp - mean_cp ** 2)
+                # Transfer results back to CPU
+                xTG = cp.asnumpy(mean_cp)   # xTT[:, 2]
+                sTG = cp.asnumpy(std_cp)    # sTT[:, 2]
+                # print('TP002', xTG)
+
+            elif is_NumPy:
                 TG = tg.loadProcesValues(df1_interp)        # Join data values under dataframe
             # ----------------------------------------------#
             # print('\nDataFrame Content', df1.head(10))
@@ -7429,28 +8177,104 @@ class tapeGapPolTabb(ttk.Frame):
             self.im24.set_xdata(np.arange(batch_TG))
             self.im25.set_xdata(np.arange(batch_TG))
 
-            # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
-            self.im10.set_ydata((TG[6]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 1
-            self.im11.set_ydata((TG[7]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 2
-            self.im12.set_ydata((TG[8]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 3
-            self.im13.set_ydata((TG[9]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 4
-            # ------ Evaluate Pp for Segments ---------#
-            # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
-            self.im14.set_ydata((TG[6]).rolling(window=self.tgS).std()[0:batch_TG])
-            self.im15.set_ydata((TG[7]).rolling(window=self.tgS).std()[0:batch_TG])
-            self.im16.set_ydata((TG[8]).rolling(window=self.tgS).std()[0:batch_TG])
-            self.im17.set_ydata((TG[9]).rolling(window=self.tgS).std()[0:batch_TG])
+            # Compute rolling mean on GPU or CPU -
+            if uCalling == 1:
+                pID = 'TT'
+                if is_CuDF or is_NumPy:
+                    # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
+                    self.im10.set_ydata((TG[5]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 1
+                    self.im11.set_ydata((TG[6]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 2
+                    self.im12.set_ydata((TG[7]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 3
+                    self.im13.set_ydata((TG[8]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 4
+                    # ------ Evaluate Pp for Segments ---------#
+                    # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
+                    self.im14.set_ydata((TG[5]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im15.set_ydata((TG[6]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im16.set_ydata((TG[7]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im17.set_ydata((TG[8]).rolling(window=self.tgS).std()[0:batch_TG])
 
-            # ---------------------------------------#
-            self.im18.set_ydata((TG[10]).rolling(window=self.tgS).mean()[0:batch_TG])   # Segment 1
-            self.im19.set_ydata((TG[11]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 2
-            self.im20.set_ydata((TG[12]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 3
-            self.im21.set_ydata((TG[13]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 4
-            # ------ Evaluate Pp for Ring 2 ---------#
-            self.im22.set_ydata((TG[10]).rolling(window=self.tgS).std()[0:batch_TG])
-            self.im23.set_ydata((TG[11]).rolling(window=self.tgS).std()[0:batch_TG])
-            self.im24.set_ydata((TG[12]).rolling(window=self.tgS).std()[0:batch_TG])
-            self.im25.set_ydata((TG[13]).rolling(window=self.tgS).std()[0:batch_TG])
+                    # ---------------------------------------#
+                    self.im18.set_ydata((TG[9]).rolling(window=self.tgS).mean()[0:batch_TG])   # Segment 1
+                    self.im19.set_ydata((TG[10]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 2
+                    self.im20.set_ydata((TG[11]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 3
+                    self.im21.set_ydata((TG[12]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 4
+                    # ------ Evaluate Pp for Ring 2 ---------#
+                    self.im22.set_ydata((TG[9]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im23.set_ydata((TG[10]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im24.set_ydata((TG[11]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im25.set_ydata((TG[12]).rolling(window=self.tgS).std()[0:batch_TG])
+
+                elif is_CuPy:
+                    # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
+                    self.im10.set_ydata((xTG[:, 5])[0:batch_TG])  # Segment 1
+                    self.im11.set_ydata((xTG[:, 6])[0:batch_TG])  # Segment 2
+                    self.im12.set_ydata((xTG[:, 7])[0:batch_TG])  # Segment 3
+                    self.im13.set_ydata((xTG[:, 8])[0:batch_TG])  # Segment 4
+                    # ------ Evaluate Pp for Segments ---------#
+                    # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
+                    self.im14.set_ydata((sTG[:, 5])[0:batch_TG])
+                    self.im15.set_ydata((sTG[:, 6])[0:batch_TG])
+                    self.im16.set_ydata((sTG[:, 7])[0:batch_TG])
+                    self.im17.set_ydata((sTG[:, 8])[0:batch_TG])
+
+                    # ---------------------------------------#
+                    self.im18.set_ydata((xTG[:, 9])[0:batch_TG])  # Segment 1
+                    self.im19.set_ydata((xTG[:, 10])[0:batch_TG])  # Segment 2
+                    self.im20.set_ydata((xTG[:, 11])[0:batch_TG])  # Segment 3
+                    self.im21.set_ydata((xTG[:, 12])[0:batch_TG])  # Segment 4
+                    # ------ Evaluate Pp for Ring 2 ---------#
+                    self.im22.set_ydata((sTG[:, 9])[0:batch_TG])
+                    self.im23.set_ydata((sTG[:, 10])[0:batch_TG])
+                    self.im24.set_ydata((sTG[:, 11])[0:batch_TG])
+                    self.im25.set_ydata((sTG[:, 12])[0:batch_TG])
+
+            elif UseSQL_DBS and uCalling == 2 or uCalling == 3:
+                if is_CuPy:
+                    # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
+                    self.im10.set_ydata((xTG[:, 5])[0:batch_TG])  # Segment 1
+                    self.im11.set_ydata((xTG[:, 6])[0:batch_TG])  # Segment 2
+                    self.im12.set_ydata((xTG[:, 7])[0:batch_TG])  # Segment 3
+                    self.im13.set_ydata((xTG[:, 8])[0:batch_TG])  # Segment 4
+                    # ------ Evaluate Pp for Segments ---------#
+                    # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
+                    self.im14.set_ydata((sTG[:, 5])[0:batch_TG])
+                    self.im15.set_ydata((sTG[:, 6])[0:batch_TG])
+                    self.im16.set_ydata((sTG[:, 7])[0:batch_TG])
+                    self.im17.set_ydata((sTG[:, 8])[0:batch_TG])
+                    # ---------------------------------------#
+                    self.im18.set_ydata((xTG[:, 9])[0:batch_TG])  # Segment 1
+                    self.im19.set_ydata((xTG[:, 10])[0:batch_TG])  # Segment 2
+                    self.im20.set_ydata((xTG[:, 11])[0:batch_TG])  # Segment 3
+                    self.im21.set_ydata((xTG[:, 12])[0:batch_TG])  # Segment 4
+                    # ------ Evaluate Pp for Ring 2 ---------#
+                    self.im22.set_ydata((sTG[:, 9])[0:batch_TG])
+                    self.im23.set_ydata((sTG[:, 10])[0:batch_TG])
+                    self.im24.set_ydata((sTG[:, 11])[0:batch_TG])
+                    self.im25.set_ydata((sTG[:, 12])[0:batch_TG])
+
+                elif is_NumPy:
+                   # X Plot Y-Axis data points for XBar -------------------------------------------[# Channels]
+                    self.im10.set_ydata((TG[5]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 1
+                    self.im11.set_ydata((TG[6]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 2
+                    self.im12.set_ydata((TG[7]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 3
+                    self.im13.set_ydata((TG[8]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 4
+                    # ------ Evaluate Pp for Segments ---------#
+                    # S Plot Y-Axis data points for StdDev ----------------------------------------[# S Bar Plot]
+                    self.im14.set_ydata((TG[5]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im15.set_ydata((TG[6]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im16.set_ydata((TG[7]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im17.set_ydata((TG[8]).rolling(window=self.tgS).std()[0:batch_TG])
+
+                    # ---------------------------------------#
+                    self.im18.set_ydata((TG[9]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 1
+                    self.im19.set_ydata((TG[10]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 2
+                    self.im20.set_ydata((TG[11]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 3
+                    self.im21.set_ydata((TG[12]).rolling(window=self.tgS).mean()[0:batch_TG])  # Segment 4
+                    # ------ Evaluate Pp for Ring 2 ---------#
+                    self.im22.set_ydata((TG[9]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im23.set_ydata((TG[10]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im24.set_ydata((TG[11]).rolling(window=self.tgS).std()[0:batch_TG])
+                    self.im25.set_ydata((TG[12]).rolling(window=self.tgS).std()[0:batch_TG])
 
             # # ---- Profile rolling Data Plot ------------------------------------------------------------------------[]
             # # Declare Plots attributes ------------------------------------------------------------[]
@@ -7474,7 +8298,6 @@ class tapeGapPolTabb(ttk.Frame):
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a3.set_xlim(0, self.win_Xmax)
-            print('[TG] Data Stream Buffer Size 2:', len(TG))
             self.canvas.draw_idle()
 
         else:
@@ -7494,14 +8317,30 @@ class tapeGapPolTabb(ttk.Frame):
         timei = time.time()  # start timing the entire loop
 
         # Call data loader Method-----------------------#
-        if UseSQL_DBS and self.runVMP:
+        if self.runVMP:
             import VarSQL_VM as vm
             g3 = qvm.validCols(self.T2)
             d3 = pd.DataFrame(self.vmD3, columns=g3)
+            # Do some data cleansing [Perform back or forward fill interpolation if Nans occurs]
+            df1 = d3.apply(pd.to_numeric, errors="coerce")
+            df1_interp = df1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+
+            if is_CuDF:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                VM = vm.loadProcesValues(gpu_df1)
+
+            elif is_CuPy:
+                # ----- Convert dataframe to CuPy -----
+                data_np = df1_interp.to_numpy().astype(np.float32)  # NumPy first
+                data_cp = cp.asarray(data_np)
+                # ---------Include any serious graphical transformations -------
+                # then convert to Numpy arrays and display
+                VM = vm.loadProcesValues(df1_interp)
+                print('CuPy is not available for VM, Using NumPy...')
+
+            elif is_NumPy:
+                VM = vm.loadProcesValues(df1_interp)
             # ---------------------------------
-            VM = vm.loadProcesValues(d3)
-            # ---------------------------------
-            print('\nSQL Content RM:', d3.tail(300))
             # print("Memory Usage:", d3.info(verbose=False))  # Check memory utilization
             # --------------------------------------#
         else:
@@ -7509,15 +8348,26 @@ class tapeGapPolTabb(ttk.Frame):
             print('[VMP] Unknown Protocol...')
 
         # ------------------------------------------#
-        if UseSQL_DBS and self.running:  # accessible through sql only!
+        if self.running:  # accessible through sql only!
             self.a4.legend(['Void Mapping Profile'], loc='upper right', fontsize="x-large")
-            pScount = VM[1]                         # Sample count
-            pCenter = np.array(VM[2] * 0.001)       # Sample centre -- X axis convert to mt
-            pAvgGap = np.array(VM[3])               # Average Gap
-            pMaxGap = VM[4]                         # Max Gap
-            vLayerN = np.array(VM[5])               # current Layer  - y axis
-            sLength = VM[6]                         # Sample length
-            gap_vol = (pAvgGap / sLength) * 100     # Percentage Void
+            if is_NumPy:
+                pScount = VM[0]                         # Sample count
+                pCenter = np.array(VM[1] * 0.001)       # Sample centre -- X axis convert to mt
+                pAvgGap = np.array(VM[2])               # Average Gap
+                pMaxGap = VM[3]                         # Max Gap
+                vLayerN = np.array(VM[4])               # current Layer  - y axis
+                sLength = VM[5]                         # Sample length
+                gap_vol = (pAvgGap / sLength) * 100     # Percentage Void
+
+            elif is_CuPy:
+                # Adjust column address when CuPy array is implemented.
+                pScount = np.array(VM[0])  # Sample count
+                pCenter = np.array(VM[1] * 0.001)   # Sample centre -- X axis convert to mt
+                pAvgGap = np.array(VM[2]*10)        # Average Gap
+                pMaxGap = np.array(VM[3])  # Max Gap
+                vLayerN = np.array(VM[4])  # current Layer  - y axis
+                sLength = np.array(VM[5])  # Sample length
+                gap_vol = (pAvgGap / sLength) * 100  # Percentage Void
             # ---------------------------------------------------------------------[VOID]
             coords = np.column_stack((pCenter, vLayerN))  # shape (N, 2)
             self.im26.set_offsets(coords)
@@ -7545,7 +8395,7 @@ class tapeGapPolTabb(ttk.Frame):
 
     # End of second stream
 
-# -----------------------------------------------------------------[Tape Placement]
+# ---------------------------------------------------------------------[Tape Placement]
 class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA param - Substrate Temperature --[]
     """ Application to convert feet to meters or vice versa. """
     def __init__(self, master=None):
@@ -7923,7 +8773,7 @@ class tapePlacementTabb(ttk.Frame):     # -- Defines the tabbed region for QA pa
         print(f"Process Interval TP: {lapsedT} sec\n")
         # -----Canvas update --------------------------------------------[]
 
-# ---------- Additional Tabb for Monitoring Parameters ------------[Monitoring Tabs]
+# ---------------- Additional Tabb for Monitoring Parameters -----------[Monitoring Tabs]
 class MonitorTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
@@ -8268,7 +9118,7 @@ class MonitorTabb(ttk.Frame):
                 d2 = pd.DataFrame(self.RPa, columns=g2)
                 g3 = qpm.validCols(self.T3)                          # Roller Pressure Table 2
                 d3 = pd.DataFrame(self.RPb, columns=g3)
-                # g4 = qpm.validCols(self.T4)                          # Winding Speed
+                # g4 = qpm.validCols(self.T4)                        # Winding Speed
                 # d4 = pd.DataFrame(self.RPc, columns=g4)
 
                 # Concatenate all columns -----------------------[]
@@ -8289,19 +9139,29 @@ class MonitorTabb(ttk.Frame):
                 d6 = pd.DataFrame(self.LAa, columns=g6)
                 g7 = qpm.validCols(self.T7)                          # Laser Angle
                 d7 = pd.DataFrame(self.LAb, columns=g7)
-
                 # Concatenate all columns -----------[]
                 df1 = pd.concat([d1, d2, d3, d4, d5, d6, d7], axis=1)
-            else:
-                df1 = 0
-                pass                                        # Reserve for process scaling -- RBL.
+                # ------------------------------------[]
+                # Do some data cleansing
+                df_clean = df1.select_dtypes(include=["number"])
+                df1_interp = df_clean.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
 
-            # ----- Access data element within the concatenated columns -------------------------[A]
-            PM = mt.loadProcesValues(df1, pRecipe)              # Join data values under dataframe
-            print('\nDataFrame Content', df1.head(10))          # Preview Data frame head
-            print("Memory Usage:", df1.info(verbose=False))     # Check memory utilization
+            if GPU_ENABLED and is_CuDF:
+                gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
+                PM = mt.loadProcesValues(gpu_df1, pRecipe)
 
-            # Declare Plots attributes ------------------------------------------------------------[]
+            elif GPU_ENABLED and is_CuPy:
+                data_np = df1_interp.to_numpy().astype(np.float32)  # NumPy first
+                data_cp = cp.asarray(data_np)
+                # ---------Include any serious graphical transformations -------
+                # then convert to Numpy arrays and display
+                PM = mt.loadProcesValues(data_cp, pRecipe)
+
+            elif is_NumPy:
+                PM = mt.loadProcesValues(df1_interp, pRecipe)
+            # --------------------------------------
+            # print('\nDataFrame Content', df1.head(10))
+            # Declare Plots attributes ---------------------------------------[]
             if self.running:
                 self.a1.legend(title='Roller Pressure - MPa', loc='upper right')
                 self.a2.legend(title='Winding Speed - m/s', loc='upper right')
@@ -8473,17 +9333,20 @@ class MonitorTabb(ttk.Frame):
                 self.a2.set_xlim(batch_PM - self.win_Xmax, batch_PM)
                 self.a3.set_xlim(batch_PM - self.win_Xmax, batch_PM)
                 self.a4.set_xlim(batch_PM - self.win_Xmax, batch_PM)
-                # self.a5.set_xlim(batch_PM - self.win_Xmax, batch_PM)
-                # self.a6.set_xlim(batch_PM - self.win_Xmax, batch_PM)
                 PM.pop(0)
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)
                 self.a3.set_xlim(0, self.win_Xmax)
                 self.a4.set_xlim(0, self.win_Xmax)
-                # self.a5.set_xlim(0, self.win_Xmax)
-                # self.a6.set_xlim(0, self.win_Xmax)
-            print('[PM] Data Stream Buffer Size 2:', len(PM))
+            self.a1.relim()         # Recalculate limits
+            self.a1.autoscale()     # Apply the new limits
+            self.a2.relim()         # Recalculate limits
+            self.a2.autoscale()     # Apply the new limits
+            self.a3.relim()         # Recalculate limits
+            self.a3.autoscale()     # Apply the new limits
+            self.a4.relim()         # Recalculate limits
+            self.a4.autoscale()     # Apply the new limits
             self.canvas.draw_idle()
 
         else:
@@ -8507,13 +9370,13 @@ class MonitorTabb(ttk.Frame):
         lapsedT = timef - timei
         print(f"[MPM] Process Interval: {lapsedT} sec\n")
 
-# -----Canvas update --------------------------------------------[]
+    # -----Canvas update --------------------------------------------[]
 
 # ============================================= CASCADE CLASS METHODS ===============================================#
 # This class procedure allows SCADA operator to split the screen into respective runtime process                     #
 # ===================================================================================================================#
 
-class cascadeCommonViewsRF(ttk.Frame):
+class cascadeCommonViewsRF(ttk.Frame):          # Load common Cascade and all object in cascadeSwitcher() class
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)

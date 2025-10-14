@@ -12,10 +12,11 @@ Author: Dr Robert Labs
 
 
 def loadProcesValues(df1):
-    sqlTP = [df1['tStamp'], df1['cLayer'], df1['R1H1TP'],
-             df1['R1H2TP'], df1['R1H3TP'], df1['R1H4TP'],
-             df1['R2H1TP'], df1['R2H2TP'], df1['R2H3TP'],
-             df1['R2H4TP'], df1['tStamp'], df1['cLayer'],
+    sqlTP = [df1['cLayer'],
+             df1['R1H1TP'], df1['R1H2TP'], df1['R1H3TP'],
+             df1['R1H4TP'], df1['R2H1TP'], df1['R2H2TP'],
+             df1['R2H3TP'], df1['R2H4TP'],
+             df1['cLayer'],
              df1['R3H1TP'], df1['R3H2TP'], df1['R3H3TP'],
              df1['R3H4TP'], df1['R4H1TP'], df1['R4H2TP'],
              df1['R4H3TP'], df1['R4H4TP']]

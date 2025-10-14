@@ -11,7 +11,7 @@ Check SQL data columns ...
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'WS_' + pWON:
-        columns = ['tStamp', 'cLayer', 'Ring1', 'Ring2', 'Ring3', 'Ring4']
+        columns = ['id_col', 'cLayer', 'Ring1', 'Ring2', 'Ring3', 'Ring4']
 
     elif pParam == 'SPC_WS':
         columns = ['cLayer', 'Ring1', 'Ring2', 'Ring3', 'Ring4']

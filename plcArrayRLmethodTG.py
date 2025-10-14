@@ -54,6 +54,8 @@ def plcExec(nGZ, grp_step, DB, fetch_no):
 	grp_step: Group Sample step
 	fetch_no: Animation Fetch Cycle
 	"""
+	timei = time.time()
+
 	db_number = DB
 	# Get contiguous data from PLC Stream --- Dealing with very volatile data frame.
 	start_offset = [0, 2, 4, 6, 14, 22, 26, 30, 38, 42, 46, 50, 54]

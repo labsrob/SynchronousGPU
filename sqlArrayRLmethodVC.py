@@ -41,12 +41,11 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
                 dL.append(result)
             last_ts = data1[-1].id_col
         else:
-            print('[cVC] Process EOF reached...')
             print('[cVC] Halting for 5 Minutes...')
             time.sleep(300)
 
     except Exception as e:
-        print("[cVC] Data trickling...")  # , e)
+        print("[cVC] Data trickling on", last_ts)  # , e)
         time.sleep(2)
 
     t1.close()

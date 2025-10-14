@@ -13,14 +13,14 @@ Author: Dr Robert Labs
 def loadProcesValues(df1, prod):        # Load useful columns out of many
     if prod == 'DNV':
         # -------- GEN Table: Cell Tension, Oven Temperature & Winding Speed --------[T1]
-        sqlPM = [df1['tStamp'], df1['cTensX'],
+        sqlPM = [ df1['cTensX'],
                    df1['oTempA'], df1['oTempB'],
                    df1['iTempA'], df1['iTempB'],
                    df1['wSpedA'], df1['wSpedB'],
                    df1['wSpedC'], df1['wSpedD'],
                    df1['PipeDi'], df1['cLayer'],
                    # ------ Roller Pressure ----[T2/T3]
-                   df1['tStamp'], df1['cLayer'], df1['R1H1RP'], #14
+                   df1['cLayer'], df1['R1H1RP'], #14
                    df1['R1H2RP'], df1['R1H3RP'], df1['R1H4RP'],
                    df1['R2H1RP'], df1['R2H2RP'], df1['R2H3RP'],
                    df1['R2H4RP'], df1['tStamp'], df1['cLayer'],

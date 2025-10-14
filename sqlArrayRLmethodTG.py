@@ -30,7 +30,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
         slideType = 'Non-overlapping'
 
     print('\n[TG] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
-    print('=' * 60)
+
     # --------------- Re-assemble into dynamic buffer -----
     if group_step == 1:
         if len(dL1) >= n2fetch:

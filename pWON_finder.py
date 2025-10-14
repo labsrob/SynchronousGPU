@@ -147,7 +147,7 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         derivedOEE = derivedWON
         # --------------------------------------------------#
 
-        if nTables != 0 and nTables <= 25:                   # Production file for DNV exist - OEE data
+        if nTables != 0 and nTables <= 20:                   # Production file for DNV exist - OEE data
             # List tables that meet this condition ---------[# schema_name	table_name	create_date]
             # mTables = conn_sq.execute(
             #     'SELECT name as table_name, create_date from '
@@ -186,7 +186,7 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             for (i, item) in enumerate(DNV_tables, start=1):
                 print(i, item)
 
-        elif nTables > 21 and nTables <= 35:
+        elif nTables > 20 and nTables <= 31:
             # List tables that meet this condition ---------[# schema_name	table_name	create_date]
             # mTables = conn_sq.execute(
             #     'SELECT schema_name(schema_id) as schema_name, name as table_name, create_date from '
@@ -251,7 +251,7 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         nTables = pTables[0]                                # Pick total from sql column, add OEE table
         print('\nFound:', nTables, 'valid records..')
 
-        if nTables != 0 and nTables <= 25:                    # DNV Production file exist - OEE data
+        if nTables != 0 and nTables <= 21:                    # DNV Production file exist - OEE data
             # List out all valid tables, figure out OEE from the creation date --------------------------[]
             mTables = conn.execute(
                 'SELECT name as table_name, create_date from '
@@ -285,7 +285,7 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             for (i, item) in enumerate(DNV_tables, start=1):
                 print(i, item)
 
-        elif nTables > 21 and nTables <= 35:
+        elif nTables > 21 and nTables <= 32:
             # List out all valid tables, figure out OEE from the creation date ----------------[]
             mTables = conn.execute(
                 'SELECT name as table_name, create_date from '

@@ -30,7 +30,6 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
         slideType = 'Non-overlapping'
 
     print('\n[RMP] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
-    print('=' * 60)
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
         if last_ts is None:
@@ -47,8 +46,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
             last_ts = data1[-1].id_col
 
         else:
-            print('[cRC] Process EOF reached...')
-            print('[cRC] Halting for 5 Minutes...')
+            print('[cRC] Halting for 30 sec..')
             time.sleep(300)
 
     except Exception as e:

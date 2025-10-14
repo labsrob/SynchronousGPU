@@ -29,7 +29,7 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
         slideType = 'Non-overlapping'
 
     print('\n[ST] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
-    print('=' * 60)
+
     # --------------- Re-assemble into dynamic buffer -----
     if group_step == 1:
         if len(dL1) >= n2fetch or len(dL2) >= n2fetch:
@@ -59,12 +59,12 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
                 dL1.append(result)
             last_t1 = data1[-1].id_col
         else:
-            print('[ST1] Process EOF reached...')
-            print('[ST1] Halting for 30 sec...')
+
+            print('[ST] Halting for 30 sec...')
             time.sleep(30)
 
     except Exception as e:
-        print("[ST1] Data trickling on IDX#:", last_t1)  # , e)
+        print("[ST] Data trickling on IDX#:", last_t1)  # , e)
         time.sleep(2)
     t1.close()
 
@@ -83,12 +83,11 @@ def sqlExec(daq, nGZ, grp_step, T1, T2, fetch_no):
                 dL2.append(result)
             last_t2 = data2[-1].id_col
         else:
-            print('[ST2] Process EOF reached...')
-            print('[ST2] Halting for 30 sec...')
+            print('[ST] Halting for 30 sec...')
             time.sleep(30)
 
     except Exception as e:
-        print("[ST2] Data trickling on IDX#:", last_t2)  # , e)
+        print("[ST] Data trickling on IDX#:", last_t2)  # , e)
         time.sleep(2)
 
     t2.close()

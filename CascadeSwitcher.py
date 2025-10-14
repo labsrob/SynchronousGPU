@@ -32,7 +32,7 @@ import rtP_Evaluator as tq
 import selDataColsLA as qla     # Laser Angle
 import selDataColsLP as qlp     # Laser Power
 import selDataColsRF as qrf     # Roller Force
-import selDataColsRM as qrm     # Ramp Mapping
+import selDataCols_RM as qrm     # Ramp Mapping
 import selDataColsST as qst     # Substrate Temperature
 import selDataColsTG as qtg     # Tape Gap Void
 import selDataColsTP as qtp     # Tape Placement error

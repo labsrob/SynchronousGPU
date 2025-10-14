@@ -102,9 +102,18 @@ smcDescription = [ "No State or Undefined State ", "System health Check, please 
 				 "EoP Error State, please wait…", "StandBy State, Call Engineers ..."]
 
 # -------------------------------------------------------------------------------------[]
-_Plc= snap7.client.Client()
-pCon = _Plc.connect('192.168.100.100', 0, 1)
+_Plc = snap7.client.Client()	# Instantiate a PLC
+# _Plc.set_session_password('Agam1000')
+# disable Allow PUT/Get download HW info and enable again
+
+pCon = _Plc.connect('192.168.100.100', 0, 1)  #:port number 4840
 db_number, start_offset, bit_offset = 89, 0, 0
+
+
+# print('PLC Info:', _Plc.get_cpu_info())
+# print('PLC State:', _Plc.get_cpu_state())
+
+
 # ---------------------------------OPC UA Details ---------------------------[Dr Labs, RB]
 value, data = True, False  			# 1 = true | 0 = false
 start_address = 0  					# starting address
@@ -187,17 +196,22 @@ def autoPausePlay():
 	print('\nChecking SMC readiness...')
 
 	try:
-		sleep(3)
-		sysRun = readBool(db_number, 0, 0)			# False/True
-		sysIdl = readBool(db_number, 0, 1)  			# System idling
-		sysRdy = readBool(db_number, 0, 2)  			# System Ready
-		msc_rt = readInteger(db_number, 2, 0)   		# Machine State Code (msc)
-		if msc_rt <= 0:
-			msc_rt = 0
-		cLayer = readInteger(db_number, 264,0) 		# Current achieved layer
-		pipPos = readLReal(117, 8, 0)  		# Current pipe Position
-		# Obtain State machine code description ----------------------------#
-		rt_stat = dict(zip(machineCode_Data, smcDescription))
+		deviceType = _Plc.get_cpu_info()
+		deviceState = _Plc.get_cpu_state()
+		if deviceType and deviceState:
+			sleep(3)
+			sysRun = readBool(db_number, 0, 0)			# False/True
+			sysIdl = readBool(db_number, 0, 1)  			# System idling
+			sysRdy = readBool(db_number, 0, 2)  			# System Ready
+			msc_rt = readInteger(db_number, 2, 0)   		# Machine State Code (msc)
+			if msc_rt <= 0:
+				msc_rt = 0
+			cLayer = readInteger(db_number, 264,0) 		# Current achieved layer
+			pipPos = readLReal(117, 8, 0)  		# Current pipe Position
+			# Obtain State machine code description ----------------------------#
+			rt_stat = dict(zip(machineCode_Data, smcDescription))
+		else:
+			print('CLI: PLC Host is offline or not available')
 
 	except Exception as err:
 		print(f"Exception Error: '{err}'")
@@ -272,7 +286,7 @@ def liveProductionRdy():
 		sysidl = False
 		sysrdy = False
 
-	return sysRun, sysidl, sysrdy, msctcp, won_NO
+	# return sysRun, sysidl, sysrdy, msctcp, won_NO
 
 
 def autoLaunchViz():			# obtain required variables for playing visualization
@@ -1104,7 +1118,8 @@ def dScreen():
 # def st_autoPausePlay():
 #     return None
 
-# watchDogController()
-# autoPausePlay()
 # sysRun(0.0), sysidl(0.1), sysrdy(0.2), msctcp(2.0), won_NO(4.0) =
-#liveProductionRdy()
+# liveProductionRdy()
+# rt_autoPausePlay()
+# autoPausePlay()
+# watchDogController()

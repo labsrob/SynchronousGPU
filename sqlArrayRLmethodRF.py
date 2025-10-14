@@ -77,7 +77,6 @@ def sqlExec(nGZ, grp_step, daq, rT1, fetch_no):
                 pass
         # print("Step List1:", len(dL1), dL1)       FIXME:
     else:
-        print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
     daq.close()

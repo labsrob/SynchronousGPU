@@ -256,29 +256,29 @@ n2fetch = 100
 import numpy as np
 import numpy as np
 
-def align_arrays(arrs, mode="truncate", pad_value=0):
-    if mode == "truncate":
-        min_len = min(len(arr) for arr in arrs)
-        return [arr[:min_len] for arr in arrs]
-
-    elif mode == "pad":
-        max_len = max(len(arr) for arr in arrs)
-        return [np.pad(arr, (0, max_len - len(arr)),
-                       constant_values=pad_value) for arr in arrs]
-
-    else:
-        raise ValueError("mode must be 'truncate' or 'pad'")
-
-
-def truncate_to_shortest(x, *ys):
-    """
-    Truncate x and all y arrays to the shortest length.
-    """
-    min_len = min([len(x)] + [len(y) for y in ys])
-    x_trunc = x[:min_len]
-    # y_trunc = np.vstack[y[:min_len] for y in ys]
-    y_trunc = np.vstack([y[:min_len] for y in ys])
-    return x_trunc, y_trunc
+# def align_arrays(arrs, mode="truncate", pad_value=0):
+#     if mode == "truncate":
+#         min_len = min(len(arr) for arr in arrs)
+#         return [arr[:min_len] for arr in arrs]
+#
+#     elif mode == "pad":
+#         max_len = max(len(arr) for arr in arrs)
+#         return [np.pad(arr, (0, max_len - len(arr)),
+#                        constant_values=pad_value) for arr in arrs]
+#
+#     else:
+#         raise ValueError("mode must be 'truncate' or 'pad'")
+#
+#
+# def truncate_to_shortest(x, *ys):
+#     """
+#     Truncate x and all y arrays to the shortest length.
+#     """
+#     min_len = min([len(x)] + [len(y) for y in ys])
+#     x_trunc = x[:min_len]
+#     # y_trunc = np.vstack[y[:min_len] for y in ys]
+#     y_trunc = np.vstack([y[:min_len] for y in ys])
+#     return x_trunc, y_trunc
 
 
 # x =  np.arange(4)
@@ -295,14 +295,14 @@ def truncate_to_shortest(x, *ys):
 import numpy as np
 
 
-def padDT(x, ys, pad_value=0):
-    max_len = max(len(x), max(len(y) for y in ys))
-    # Pad x if shorter
-    x_padded = np.pad(x, (0, max_len - len(x)), constant_values=pad_value)
-    # Pad each y-series
-    ys_padded = np.vstack([np.pad(y, (0, max_len - len(y)), constant_values=pad_value) for y in ys])
-    return x_padded, ys_padded
-#
+# def padDT(x, ys, pad_value=0):
+#     max_len = max(len(x), max(len(y) for y in ys))
+#     # Pad x if shorter
+#     x_padded = np.pad(x, (0, max_len - len(x)), constant_values=pad_value)
+#     # Pad each y-series
+#     ys_padded = np.vstack([np.pad(y, (0, max_len - len(y)), constant_values=pad_value) for y in ys])
+#     return x_padded, ys_padded
+# #
 #
 # x = np.arange(32)
 # y1 = np.arange(28)      # shorter
@@ -375,46 +375,215 @@ try:
         if num_gpus > 0:
             free_mem, total_mem = cp.cuda.runtime.memGetInfo()
             if free_mem / total_mem > 0.1:  # at least 10% free memory
-                np = cp                     # use CuPy as NumPy
+                np = cp                # ✅ use CuPy as NumPy
                 GPU_ENABLED = True
-                print(f"Using GPU (CuPy) | Free memory: {free_mem / 1e9:.2f} GB")
+                print(f"✅ Using GPU (CuPy) | Free memory: {free_mem / 1e9:.2f} GB")
             else:
-                print("GPU memory low — falling back to CPU (NumPy).")
+                print("⚠️ GPU memory low — falling back to CPU (NumPy).")
         else:
-            print("No GPU found — using CPU (NumPy).")
+            print("⚠️ No GPU found — using CPU (NumPy).")
     except cp.cuda.runtime.CUDARuntimeError:
-        print("CUDA not available — using CPU (NumPy).")
+        print("⚠️ CUDA not available — using CPU (NumPy).")
 
 except ImportError:
     import numpy as np
     GPU_ENABLED = False
-    print("CuPy not installed — using CPU (NumPy).")
+    print("⚠️ CuPy not installed — using CPU (NumPy).")
 
 # Always ensure np.asnumpy() is defined (for cross-compatibility)
 if not hasattr(np, "asnumpy"):
     np.asnumpy = lambda x: x
 
-# NumPy array on CPU
-np_arr = np.arange(5)
-print("NumPy:", type(np_arr))
-
-# Convert to CuPy array (on GPU)
-cp_arr = np.asarray(np_arr)
-print("CuPy:", type(cp_arr))
-
-# Convert back to NumPy
-np_arr2 = cp_arr.get()
-print("Back to NumPy:", type(np_arr2))
-
-# works on GPU if available, otherwise CPU
-x = np.arange(10)
-y = np.sin(x)
-
-# convert back to CPU safely
-y_cpu = np.asnumpy(y)
-print(type(y_cpu))
+# # NumPy array on CPU
+# np_arr = np.arange(5)
+# print("NumPy:", type(np_arr))
+#
+# # Convert to CuPy array (on GPU)
+# cp_arr = np.asarray(np_arr)
+# print("CuPy:", type(cp_arr))
+#
+# # Convert back to NumPy
+# np_arr2 = cp_arr.get()
+# print("Back to NumPy:", type(np_arr2))
+#
+# # works on GPU if available, otherwise CPU
+# x = np.arange(10)
+# y = np.sin(x)
+#
+# # convert back to CPU safely
+# y_cpu = np.asnumpy(y)
+# print(type(y_cpu))
 
 # --------------------------------------------------------------------------[]
+#
+# import cupy
+# print(cupy.Series([1, 2, 3]))
 
-import cupy
-print(cupy.Series([1, 2, 3]))
+# # Rolling mean with min_periods=1
+# gdf_rolling = gdf.rolling(window=s_fetch, min_periods=1).mean()
+#
+# # Optionally convert back to pandas
+# pdf_rolling = gdf_rolling.to_pandas()
+
+# -------------------------------------------------------------------Test @ Jit Numba --------#
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from numba import cuda
+# NUMBA_CUDA_USE_NVIDIA_BINDING = 0
+# print(cuda.is_available())
+#
+# # Generate synthetic time series data
+# N = 1000
+# np.random.seed(0)
+# signal = np.sin(np.linspace(0, 20, N)) + np.random.normal(0, 0.3, N).astype(np.float32)
+#
+# # Rolling window size
+# window = 25
+# half_window = window // 2
+#
+# # Output arrays
+# rolling_mean = np.zeros_like(signal)
+# rolling_std = np.zeros_like(signal)
+#
+# # CUDA kernel
+# @cuda.jit
+# def rolling_stats_kernel(data, mean_out, std_out, window):
+#     i = cuda.grid(1)
+#     N = data.shape[0]
+#     half_w = window // 2
+#
+#     if i < N:
+#         sum_ = 0.0
+#         count = 0
+#         for j in range(i - half_w, i + half_w + 1):
+#             if 0 <= j < N:
+#                 sum_ += data[j]
+#                 count += 1
+#
+#         mean = sum_ / count
+#         mean_out[i] = mean
+#
+#         # Compute standard deviation
+#         sum_sq = 0.0
+#         for j in range(i - half_w, i + half_w + 1):
+#             if 0 <= j < N:
+#                 sum_sq += (data[j] - mean) ** 2
+#
+#         std_out[i] = (sum_sq / count) ** 0.5
+#
+# # Move data to device
+# d_signal = cuda.to_device(signal)
+# d_mean = cuda.device_array_like(signal)
+# d_std = cuda.device_array_like(signal)
+#
+# # Launch kernel
+# threads_per_block = 128
+# blocks = (N + threads_per_block - 1) // threads_per_block
+#
+# rolling_stats_kernel[blocks, threads_per_block](d_signal, d_mean, d_std, window)
+#
+# # Copy back to host
+# d_mean.copy_to_host(rolling_mean)
+# d_std.copy_to_host(rolling_std)
+#
+# # Plotting
+# x = np.arange(N)
+# plt.figure(figsize=(12, 6))
+# plt.plot(x, signal, label='Original Signal', alpha=0.5)
+# plt.plot(x, rolling_mean, label='Rolling Mean', color='orange')
+# plt.fill_between(x, rolling_mean - rolling_std, rolling_mean + rolling_std,
+#                  color='orange', alpha=0.2, label='Rolling Std Dev')
+# plt.title("Rolling Mean and Standard Deviation (Window = {})".format(window))
+# plt.legend()
+# plt.grid(True)
+# plt.xlabel("Time")
+# plt.ylabel("Signal")
+# plt.tight_layout()
+# plt.show()
+
+# ------------------------------------------------------------------------------------------
+#
+# import pandas as pd
+# import numpy as np
+#
+# import cupy as cp
+# from cupyx.scipy.ndimage import uniform_filter1d
+#
+# import matplotlib.pyplot as plt
+# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+# import tkinter as tk
+#
+# # ----- Step 1: Simulate SQL data as a DataFrame -----
+# # Simulated data: 300 rows, 10 columns
+# np.random.seed(42)
+# df = pd.DataFrame(np.random.randn(300, 10), columns=[f'col{i}' for i in range(10)])
+#
+# # ----- Step 2: Convert to CuPy -----
+# data_np = df.to_numpy().astype(np.float32)   # NumPy first
+# data_cp = cp.asarray(data_np)                # Then to CuPy
+#
+# window = 30
+#
+# # ----- Step 3: Compute rolling mean & std (centered window) -----
+# # Using uniform_filter1d for efficient rolling mean
+# mean_cp = uniform_filter1d(data_cp, size=window, axis=0, mode='reflect')
+# # Compute rolling std: std(x) = sqrt(mean(x^2) - mean(x)^2)
+# squared_cp = uniform_filter1d(data_cp ** 2, size=window, axis=0, mode='reflect')
+# std_cp = cp.sqrt(squared_cp - mean_cp ** 2)
+#
+# # Transfer results back to CPU
+# mean_np = cp.asnumpy(mean_cp)
+# std_np = cp.asnumpy(std_cp)
+#
+# # ----- Step 4: Plot in Tkinter -----
+# def plot_in_tkinter():
+#     root = tk.Tk()
+#     root.title("CuPy Rolling Mean/Std Plot (10 Columns)")
+#
+#     fig, axs = plt.subplots(5, 2, figsize=(10, 8), constrained_layout=True)
+#     axs = axs.flatten()
+#
+#     x = np.arange(len(mean_np))
+#
+#     for i in range(10):
+#         axs[i].plot(x, mean_np[:, i], label=f'Mean col{i}', color='blue')
+#         axs[i].fill_between(x,
+#                             mean_np[:, i] - std_np[:, i],
+#                             mean_np[:, i] + std_np[:, i],
+#                             alpha=0.3,
+#                             color='blue',
+#                             label='±1 Std Dev')
+#         axs[i].set_title(f'Column {i}')
+#         axs[i].legend()
+#         axs[i].grid(True)
+#
+#     # Embed the plot into Tkinter
+#     canvas = FigureCanvasTkAgg(fig, master=root)
+#     canvas.draw()
+#     canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+#
+#     root.mainloop()
+#
+# # ----- Run the app -----
+# plot_in_tkinter()
+import numpy as np
+import statistics as st
+# ------------------------------------------------
+list1 = [3.2,2.1,5.0,6.2]
+list2 = [4,2,6,5]
+list3 = [3,5,4,7]
+list4 = [4,5,2,3]
+print('R1:', np.mean(list1))
+print('R2:', np.mean(list2))
+print('R3:', np.mean(list3))
+print('R4:', np.mean(list4))
+print('Total X:', np.mean(list1) + np.mean(list2) + np.mean(list3) + np.mean(list4))
+print('Total Mean of Means:', np.mean([np.mean(list1), np.mean(list2), np.mean(list3), np.mean(list4)]))
+
+print('Total Mean of_Means:', np.mean([list1, list2, list3, list4]))
+print('Total Mean of_Stds:', np.std([list1, list2, list3, list4]))
+
+
+list = [420.2, 425.13333, 415.73334, 422.60004]
+print('TP01', np.mean(list))
+print('TP01', st.mean(list))
