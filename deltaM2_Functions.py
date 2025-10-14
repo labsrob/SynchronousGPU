@@ -1120,6 +1120,4 @@ def dScreen():
 
 # sysRun(0.0), sysidl(0.1), sysrdy(0.2), msctcp(2.0), won_NO(4.0) =
 # liveProductionRdy()
-# rt_autoPausePlay()
-# autoPausePlay()
-# watchDogController()
+rt_autoPausePlay()

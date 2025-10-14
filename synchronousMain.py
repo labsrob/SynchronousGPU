@@ -113,17 +113,12 @@ import cupy as cp
 import shutil
 import warnings
 # import cudf
-cudf = False
 
+cudf = False
 import cupy as cp
 import pandas as pd
 from cupyx.scipy.ndimage import uniform_filter1d
-# -------------------
-is_CuDF = False
-is_CuPy = True
-is_NumPy = False
-# -------------------
-GPU_ENABLED = True
+
 
 def get_nvidia_info():
     """Return GPU info (name, memory, utilization, temperature) if available."""
@@ -193,7 +188,12 @@ except ImportError:
 # --- Make np.asnumpy safe for both backends ---
 # if not hasattr(np, "asnumpy"):
 #     np.asnumpy = lambda x: x
-
+# -------------------
+is_CuDF = False
+is_CuPy = True
+is_NumPy = False
+# -------------------
+GPU_ENABLED = True
 # ------------------------[]
 # Cross-platform simple beep
 def beep():
@@ -3156,7 +3156,8 @@ class common_rampCount(ttk.Frame):
                 RC.pop(0)
             else:
                 self.a1.set_xlim(0, self.win_XmaxRC)
-            print('[cRC] Data Stream Buffer Size 2:', len(RC))
+            # self.a1.relim()         # Recalculate limits
+            # self.a1.autoscale()     # Apply the new limits
             self.canvas.draw_idle()
 
         else:
@@ -3391,7 +3392,10 @@ class common_climateProfile(ttk.Frame):
             else:
                 self.a2.set_xlim(0, self.win_Xmax)
                 self.a3.set_xlim(0, self.win_Xmax)
-            print('Data Stream Buffer Size 2:', len(EV))
+            self.a2.relim()  # Recalculate limits
+            self.a2.autoscale()  # Apply the new limits
+            self.a3.relim()  # Recalculate limits
+            self.a3.autoscale()  # Apply the new limits
             self.canvas.draw_idle()
 
         else:
@@ -3600,7 +3604,8 @@ class common_gapCount(ttk.Frame):
                 VC.pop(0)
             else:
                 self.a3.set_xlim(0, self.win_Xmax)
-            print('Data Stream Buffer Size 2:', len(VC))
+            self.a3.relim()         # Recalculate limits
+            self.a3.autoscale()     # Apply the new limits
             self.canvas.draw_idle()
 
         else:
@@ -5639,7 +5644,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
         # self.status = tab_status(notebook, 0)
-        self.running = True
+        self.running = False
         self.runRMP = False
 
         # prevents user possible double loading -----
@@ -6136,11 +6141,11 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
             data1 = df1.select_dtypes(include=["number"])
             df1_interp = data1.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
             # ------------------------------------------#
-            if GPU_ENABLED and is_CuDF:
+            if is_CuDF:
                 gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 # ----------------------------------------------------#
                 TT = tt.loadProcesValues(gpu_df1)
-            elif GPU_ENABLED and is_CuPy:
+            elif is_CuPy:
                 # ----- Convert dataframe to CuPy -----
                 data_np = df1_interp.to_numpy().astype(np.float32)      # NumPy first
                 data_cp = cp.asarray(data_np)                           # Then to CuPy
@@ -6333,7 +6338,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                         xig.processRT_Sigma(pID, rID, head1, head2, head3, head4)
 
                 # ------------------------------------------------------------------------------[]
-                elif GPU_ENABLED and is_CuPy:  # Live Stream on GPU
+                elif is_CuPy:  # Live Stream on GPU
                     # X Plot Y-Axis data points for XBar ---------------------------------[Ring 1 TT]
                     self.im10.set_ydata((xTT[:, 1])[0:batch_TT])  # head 1
                     self.im11.set_ydata((xTT[:, 2])[0:batch_TT])  # head 2
@@ -6426,7 +6431,7 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                 if GPU_ENABLED and is_CuDF:
                     pass        # Not implemented yet
 
-                elif GPU_ENABLED and is_CuPy:
+                elif is_CuPy:
                     self.im10.set_ydata((xTT[:, 1])[0:batch_TT])  # head 1
                     self.im11.set_ydata((xTT[:, 2])[0:batch_TT])  # head 2
                     self.im12.set_ydata((xTT[:, 3])[0:batch_TT])  # head 3
@@ -6659,7 +6664,7 @@ class substTempTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
+        self.running = False
 
         # prevents user possible double loading -----
         if not self.running:
@@ -8147,7 +8152,7 @@ class tapeGapPolTabb(ttk.Frame):
             elif is_NumPy:
                 TG = tg.loadProcesValues(df1_interp)        # Join data values under dataframe
             # ----------------------------------------------#
-            # print('\nDataFrame Content', df1.head(10))
+            # print('\nDataFrame Content, df1.head(10))
             # print("Memory Usage:", df1.info(verbose=False))  # Check memory utilization
             # --------------------------------------#
         else:
@@ -8945,71 +8950,9 @@ class MonitorTabb(ttk.Frame):
             im32, = self.a4.plot([], [], 'o-', label='RTD Oven Temperature (Upper Segment)')
             im33, = self.a4.plot([], [], 'o-', label='IR Oven Temperature (Lower Segment)')
             im34, = self.a4.plot([], [], 'o-', label='IR Oven Temperature (Upper Segment)')
+            im35, = self.a4.plot([], [], 'o-', label='IR Oven Temperature (Lower Segment)')
+            im36, = self.a4.plot([], [], 'o-', label='IR Oven Temperature (Upper Segment)')
 
-        elif pRecipe == 'MGM':
-            # --------------------------------------------------[Laser Power]
-            im10, = self.a1.plot([], [], 'o-', label='Laser Power - (R1H1)')
-            im11, = self.a1.plot([], [], 'o-', label='Laser Power - (R1H2)')
-            im12, = self.a1.plot([], [], 'o-', label='Laser Power - (R1H3)')
-            im13, = self.a1.plot([], [], 'o-', label='Laser Power - (R1H4)')
-            im14, = self.a1.plot([], [], 'o-', label='Laser Power - (R2H1)')
-            im15, = self.a1.plot([], [], 'o-', label='Laser Power - (R2H2)')
-            im16, = self.a1.plot([], [], 'o-', label='Laser Power - (R2H3)')
-            im17, = self.a1.plot([], [], 'o-', label='Laser Power - (R2H4)')
-            im18, = self.a1.plot([], [], 'o-', label='Laser Power - (R3H1)')
-            im19, = self.a1.plot([], [], 'o-', label='Laser Power - (R3H2)')
-            im20, = self.a1.plot([], [], 'o-', label='Laser Power - (R3H3)')
-            im21, = self.a1.plot([], [], 'o-', label='Laser Power - (R3H4)')
-            im22, = self.a1.plot([], [], 'o-', label='Laser Power - (R4H1)')
-            im23, = self.a1.plot([], [], 'o-', label='Laser Power - (R4H2)')
-            im24, = self.a1.plot([], [], 'o-', label='Laser Power - (R4H3)')
-            im25, = self.a1.plot([], [], 'o-', label='Laser Power - (R4H4)')
-            # ---------------------------------------- [Cell Tension  & Oven Temp]
-            im26, = self.a2.plot([], [], 'o-', label='Active Cell Tension')
-            # --------------------------------------------------[Roller Pressure]
-            im27, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R1H1)')
-            im28, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R1H2)')
-            im29, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R1H3)')
-            im30, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R1H4)')
-            im31, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R2H1)')
-            im32, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R2H2)')
-            im33, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R2H3)')
-            im34, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R2H4)')
-            im35, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R3H1)')
-            im36, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R3H2)')
-            im37, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R3H3)')
-            im38, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R3H4)')
-            im39, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R4H1)')
-            im40, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R4H2)')
-            im41, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R4H3)')
-            im42, = self.a3.plot([], [], 'o-', label='Roller Pressure - (R4H4)')
-            # --------------------------------------------------[Laser Angle]
-            im43, = self.a4.plot([], [], 'o-', label='Laser Angle - (R1H1)')
-            im44, = self.a4.plot([], [], 'o-', label='Laser Angle - (R1H2)')
-            im45, = self.a4.plot([], [], 'o-', label='Laser Angle - (R1H3)')
-            im46, = self.a4.plot([], [], 'o-', label='Laser Angle - (R1H4)')
-            im47, = self.a4.plot([], [], 'o-', label='Laser Angle - (R2H1)')
-            im48, = self.a4.plot([], [], 'o-', label='Laser Angle - (R2H2)')
-            im49, = self.a4.plot([], [], 'o-', label='Laser Angle - (R2H3)')
-            im50, = self.a4.plot([], [], 'o-', label='Laser Angle - (R2H4)')
-            im51, = self.a4.plot([], [], 'o-', label='Laser Angle - (R3H1)')
-            im52, = self.a4.plot([], [], 'o-', label='Laser Angle - (R3H2)')
-            im53, = self.a4.plot([], [], 'o-', label='Laser Angle - (R3H3)')
-            im54, = self.a4.plot([], [], 'o-', label='Laser Angle - (R3H4)')
-            im55, = self.a4.plot([], [], 'o-', label='Laser Angle - (R4H1)')
-            im56, = self.a4.plot([], [], 'o-', label='Laser Angle - (R4H2)')
-            im57, = self.a4.plot([], [], 'o-', label='Laser Angle - (R4H3)')
-            im58, = self.a4.plot([], [], 'o-', label='Laser Angle - (R4H4)')
-            # -----------------------------------------------[ Oven Temperature]
-            im59, = self.a5.plot([], [], 'o-', label='RTD Oven Temperature (Lower Segment)')
-            im60, = self.a5.plot([], [], 'o-', label='RTD Oven Temperature (Upper Segment)')
-            im61, = self.a6.plot([], [], 'o-', label='IR Oven Temperature (Lower Segment)')
-            im62, = self.a6.plot([], [], 'o-', label='IR Oven Temperature (Upper Segment)')
-            # ----------------------------------------------[Winding Speed x16]
-            im63, = self.a6.plot([], [], 'o-', label='Winding Speed - (Ring 1)')
-            im64, = self.a6.plot([], [], 'o-', label='Winding Speed - (Ring 2)')
-            im65, = self.a6.plot([], [], 'o-', label='Winding Speed - (Ring 3)')
-            im66, = self.a6.plot([], [], 'o-', label='Winding Speed - (Ring 4)')
 
         # self.canvas = FigureCanvasTkAgg(self.f, master=root)
         self.canvas = FigureCanvasTkAgg(self.f, self)
@@ -9037,7 +8980,7 @@ class MonitorTabb(ttk.Frame):
             import sqlArrayRLmethodPM as spm
             mt_con = sq.sql_connectRTM()
         else:
-            print('[RTM] Data Source selection is Unknown')
+            print('[PM] Data Source selection is Unknown')
             mt_con = None
 
         # Initialise RT variables ---[]
@@ -9063,15 +9006,7 @@ class MonitorTabb(ttk.Frame):
 
                 else:
                     # Get list of relevant SQL Tables using conn() and execute real-time query --------------------[]
-                    if pRecipe == 'DNV':
-                        self.gEN, self.RPa, self.RPb = spm.dnv_sqlExec(mt_con, s_fetch, stp_Sz, self.T1, self.T2, self.T3, batch_PM)
-
-                    elif pRecipe == 'MGM':
-                         self.gEN, self.RPa, self.RPb, self.LPa, self.LPb, self.LAa, self.LAb = spm.mgm_sqlExec(
-                            mt_con, s_fetch, stp_Sz, self.T1, self.T2, self.T3,
-                            self.T4, self.T5, self.T6, self.T7, batch_PM)
-                    else:
-                        self.gEN, self.RP, self.LP, self.LA = 0, 0, 0, 0            # Assigned to Bespoke User Selection.
+                    self.gEN, self.RPa, self.RPb = spm.dnv_sqlExec(mt_con, s_fetch, stp_Sz, self.T1, self.T2, self.T3, batch_PM)
                     time.sleep(60)
                 # ------ Inhibit iteration ----------------------------------------------------------[]
                 """
@@ -9092,9 +9027,9 @@ class MonitorTabb(ttk.Frame):
 
             else:
                 print('[PM] is active but no visualisation!\n')
-            print('[RMP] Waiting for refresh..')
+            print('[PM] Waiting for refresh..')
             if mt_con:
-                self.canvas.get_tk_widget().after(30, self.mtDataPlot)
+                self.canvas.get_tk_widget().after(0, self.mtDataPlot)
                 batch_PM += 1
             else:
                 print('[PM] sorry, instance not granted, trying again..')
@@ -9111,127 +9046,114 @@ class MonitorTabb(ttk.Frame):
             print('\nMonitor Tabb running......')
             import VarSQL_PM as mt
             # ----------------------------------------------#
-            if pRecipe == 'DNV':
-                g1 = qpm.validCols(self.T1)                          # General Table (OT/CT)
-                d1 = pd.DataFrame(self.gEN, columns=g1)
-                g2 = qpm.validCols(self.T2)                          # Roller Pressure Table 1
-                d2 = pd.DataFrame(self.RPa, columns=g2)
-                g3 = qpm.validCols(self.T3)                          # Roller Pressure Table 2
-                d3 = pd.DataFrame(self.RPb, columns=g3)
-                # g4 = qpm.validCols(self.T4)                        # Winding Speed
-                # d4 = pd.DataFrame(self.RPc, columns=g4)
+            g1 = qpm.validCols(self.T1)                          # General Table (OT/CT)
+            d1 = pd.DataFrame(self.gEN, columns=g1)
 
-                # Concatenate all columns -----------------------[]
-                df1 = pd.concat([d1, d2, d3], axis=1)
+            g2 = qpm.validCols(self.T2)                          # Roller Pressure Table 1
+            d2 = pd.DataFrame(self.RPa, columns=g2)
 
-            elif pRecipe == 'MGM':
-                g1 = qpm.validCols(self.T1)                          # General Table
-                d1 = pd.DataFrame(self.gEN, columns=g1)
-                g2 = qpm.validCols(self.T2)                          # Roller Pressure Table 1
-                d2 = pd.DataFrame(self.RPa, columns=g2)
-                g3 = qpm.validCols(self.T3)                          # Roller Pressure Table 2
-                d3 = pd.DataFrame(self.RPb, columns=g3)
-                g4 = qpm.validCols(self.T4)                          # Laser Power Table 1
-                d4 = pd.DataFrame(self.LPa, columns=g4)
-                g5 = qpm.validCols(self.T5)                          # Laser Power Table 2
-                d5 = pd.DataFrame(self.LPb, columns=g5)
-                g6 = qpm.validCols(self.T6)                          # Laser Angle
-                d6 = pd.DataFrame(self.LAa, columns=g6)
-                g7 = qpm.validCols(self.T7)                          # Laser Angle
-                d7 = pd.DataFrame(self.LAb, columns=g7)
-                # Concatenate all columns -----------[]
-                df1 = pd.concat([d1, d2, d3, d4, d5, d6, d7], axis=1)
-                # ------------------------------------[]
-                # Do some data cleansing
-                df_clean = df1.select_dtypes(include=["number"])
-                df1_interp = df_clean.interpolate(method="linear", axis=0).ffill().bfill()  # column-wise
+            g3 = qpm.validCols(self.T3)                          # Roller Pressure Table 2
+            d3 = pd.DataFrame(self.RPb, columns=g3)
 
-            if GPU_ENABLED and is_CuDF:
+            # Concatenate all columns -----------------[]
+            df1 = pd.concat([d1, d2, d3], axis=1)
+            # -----------------------------------------[]
+
+            # Do some data cleansing ------------------[]
+            df_clean = df1.select_dtypes(include=["number"])
+            df1_interp = df_clean.interpolate(method="linear", axis=0).ffill().bfill()  #
+            if is_CuDF:
                 gpu_df1 = cudf.from_pandas(df1_interp.select_dtypes(include="number"))
                 PM = mt.loadProcesValues(gpu_df1, pRecipe)
 
-            elif GPU_ENABLED and is_CuPy:
+            elif is_CuPy:
+                print('[PM] Process Monitoring in progress...')
                 data_np = df1_interp.to_numpy().astype(np.float32)  # NumPy first
                 data_cp = cp.asarray(data_np)
+
                 # ---------Include any serious graphical transformations -------
-                # then convert to Numpy arrays and display
-                PM = mt.loadProcesValues(data_cp, pRecipe)
+                mean_cp = uniform_filter1d(data_cp, size=s_fetch, axis=0, mode='reflect')
+                PM = cp.asnumpy(mean_cp)
+                # PM = mt.loadProcesValues(mean_cp, pRecipe)
+                # print('TP012', PM[:, 1])
 
             elif is_NumPy:
                 PM = mt.loadProcesValues(df1_interp, pRecipe)
-            # --------------------------------------
-            # print('\nDataFrame Content', df1.head(10))
-            # Declare Plots attributes ---------------------------------------[]
-            if self.running:
-                self.a1.legend(title='Roller Pressure - MPa', loc='upper right')
-                self.a2.legend(title='Winding Speed - m/s', loc='upper right')
-                self.a3.legend(title='Cell Tension - N.m', loc='upper right')
-                self.a4.legend(title='Oven Temperature - °C', loc='upper right')
-                # ------------------------------------------#
-                im10.set_xdata(np.arange(batch_PM))
-                im11.set_xdata(np.arange(batch_PM))
-                im12.set_xdata(np.arange(batch_PM))
-                im13.set_xdata(np.arange(batch_PM))
-                im14.set_xdata(np.arange(batch_PM))
-                im15.set_xdata(np.arange(batch_PM))
-                im16.set_xdata(np.arange(batch_PM))
-                im17.set_xdata(np.arange(batch_PM))
-                im18.set_xdata(np.arange(batch_PM))
-                im19.set_xdata(np.arange(batch_PM))
-                im20.set_xdata(np.arange(batch_PM))
-                im21.set_xdata(np.arange(batch_PM))
-                im22.set_xdata(np.arange(batch_PM))
-                im23.set_xdata(np.arange(batch_PM))
-                im24.set_xdata(np.arange(batch_PM))
-                im25.set_xdata(np.arange(batch_PM))
+                # print('TP010', PM[0], PM[1], PM[2])
+        else:
+            PM = 0
+            print('[PM] Unknown Protocol...')
 
-                im26.set_xdata(np.arange(batch_PM))
-                im27.set_xdata(np.arange(batch_PM))
-                im28.set_xdata(np.arange(batch_PM))
-                im29.set_xdata(np.arange(batch_PM))
-                im30.set_xdata(np.arange(batch_PM))
-                im31.set_xdata(np.arange(batch_PM))
-                im32.set_xdata(np.arange(batch_PM))
-                im33.set_xdata(np.arange(batch_PM))
-                im34.set_xdata(np.arange(batch_PM))
-                if pRecipe == 'MGM':
-                    im35.set_xdata(np.arange(batch_PM))
-                    im36.set_xdata(np.arange(batch_PM))
-                    im37.set_xdata(np.arange(batch_PM))
-                    im38.set_xdata(np.arange(batch_PM))
-                    im39.set_xdata(np.arange(batch_PM))
-                    im40.set_xdata(np.arange(batch_PM))
-                    im41.set_xdata(np.arange(batch_PM))
+        # Declare Plots attributes -----------[]
+        if self.running:
+            self.a1.legend(title='Roller Pressure - MPa', loc='upper right')
+            self.a2.legend(title='Winding Speed - m/s', loc='upper right')
+            self.a3.legend(title='Cell Tension - N.m', loc='upper right')
+            self.a4.legend(title='Oven Temperature - °C', loc='upper right')
+            # ------------------------------------------#
+            im10.set_xdata(np.arange(batch_PM))
+            im11.set_xdata(np.arange(batch_PM))
+            im12.set_xdata(np.arange(batch_PM))
+            im13.set_xdata(np.arange(batch_PM))
+            im14.set_xdata(np.arange(batch_PM))
+            im15.set_xdata(np.arange(batch_PM))
+            im16.set_xdata(np.arange(batch_PM))
+            im17.set_xdata(np.arange(batch_PM))
+            im18.set_xdata(np.arange(batch_PM))
+            im19.set_xdata(np.arange(batch_PM))
+            im20.set_xdata(np.arange(batch_PM))
+            im21.set_xdata(np.arange(batch_PM))
+            im22.set_xdata(np.arange(batch_PM))
+            im23.set_xdata(np.arange(batch_PM))
+            im24.set_xdata(np.arange(batch_PM))
+            im25.set_xdata(np.arange(batch_PM))
 
-                    im42.set_xdata(np.arange(batch_PM))
-                    im43.set_xdata(np.arange(batch_PM))
-                    im44.set_xdata(np.arange(batch_PM))
-                    im45.set_xdata(np.arange(batch_PM))
+            im26.set_xdata(np.arange(batch_PM))
+            im27.set_xdata(np.arange(batch_PM))
+            im28.set_xdata(np.arange(batch_PM))
+            im29.set_xdata(np.arange(batch_PM))
+            im30.set_xdata(np.arange(batch_PM))
+            im31.set_xdata(np.arange(batch_PM))
+            im32.set_xdata(np.arange(batch_PM))
+            im33.set_xdata(np.arange(batch_PM))
+            im34.set_xdata(np.arange(batch_PM))
+            im35.set_xdata(np.arange(batch_PM))
+            im36.set_xdata(np.arange(batch_PM))
 
-                    im46.set_xdata(np.arange(batch_PM))
-                    im47.set_xdata(np.arange(batch_PM))
-                    im48.set_xdata(np.arange(batch_PM))
-                    im49.set_xdata(np.arange(batch_PM))
-                    im50.set_xdata(np.arange(batch_PM))
-                    im51.set_xdata(np.arange(batch_PM))
-                    im52.set_xdata(np.arange(batch_PM))
-                    im53.set_xdata(np.arange(batch_PM))
-                    im54.set_xdata(np.arange(batch_PM))
-                    im55.set_xdata(np.arange(batch_PM))
-                    im56.set_xdata(np.arange(batch_PM))
-                    im57.set_xdata(np.arange(batch_PM))
-                    im58.set_xdata(np.arange(batch_PM))
-                    im59.set_xdata(np.arange(batch_PM))
-                    im60.set_xdata(np.arange(batch_PM))
-                    im61.set_xdata(np.arange(batch_PM))
+            if self.running and is_CuPy:
+                # X Plot Y-Axis ----------[Roller Pressure x16, A1]
+                im10.set_ydata((PM[:, 14])[0:batch_PM])  # R1H1
+                im11.set_ydata((PM[:, 15])[0:batch_PM])  # R1H2
+                im12.set_ydata((PM[:, 16])[0:batch_PM])  # R1H3
+                im13.set_ydata((PM[:, 17])[0:batch_PM])  # R1H4
+                im14.set_ydata((PM[:, 18])[0:batch_PM])  # R2H1
+                im15.set_ydata((PM[:, 19])[0:batch_PM])  # R2H2
+                im16.set_ydata((PM[:, 20])[0:batch_PM])  # R2H3
+                im17.set_ydata((PM[:, 21])[0:batch_PM])  # R2H4
+                im18.set_ydata((PM[:, 23])[0:batch_PM])  # Segment 1
+                im19.set_ydata((PM[:, 24])[0:batch_PM])  # Segment 2
+                im20.set_ydata((PM[:, 25])[0:batch_PM])  # Segment 3
+                im21.set_ydata((PM[:, 26])[0:batch_PM])  # Segment 4
+                im22.set_ydata((PM[:, 27])[0:batch_PM])  # Segment 1
+                im23.set_ydata((PM[:, 28])[0:batch_PM])  # Segment 2
+                im24.set_ydata((PM[:, 29])[0:batch_PM])  # Segment 3
+                im25.set_ydata((PM[:, 30])[0:batch_PM])  # Segment 4
+                # ------------------------------------- Tape Winding Speed x16, A2
+                im26.set_ydata((PM[:, 8])[0:batch_PM])  # Winding SPeed
+                im27.set_ydata((PM[:, 9])[0:batch_PM])  # WS Ring2
+                im28.set_ydata((PM[:, 10])[0:batch_PM])  # WS Ring3
+                im29.set_ydata((PM[:, 11])[0:batch_PM])  # WS Ring4
+                # --------------------------------------Active Cell Tension x1
+                im30.set_ydata((PM[:, 1])[0:batch_PM])  # SCell Tension on CuPy
+                # ----------------------------------------Oven Temperature x4 (RTD & IR Temp)
+                im31.set_ydata((PM[:, 2])[0:batch_PM])  # Segment 2
+                im32.set_ydata((PM[:, 3])[0:batch_PM])  # Segment 3
+                im33.set_ydata((PM[:, 4])[0:batch_PM])  # Segment 4
+                im34.set_ydata((PM[:, 5])[0:batch_PM])  # Segment 1
+                im35.set_ydata((PM[:, 6])[0:batch_PM])  # Segment 4
+                im36.set_ydata((PM[:, 7])[0:batch_PM])  # Segment 1
 
-                    im62.set_xdata(np.arange(batch_PM))
-                    im63.set_xdata(np.arange(batch_PM))
-                    im64.set_xdata(np.arange(batch_PM))
-                    im65.set_xdata(np.arange(batch_PM))
-                    im66.set_xdata(np.arange(batch_PM))
-
-            if self.running and pRecipe == 'DNV':
+            elif is_NumPy:
                 # X Plot Y-Axis data points for XBar ----------[Roller Pressure x16, A1]
                 im10.set_ydata((PM[14]).rolling(window=25).mean()[0:batch_PM])  # R1H1
                 im11.set_ydata((PM[15]).rolling(window=25).mean()[0:batch_PM])  # R1H2
@@ -9241,91 +9163,28 @@ class MonitorTabb(ttk.Frame):
                 im15.set_ydata((PM[19]).rolling(window=25).mean()[0:batch_PM])  # R2H2
                 im16.set_ydata((PM[20]).rolling(window=25).mean()[0:batch_PM])  # R2H3
                 im17.set_ydata((PM[21]).rolling(window=25).mean()[0:batch_PM])  # R2H4
-                im18.set_ydata((PM[24]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im19.set_ydata((PM[25]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im20.set_ydata((PM[26]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im21.set_ydata((PM[27]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im22.set_ydata((PM[28]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im23.set_ydata((PM[29]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im24.set_ydata((PM[30]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im25.set_ydata((PM[31]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
+                im18.set_ydata((PM[22]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
+                im19.set_ydata((PM[23]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
+                im20.set_ydata((PM[24]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
+                im21.set_ydata((PM[25]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
+                im22.set_ydata((PM[26]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
+                im23.set_ydata((PM[27]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
+                im24.set_ydata((PM[28]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
+                im25.set_ydata((PM[29]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
                 # ------------------------------------- Tape Winding Speed x16, A2
-                im26.set_ydata((PM[6]).rolling(window=25).mean()[0:batch_PM])  # Winding SPeed
-                im27.set_ydata((PM[7]).rolling(window=25).mean()[0:batch_PM])  # WS Ring2
-                im28.set_ydata((PM[8]).rolling(window=25).mean()[0:batch_PM])  # WS Ring3
-                im29.set_ydata((PM[9]).rolling(window=25).mean()[0:batch_PM])  # WS Ring4
+                im26.set_ydata((PM[7]).rolling(window=25).mean()[0:batch_PM])  # Winding SPeed
+                im27.set_ydata((PM[8]).rolling(window=25).mean()[0:batch_PM])  # WS Ring2
+                im28.set_ydata((PM[9]).rolling(window=25).mean()[0:batch_PM])  # WS Ring3
+                im29.set_ydata((PM[10]).rolling(window=25).mean()[0:batch_PM])  # WS Ring4
                 # --------------------------------------Active Cell Tension x1
-                im30.set_ydata((PM[1]).rolling(window=25).mean()[0:batch_PM])  # SCell Tension
+                im30.set_ydata((PM[0]).rolling(window=25).mean()[0:batch_PM])  # SCell Tension
                 # ----------------------------------------Oven Temperature x4 (RTD & IR Temp)
-                im31.set_ydata((PM[2]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im32.set_ydata((PM[3]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im33.set_ydata((PM[4]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im34.set_ydata((PM[5]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-
-            elif self.running and pRecipe == 'MGM':
-                # -------------------------------------------------------------------------------[Laser Power]
-                im10.set_ydata((PM[30]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im11.set_ydata((PM[31]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im12.set_ydata((PM[32]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im13.set_ydata((PM[33]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im14.set_ydata((PM[34]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im15.set_ydata((PM[35]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im16.set_ydata((PM[36]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im17.set_ydata((PM[37]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im18.set_ydata((PM[38]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im19.set_ydata((PM[39]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im20.set_ydata((PM[40]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im21.set_ydata((PM[41]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im22.set_ydata((PM[42]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im23.set_ydata((PM[43]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im24.set_ydata((PM[44]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im25.set_ydata((PM[45]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                # -----------------------------------------------------[Cell Tension]
-                im26.set_ydata((PM[1]).rolling(window=25).mean()[0:batch_PM])   # Segment 1
-                # --------------------------------------------------[Roller Pressure]
-                im27.set_ydata((PM[13]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im28.set_ydata((PM[14]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im29.set_ydata((PM[15]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im30.set_ydata((PM[16]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im31.set_ydata((PM[17]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im32.set_ydata((PM[18]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im33.set_ydata((PM[19]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im34.set_ydata((PM[20]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im35.set_ydata((PM[21]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im36.set_ydata((PM[22]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im37.set_ydata((PM[23]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im38.set_ydata((PM[24]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im39.set_ydata((PM[25]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im40.set_ydata((PM[26]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im41.set_ydata((PM[27]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im42.set_ydata((PM[28]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                # -------------------------------------------------------[Laser Angle]
-                im43.set_ydata((PM[47]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im44.set_ydata((PM[48]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im45.set_ydata((PM[49]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im46.set_ydata((PM[50]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im47.set_ydata((PM[51]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im48.set_ydata((PM[52]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im49.set_ydata((PM[53]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im50.set_ydata((PM[54]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im51.set_ydata((PM[55]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im52.set_ydata((PM[56]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im53.set_ydata((PM[57]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im54.set_ydata((PM[58]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                im55.set_ydata((PM[59]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im56.set_ydata((PM[60]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im57.set_ydata((PM[61]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im58.set_ydata((PM[62]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                # -------------------------------------------------[Oven Temperature]
-                im59.set_ydata((PM[2]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im60.set_ydata((PM[3]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im61.set_ydata((PM[4]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im62.set_ydata((PM[5]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
-                # ----------------------------------------------[Winding Speed x16]
-                im63.set_ydata((PM[6]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
-                im64.set_ydata((PM[7]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
-                im65.set_ydata((PM[8]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
-                im66.set_ydata((PM[9]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
+                im31.set_ydata((PM[1]).rolling(window=25).mean()[0:batch_PM])  # Segment 2
+                im32.set_ydata((PM[2]).rolling(window=25).mean()[0:batch_PM])  # Segment 3
+                im33.set_ydata((PM[3]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
+                im34.set_ydata((PM[4]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
+                im35.set_ydata((PM[5]).rolling(window=25).mean()[0:batch_PM])  # Segment 4
+                im36.set_ydata((PM[6]).rolling(window=25).mean()[0:batch_PM])  # Segment 1
 
             # Setting up the parameters for moving windows Axes ---[]
             if batch_PM > self.win_Xmax:
@@ -9333,7 +9192,9 @@ class MonitorTabb(ttk.Frame):
                 self.a2.set_xlim(batch_PM - self.win_Xmax, batch_PM)
                 self.a3.set_xlim(batch_PM - self.win_Xmax, batch_PM)
                 self.a4.set_xlim(batch_PM - self.win_Xmax, batch_PM)
-                PM.pop(0)
+                if is_NumPy:
+                    PM.pop(0)
+                # PM.pop(0)
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)
