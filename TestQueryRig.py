@@ -344,55 +344,55 @@ import numpy as np
 # plt.legend(title="valueA")
 # plt.show()
 
-mlis =[] # [2, 3, 8]
-# mlis.append(5)
-mlis.insert(0,8)
-print('New List', mlis)
-
-# Example 2: Using the pop() method
-my_list = [1, 2, 3, 4, 5]
-last_element = my_list.pop()
-print(last_element)
-
-try:
-    import cupy as np
-    GPU_ENABLED = True
-except ImportError:
-    import numpy as np
-    GPU_ENABLED = False
-# make numpy compatible with cupy API
-np.asnumpy = lambda x: x
-# import cudf
-
-try:
-    import cupy as cp
-    import numpy as np
-    GPU_ENABLED = False
-
-    # Check if a CUDA device is available and usable
-    try:
-        num_gpus = cp.cuda.runtime.getDeviceCount()
-        if num_gpus > 0:
-            free_mem, total_mem = cp.cuda.runtime.memGetInfo()
-            if free_mem / total_mem > 0.1:  # at least 10% free memory
-                np = cp                # ✅ use CuPy as NumPy
-                GPU_ENABLED = True
-                print(f"✅ Using GPU (CuPy) | Free memory: {free_mem / 1e9:.2f} GB")
-            else:
-                print("⚠️ GPU memory low — falling back to CPU (NumPy).")
-        else:
-            print("⚠️ No GPU found — using CPU (NumPy).")
-    except cp.cuda.runtime.CUDARuntimeError:
-        print("⚠️ CUDA not available — using CPU (NumPy).")
-
-except ImportError:
-    import numpy as np
-    GPU_ENABLED = False
-    print("⚠️ CuPy not installed — using CPU (NumPy).")
-
-# Always ensure np.asnumpy() is defined (for cross-compatibility)
-if not hasattr(np, "asnumpy"):
-    np.asnumpy = lambda x: x
+# mlis =[] # [2, 3, 8]
+# # mlis.append(5)
+# mlis.insert(0,8)
+# print('New List', mlis)
+#
+# # Example 2: Using the pop() method
+# my_list = [1, 2, 3, 4, 5]
+# last_element = my_list.pop()
+# print(last_element)
+#
+# try:
+#     import cupy as np
+#     GPU_ENABLED = True
+# except ImportError:
+#     import numpy as np
+#     GPU_ENABLED = False
+# # make numpy compatible with cupy API
+# np.asnumpy = lambda x: x
+# # import cudf
+#
+# try:
+#     import cupy as cp
+#     import numpy as np
+#     GPU_ENABLED = False
+#
+#     # Check if a CUDA device is available and usable
+#     try:
+#         num_gpus = cp.cuda.runtime.getDeviceCount()
+#         if num_gpus > 0:
+#             free_mem, total_mem = cp.cuda.runtime.memGetInfo()
+#             if free_mem / total_mem > 0.1:  # at least 10% free memory
+#                 np = cp                # ✅ use CuPy as NumPy
+#                 GPU_ENABLED = True
+#                 print(f"✅ Using GPU (CuPy) | Free memory: {free_mem / 1e9:.2f} GB")
+#             else:
+#                 print("⚠️ GPU memory low — falling back to CPU (NumPy).")
+#         else:
+#             print("⚠️ No GPU found — using CPU (NumPy).")
+#     except cp.cuda.runtime.CUDARuntimeError:
+#         print("⚠️ CUDA not available — using CPU (NumPy).")
+#
+# except ImportError:
+#     import numpy as np
+#     GPU_ENABLED = False
+#     print("⚠️ CuPy not installed — using CPU (NumPy).")
+#
+# # Always ensure np.asnumpy() is defined (for cross-compatibility)
+# if not hasattr(np, "asnumpy"):
+#     np.asnumpy = lambda x: x
 
 # # NumPy array on CPU
 # np_arr = np.arange(5)
@@ -564,26 +564,54 @@ if not hasattr(np, "asnumpy"):
 #
 #     root.mainloop()
 #
-# # ----- Run the app -----
-# plot_in_tkinter()
-import numpy as np
-import statistics as st
-# ------------------------------------------------
-list1 = [3.2,2.1,5.0,6.2]
-list2 = [4,2,6,5]
-list3 = [3,5,4,7]
-list4 = [4,5,2,3]
-print('R1:', np.mean(list1))
-print('R2:', np.mean(list2))
-print('R3:', np.mean(list3))
-print('R4:', np.mean(list4))
-print('Total X:', np.mean(list1) + np.mean(list2) + np.mean(list3) + np.mean(list4))
-print('Total Mean of Means:', np.mean([np.mean(list1), np.mean(list2), np.mean(list3), np.mean(list4)]))
+# # # ----- Run the app -----
+# # plot_in_tkinter()
+# import numpy as np
+# import statistics as st
+# # ------------------------------------------------
+# list1 = [3.2,2.1,5.0,6.2]
+# list2 = [4,2,6,5]
+# list3 = [3,5,4,7]
+# list4 = [4,5,2,3]
+# print('R1:', np.mean(list1))
+# print('R2:', np.mean(list2))
+# print('R3:', np.mean(list3))
+# print('R4:', np.mean(list4))
+# print('Total X:', np.mean(list1) + np.mean(list2) + np.mean(list3) + np.mean(list4))
+# print('Total Mean of Means:', np.mean([np.mean(list1), np.mean(list2), np.mean(list3), np.mean(list4)]))
+#
+# print('Total Mean of_Means:', np.mean([list1, list2, list3, list4]))
+# print('Total Mean of_Stds:', np.std([list1, list2, list3, list4]))
+#
+#
+# list = [420.2, 425.13333, 415.73334, 422.60004]
+# print('TP01', np.mean(list))
+# print('TP01', st.mean(list))
+import snap7
+from snap7.util import *
+#from snap7.types import *
+from opcua import Client
 
-print('Total Mean of_Means:', np.mean([list1, list2, list3, list4]))
-print('Total Mean of_Stds:', np.std([list1, list2, list3, list4]))
+# ISO-on-TCP (RFC 1006) protocol used by older S7 models and
+# Siemens added secure communication (TLS, encryption, authentication)
+# in S7-1500 and S7-1200 firmware updates, which Snap7 doesn't yet support.
 
+# Replace with your PLC IP
+PLC_IP = '192.168.100.100'
+RACK = 0
+SLOT = 1
 
-list = [420.2, 425.13333, 415.73334, 422.60004]
-print('TP01', np.mean(list))
-print('TP01', st.mean(list))
+# Create client
+plc = snap7.client.Client()
+
+client = Client("opc.tcp://192.168.100.100:4840")
+client.set_user("spc")
+client.set_password("R0bb13!L")
+try:
+    client.connect()
+    print("Connected with authentication.")
+    # browse, read, write...
+finally:
+    client.disconnect()
+
+# client.disconnect()

@@ -1,0 +1,1 @@
+2025-10-14 19:27.08 --- [RMP] Reconnect attempt 1/5 failed: ('HYT00', '[HYT00] [Microsoft][ODBC SQL Server Driver]Login timeout expired (0) (SQLDriverConnect); [HYT00] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')

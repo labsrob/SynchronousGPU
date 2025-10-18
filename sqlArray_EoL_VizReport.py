@@ -29,6 +29,7 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
         slideType = 'Smooth Edge'
     else:
         slideType = 'Non-overlapping'
+
     print('\n[EoL Viz] SAMPLE SIZE:', nGZ, '| SLIDE Mode:', slideType, '| BATCH:', fetch_no)
     print('='*60)
 

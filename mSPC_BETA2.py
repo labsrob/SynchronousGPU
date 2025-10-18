@@ -7,7 +7,7 @@ import deltaM2_Functions as nw
 
 def get_pStatus():
     print('Testing TCP01 Active Status...')
-    sysidl, sysrdy, sysRun = nw.liveProductionRdy() # System idling
+    sysRun, sysidl, sysrdy, msctcp, won_NO = nw.liveProductionRdy() # System idling
     if sysidl or sysrdy or sysRun:
         nw.watchDog()             # Launch Watchdog from Snooze if live production
     else:

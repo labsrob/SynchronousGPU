@@ -89,7 +89,7 @@ def check_PLC_Status():
 		successNote()
 	else:
 		active_conn = 'False'
-		errorLog(err)
+		errorLog(active_conn)
 	return active_conn
 
 

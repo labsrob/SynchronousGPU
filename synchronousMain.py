@@ -2496,8 +2496,9 @@ class collectiveEoL(ttk.Frame):
         # Define PLC/SMC error state ----------------------------------------------------#
         import sqlArray_EoL_VizReport as sel
         paused = False
-        sysRun = False
-        msctcp = 0
+        EoL_flag = False
+        EoP_flag = False
+
 
         while True:
             print('[\nEOL Viz] now running....')
@@ -2518,22 +2519,43 @@ class collectiveEoL(ttk.Frame):
                         time.sleep(0.2)
 
                 # Activate End of Layer Report -------------------------------------#
-                elif sysRun and msc_rt == 49728:
+                elif sysRun and msc_rt == 49664:   # EoL_Flag is high towards the End of Layer
+                    print("\n[EoL indicated] SPC Visualisation pausing for EoL auto report")
                     layerN = cLayer
-                    time.sleep(60)
-                    # ----------------[]
-                    if not pdf_layer:
-                        pdf_layer.append(layerN)  # start at layer 1
-                    if len(pdf_layer) > 1:
-                        layerN = pdf_layer[-2]
-                    else:
-                        layerN = pdf_layer[0]
-                    # Trigger EoL report -- Verify MSC State machine Code update
-                    layerProcess(layerN)
+                    EoL_flag = True
 
-                elif not sysRun and msc_rt == 59776:            # End of Pipe lay?
-                    # trigger EoP Report                        # TODO Wrapp up this method asap.
-                    continue                                    # keep looping on the spot until operator action
+                    while EoL_flag:
+                        # Monitor activities #time.sleep(15)
+                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+
+                        if not sysRun and msc_rt != 49664:                 # Bit goes low
+                            # ------ Activate EoL Report Generation ---
+                            if not pdf_layer:
+                                pdf_layer.append(layerN)                    # start at layer 1
+                            if len(pdf_layer) > 1:
+                                layerN = pdf_layer[-2]
+                            else:
+                                layerN = pdf_layer[0]
+                            layerProcess(layerN)                            # Trigger EoL report
+                            EoL_flag = False
+                            print('[EoL] Automatic Report Generation now activated!')
+                        time.sleep(60)
+
+                # Activate Enf of Pipe Report ------------------#
+                elif sysRun and msc_rt == 59776:            # End of Pipe lay?
+                    print("\n[EoP indicated]. Process is generating final Pipe report, please wait..")
+                    EoP_flag = False
+
+                    while EoP_flag:
+                        # Monitor activities #time.sleep(15)
+                        sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
+
+                        if not sysRun and msc_rt != 49664:              # Bit goes low
+                            # ------ Activate EoL Report Generation ---
+                            layerProcess(cLayr)                        # Trigger EoP report
+                            EoP_flag = False
+                            print('[EoL] Automatic Report Generation now activated!')
+                        time.sleep(60)
 
                 else:
                     layerN = cLayer
@@ -5640,7 +5662,11 @@ class rollerPreTabb(ttk.Frame):
             if batch_RP > self.win_Xmax:
                 self.a1.set_xlim(batch_RP - self.win_Xmax, batch_RP)
                 self.a2.set_xlim(batch_RP - self.win_Xmax, batch_RP)
+                # if is_CuPy:
+                #     np.delete(RP, 1)
+                # else:
                 RP.pop(0)
+
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)
@@ -6585,8 +6611,8 @@ class tapeTempTabb(ttk.Frame):  # -- Defines the tabbed region for QA param - Ta
                 self.a1.set_xlim(batch_TT - self.win_Xmax, batch_TT)
                 self.a2.set_xlim(batch_TT - self.win_Xmax, batch_TT)
                 if is_CuPy:
-                    xTT.pop(0)
-                    sTT.pop(0)
+                    np.delete(xTT, 1)
+                    np.delete(xTT, 1)
                 else:
                     TT.pop(0) # reset batch no
             else:
@@ -7071,7 +7097,7 @@ class substTempTabb(ttk.Frame):
                 sST = cp.asnumpy(std_cp)    # sTT[:, 2]
 
                 # You can flatten the 2D array if you like
-                values_list = xST.flatten().tolist()
+                # values_list = xST.flatten().tolist()  # valid for CuPy array
                 # print('TP02', values_list)
             # --------------------------------------
             elif is_NumPy:      # CPU fall back
@@ -7668,8 +7694,8 @@ class substTempTabb(ttk.Frame):
                 self.a1.set_xlim(batch_ST - self.win_Xmax, batch_ST)
                 self.a2.set_xlim(batch_ST - self.win_Xmax, batch_ST)
                 if is_CuPy:
-                    xST.pop(0)
-                    sST.pop(0)
+                    np.delete(xST, 1)
+                    np.delete(sST, 1)
                 else:
                     ST.pop(0)
             else:
@@ -8325,7 +8351,10 @@ class tapeGapPolTabb(ttk.Frame):
             if batch_TG > self.win_Xmax:
                 self.a1.set_xlim(batch_TG - self.win_Xmax, batch_TG)
                 self.a3.set_xlim(batch_TG - self.win_Xmax, batch_TG)
-                TG.pop(0)
+                if is_CuPy:
+                    np.delete(TG, 1)
+                else:
+                    TG.pop(0)
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a3.set_xlim(0, self.win_Xmax)
@@ -9108,6 +9137,7 @@ class MonitorTabb(ttk.Frame):
                 PM = cp.asnumpy(mean_cp)
                 # PM = mt.loadProcesValues(mean_cp, pRecipe)
                 # print('TP012', PM[:, 1])
+                # PM = PM.tolist()          # This is valid for pythonian method.
 
             elif is_NumPy:
                 PM = mt.loadProcesValues(df1_interp, pRecipe)
@@ -9224,9 +9254,10 @@ class MonitorTabb(ttk.Frame):
                 self.a2.set_xlim(batch_PM - self.win_Xmax, batch_PM)
                 self.a3.set_xlim(batch_PM - self.win_Xmax, batch_PM)
                 self.a4.set_xlim(batch_PM - self.win_Xmax, batch_PM)
-                if is_NumPy:
+                if is_CuPy:
+                    np.delete(PM, 1)    # removes element at index 1
+                else:
                     PM.pop(0)
-                # PM.pop(0)
             else:
                 self.a1.set_xlim(0, self.win_Xmax)
                 self.a2.set_xlim(0, self.win_Xmax)

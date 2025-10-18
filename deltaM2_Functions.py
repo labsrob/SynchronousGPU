@@ -27,6 +27,7 @@ flag = 'Low'
 # -------------------------- Initiate variable --------------------[]
 user_url = "http://www.magmaglobal.com/synchronous_spc"
 today = date.today()
+
 # ------------ Launch-Screen Event Functional Control -------------[]
 stup_messages = ["Evaluating ring-head combinations", "Checking SQL repository Hardware",
                  "Accessing selected parameters", "Checking SPC Constants and Metrics",
@@ -103,7 +104,7 @@ smcDescription = [ "No State or Undefined State ", "System health Check, please 
 
 # -------------------------------------------------------------------------------------[]
 _Plc = snap7.client.Client()	# Instantiate a PLC
-# _Plc.set_session_password('Agam1000')
+# _Plc.set_session_password('Robb13!L')
 # disable Allow PUT/Get download HW info and enable again
 
 pCon = _Plc.connect('192.168.100.100', 0, 1)  #:port number 4840
@@ -283,10 +284,12 @@ def liveProductionRdy():
 	except Exception as err:
 		print(f"Exception Error: '{err}'")
 		errorLog(f"{err}")
+		sysRun = None
 		sysidl = False
 		sysrdy = False
+		msctcp, won_NO = 0, 0
 
-	# return sysRun, sysidl, sysrdy, msctcp, won_NO
+	return sysRun, sysidl, sysrdy, msctcp, won_NO
 
 
 def autoLaunchViz():			# obtain required variables for playing visualization
@@ -833,35 +836,40 @@ def sendM2M_ACK():
 
 
 def move_window():
-	global timer, flag
-	t_snooze = 30000
-	trefresh = 2
+	global timer, flag, mySplash
+
+	t_snooze = 100
+	trefresh = 5
 
 	timer = Timer(trefresh, move_window)       	# Start threading.Timer()
 
 	mySplash.bind("<Motion>", to_GUI)           # To GUI Menu
 	mySplash.bind("<Escape>", to_GUI)           # To GUI Menu
+
 	if sysrdy and not sysidl:
+		timer.cancel()
 		to_AutoProcess(event=None)
 	mySplash.config(cursor="none")
 
 	# --------------------------------------------------[]
 	print('\nSPC in Snooze mode, press Esc to resume')             # Snooze function
 	mySplash.geometry(f"{w}x{h}+{int(randint(10, 1900))}+{int(randint(10, 1000))}")
-	if not timer.is_alive():
-		timer.start()
+	if timer.is_alive():
 		flag = 'High'
 	else:
-		timer.cancel()
 		flag = 'Low'
-		mySplash.deiconify()
+		timer.start()
 
 	timeB = time.time()  # start timing the entire loop
-	tLapsed = (t_snooze / (trefresh * 1000)) - (timeB - timeA)
-	print('TP01', (timeB - timeA))
-	print('TP02', (t_snooze / (trefresh * 1000)))
-	print('Exiting to Snooze in '+str(tLapsed)+' sec(s)...')
-	mySplash.after(t_snooze, lambda: dScreen()) 	# set to x minutes
+	lapsed = (timeB - timeA)
+	spent_time = (t_snooze - lapsed)
+	print('TP01', lapsed)
+	print('TP02', spent_time)
+
+	print('Snoozing in '+str(spent_time)+' sec(s)...')
+	if spent_time <=10:
+		print('Switching back to default screen..')
+		mySplash.after(t_snooze, dScreen) 	# set to x minutes
 
 	return
 
@@ -941,7 +949,7 @@ def localSplash():
 		for n in range(r):
 			sleep(.2)
 			if n <= (r - 2):
-				init_str.set(f"Connecting to PLC Subsystem.{'.' * n}".ljust(27))
+				init_str.set(f"connecting PLC subsystem.{'.' * n}".ljust(27))
 				connectPLC = xp.connectM2M(1, 2)  # Is the main PLC up?
 				print('\nIs Available:', connectPLC)
 				# ----------------------------------
@@ -962,7 +970,7 @@ def localSplash():
 					print('\nIndustrial Server is Offline...')
 					pass
 			else:
-				init_str.set(f"Establishing Connectivity...{'.' * n}".ljust(27))
+				init_str.set(f"initialising OPCUA protocol.{'.' * n}".ljust(27))
 				# recall M2M connection again ----------- 1st time try
 				if connectPLC and sysrdy:
 					print('\nChecking Production Readiness... (1)')
@@ -978,22 +986,22 @@ def localSplash():
 
 		for n in range(r):
 			sleep(.2)
-			init_str.set(f"Almost Done.{'.' * n}".ljust(27))
+			init_str.set(f"almost done, please wait...{'.' * n}".ljust(27))
 			mySplash.update_idletasks()
 
 		for n in range(r):
 			sleep(.5)
-			init_str.set("Almost Done..........".ljust(27))
+			init_str.set("almost done..........".ljust(27))
 			sleep(.5)
-			init_str.set("System initialization completed".ljust(27))
-
+			init_str.set("system initialization completed".ljust(27))
 			# Allow SPC loading user values from SCADA once for every pipe laying process ----
 			mySplash.update_idletasks()
 		if sysrdy:
 			Label(mySplash, text="Realtime Processing!", justify=CENTER, font=("NovaMono", f)).place(x=xp1, y=yp)
 		else:
-			Label(mySplash, text="Post Processing Available!", justify=CENTER, font=("NovaMono", f)).place(x=xp2, y=yp)
-		mySplash.after(30000, lambda: move_window())		# move splash windo 3 min
+			Label(mySplash, text="check PLC connectivity!", justify=CENTER, font=("NovaMono", f)).place(x=xp2, y=yp)
+		print('\nRandom screen splash commenced...')
+		mySplash.after(3000, move_window)		# move splash window 1 min
 	mySplash.update_idletasks()
 
 
@@ -1050,6 +1058,7 @@ def toProcess(event):
 
 def showDefaultScreen():
 	# global running
+	updateSCRres()
 	# ------------------
 	while running:
 		# print('TP01', running)
@@ -1084,6 +1093,7 @@ def dScreen():
 	root.bind("<Escape>", toSplash)    # Code from watchdog to Visualisation
 
 	if sysrdy:
+		timer.cancel()
 		toProcess()						# Exit to auto Processing
 	else:
 		pass
@@ -1108,18 +1118,10 @@ def dScreen():
 	date_label.place(y=screen_height / 2 + 200, x=screen_width / 2, anchor="center")
 	# ------------------#
 	showDefaultScreen()	# Snooze default screen
-	print('Exiting Snoozer...')
+	print('Snoozing...')
 	os._exit(0)
 	# mySplash.quit()
 
 	return
 
-#
-# def st_autoPausePlay():
-#     return None
-
-# sysRun(0.0), sysidl(0.1), sysrdy(0.2), msctcp(2.0), won_NO(4.0) =
-# liveProductionRdy()
-rt_autoPausePlay()
-
-# --- AUTO DETECT GPU vs CPU BACKEND ---
+# sysRun, sysidl, sysrdy, msctcp, won_NO = liveProductionRdy()
