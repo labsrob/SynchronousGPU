@@ -241,7 +241,7 @@ def LaserAngleSigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     return
 
 
-def RollerForceSigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
+def RP_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     """
        md : Mode Processing (i.e SQL/PLC Query)
        """
@@ -265,7 +265,7 @@ def RollerForceSigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     return
 
 
-def TapeTempSigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
+def TG_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     """
        md : Mode Processing (i.e SQL/PLC Query)
        """
@@ -288,7 +288,7 @@ def TapeTempSigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
 
     return
 
-def DeltaTempSigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
+def TT_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     """
        md : Mode Processing (i.e SQL/PLC Query)
        """
@@ -311,7 +311,7 @@ def DeltaTempSigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
 
     return
 
-def TapeGapSigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
+def ST_Sigma(rID, pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     """
        md : Mode Processing (i.e SQL/PLC Query)
        """

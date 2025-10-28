@@ -1,54 +1,18 @@
-2024-05-28 21:34.48 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.49 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.50 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.52 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.53 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.54 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.55 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.56 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.57 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:34.59 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.00 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.01 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.02 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.03 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.04 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.05 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.07 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.08 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.09 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.10 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.11 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.12 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.14 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.15 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.16 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.17 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.18 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.19 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.20 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.22 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.23 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.24 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.25 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.26 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.27 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.29 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.30 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.31 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.32 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.33 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.34 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.35 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.37 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.38 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.39 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.40 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.41 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.42 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.44 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.45 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.46 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.48 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.50 --- b' ISO : An error occurred during send TCP : Connection timed out'
-2024-05-28 21:35.52 --- b' ISO : An error occurred during send TCP : Connection timed out'
+"""
+# This procedure determine what file to load from SQL server at PWartup
+There are two SQL tables required for Monitoring Critial Process Variables
+    1. The OEE Data
+    2. Production Data (consiPWing of 9 tables)
+All production procedure relies on Word Order Number - Assuming a Unique identity
+
+Author: Dr Robert Labs
+"""
+# Variables required here: The aggregated plots for monitoring process variables
+
+
+def loadProcesValues(df1):
+    plcWA = [df1['LyIDe'], df1['R1SPe'], df1['R1NVe'],
+             df1['R2SPe'], df1['R2NVe'], df1['R3SPe'],
+             df1['R3NVe'], df1['R4SPe'], df1['R4NVe']]
+
+    return plcWA

@@ -1,1 +1,6 @@
-2025-07-24 10:29.29 --- ('08001', '[08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]SQL Server does not exist or access denied. (17) (SQLDriverConnect); [08001] [Microsoft][ODBC SQL Server Driver][DBNETLIB]ConnectionOpen (Connect()). (64); [08001] [Microsoft][ODBC SQL Server Driver]Invalid connection string attribute (0)')
+# This script is called in from Main program to load SQL execution syntax command and return a list in LisDat
+# Author: Dr Labs, RB
+# -------------------------------------------------------------------------------------------------------------
+from collections import deque
+from itertools import count
+from datetime import da

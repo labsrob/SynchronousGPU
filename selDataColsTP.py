@@ -10,11 +10,11 @@ Tape Placement Error - Keyance
 def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'TP1_' + pWON:
-        columns = ['tStamp', 'cLayer', 'R1H1TP', 'R1H2TP', 'R1H3TP',
+        columns = ['id_col', 'cLayer', 'R1H1TP', 'R1H2TP', 'R1H3TP',
                    'R1H4TP', 'R2H1TP', 'R2H2TP', 'R2H3TP', 'R2H4TP']
 
     elif pParam == 'TP2_' + pWON:
-        columns = ['tStamp', 'cLayer', 'R3H1TP', 'R3H2TP', 'R3H3TP',
+        columns = ['id_col', 'cLayer', 'R3H1TP', 'R3H2TP', 'R3H3TP',
                    'R3H4TP', 'R4H1TP', 'R4H2TP',' R4H3TP', 'R4H4TP' ]
 
     elif pParam == 'SPC_TP':

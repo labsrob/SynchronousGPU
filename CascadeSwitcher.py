@@ -32,7 +32,7 @@ import rtP_Evaluator as tq
 import selDataColsLA as qla     # Laser Angle
 import selDataColsLP as qlp     # Laser Power
 import selDataColsRF as qrf     # Roller Force
-import selDataColsRM as qrm     # Ramp Mapping
+import selDataCols_RM as qrm     # Ramp Mapping
 import selDataColsST as qst     # Substrate Temperature
 import selDataColsTG as qtg     # Tape Gap Void
 import selDataColsTP as qtp     # Tape Placement error
@@ -93,7 +93,7 @@ processWON = [pWON, "20240507", "20240508"]             # Dynamically obtain WON
 # ------------- Dummy values ----------------------[]
 pPos = '6.2345'
 layer = '03'
-WON = "275044"
+
 sel_SS = "30"
 sel_gT = "S-Domino"
 eSMC = 'Tape laying process in progress...'
@@ -3326,7 +3326,7 @@ def laProcessParam(vCounter, pType):  # Tape Placement
 
 # ---------------------- Port windows into parallel processing ----------[]
 
-def myMain(cMode, ProcID):
+def myMain(cMode, pWON, ProcID):
     global pParam, smp_Sz, stp_Sz, p1, p2, p3, p4, p5, p6, p7, p8
     # ---------------------------
     pParam = ProcID

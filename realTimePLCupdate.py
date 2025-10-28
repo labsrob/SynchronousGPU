@@ -148,7 +148,7 @@ def processR1_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID):
         elif pID == 'DL':
             SigPid = 3.3
 
-        elif pID == 'RF':
+        elif pID == 'RP':
             SigPid = 3.4
         elif pID == 'TT':
             SigPid = 5.0
@@ -208,7 +208,7 @@ def processR2_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
         elif pID == 'DL':
             SigPid = 3.3
 
-        elif pID == 'RF':
+        elif pID == 'RP':
             SigPid = 3.4
         elif pID == 'TT':
             SigPid = 5.0
@@ -268,7 +268,7 @@ def processR3_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
         elif pID == 'DL':
             SigPid = 3.3
 
-        elif pID == 'RF':
+        elif pID == 'RP':
             SigPid = 3.4
         elif pID == 'TT':
             SigPid = 5.0
@@ -329,7 +329,7 @@ def processR4_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
         elif pID == 'DL':
             SigPid = 3.3
 
-        elif pID == 'RF':
+        elif pID == 'RP':
             SigPid = 3.4
         elif pID == 'TT':
             SigPid = 5.0

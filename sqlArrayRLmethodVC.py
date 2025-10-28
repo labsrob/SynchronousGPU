@@ -24,7 +24,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
     n2fetch = int(nGZ)
     group_step = int(grp_step)
     fetch_no = int(fetch_no)  # dbfreq = TODO look into any potential conflict
-    print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
+    print('\n[cVC]SAMPLE SIZE:', nGZ, '| SLIDE STEP:', group_step, '| BATCH:', fetch_no)
 
     # ------------- Consistency Logic ensure list is filled with predetermined elements --------------
     try:
@@ -41,12 +41,11 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
                 dL.append(result)
             last_ts = data1[-1].id_col
         else:
-            print('[cVC] Process EOF reached...')
             print('[cVC] Halting for 5 Minutes...')
             time.sleep(300)
 
     except Exception as e:
-        print("[cVC] Void Count Data trickling...")  # , e)
+        print("[cVC] Data trickling on", last_ts)  # , e)
         time.sleep(2)
 
     t1.close()

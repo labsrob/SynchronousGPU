@@ -12,8 +12,8 @@ def validCols(pParam, pWON=None):
     # print('Detected RingHead Combo:', configH)
     if pParam == 'ZLP_' + pWON:
         columns = [ # Tape Temperature --------------[]
-                   'tStmf', 'LyIDf', 'R1SPf', 'R1NVf', 'R2SPf',
-                   'R2NVf', 'R3SPf', 'R3NVf', 'R4SPf',  'R4NVf']
+                   'id_col', 'LyID', 'R1SP', 'R1NV', 'R2SP',
+                   'R2NV', 'R3SP', 'R3NV', 'R4SP',  'R4NV']
 
 
     else:

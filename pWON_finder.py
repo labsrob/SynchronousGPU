@@ -15,6 +15,7 @@ import os
 conn = 'from sql connection'
 apCalledby = []
 
+
 srchA, srchB = [], []
 processWON = []
 # Declare empty arrays ------------[]
@@ -28,6 +29,7 @@ now = datetime.now()
 rtUpdateCONNX = False               # import realTimeUpdate as pq | ALLOW CONNECTION ONCE
 inUseAlready = False                # import realTPostProdUpdate as pq | ALLOW USAGE of CLASS ONCE
 UsePLC_DBS = True
+nTables = 0
 
 
 def connSQL():
@@ -53,13 +55,13 @@ def errornotFoundWON():
 def srcforOEE(MatchOEE):
 
     import CommsSql as sqlc
-    sql = sqlc.DAQ_connect()        # Execute connection
-    conn_oee = sql.cursor()         # Convert to cursor
-
-
-    # TODO --- Search for OEE records by date string & WON string -------------------------------[]
-
+    try:
+        sql = sqlc.wonFinder_connect()          # Execute connection
+        conn_oee = sql.cursor()                 # Convert to cursor
+    except Exception as e:
+        print('SQL connection issues. Try again later.')
     # ------------------------------------- Load OEE Data from SQL Table  -----------------------[]
+
     # find creation date of the known WON#
     locateOEE = 'OEE_' + str(MatchOEE)
     print('\nSearching for OEE records...', locateOEE)
@@ -84,7 +86,7 @@ def srcforOEE(MatchOEE):
             oeeID = gOEE
         else:
             # print('Complicated....:', gOEE)
-            validOEE = 'C'  # Complicated or multiple matching Tables
+            validOEE = 'C'                  # Complicated or multiple matching Tables
             oeeID = gOEE
 
     # ---------------------------------[]
@@ -92,25 +94,32 @@ def srcforOEE(MatchOEE):
 
 
 def srcTable(sD1, sD2, uWON):               # Post Production data search
+    global pWON
     # ----------------------#
     # Load SQL server library --------------#
     import CommsSql as s_con
 
-    mTables = 0
     StaSearchD = str(sD1)                    # Date Lower Boundary or WON #
     EndSearchD = str(sD2)
 
     # Test connection readiness and clear any flags
-    conn = s_con.DAQ_connect()              # Execute connection
-    if conn != 'failed':
-        qcon = conn.cursor()                    # Convert to cursor
+    try:
+        sqlT = s_con.wonFinder_connect()        # Execute connection
+        conn = sqlT.cursor()                    # Convert to cursor
+    except Exception as e:
+        print('Sorry, no valid server connectivity')
+        sqlT = None
+    # --------------------------------------#
+    pWON = uWON
 
     # ----------------------------------- If Search was by Date String ----------------------[]
-    if conn != 'failed' and StaSearchD != '0' and EndSearchD != '0':               # If Date search
+    mTables = 0
+
+    if sqlT and StaSearchD != '0' and EndSearchD != '0':               # If Date search
         print('\nSearching for WON by date...')
 
         # Find out how many tables meet this condition -----[A]
-        pTables = qcon.execute('SELECT COUNT(create_date) AS ValidTotal from sys.tables where '
+        pTables = conn.execute('SELECT COUNT(create_date) AS ValidTotal from sys.tables where '
                                      'create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND ' + "'" + EndSearchD + "'").fetchone()
         time.sleep(10)                                      # allow SQL server response delay
 
@@ -145,19 +154,19 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         derivedOEE = derivedWON
         # --------------------------------------------------#
 
-        if nTables != 0 and nTables <= 18:                   # Production file for DNV exist - OEE data
+        if nTables != 0 and nTables <= 20:                   # Production file for DNV exist - OEE data
             # List tables that meet this condition ---------[# schema_name	table_name	create_date]
             # mTables = conn_sq.execute(
             #     'SELECT name as table_name, create_date from '
             #     'sys.tables where create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND '
             #     + "'" + EndSearchD + "'" + 'order by table_name asc').fetchmany(nTables)
             # -------------------------------------------------------------------------------------[]
-            mTables = qcon.execute('SELECT name as table_name, create_date from sys.tables where '
+            mTables = conn.execute('SELECT name as table_name, create_date from sys.tables where '
                                       'name LIKE ' + "'" '%' + str(derivedWON) + '%' "'" +
                                       'order by name asc').fetchmany(nTables)
             # get the Work Order Name and keep for index-tracking ----[]
 
-            ptype = 'DNV'
+            ptype = 'DNV PROCEDURE'
             # List all tables in DNV Configuration -----------[]
             T1 = str(mTables[0][0])  # EV_
             T2 = str(mTables[1][0])  # GEN_
@@ -173,26 +182,28 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             T12 = str(mTables[11][0])  # TT2_
             T13 = str(mTables[12][0])  # VC_
             T14 = str(mTables[13][0])  # VM_
-            T15 = str(mTables[13][0])  # ZST_
-            T16 = str(mTables[13][0])  # ZTG_
-            T17 = str(mTables[13][0])  # ZTT_
-            T18 = str(mTables[13][0])  # ZWS_
+            T15 = str(mTables[14][0])  # ZST_
+            T16 = str(mTables[15][0])  # ZTG_
+            T17 = str(mTables[16][0])  # ZTT_
+            T18 = str(mTables[17][0])  # ZWS_
+            T19 = str(mTables[18][0])
+            T20 = str(mTables[19][0])
 
-            DNV_tables = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18]
+            DNV_tables = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20]
             for (i, item) in enumerate(DNV_tables, start=1):
                 print(i, item)
 
-        elif nTables > 18 and nTables <= 30:
+        elif nTables > 20 and nTables <= 31:
             # List tables that meet this condition ---------[# schema_name	table_name	create_date]
             # mTables = conn_sq.execute(
             #     'SELECT schema_name(schema_id) as schema_name, name as table_name, create_date from '
             #     'sys.tables where create_date BETWEEN ' + "'" + StaSearchD + "'" + ' AND '
             #     + "'" + EndSearchD + "'" + 'order by table_name asc').fetchmany(nTables)
             # -------------------------------------------------------------------------------------[]
-            mTables = qcon.execute('SELECT name as table_name, create_date from sys.tables where '
+            mTables = conn.execute('SELECT name as table_name, create_date from sys.tables where '
                                       'name LIKE ' + "'" '%' + str(derivedWON) + '%' "'" +
                                       'order by name asc').fetchmany(nTables)
-            ptype = 'MGM'
+            ptype = 'MGM PROCEDURE'
             # List all tables in DNV Configuration -----------[]
             T1 = str(mTables[0][0])  # EV_
             T2 = str(mTables[1][0])  # GEN
@@ -233,27 +244,28 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         else:
             print('Invalid number of PPA records found!')
             mTables = 0
-            ptype = 'UNK'
+            ptype = 'UNDEFINED PROCEDURE'
             errornotFoundWON()
         # -----------------------------------------#
 
     # ------------------------------------- If Search was by Work Order Number -----------------------[]
-    elif conn != 'failed' and uWON != 0 and StaSearchD == '0' and EndSearchD =='0':                        # WON is searched by WO# -------[]
+    elif sqlT and uWON != 0 and StaSearchD == '0' and EndSearchD =='0':                        # WON is searched by WO# -------[]
+
         # print('Work Order Number Search...')
-        pTables = qcon.execute('Select count(*) AS ValidTotal from information_schema.Tables where '
+        pTables = conn.execute('Select count(*) AS ValidTotal from information_schema.Tables where '
                                      'TABLE_NAME like ' + "'" '%' + str(uWON) + '%' "'").fetchone()
         time.sleep(4)                                       # allow SQL server response delay
         nTables = pTables[0]                                # Pick total from sql column, add OEE table
         print('\nFound:', nTables, 'valid records..')
 
-        if nTables != 0 and nTables == 18:                    # DNV Production file exist - OEE data
+        if nTables != 0 and nTables <= 21:                    # DNV Production file exist - OEE data
             # List out all valid tables, figure out OEE from the creation date --------------------------[]
-            mTables = qcon.execute(
+            mTables = conn.execute(
                 'SELECT name as table_name, create_date from '
                 'sys.tables where name LIKE ' + "'" '%' + str(uWON) + '%' "'" + 'order by name asc').fetchmany(
                 nTables)
 
-            ptype = 'DNV'
+            ptype = 'DNV PROCEDURE'
             # List all tables in DNV Configuration -----------[]
             T1 = str(mTables[0][0])     # EV_
             T2 = str(mTables[1][0])     # GEN_
@@ -269,23 +281,25 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             T12 = str(mTables[11][0])   # TT2_
             T13 = str(mTables[12][0])   # VC_
             T14 = str(mTables[13][0])   # VM_
-            T15 = str(mTables[13][0])  # ZST_
-            T16 = str(mTables[13][0])  # ZTG_
-            T17 = str(mTables[13][0])  # ZTT_
-            T18 = str(mTables[13][0])  # ZWS_
+            T15 = str(mTables[14][0])  # ZPP_
+            T16 = str(mTables[15][0])  # ZST_
+            T17 = str(mTables[16][0])  # ZTG_
+            T18 = str(mTables[17][0])  # ZTT_
+            T19 = str(mTables[18][0])  # ZWS_
+            T20 = str(mTables[19][0])  # ZWS_
             #
-            DNV_tables = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18]
+            DNV_tables = [T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20]
             for (i, item) in enumerate(DNV_tables, start=1):
                 print(i, item)
 
-        elif nTables > 18 and nTables <= 31:
+        elif nTables > 21 and nTables <= 32:
             # List out all valid tables, figure out OEE from the creation date ----------------[]
-            mTables = qcon.execute(
+            mTables = conn.execute(
                 'SELECT name as table_name, create_date from '
                 'sys.tables where name LIKE ' + "'" '%' + str(uWON) + '%' "'" + 'order by name asc').fetchmany(
                 nTables)
 
-            ptype = 'MGM'
+            ptype = 'MGM PROCEDURE'
             # List all tables in DNV Configuration -----------[]
             T1 = str(mTables[0][0])     # EV_
             T2 = str(mTables[1][0])     # GEN
@@ -325,9 +339,8 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
         else:
             print('User specified an invalid WON #..')
             mTables = 0
-            ptype = 'UNK'
+            ptype = 'UNDEFINED PROCEDURE'
             errornotFoundWON()
-
 
         # Verify OEE data against user specified WON ----[] # we require OEE data.
         if not mTables:
@@ -356,9 +369,9 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             derivedOEE = checkOEE + xmonth + xday               # TP6: 20250604
             # print('Computed Table: OEE_', derivedOEE)
     else:
-        print('\nData Server is Offline...')
-    # --------------------------------------------------------------------------------[]
+        print('Sorry, issues with M2M connectivity')
 
+    # --------------------------------------------------------------------------------[]
     # Locate the matching OEE Table for the WON, otherwise load current OEE
     if mTables != 0:
         organicID, oeeID = srcforOEE(derivedOEE)  # search table record for matching OEEid
@@ -366,21 +379,18 @@ def srcTable(sD1, sD2, uWON):               # Post Production data search
             gOEE = mP.get_encodedFiles()
             newREC = organicID
             pType = prodT
-            nTables = mTables
             print('\nNo valid OEE records found! Using current OEE..', gOEE)
         else:
             gOEE = oeeID
             newREC = organicID  # Valid  = 'O' for organic
-            pType = 'UNK'
+            pType = 'UNDEFINED PROCEDURE'
             # gOEE = OEE Table | newREC = if OEE is not multiple | pType = DNV/MGM
-            nTables = 0
             print('\nLoading OEE records for specified WON #:', gOEE)
     else:
         gOEE = 0
         newREC = 0              # Valid  = 'O' for organic
-        pType = 'IVLD'
+        pType = 'UNDEFINED PROCEDURE'
         nTables = 0
-        print('Sorry, No valid data is found...')
 
     return gOEE, newREC, pType, nTables
 

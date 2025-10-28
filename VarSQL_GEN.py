@@ -11,7 +11,7 @@ Author: Dr Robert Labs
 
 # pull data from simotion and Met Office for location specific data
 def loadProcesValues(df1):
-    sqlGEN = [df1['tStamp'], df1['cTensX'], df1['oTempA'], df1['oTempB'],
+    sqlGEN = [df1['cTensX'], df1['oTempA'], df1['oTempB'],
               df1['iTempA'], df1['iTempB'], df1['wSpedA'], df1['wSpedB'],
               df1['wSpedC'], df1['wSpedD'], df1['PipeDi'], df1['cLayer']]
 

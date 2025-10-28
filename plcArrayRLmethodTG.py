@@ -19,13 +19,6 @@ pCon = snap7.client.Client()
 
 # ---------------------- Collective Functions ---------------------------------------
 
-def readBool(db_number, start_offset, bit_offset):
-	reading = pCon.db_read(db_number, start_offset, b_length)
-	a = snap7.util.get_bool(reading, 0, bit_offset)
-	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
-	return a
-
-
 def readReal(db_number, start_offset, bit_offset):
 	reading = pCon.db_read(db_number, start_offset, r_length)
 	a = snap7.util.get_real(reading, 0)
@@ -37,19 +30,6 @@ def readInteger(db_number, start_offset, bit_offset):
 	a = snap7.util.get_int(reading, 0)
 	# print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
 	return a
-
-def readString(db_number, start_offset, bit_offset):
-	r_length = 16
-	reading = pCon.db_read(db_number, start_offset, r_length)
-	a = snap7.util.get_string(reading, 0)
-	print('DB Number: ' + str(db_number) + ' Bit: ' + str(start_offset) + '.' + str(bit_offset) + ' Value: ' + str(a))
-	return a
-
-def writeBool(db_number, start_offset, bit_offset, value):
-	bArray = pCon.db_read(db_number, start_offset, b_length)    		# (db, start offset, [b_length = read 1 byte])
-	snap7.util.set_bool(bArray, 0, bit_offset, value)    			# (value 1= true;0=false)
-	pCon.db_write(db_number, start_offset, bArray)       			# write back the bytearray
-	return 	# None
 
 def writeReal(db_number, start_offset, r_data):
 	# reading = plc.db_read(db_number, start_offset, r_length)
@@ -74,23 +54,26 @@ def plcExec(nGZ, grp_step, DB, fetch_no):
 	grp_step: Group Sample step
 	fetch_no: Animation Fetch Cycle
 	"""
+	timei = time.time()
+
 	db_number = DB
 	# Get contiguous data from PLC Stream --- Dealing with very volatile data frame.
 	start_offset = [0, 2, 4, 6, 14, 22, 26, 30, 38, 42, 46, 50, 54]
 	bit_offset = [0, 1, 2]
 	id1 = str(0)
-
-	timei = time.time()
 	# ------------------------------------------------------------------------
-	group_step = int(grp_step)  	# group size/ sample sze
-	fetch_no = int(fetch_no)  		# dbfreq = TODO look into any potential conflict
-	print('\nSAMPLE SIZE:', nGZ, '| SLIDE STEP:', int(grp_step), '| FETCH CYCLE:', fetch_no)
+	n2fetch = int(nGZ)
+	group_step = int(grp_step)
+	fetch_no = int(fetch_no)
+	if group_step == 1:
+		slideType = 'Smooth Edge*'
+	else:
+		slideType = 'Non-overlapping*'
 
+	print('\n[TG] SAMPLE SIZE:', nGZ, '| SLIDE MODE:', slideType, '| BATCH:', fetch_no)
+	print('=' * 60)
 	# ------------- Consistency Logic ensure list is filled with predetermined elements --------------
 	if group_step == 1:
-		print('Domino step mode..')
-		print('\nSINGLE STEP SLIDE')
-		print('=================')
 		print('Array length:', len(arrayTG), 'Fetch Value', fetch_no)
 		if len(arrayTG) == nGZ and fetch_no > 0:
 			print('TP A')
@@ -116,9 +99,6 @@ def plcExec(nGZ, grp_step, DB, fetch_no):
 		print('Processing Query #:', idxA)
 
 	elif group_step > 1:
-		print('Discrete step mode..')
-		print('\nSAMPLE SIZE SLIDE')
-		print('=================')
 		if fetch_no != 0 and len(arrayTG) >= nGZ:
 			n2fetch = nGZ # (nGZ * fetch_no)
 		else:

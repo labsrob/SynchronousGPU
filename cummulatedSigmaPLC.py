@@ -127,13 +127,14 @@ def stopTCP_Ctrl():
     return auto_ACK, autoStop, pipe_Pos
 
 
-def processR1_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
+def processRT_Sigma(pID, rID, v1, v2, v3, v4):
     """
+    #  processID, Upper, Lower, pMean, pDev, v1, v2, v3, v4 = Head1, Head 2, Head3, Head4, Layer, Pipe Pos,
     NOTE: This function must be loaded in a persistent fashion
-    :param v1: RIng1 head 1 - result from XBar & S-Plot analysis
-    :param v2: Ring1 head 2 - result from XBar & S-Plot analysis
-    :param v3: Ring1 head 3 - result from XBar & S-Plot analysis
-    :param v4: Ring1 head 4 - result from XBar & S-Plot analysis
+    :param v1: head 1 - result from XBar & S-Plot analysis
+    :param v2: head 2 - result from XBar & S-Plot analysis
+    :param v3: head 3 - result from XBar & S-Plot analysis
+    :param v4: head 4 - result from XBar & S-Plot analysis
     """
 
     # Obtain runtime settings for SPC take over ------------[]
@@ -142,46 +143,43 @@ def processR1_Sigma(pU, pL, pX, pD, v1, v2, v3, v4, clayer, pPos, pID, md):
     try:
         if pID == 'RF':
             SigPid = 3.0
-        elif pID == 'TS':
+        elif pID == 'RP':
             SigPid = 1.0
         elif pID == 'TT':
             SigPid = 5.0
-        elif pID == 'DT':
+        elif pID == 'ST':
             SigPid = 7.0
         elif pID == 'TG':
             SigPid = 9.0
 
-        if md:
-            if not WON_Array:       # store work order number if WON_array is empty.
-                won = recall_fromPLC_WON()
-                WON_Array.append(won)
-            else:
-                pass
-            # Write sigma values into PLC data blocks if PLC Query is true ---[]
+        # Write sigma values into PLC data blocks if PLC Query is true ---[]
+        if rID == 'Ring 1':
             pCon.writeReal(db_number, start_offset[6], v1)
-            pCon.writeReal(db_number, start_offset[7], v2)
-            pCon.writeReal(db_number, start_offset[8], v3)
-            pCon.writeReal(db_number, start_offset[9], v4)
-            pCon.writeReal(db_number, start_offset[28], SigPid)
+        elif rID == 'Ring 2':
+            pCon.writeReal(db_number, start_offset[7], v1)
+        elif rID == 'Ring 3':
+            pCon.writeReal(db_number, start_offset[8], v1)
+        elif rID == 'Ring 4':
+            pCon.writeReal(db_number, start_offset[9], v1)
+        pCon.writeReal(db_number, start_offset[28], SigPid)
 
     except Exception as err:
         print(f"PLC Write Error: {err}")
 
     # Read Pipe Discrete Position --------------------------[]
-    if clayer==None and pPos==None and md:
-        try:
-            layer = pCon.readInteger(db_number, start_offset[0], bit_offset[0])
-            pPos = pCon.readReal(db_number, start_offset[1], bit_offset[0])
-        except Exception as err:
-            print(f"PLC Read Error: {err}")
+    try:
+        layer = pCon.readInteger(db_number, start_offset[0], bit_offset[0])
+        pPos = pCon.readReal(db_number, start_offset[1], bit_offset[0])
+    except Exception as err:
+        print(f"PLC Read Error: {err}")
     else:
-        layer = clayer
-        pPos = round(pPos, 2)
-    ring = 'Ring#1'             # unidirectional convention
+        layer = 'ND'
+        pPos = 'ND'
+    ring = rID                  # unidirectional convention
     prID = pID                  # String value of process identification
 
     # Write to FMEA report file ----------------------------[]
-    sigmaErrorLog(layer, prID, str(pX), str(pD), str(pU), str(pL), ring, v1, v2, v3, v4, pPos)
+    sigmaErrorLog(layer, prID, str(0), str(0), str(0), str(0), ring, v1, v2, v3, v4, pPos)
 
     return
 

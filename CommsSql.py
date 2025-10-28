@@ -15,7 +15,7 @@ today = date.today()
 import time
 
 # Initialise relevant variables and load configuration settings ----------[]
-server_IP, db_ref, isAtho, yekref = tx.load_configSQL('checksumError.ini')
+server_IP, db_ref, isAtho, yekref = tx.load_configSQL('C:\\synchronousGPU\\INI_Files\\checksumError.ini')
 # print('ServerUse Details:', server_IP, db_ref, isAtho, yekref)
 Encrypt = 'no'                  # Added today 06/08/2024 [optional]
 Certify = 'yes'                 # DITTO
@@ -673,7 +673,116 @@ def sql_connectRC():
 
 
 # ----------------------------------------------------------------------------
-def DAQ_connect():
+def eolViz_connect():
+    """
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    # ---------------------------------------------------------#
+    if conn == None:
+        print('\n[EoL Viz] Connecting to SQL server...')
+
+        try:
+            conn = pyodbc.connect('Driver={SQL Server};'
+                                  'Server=' + server_IP + ';'
+                                  'Database=' + db_ref + ';'
+                                  'Encrypt=' + Encrypt + ';'
+                                  'TrustServerCertificate=' + Certify + ';'
+                                  'uid=' + isAtho + ';'
+                                  'pwd=' + yekref + ';'
+                                  'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+            # conn = True
+            print('\n[EoL Viz] SQL Server connection active!\n')
+            return conn
+
+        except Exception as err:
+            errorLog(str(err))                      # Log the error in txt file
+            errorConnect()
+            print('\n[EoL Viz] Connection issue: SQL Server is inaccessible!')
+
+        return None
+
+# ----------------------------------------------------------------------------
+def eolRPT_connect():
+    """
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    # ---------------------------------------------------------#
+    if conn == None:
+        print('\n[EoL RPT] Connecting to SQL server...')
+
+        try:
+            conn = pyodbc.connect('Driver={SQL Server};'
+                                  'Server=' + server_IP + ';'
+                                  'Database=' + db_ref + ';'
+                                  'Encrypt=' + Encrypt + ';'
+                                  'TrustServerCertificate=' + Certify + ';'
+                                  'uid=' + isAtho + ';'
+                                  'pwd=' + yekref + ';'
+                                  'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+            # conn = True
+            print('\n[EoL RPT] SQL Server connection active!\n')
+            return conn
+
+        except Exception as err:
+            errorLog(str(err))                      # Log the error in txt file
+            errorConnect()
+            print('\n[EoL RPT] Connection issue: SQL Server is inaccessible!')
+
+        return None
+
+def wonFinder_connect():
+    """
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    # ---------------------------------------------------------#
+    if conn == None:
+        print('\n[WON Finder] Connecting to SQL server...')
+
+        try:
+            conn = pyodbc.connect('Driver={SQL Server};'
+                                  'Server=' + server_IP + ';'
+                                  'Database=' + db_ref + ';'
+                                  'Encrypt=' + Encrypt + ';'
+                                  'TrustServerCertificate=' + Certify + ';'
+                                  'uid=' + isAtho + ';'
+                                  'pwd=' + yekref + ';'
+                                  'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+            # conn = True
+            print('\n[WON Finder] SQL Server connection active!\n')
+            return conn
+
+        except Exception as err:
+            errorLog(str(err))                      # Log the error in txt file
+            errorConnect()
+            print('\n[WON Finder] Connection issue: SQL Server is inaccessible!')
+
+        return None
+
+def ensure_connection(conn):
+    """Check if connection is alive, reconnect if needed."""
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")  # lightweight test query
+        cursor.close()
+        return conn
+    except Exception:
+        print("Reconnecting...")
+        return # DAQ_connect()
+
+# --------------------------------------------------------------------------------
+def rpt_SQLconnect():
     """
     state: 1 connected, 0 Not connected
     agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
@@ -699,22 +808,68 @@ def DAQ_connect():
             return conn
 
         except Exception as err:
-            errorLog(str(err))                      # Log the error in txt file
-            errorConnect()
             print('\n[EoL] Connection issue: SQL Server is inaccessible!')
 
-        return None
+    return None
 
+def sql_connectEoP():
+    # Substrate Temperature SQL Instance
+    """
+    Parallel connection call for Tape Temperature Model - RL
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    resilenceN = 5
+    wait2retry = 2
+    Certify = 'Certify'
+    # ---------------------------------------------------------#
 
-def ensure_connection(conn):
-    """Check if connection is alive, reconnect if needed."""
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1")  # lightweight test query
-        cursor.close()
-        return conn
-    except Exception:
-        print("Reconnecting...")
-        return DAQ_connect()
+    if conn == None:
+        print('[ST] Connecting to SQL server...')
+        # Ensure connection is robust and resilience ------
+        for attempt in range(1, resilenceN + 1):
+            # Use pymssql or pyodbc
+            try:
+                conn = pyodbc.connect('Driver={SQL Server};'
+                                      'Server=' + server_IP + ';'
+                                      'Database=' + db_ref + ';'
+                                      'Encrypt=' + Encrypt + ';'
+                                      'TrustServerCertificate=' + Certify + ';'
+                                      'uid=' + isAtho + ';'
+                                      'pwd=' + yekref + ';'
+                                      'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+                # conn = True
+                print('\n[ST] SQL Server connection active!\n')
+                return conn
 
-# --------------------------------------------------------------------------------
+            except Exception as err:
+                wait_time = wait2retry * (2 ** (attempt - 1))
+                errorLog(f"[ST] Reconnect attempt {attempt}/{resilenceN} failed: {err}") #(str(err))                      # Log the error in txt file
+                # -----------------------
+                if attempt < resilenceN:
+                    #logging.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                else:
+                    # logging.critical("Max retries reached. Exiting.")
+                    # raise  # or return None if you prefer soft e
+                    errorConnect()
+                    print('\n[ST] Connection issue: Server is inaccessible!')
+        return None        # conn = False
+
+    else:                                           # when connection = 1 and requires disconnect
+        try:
+            conn.close()
+            errorNote()
+            print('\n[ST] Active connection will be closed...')
+
+        except Exception as err:
+            print(f"[ST] Connection Error: {err}")       # catch whatever error raised
+            # conn = False
+            errorLog(err)
+        print('\nConnection Summary:', conn)
+
+    return None
+# ------------------------------------------------------------[]Ramp Mapping]
