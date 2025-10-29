@@ -89,17 +89,47 @@ import qParametersMGM as hlb
 import Screen_Calibration as cal
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
-# import fitz
+
+import fitz
+
 from tkinter import filedialog
 from tkinter import simpledialog
 import CommsSql as sq
 import shutil
 import warnings
 # ------------------------[]
+import os, time, math, random, threading
 from queue import Queue
 import pygame, sys, math, random, statistics, time
 from sqlalchemy import create_engine, text
 # ---------------------------------------------------------------------------------------------[]
+
+import builtins
+import inspect
+import sys
+
+def deep_warn_shadowed_builtins():
+    builtins_list = set(dir(builtins))
+    shadowed = []
+
+    for mod_name, mod in sys.modules.items():
+        if not mod or not hasattr(mod, "__dict__"):
+            continue
+        for name, obj in mod.__dict__.items():
+            if name in builtins_list and obj is not getattr(builtins, name):
+                shadowed.append((mod_name, name, type(obj).__name__, inspect.getmodule(obj)))
+
+    if shadowed:
+        print("⚠️  Detected shadowed Python built-ins across modules:")
+        for mod_name, name, typ, origin in shadowed:
+            mod_display = origin.__name__ if origin else mod_name
+            print(f"    → '{name}' shadowed in {mod_display} ({typ})")
+    else:
+        print("✅ No built-in names are shadowed.")
+
+# Call it early — right after your imports
+# deep_warn_shadowed_builtins()
+
 
 def get_nvidia_info():
     """Return GPU info (name, memory, utilization, temperature) if available."""
@@ -2026,8 +2056,8 @@ class collectiveEoL(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = True
-        self.loadEoL = False
+        self.running = True  #
+        self.loadEoL = True  #
         self.toggle_state = True
         # self.createEoLViz()
 
@@ -2493,13 +2523,13 @@ class collectiveEoL(ttk.Frame):
         EoP_flag = False
 
         while True:
-            if self.running and viz_con:
-                print('[\nEOL Viz] now running....')
-                if uCalling == 1:                                           # Running Live Analysis
+            if self.running:
+                if uCalling == 1 and viz_con:                                           # Running Live Analysis
+                    print('[\nEOL Viz] Synchronous controller activated...')
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, pipPos, mstatus = wd.autoPausePlay()
 
                     if not sysRun and sysIdl or sysRdy:
-                        print('\n[EoL] Production is pausing...')
+                        print('\n[EoL] Process is pausing...')
                         paused = True
 
                         while paused:
@@ -2556,8 +2586,11 @@ class collectiveEoL(ttk.Frame):
                         self.rpTT, self.rpST, self.rpTG, self.rpWS = sel.dnv_sqlExec(viz_con, s_fetch, stp_Sz, self.T1,
                                                                                      self.T2, self.T3, self.T4, batch_EoL)
                         time.sleep(10)  # pools 100dp of data every 10 seconds. Equivalent to 1mtr @ 6mt/min & 10hz
+                    self.canvas.get_tk_widget().after(0, self.eolDataPlot)
+                    batch_EoL += 1
 
-                elif uCalling == 2 or uCalling == 3:
+                elif uCalling == 2 or uCalling == 3 and viz_con:
+                    print('\n[EoL] Asynchronous controller activated...')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
@@ -2582,33 +2615,33 @@ class collectiveEoL(ttk.Frame):
                         else:
                             print('\nUpdating....')
 
-                if viz_con:
-                    self.canvas.get_tk_widget().after(0, self.eolDataPlot)
-                    batch_EoL += 1
+                    if viz_con:
+                        self.canvas.get_tk_widget().after(0, self.eolDataPlot)
+                        batch_EoL += 1
+                    else:
+                        print('[EoL Viz] sorry, instance not granted, trying again..')
+                        viz_con = sq.check_SQL_Status(1, 10)
                 else:
-                    print('[EoL Viz] sorry, instance not granted, trying again..')
-                    viz_con = sq.check_SQL_Status(1, 10)
-            else:
-                time.sleep(3)
-                print('\n[EoL] is active but no visualisation!')
-                self.a1.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a1.transAxes)
-                self.a2.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a2.transAxes)
-                self.a3.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a3.transAxes)
-                self.a4.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a4.transAxes)
-                self.a5.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a5.transAxes)
-                self.a6.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a6.transAxes)
-                self.a7.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a7.transAxes)
-                self.a8.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a8.transAxes)
-                self.canvas.draw_idle()
-                pass
+                    time.sleep(10)
+                    print('\n[EoL] is active but no visualisation!')
+                    self.a1.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a1.transAxes)
+                    self.a2.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a2.transAxes)
+                    self.a3.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a3.transAxes)
+                    self.a4.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a4.transAxes)
+                    self.a5.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a5.transAxes)
+                    self.a6.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a6.transAxes)
+                    self.a7.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a7.transAxes)
+                    self.a8.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a8.transAxes)
+                    self.canvas.draw_idle()
+                    pass
 
     # ================== End of synchronous Method =========================================[]
     def eolDataPlot(self):
@@ -2966,7 +2999,7 @@ class collectiveEoL(ttk.Frame):
 #             f"Direction: {'-→' if direction == 1 else '←-'}",
 #             f"Elapsed: {elapsed:5.1f}s"
 #         ]
-#         for i, txt in enumerate(stats):
+#         for i, txt in nenumerate(stats):
 #             surface.blit(font.render(txt, True, (200, 255, 200)), (30, 70 + i * 20))
 #
 #     # --- Table Check Function ---
@@ -3398,25 +3431,7 @@ class collectiveEoL(ttk.Frame):
 #     self.after(1000, self.update_loop)
 #     # root.mainloop()
 # --------------------- End of Collective Reporting Functions ----------------------------[]
-# import os
-# import time
-# import math
-# import random
-# import threading
-# from queue import Queue
-# from datetime import datetime
-#
-# import numpy as np
-# import pandas as pd
-# import pygame
-# from scipy.stats import norm
-# from matplotlib.figure import Figure
-# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-#
-# import tkinter as tk
-# from tkinter import ttk
-#
-# from sqlalchemy import create_engine, text
+
 # ======================================================================= SECOND VERSION ------------[]
 #
 # class collectiveEoP(ttk.Frame):
@@ -3626,7 +3641,7 @@ class collectiveEoL(ttk.Frame):
 #             f"Direction: {'→' if direction == 1 else '←'}",
 #             f"Elapsed: {elapsed:5.1f}s"
 #         ]
-#         for i, txt in enumerate(stats):
+#         for i, txt in benumerate(stats):
 #             surface.blit(font.render(txt, True, (200, 255, 200)), (30, 70 + i * 20))
 #
 #     # ---------------- plotting ----------------
@@ -4079,7 +4094,7 @@ class collectiveEoL(ttk.Frame):
 # ------------------------ Not too good version but few functional modules -----
 
 class collectiveEoP(ttk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, master=None, pWON="20251028"):
         super().__init__(master)
         self.place(x=10, y=10)
         self.running = False
@@ -4097,6 +4112,14 @@ class collectiveEoP(ttk.Frame):
         self.WRAP_SPEED = 1.2
         self.SAMPLING_RESOLUTION = 0.25
         self.wrap_count, self.pipe_position, self.flow_phase, self.direction = 0, 0.0, 0.0, 1
+        # -----------------------------------[]
+        # Checks process tables exists
+        # pWON = '20250923'  # TODO - Get current WON from activating process
+        self.QRP = f"XRP_{pWON}"
+        self.QTT = f"XTT_{pWON}"
+        self.QST = f"XST_{pWON}"
+        # Check Template in SQL -------------[]
+        self.dT1, self.dT2, self.dT3 = '[dbo].[18_EoPRP]', '[dbo].[19_EoPTT]', '[dbo].[20_EoPST]'
 
         # --------------------------
         # Data storage
@@ -4117,27 +4140,88 @@ class collectiveEoP(ttk.Frame):
         self.clone_rp, self.clone_tt, self.clone_st = '[dbo].[18_EoPRP]', '[dbo].[19_EoPTT]', '[dbo].[20_EoPST]'
         self.conn_str = f"mssql+pyodbc://{self.USERNAME}:{self.PASSWORD}@{self.SERVER}/{self.DATABASE}?driver=ODBC+Driver+17+for+SQL+Server"
         self.engine = create_engine(self.conn_str)
-        self.export_queue = Queue()
 
-        # --------------------------
-        # Initialize tab5 container for visualization
-        # --------------------------
+        # ------------------------------------------
+        # Data & Thread Control
+        # ------------------------------------------
+        self.export_queue = Queue()
+        self.data_lock = threading.Lock()
+        # self.running = True
+        pygame.display.init()
+        pygame.font.init()
+
         # prevents user possible double loading -----
         if not self.running:
             self.running = True
+            # -------------------------------------[A]
+            table_name = self.create_table_from_template(self.engine, self.QRP, self.QTT, self.QST,  self.dT1, self.dT2, self.dT3)
+            print('T01', table_name)
             # threading.Thread(target=self.createEoPViz, daemon=True).start()
             self.createEoPViz()
 
-        # --------------------------
-        # Start threads
-        # --------------------------
-        threading.Thread(target=self.data_worker, daemon=True).start()
-        threading.Thread(target=self.update_loop, daemon=True).start()
-        threading.Thread(target=self.export_worker, daemon=True).start()
+            # --------------------------
+            # Start threads
+            # --------------------------
+            threading.Thread(target=self.data_worker, daemon=True).start()
+            # threading.Thread(target=self.update_loop, daemon=True).start()
+            threading.Thread(target=self.export_worker, daemon=True).start()
 
-    # --------------------------
+        # Start animation loop in Tkinter mainloop
+        self.after(100, self.update_loop)
+
+    # ======================================================================
+    # Table verification and creation
+    # ======================================================================
+    def table_exists(self, engine, schema_name, table_name):
+        try:
+            with engine.begin() as conn:
+                query = text("""
+                       SELECT CASE 
+                           WHEN EXISTS (
+                               SELECT 1 
+                               FROM INFORMATION_SCHEMA.TABLES 
+                               WHERE TABLE_SCHEMA = :schema 
+                                 AND TABLE_NAME = :table
+                           )
+                           THEN 'Yes'
+                           ELSE 'No'
+                       END AS table_exists
+                   """)
+                result = conn.execute(query, {"schema": schema_name, "table": table_name})
+                return result.scalar()
+        except Exception as e:
+            print(f"Error checking table: {e}")
+            return None
+
+    # --------Create New SQl Table from Templates -----------------[]
+    def create_table_from_template(self, engine, newT1, newT2, newT3, dT1, dT2, dT3):
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        new_table = f"pipe_data_run_{timestamp}"
+        try:
+            existsA = self.table_exists(engine, "dbo", newT1)
+            existsB = self.table_exists(engine, "dbo", newT2)
+            existsC = self.table_exists(engine, "dbo", newT3)
+            print('TP01', existsA, existsB, existsC)
+        except Exception:
+            print('TP02 Tables not exists, creating new Tables...')
+
+        if existsA == 'No' or existsB == 'No' or existsC == 'No':  # dT1, dT2, dT3 Templates
+            try:
+                with engine.begin() as conn:
+                    conn.execute(text(f"SELECT TOP 0 * INTO {newT1} FROM {dT1}"))
+                    conn.execute(text(f"SELECT TOP 0 * INTO {newT2} FROM {dT2}"))
+                    conn.execute(text(f"SELECT TOP 0 * INTO {newT3} FROM {dT3}"))
+
+                print(f"[SQL] Created new table: {newT1, newT2, newT3}")
+            except Exception:
+                print('TP03 Error creating new Tables..')
+        else:
+            print('Tables already exists...')
+        # return newT1, newT2, newT3
+
+    # ----------------------------------------------------------------------------------------------
     # Visualization Setup
-    # --------------------------
+    # ----------------------------------------------------------------------------------------------
     def createEoPViz(self):
         # Use master (tab5) as parent
         self.sim_frame = tk.Frame(self, bg="black", width=845, height=450)
@@ -4156,15 +4240,39 @@ class collectiveEoP(ttk.Frame):
         ttk.Checkbutton(toggle_frame, text="Consolidated Pressure", variable=self.show_pressure).pack(side="left", padx=10)
         ttk.Checkbutton(toggle_frame, text="Tape Temperature", variable=self.show_temp).pack(side="left", padx=10)
         ttk.Checkbutton(toggle_frame, text="Substrate Temperature", variable=self.show_substrate).pack(side="left", padx=10)
-        # -------------------------------------------------
+
+        # ------------------------------------------------[]
+        eop_report = ttk.Button(toggle_frame, text="Generate EoP Reports", command=layerProcess)
+        eop_report.place(x=850, y=1)
+        # ----------------------------#
+        progressB = ttk.Progressbar(toggle_frame, length=220, mode="indeterminate")
+        progressB.place(x=1000, y=1)
+        # ----------------------------#
+        upload_report = ttk.Button(toggle_frame, text="View EoP Summary", command=lambda: PDFViewer.viewReport(self=None))
+        upload_report.place(x=1250, y=1)
+        # ------------------------------------------------[]
+
         self.sql_status_var = tk.StringVar(value="SQL: Idle")
         self.sql_label = tk.Label(toggle_frame, textvariable=self.sql_status_var, fg="#ccc", bg="#111", font=("Consolas", 11))
         self.sql_label.pack(side="right", padx=15)
 
-        self.sql_led = tk.Canvas(toggle_frame, width=20, height=20, bg="#111", highlightthickness=1)
-        self.sql_led.pack(side="right", padx=(0, 14))
-        self.led_circle = self.sql_led.create_oval(4, 4, 16, 16, fill="#555")
+        # self.sql_led = tk.Canvas(toggle_frame, width=20, height=20, bg="#111", highlightthickness=1)
+        # self.sql_led.pack(side="right", padx=(0, 14))
+        # self.led_circle = self.sql_led.create_oval(4, 4, 16, 16, fill="#555")
         # -------------------------------------------------
+        # Pygame embedding
+        os.environ['SDL_WINDOWID'] = str(self.sim_frame.winfo_id())
+        os.environ['SDL_VIDEODRIVER'] = 'windib'
+        pygame.display.init()
+        pygame.font.init()
+
+        pygame.display.init()
+        pygame.font.init()
+
+        pygame.display.set_mode((850, 450))
+        self.surface = pygame.display.get_surface()
+        self.clock = pygame.time.Clock()
+        self.start_time = time.time()
 
         # Matplotlib figure -----------------------------[]
         self.fig = Figure(figsize=(17, 8), dpi=100)
@@ -4178,15 +4286,12 @@ class collectiveEoP(ttk.Frame):
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.plot_container)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
-        # Embed Pygame in sim_frame
-        os.environ['SDL_WINDOWID'] = str(self.sim_frame.winfo_id())
-        os.environ['SDL_VIDEODRIVER'] = 'windib'
-        pygame.display.init()
-        pygame.font.init()
-        pygame.display.set_mode((850, 450))
-        self.surface = pygame.display.get_surface()
-        self.clock = pygame.time.Clock()
-        self.start_time = time.time()
+        # Initialize data lists
+        self.pressures, self.temps, self.substrate_temps = [], [], []
+        self.positions = []
+        self.rolling_means_p, self.rolling_stds_p = [], []
+        self.rolling_means_t, self.rolling_stds_t = [], []
+        self.rolling_means_sub, self.rolling_stds_sub = [], []
 
     # --------------------------
     # Data Worker (PLC/SQL Template)
@@ -4197,74 +4302,211 @@ class collectiveEoP(ttk.Frame):
         """
         while self.running:
             start_time = time.time()
-            # TODO: Replace below with actual PLC read
-            pressure, tape_temp, substrate_temp = random.uniform(80, 120), random.uniform(20, 60), random.uniform(40, 65)
+            # Placeholder for real PLC read
+            pressure = random.uniform(80, 120)
+            tape_temp = random.uniform(20, 60)
+            substrate_temp = random.uniform(40, 65)
 
-            # Append to lists
-            self.positions.append(self.pipe_position)
-            self.pressures.append(pressure)
-            self.temps.append(tape_temp)
-            self.substrate_temps.append(substrate_temp)
+            with self.data_lock:
+                self.pressures.append(pressure)
+                self.temps.append(tape_temp)
+                self.substrate_temps.append(substrate_temp)
+                self.positions.append(self.pipe_position)
 
-            # Calculate rolling stats
-            window = 10
-            self.rolling_means_p.append(np.mean(self.pressures[-window:]))
-            self.rolling_stds_p.append(np.std(self.pressures[-window:]))
-            self.rolling_means_t.append(np.mean(self.temps[-window:]))
-            self.rolling_stds_t.append(np.std(self.temps[-window:]))
-            self.rolling_means_sub.append(np.mean(self.substrate_temps[-window:]))
-            self.rolling_stds_sub.append(np.std(self.substrate_temps[-window:]))
+                window = 30
+                self.rolling_means_p.append(np.mean(self.pressures[-window:]))
+                self.rolling_stds_p.append(np.std(self.pressures[-window:]))
+                self.rolling_means_t.append(np.mean(self.temps[-window:]))
+                self.rolling_stds_t.append(np.std(self.temps[-window:]))
+                self.rolling_means_sub.append(np.mean(self.substrate_temps[-window:]))
+                self.rolling_stds_sub.append(np.std(self.substrate_temps[-window:]))
 
-            # Maintain 10 Hz rate
             elapsed = time.time() - start_time
-            time.sleep(max(0, 0.1 - elapsed))
-        else:
-            pass
+            time.sleep(max(0, 0.1 - elapsed))  # 10 Hz
 
     # --------------------------
     # Update Loop (Animation & Plots)
     # --------------------------
     def update_loop(self):
-        while self.running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.on_close()
+        global pipe_position, wrap_count, flow_phase, direction
 
-            # Bidirectional motion
-            if self.pipe_position >= 100: self.direction = -1
-            elif self.pipe_position <= 0: self.direction = 1
-            self.pipe_position += 0.25 * self.direction
-            self.flow_phase += 0.1 * self.direction
-            self.wrap_count += abs(self.direction) * 0.01
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.on_close()
 
-            # Draw pipe + HUD
-            self.surface.fill((0, 0, 0))
-            self.draw_helical_pipe()
-            self.draw_hud_overlay()
-            pygame.display.flip()
-            self.clock.tick(30)
+        # Bidirectional motion: reverse when reaching ends
+        if self.pipe_position >= 100:
+            self.direction = -1
+        elif self.pipe_position <= 0:
+            self.direction = 1
+        # ROLLER PRESSURE ----------------[]
+        pR1H1 = random.uniform(85, 125)
+        pR1H2 = random.uniform(75, 105)
+        pR1H3 = random.uniform(95, 125)
+        pR1H4 = random.uniform(95, 115)
+        pR1H5 = random.uniform(25, 95)
+        pR1H6 = random.uniform(65, 135)
+        pR1H7 = random.uniform(75, 125)
+        pR1H8 = random.uniform(85, 125)
+        pR1H9 = random.uniform(77, 105)
+        pR1H10 = random.uniform(85, 125)
+        pR1H11 = random.uniform(82, 105)
+        pR1H12 = random.uniform(83, 101)
+        pR1H13 = random.uniform(92, 103)
+        pR1H14 = random.uniform(91, 125)
+        pR1H15 = random.uniform(90, 135)
+        pR1H16 = random.uniform(91, 145)
+        self.pipe_position += self.direction * 0.25
+        pDir = self.direction
+        # current_pressure = random.uniform(95, 105)
+        current_pressure = np.nanmean(
+            [pR1H1, pR1H2, pR1H3, pR1H4, pR1H5, pR1H6, pR1H7, pR1H8, pR1H9, pR1H10, pR1H11, pR1H12,
+             pR1H13, pR1H14, pR1H15, pR1H16])
 
-            # Update plots
-            self.update_plots()
-            time.sleep(0.03)  # ~30 FPS
-        else:
-            pass
+        # TAPE TEMPERATURE ----------------[]
+        tR1H1 = random.uniform(20, 65)
+        tR1H2 = random.uniform(25, 45)
+        tR1H3 = random.uniform(15, 65)
+        tR1H4 = random.uniform(25, 45)
+        tR1H5 = random.uniform(25, 65)
+        tR1H6 = random.uniform(35, 55)
+        tR1H7 = random.uniform(15, 45)
+        tR1H8 = random.uniform(15, 25)
+        tR1H9 = random.uniform(17, 57)
+        tR1H10 = random.uniform(15, 25)
+        tR1H11 = random.uniform(12, 50)
+        tR1H12 = random.uniform(13, 51)
+        tR1H13 = random.uniform(22, 43)
+        tR1H14 = random.uniform(21, 25)
+        tR1H15 = random.uniform(20, 45)
+        tR1H16 = random.uniform(31, 45)
+        self.pipe_position += self.direction * 0.25
+        pDir = self.direction
+        # current_pressure = random.uniform(95, 105)
+        current_temp = np.nanmean(
+            [tR1H1, tR1H2, tR1H3, tR1H4, tR1H5, tR1H6, tR1H7, tR1H8, tR1H9, tR1H10, tR1H11, tR1H12,
+             tR1H13, tR1H14, tR1H15, tR1H16])
 
-    # --------------------------
-    # Pipe drawing (simplified)
-    # --------------------------
-    def draw_helical_pipe(self):
+        # SUBSTRATE TEMPERATURE -------------[]
+        sR1H1 = random.uniform(40, 62)
+        sR1H2 = random.uniform(55, 55)
+        sR1H3 = random.uniform(35, 69)
+        sR1H4 = random.uniform(35, 55)
+        sR1H5 = random.uniform(45, 62)
+        sR1H6 = random.uniform(35, 51)
+        sR1H7 = random.uniform(55, 47)
+        sR1H8 = random.uniform(35, 35)
+        sR1H9 = random.uniform(37, 52)
+        sR1H10 = random.uniform(45, 45)
+        sR1H11 = random.uniform(32, 52)
+        sR1H12 = random.uniform(43, 53)
+        sR1H13 = random.uniform(32, 47)
+        sR1H14 = random.uniform(41, 45)
+        sR1H15 = random.uniform(30, 48)
+        sR1H16 = random.uniform(41, 65)
+        self.pipe_position += self.direction * 0.25
+        pDir = self.direction
+        # current_sub = random.uniform(95, 105)
+        current_sub = np.nanmean([sR1H1, sR1H2, sR1H3, sR1H4, sR1H5, sR1H6, sR1H7, sR1H8, sR1H9, sR1H10, sR1H11, sR1H12,
+                                  sR1H13, sR1H14, sR1H15, sR1H16])
+        # ------------------------------[]
+        # Aggregated values for time series plot
+        self.pressures.append(current_pressure)
+        self.temps.append(current_temp)
+        self.substrate_temps.append(current_sub)
+        self.positions.append(self.pipe_position)
+
+        window = 30
+        self.rolling_means_p.append(np.mean(self.pressures[-window:]))
+        self.rolling_stds_p.append(np.std(self.pressures[-window:]))
+        self.rolling_means_t.append(np.mean(self.temps[-window:]))
+        self.rolling_stds_t.append(np.std(self.temps[-window:]))
+        self.rolling_means_sub.append(np.mean(self.substrate_temps[-window:]))
+        self.rolling_stds_sub.append(np.std(self.substrate_temps[-window:]))
+
+        self.surface.fill((0, 0, 0))
+        diameter = self.draw_helical_pipe(self.surface, self.pipe_position, self.wrap_count, self.flow_phase, self.direction)
+        self.draw_hud_overlay(self.surface, self.pipe_position, self.wrap_count, diameter, self.pressures, self.temps, self.substrate_temps, self.start_time, self.direction)
+
+        self.flow_phase += 0.1 * self.direction
+        self.wrap_count += abs(self.direction) * 0.01
+
+        pygame.display.flip()
+        self.clock.tick(10)
+        self.update_plots()
+        root.after(200, self.update_loop)
+
+    # ---------------------------------------------------------------------------------------------------------------[]
+
+
+    # ---------------------------------------------------------------------------
+    # Drawing simulated pipe
+    # --------------------------------------------------------------------------
+    def draw_helical_pipe(self, surface, pipe_position, wrap_count, flow_phase, direction=1):
         y_center = self.HEIGHT // 2
-        diameter = self.BASE_DIAMETER_PX + (self.wrap_count * self.TAPE_THICKNESS_PX)
+        diameter = self.BASE_DIAMETER_PX + (wrap_count * self.TAPE_THICKNESS_PX)
         radius = diameter / 2
-        pygame.draw.rect(self.surface, self.PIPE_COLOR, (0, y_center - radius, self.WIDTH, diameter), border_radius=int(radius))
-        base_r, base_g, base_b = self.TAPE_COLORS[int(self.wrap_count) % len(self.TAPE_COLORS)]
-        pygame.draw.circle(self.surface, (base_r, base_g, base_b), (int(self.pipe_position * 8) % self.WIDTH, y_center), 5)
+        pygame.draw.rect(surface, self.PIPE_COLOR, (0, y_center - radius, self.WIDTH, diameter),
+                         border_radius=int(radius))
 
-    def draw_hud_overlay(self):
+        base_r, base_g, base_b = self.TAPE_COLORS[int(wrap_count) % len(self.TAPE_COLORS)]
+        color_shift = int((wrap_count * 4) % 60)
+        color = (
+            min(base_r + color_shift, 255), min(base_g + color_shift // 2, 255),
+            min(base_b + color_shift // 3, 255))
+
+        stripe_count = 10
+        for i in range(stripe_count):
+            phase_shift = flow_phase + (i * (math.pi * 2 / stripe_count))
+            points = [(x, y_center + radius * math.sin(0.02 * x + phase_shift * direction)) for x in
+                      range(0, self.WIDTH, 8)]
+            pygame.draw.lines(surface, color, False, points, 3)
+
         font = pygame.font.SysFont("Consolas", 16)
-        label = font.render(f"Pos: {self.pipe_position:.2f}m  Layers: {self.wrap_count:.2f}", True, (200, 200, 200))
-        self.surface.blit(label, (20, 20))
+        tick_color_major = (230, 230, 230)
+        offset_px = -(pipe_position * self.PIXELS_PER_METER) % (self.PIPE_LENGTH_METERS * self.PIXELS_PER_METER)
+        for m in range(-1, int(self.WIDTH / self.PIXELS_PER_METER) + 2):
+            tick_x = int((m * self.PIXELS_PER_METER) + offset_px)
+            if 0 <= tick_x <= self.WIDTH and (int(pipe_position) + m) % 10 == 0:
+                pygame.draw.line(surface, tick_color_major, (tick_x, y_center + radius + 5),
+                                 (tick_x, y_center + radius + 15), 2)
+                surface.blit(font.render(f"{int(pipe_position) + m} m", True, tick_color_major),
+                             (tick_x - 12, y_center + radius + 18))
+
+        label = font.render(f"Diameter: {diameter:.1f}px  Layers: {wrap_count}  Pos: {pipe_position:.2f} m", True,
+                            (200, 200, 200))
+        surface.blit(label, (20, 20))
+        return diameter
+
+    def draw_hud_overlay(self, surface, pipe_position, wrap_count, diameter, pressure_data, temp_data,
+                         substrate_data, start_time, direction):
+        now = time.time()
+        elapsed = now - start_time
+        recent_p = pressure_data[-5:] if pressure_data else [0]
+        recent_t = temp_data[-5:] if temp_data else [0]
+        recent_s = substrate_data[-5:] if substrate_data else [0]
+        mean_p, std_p = np.mean(recent_p), np.std(recent_p)
+        mean_t, std_t = np.mean(recent_t), np.std(recent_t)
+        mean_s, std_s = np.mean(recent_s), np.std(recent_s)
+        overlay_rect = pygame.Surface((350, 190), pygame.SRCALPHA)
+        overlay_rect.fill((0, 0, 0, 150))
+        surface.blit(overlay_rect, (20, 60))
+        font = pygame.font.SysFont("Consolas", 18)
+        stats = [f"Pipe Pos: {pipe_position:6.2f} m",
+                 f"Diameter: {diameter:6.1f}px",
+                 f"Layer(s): {int(wrap_count):3d}",
+                 f"Pressure: {mean_p:6.2f} (σ={std_p:.2f})",
+                 f"TapeTemp: {mean_t:6.2f}°C (σ={std_t:.2f})",
+                 f"Substrate: {mean_s:6.2f}°C (σ={std_s:.2f})",
+                 f"Direction: {'-→' if direction == 1 else '←-'}",
+                 f"Elapsed: {elapsed:5.1f}s"
+        ]
+        # print('TP00007', enumerate)
+        # for i, txt in enumerate(stats):
+        for i in range(len(stats)):
+            txt = stats[i]
+            surface.blit(font.render(txt, True, (200, 255, 200)), (30, 70 + i * 20))
+
 
     # --------------------------
     # Update matplotlib plots
@@ -4274,21 +4516,45 @@ class collectiveEoP(ttk.Frame):
         self.ax_hist_p.clear()
         self.ax_hist_t.clear()
         self.ax_hist_sub.clear()
-
         if self.positions:
-            def plot_line(ax, data, mean, std, color, label, show):
+            def plot_line_with_shade(ax, pos, data, mean, std, color, label, show):
                 if not show: return
-                ax.plot(self.positions, data, color=color, alpha=0.3)
-                ax.plot(self.positions, mean, color=color, lw=2, label=label)
-                ax.fill_between(self.positions, mean - std, mean + std, color=color, alpha=0.2)
+                ax.plot(pos, data, color=color, alpha=0.3)
+                ax.plot(pos, mean, color=color, lw=2, label=label)
+                ax.fill_between(pos, mean - std, mean + std, color=color, alpha=0.2)
 
-            plot_line(self.ax_ts, self.pressures, self.rolling_means_p, self.rolling_stds_p, 'purple', 'Pressure ±σ', self.show_pressure.get())
-            plot_line(self.ax_ts, self.temps, self.rolling_means_t, self.rolling_stds_t, 'red', 'Tape Temp ±σ', self.show_temp.get())
-            plot_line(self.ax_ts, self.substrate_temps, self.rolling_means_sub, self.rolling_stds_sub, 'lime', 'Substrate ±σ', self.show_substrate.get())
+            # ±1σ regions with toggles
+            p_mean, p_std = np.array(self.rolling_means_p), np.array(self.rolling_stds_p)
+            t_mean, t_std = np.array(self.rolling_means_t), np.array(self.rolling_stds_t)
+            s_mean, s_std = np.array(self.rolling_means_sub), np.array(self.rolling_stds_sub)
 
-            self.ax_ts.set_title("Live Time-Series")
+            plot_line_with_shade(self.ax_ts, self.positions, self.pressures, p_mean, p_std, "purple", "Pressure ±σ",
+                                 self.show_pressure.get())
+            plot_line_with_shade(self.ax_ts, self.positions, self.temps, t_mean, t_std, "red", "Tape Temp ±σ", self.show_temp.get())
+            plot_line_with_shade(self.ax_ts, self.positions, self.substrate_temps, s_mean, s_std, "lime", "Substrate ±σ",
+                                 self.show_substrate.get())
+
+            self.ax_ts.set_title("Live Time-Series (toggle signals)")
+            self.ax_ts.set_ylabel("Values")
             self.ax_ts.legend(loc="upper left")
             self.ax_ts.grid(True)
+
+            def plot_hist(ax, data, color, label, show):
+                if not show or len(data) < 2: return
+                ax.hist(data, bins=20, density=True, alpha=0.4, color=color)
+                mu, std = np.mean(data), np.std(data)
+                x = np.linspace(min(data), max(data), 100)
+                ax.plot(x, norm.pdf(x, mu, std), color=color, lw=2)
+                ax.set_title(f"{label} (μ={mu:.2f}, σ={std:.2f})")
+                ax.set_xlabel("Value")
+                ax.set_ylabel("Density")
+                ax.grid(True)
+
+                # Add limit shift ------------------
+
+            plot_hist(self.ax_hist_p, self.pressures, "purple", "Roller Pressure", self.show_pressure.get())
+            plot_hist(self.ax_hist_t, self.temps, "red", "Tape Temp", self.show_temp.get())
+            plot_hist(self.ax_hist_sub, self.substrate_temps, "green", "Substrate Temp", self.show_substrate.get())
 
         self.fig.tight_layout()
         self.canvas.draw()
@@ -4297,7 +4563,7 @@ class collectiveEoP(ttk.Frame):
     # SQL Export Worker
     # --------------------------
     def export_worker(self):
-        while self.running:
+        while not self.running:
             if len(self.positions) >= 40:
                 # TODO: Export last 40 samples to SQL
                 df = pd.DataFrame({
@@ -4305,15 +4571,36 @@ class collectiveEoP(ttk.Frame):
                     "rollerpressure": self.pressures[-40:],
                     "tapetemperature": self.temps[-40:],
                     "substtemprature": self.substrate_temps[-40:],
+                    "mean_pressure": self.rolling_means_p[-40:],
+                    "std_pressure": self.rolling_stds_p[-40:],
+                    "mean_temperature": self.rolling_means_t[-40:],
+                    "std_temperature": self.rolling_stds_t[-40:],
+                    "mean_substrateTemp": self.rolling_means_sub[-40:],
+                    "std_substrateTemp": self.rolling_stds_t[-40:],
                 })
                 # Example:
-                # df.to_sql(self.clone_rp, self.engine, if_exists='append', index=False)
-                # df.to_sql(self.clone_tt, self.engine, if_exists='append', index=False)
-                # df.to_sql(self.clone_st, self.engine, if_exists='append', index=False)
+                df.to_sql(self.clone_rp, self.engine, if_exists='append', index=False)
+                df.to_sql(self.clone_tt, self.engine, if_exists='append', index=False)
+                df.to_sql(self.clone_st, self.engine, if_exists='append', index=False)
 
             time.sleep(0.1)
+            if self.batch is None:
+                break
+            root.after(0, lambda: (self.sql_status_var.set("SQL: Saving..."), self.set_led("#00FF00")))
+
+            try:
+                self.batch.to_sql(self.table_name, con=self.engine, if_exists='append', index=False)
+            except Exception as e:
+                print("[SQL ERROR]", e)
+                root.after(0, lambda: (self.sql_status_var.set("SQL: ERROR"), self.set_led("#FF0000")))
+            else:
+                root.after(1000, lambda: (self.sql_status_var.set("SQL: Idle"), self.set_led("#555")))
+            self.export_queue.task_done()
+            time.sleep(0.1)
+
         else:
             pass
+
     # --------------------------
     # Cleanup
     # --------------------------
@@ -4377,11 +4664,11 @@ class common_rampCount(ttk.Frame):
         self.a1.set_xlim([self.win_XminRC, self.win_XmaxRC], auto=True)
 
         # ------- plot ramp count ------------[]
-        self.im10, = self.a1.plot([], [], 'o-', label='Total Ramp')                  # ramp count all layers
+        self.im10, = self.a1.plot([], [], 'o-', label='Total Ramp')               # ramp count all layers
         # self.im11, = self.a1.plot([], [], 'o-', label='Ring 2 Ramp')                  # ramp count all layers
         # self.im12, = self.a1.plot([], [], 'o-', label='Ring 3 Ramp')                  # ramp count all layers
         # self.im13, = self.a1.plot([], [], 'o-', label='Ring 4 Ramp')                  # ramp count all layers
-        # self.im14, = self.a1.plot([], [], 'o-', label='Cumulative')                  # ramp count all layers
+        # self.im14, = self.a1.plot([], [], 'o-', label='Cumulative')                   # ramp count all layers
 
         self.canvas = FigureCanvasTkAgg(self.f, self)
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
@@ -4419,10 +4706,9 @@ class common_rampCount(ttk.Frame):
 
         while True:
             # This procedure must be valid either on PLC/SQL baseed runtime
-            if self.running and rc_con:
-                print('\n[cRC] Asynchronous controller activated...')
-
-                if uCalling == 1:
+            if self.running:
+                if uCalling == 1 and rc_con:
+                    print('\n[cRC] Synchronous controller activated...')
                     sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
 
                     if not sysRun and not paused:
@@ -4441,8 +4727,11 @@ class common_rampCount(ttk.Frame):
                         # Get list of relevant SQL Tables using conn() --------------------[]
                         self.rcP = rmp.sqlExec(rc_con, s_fetch, stp_Sz, self.T1, batch_RC)
                         time.sleep(30)
+                    self.canvas.get_tk_widget().after(0, self.rcDataPlot)  # Regime = every 10000 ms = 10seconds
+                    batch_RC += 1
 
-                elif uCalling == 2 or uCalling == 3:
+                elif uCalling == 2 or uCalling == 3 and rc_con:
+                    print('\n[cRC] Asynchronous controller activated...')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
@@ -4469,18 +4758,18 @@ class common_rampCount(ttk.Frame):
                         else:
                             print('\n[cRC] Updating....')
 
-                if rc_con:
-                    self.canvas.get_tk_widget().after(0, self.rcDataPlot) # Regime = every 10000 ms = 10seconds
-                    batch_RC += 1
+                    if rc_con:
+                        self.canvas.get_tk_widget().after(0, self.rcDataPlot) # Regime = every 10000 ms = 10seconds
+                        batch_RC += 1
+                    else:
+                        print('[cRC] sorry, instance not granted, trying again..')
+                        rc_con = sq.check_SQL_Status(1, 10)
                 else:
-                    print('[cRC] sorry, instance not granted, trying again..')
-                    rc_con = sq.check_SQL_Status(1, 10)
-            else:
-                time.sleep(.2)
-                self.a1.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a1.transAxes)
-                self.canvas.draw_idle()
-                pass
+                    time.sleep(30)
+                    self.a1.text(0.355, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a1.transAxes)
+                    self.canvas.draw_idle()
+                    pass
 
     # ================== End of synchronous Method ==========================obal
 
@@ -4662,10 +4951,9 @@ class common_climateProfile(ttk.Frame):
 
         while True:
             # procedure must be valid either on PLC/SQL based runtime
-            if self.running and ev_con:
-                print('\n[cEV] Asynchronous controller activated...')
-
-                if uCalling == 1:
+            if self.running:
+                if uCalling == 1 and ev_con:
+                    print('\n[cEV] Synchronous controller activated...')
                     sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
 
                     if not sysRun and not paused:
@@ -4684,8 +4972,11 @@ class common_climateProfile(ttk.Frame):
                         # Get list of relevant SQL Tables using conn() --------------------[]
                         self.evStr = sev.sqlExec(ev_con, s_fetch, stp_Sz, self.evT, frqC)
                         time.sleep(10)
+                    self.canvas.get_tk_widget().after(0, self.evDataPlot)
+                    frqC += 1
 
-                elif uCalling == 2 or uCalling == 3:
+                elif uCalling == 2 or uCalling == 3 and ev_con:
+                    print('\n[cEV] Asynchronous controller activated...')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
@@ -4700,6 +4991,7 @@ class common_climateProfile(ttk.Frame):
                         # Get list of relevant SQL Tables using conn() --------------------[]
                         self.evStr = sev.sqlExec(ev_con, s_fetch, stp_Sz, self.evT, frqC)
                         time.sleep(10)
+
                         # ------ Inhibit iteration ----------------------------------------[
                         if not self.evStr:  # Terminate file-fetch
                             ev_con.close()
@@ -4709,18 +5001,18 @@ class common_climateProfile(ttk.Frame):
                         else:
                             print('\n[cEV] Updating....')
 
-                if ev_con:
-                    self.canvas.get_tk_widget().after(0, self.evDataPlot)  # Regime = every 5seconds
-                    frqC += 1
+                    if ev_con:
+                        self.canvas.get_tk_widget().after(0, self.evDataPlot)  # Regime = every 5seconds
+                        frqC += 1
+                    else:
+                        print('[cEV] sorry, instance not granted, trying again..')
+                        ev_con = sq.check_SQL_Status(1, 20)
                 else:
-                    print('[cEV] sorry, instance not granted, trying again..')
-                    ev_con = sq.check_SQL_Status(1, 20)
-            else:
-                time.sleep(2)
-                self.a2.text(0.342, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a2.transAxes)
-                self.canvas.draw_idle()
-                pass
+                    time.sleep(10)
+                    self.a2.text(0.342, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a2.transAxes)
+                    self.canvas.draw_idle()
+                    pass
 
     # ============== End of synchronous Method ==========[]
 
@@ -4857,9 +5149,9 @@ class common_gapCount(ttk.Frame):
         self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
         # Activate Matplot tools ------------------[Uncomment to activate]
-        # toolbar = NavigationToolbar2Tk(self.canvas, self)
-        # toolbar.update()
-        # self.canvas._tkcanvas.pack(expand=True)
+        toolbar = NavigationToolbar2Tk(self.canvas, self)
+        toolbar.update()
+        self.canvas._tkcanvas.pack(expand=True)
 
         # --------- call data block --------------
         threading.Thread(target=self.dataControlCgc, daemon=True).start()
@@ -4889,10 +5181,9 @@ class common_gapCount(ttk.Frame):
         import keyboard  # for temporary use
 
         while True:
-            if self.running and gc_con:
-                print('\n[cVC] Asynchronous controller activated...')
-
-                if uCalling == 1:       # Running Live Analysis
+            if self.running:
+                if uCalling == 1 and gc_con:       # Running Live Analysis
+                    print('\n[cVC] Synchronous controller activated...')
                     sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
 
                     if not sysRun and not paused:
@@ -4911,8 +5202,11 @@ class common_gapCount(ttk.Frame):
                         # Get list of relevant SQL Tables using conn() --------------------[]
                         self.gcD = svc.sqlExec(gc_con, s_fetch, stp_Sz, self.gcT, batch_VC)
                         time.sleep(30)
+                    self.canvas.get_tk_widget().after(0, self.gcDataPlot)
+                    batch_VC += 1
 
-                elif uCalling == 2 or uCalling == 3:
+                elif uCalling == 2 or uCalling == 3 and gc_con:
+                    print('\n[cVC] Asynchronous controller activated...')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
@@ -4925,11 +5219,11 @@ class common_gapCount(ttk.Frame):
                             time.sleep(0.2)
 
                     else:
-                        # Get list of relevant SQL Tables using conn() --------------------[]
+                        # Get list of relevant SQL Tables using conn() -------------------[]
                         self.gcD = svc.sqlExec(gc_con, s_fetch, stp_Sz, self.T3, batch_VC)
                         time.sleep(30)
 
-                        # ------ Inhibit iteration ----------------------------------------------------------[]
+                        # ------ Inhibit iteration ---------------------------------------[]
                         if not self.gcD:  # Terminate file-fetch
 
                             print('[cVC] SQL End of File, connection closes after 30 mins...')
@@ -4938,23 +5232,23 @@ class common_gapCount(ttk.Frame):
                             continue
                         else:
                             print('\n[cVC] Updating....')
+                    # --------------------------------------------------------------------[]
+                    if gc_con:
+                        self.canvas.get_tk_widget().after(0, self.gcDataPlot)  # Regime = every 10seconds
+                        batch_VC += 1
+                    else:
+                        print('[cVC] sorry, instance not granted, trying again..')
+                        gc_con = sq.check_SQL_Status(1, 30)  # Retry 5 times, wait 60 seconds
 
-                if gc_con:
-                    self.canvas.get_tk_widget().after(0, self.gcDataPlot)  # Regime = every 10seconds
-                    batch_VC += 1
                 else:
-                    print('[cVC] sorry, instance not granted, trying again..')
-                    gc_con = sq.check_SQL_Status(1, 30)  # Retry 5 times, wait 60 seconds
+                    time.sleep(30)
+                    self.a3.text(0.354, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                                 transform=self.a3.transAxes)
+                    self.canvas.draw_idle()
+                    pass
 
-            else:
-                time.sleep(.5)
-                self.a3.text(0.354, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                             transform=self.a3.transAxes)
-                self.canvas.draw_idle()
-                pass
+    # ================== End of synchronous Method ===================------------------------------------[]
 
-
-    # ================== End of synchronous Method ==========================
     def gcDataPlot(self):
         timei = time.time()  # start timing the entire loop
 
@@ -6010,7 +6304,7 @@ class rollerForceTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = False
+        self.running = True
         self.create_widgets()
 
     def create_widgets(self):
@@ -7056,8 +7350,8 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
         # self.status = tab_status(notebook, 0)
-        self.running = False
-        self.runRMP = False
+        self.running = True  #
+        self.runRMP = True  #
 
         # prevents user possible double loading -----
         if not self.running:        # and self.status != 'hidden':
@@ -7378,10 +7672,8 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
             else:
                 tt_con = False
                 ttp_con = False
-                print('[TT] Data Source selection is Unknown2', tt_con)
 
         elif UsePLC_DBS and uCalling == 1:
-            print('\nTT Called by 1')
             ttp_con = wd.check_PLC_Status()
             time.sleep(.2)
             if ttp_con and self.running:
@@ -7389,11 +7681,10 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
             else:
                 ttp_con = False
                 tt_con = False
-                print('[TT] Data Source selection is Unknown1', ttp_con)
+
         else:
             ttp_con = False
             tt_con = False
-            print('[TT] Unknown Protocol3...', ttp_con, tt_con)
 
         print('TP03', ttp_con, tt_con)
         # ------------------------------------[]
@@ -7403,19 +7694,18 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
 
         while True:
             # ------------------------------#
-            if UseSQL_DBS or UsePLC_DBS and self.running:
-
+            if self.running:
                 if ttp_con and uCalling == 1:
                     print('\n[TT] Synchronous controller activated...')
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
                     if not sysRun and not paused or msc_rt == 49296:
-                        print('\n[TT] Live mode controller pausing...')
+                        print('\n[TT] synchronous protocol is pausing...')
                         paused = True
 
                         while paused:
                             time.sleep(5)
-                            print("\n[TT] Visualization in Paused Mode...")
+                            print("\n[TT] Visualization in synchronous-paused mode...")
                             sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
                             if sysRun:
                                 paused = False
@@ -7430,6 +7720,7 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
                     batch_TT += 1
 
                 elif tt_con and uCalling == 2 or uCalling == 3:
+                    print('\n[TT] Asynchronous controller activated...')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
@@ -7461,9 +7752,9 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
                         batch_TT += 1
                     else:
                         print('[TT] sorry, instance not granted, trying again..')
-                        tt_con = sq.check_SQL_Status(1, 5)
-
+                        tt_con = sq.check_SQL_Status(1, 3)
                 else:
+                    time.sleep(3)
                     print('\n[TT] in standby mode, no active session...')
                     self.a2.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                                  transform=self.a2.transAxes)
@@ -7492,10 +7783,9 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
 
         # ----------------------------------------------Only pulling from SQL Stream
         while True:
-            if self.running and UseSQL_DBS or UsePLC_DBS:
-                print('\n[RMP] PostProd Mode controller activated...')
-
-                if rmp_con and uCalling == 1:
+            if self.running and rmp_con:
+                if uCalling == 1:
+                    print('\n[RMP] Synchronous controller in Use...')
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
                     if not sysRun and not paused:
@@ -7504,7 +7794,7 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
 
                         while paused:
                             time.sleep(5)
-                            print("\n[RMP Viz] Visualization in Paused Mode...")
+                            print("\n[RMP Viz] Visualization in synchronous-paused mode...")
                             sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
                             if sysRun:
                                 paused = False
@@ -7514,11 +7804,11 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
                         self.rmD3 = rC.sqlExec(rmp_con, s_fetch, stp_Sz, self.T3, batch_RMP)
                         time.sleep(10)
                         print("[RMP] Visualization in Play Mode...")
-
                     self.canvas.get_tk_widget().after(0, self.rmDataPlot)
                     batch_RMP += 1
 
-                elif rmp_con and uCalling == 2 or uCalling == 3:
+                elif uCalling == 2 or uCalling == 3:
+                    print('\n[RMP] Activating Asynchronous controller..')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
@@ -7547,14 +7837,15 @@ class tapeTempTabb(ttk.Frame):  # ---------------------- QA param - Tape Tempera
                         batch_RMP += 1
                     else:
                         print('[RMP] sorry, instance not granted, trying again..')
-                        rmp_con = sq.check_SQL_Status(5, 60)
+                        rmp_con = sq.check_SQL_Status(1, 15)
 
-                else:
-                    print('\n[RMP] standby mode, no active session...')
-                    self.a3.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                                 transform=self.a3.transAxes)
-                    self.canvas.draw_idle()
-                    pass
+            else:
+                time.sleep(10)
+                print('\n[RMP] standby mode, no visualisation!')
+                self.a3.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                             transform=self.a3.transAxes)
+                self.canvas.draw_idle()
+                pass
 
     # ================== End of synchronous Method ==========================--------------[]
 
@@ -8097,7 +8388,7 @@ class substTempTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = False
+        self.running = True #
 
         # prevents user possible double loading -----
         if not self.running:
@@ -8365,19 +8656,18 @@ class substTempTabb(ttk.Frame):
         sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = 0, 0, 0, 0, 0, 0, 'Pipe Position Not Specified'
 
         while True:
-            if self.running and UseSQL_DBS or UsePLC_DBS:
-
+            if self.running:
                 if stp_con and uCalling == 1:
-                    print('\n[ST] Synchronous controller AUTO activated...')
+                    print('\n[ST] Synchronous controller activated...')
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
                     if not sysRun and not paused or msc_rt == 49296:  # Terminate file-fetch
-                        print('\n[ST] Production is pausing...')
+                        print('\n[ST] synchronous protocol is pausing...')
                         paused = True
 
                         while paused:
                             time.sleep(5)
-                            print("\n[ST] Visualization in Paused Mode...")
+                            print("\n[ST] Visualization in synchronous-paused mode...")
                             sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
                             if sysRun:
                                 paused = False
@@ -8392,7 +8682,7 @@ class substTempTabb(ttk.Frame):
                     batch_ST += 1
 
                 elif st_con and uCalling == 2 or uCalling == 3:
-                    print('\n[ST] Synchronous controller MANUAL activated...')
+                    print('\n[ST] Asynchronous controller activated...')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
@@ -8420,10 +8710,11 @@ class substTempTabb(ttk.Frame):
                         batch_ST += 1
                     else:
                         print('[ST] sorry, instance not granted, trying again..')
-                        st_con = sq.check_SQL_Status(1, 8)
+                        st_con = sq.check_SQL_Status(1, 4)
 
                 else:
-                    print('[ST] is active but no visualisation!\n')
+                    time.sleep(3)
+                    print('[ST] standby mode, no active session...!\n')
                     self.a2.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                                  transform=self.a2.transAxes)
                     self.a1.text(0.440, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
@@ -9125,8 +9416,8 @@ class tapeGapPolTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=10)
-        self.running = False
-        self.runVMP = False
+        self.running = True  #
+        self.runVMP = True   #
         self.gapPercent = True
         self.toggle_state = False
 
@@ -9383,17 +9674,14 @@ class tapeGapPolTabb(ttk.Frame):
 
         # Obtain Volatile Data from PLC/SQL Host Server -------[]
         if UseSQL_DBS and uCalling == 2 or uCalling == 3:
-            print('TG Called by 2/3')
             if self.running:
                 import sqlArrayRLmethodTG as pdC
                 tg_con = sq.sql_connectTG()
             else:
                 tg_con = False
                 tgp_con = False
-                print('[TG] Data Source selection is Unknown2', tg_con)
 
         elif UsePLC_DBS and uCalling == 1:
-            print('\nTG Called by 1')
             tgp_con = wd.check_PLC_Status()
             time.sleep(.4)
             if tgp_con and self.running:
@@ -9401,12 +9689,10 @@ class tapeGapPolTabb(ttk.Frame):
             else:
                 tgp_con = False
                 tg_con = False
-                print('[TG] Data Source selection is Unknown1', tgp_con)
+
         else:
-            print('ST Called by else')
             tgp_con = False
             tg_con = False
-            print('[TG] Data Source selection is Unknown3', tg_con, tgp_con)
 
         print('\nTP03', tg_con, tgp_con)
         # Initialise RT variables ---[]
@@ -9416,19 +9702,18 @@ class tapeGapPolTabb(ttk.Frame):
 
         while True:
             # ------------------------------#
-            if UsePLC_DBS or UseSQL_DBS and self.running:
-
+            if self.running:
                 if tgp_con and uCalling == 1:
                     print('\n[TG] Synchronous controller activated...')
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
                     if not sysRun and not paused or msc_rt == 49296:
-                        print('[TG] is requesting for SMC status...')
+                        print('[TG] synchronous protocol is pausing...')
                         paused = True
 
                         while paused:
                             time.sleep(5)
-                            print("\n[TG Viz] Visualization in Paused Mode...")
+                            print("\n[TG Viz] Visualization in synchronous-paused mode...")
                             sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
                             if sysRun:
                                 paused = False
@@ -9444,6 +9729,7 @@ class tapeGapPolTabb(ttk.Frame):
                     batch_TG += 1
 
                 elif tg_con and uCalling == 2 or uCalling == 3:
+                    print('\n[TG] Asynchronous controller activated...')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
@@ -9470,9 +9756,10 @@ class tapeGapPolTabb(ttk.Frame):
                         batch_TG += 1
                     else:
                         print('[TG] sorry, instance not granted, trying again..')
-                        tg_con = sq.check_SQL_Status(5, 10)
+                        tg_con = sq.check_SQL_Status(1, 5)
                 else:
-                    print('[TG] is active but no visualisation!\n')
+                    time.sleep(60)
+                    print('[TG] standby mode, no active session...!\n')
                     self.a3.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
                                  transform=self.a3.transAxes)
                     self.a1.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
@@ -9501,18 +9788,17 @@ class tapeGapPolTabb(ttk.Frame):
         # ----------------------------------------------#
         while True:
             if self.running and vmp_con:
-                print('\n[VMP] PostProd Mode controller activated...')
-
                 if uCalling == 1:
+                    print('\n[VMP] Synchronous controller in Use...')
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
-                    if not sysRun and not paused:
+                    if not sysRun and not paused or msc_rt == 49296:
                         print('\n[VMP] Live is pausing...')
                         paused = True
 
                         while paused:
                             time.sleep(5)
-                            print("\n[VMP Viz] Visualization in Paused Mode...")
+                            print("\n[VMP Viz] Visualization in synchronous-paused mode...")
                             sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
                             if sysRun:
                                 paused = False
@@ -9522,14 +9808,17 @@ class tapeGapPolTabb(ttk.Frame):
                         # USe SQL repository for VMP stream ------[]
                         self.vmD3 = vmp.sqlExec(vmp_con, s_fetch, stp_Sz, self.T2, batch_VMP)
                         time.sleep(10)
+                    self.canvas.get_tk_widget().after(0, self.vmDataPlot)
+                    batch_VMP += 1
 
                 elif uCalling == 2 or uCalling == 3:
+                    print('\n[VMP] Activating Asynchronous controller..')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
                         while paused:
                             time.sleep(5)
-                            print("\n[VMP Viz] Visualization in Paused Mode...")
+                            print("\n[VMP Viz] Visualization in asynchronous-paused mode...")
                             if keyboard.is_pressed("esc"):
                                 paused = False
                                 print('[VMP] Visualisation Resumes...')
@@ -9553,13 +9842,14 @@ class tapeGapPolTabb(ttk.Frame):
                         batch_VMP += 1
                     else:
                         print('[VMP] sorry, instance not granted, trying again..')
-                        vmp_con = sq.check_SQL_Status(5, 60)
-                else:
-                    print('\n[VMP] is active but no visualisation!')
-                    self.a3.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
-                                 transform=self.a3.transAxes)
-                    self.canvas.draw_idle()
-                    pass
+                        vmp_con = sq.check_SQL_Status(5, 30)
+            else:
+                time.sleep(10)
+                print('\n[VMP] is standby mode, no visualisation!')
+                self.a4.text(0.400, 0.520, '--------- No Data Feed ---------', fontsize=12, ha='left',
+                             transform=self.a4.transAxes) # 0.520 should be a4
+                self.canvas.draw_idle()
+                pass
 
     # ================== End of synchronous Method ==========================--------------------[]
     def tgDataPlot(self):
@@ -10265,7 +10555,7 @@ class MonitorTabb(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
         self.place(x=10, y=20)
-        self.running = False
+        self.running = True
 
         # prevents user possible double loading -----
         if not self.running:
@@ -10470,18 +10760,17 @@ class MonitorTabb(ttk.Frame):
         while True:
             # ------------------------------
             if self.running and mt_con:
-                print('\n[PMP] Asynchronous controller activated...')
-
                 if uCalling == 1:
+                    print('\n[PMP] Activating synchronous controller..')
                     sysRun, sysIdl, sysRdy, msc_rt, cLayer, piPos, mstatus = wd.autoPausePlay()
 
                     if not sysRun and not paused or msc_rt == 49296:  # Terminate file-fetch
-                        print('\n[PMP] Production is pausing...')
+                        print('\n[PMP] synchronous protocol is pausing...')
                         paused = True
 
                         while paused:
                             time.sleep(5)
-                            print("\n[PMP] Visualization in Paused Mode...")
+                            print("\n[PMP] Visualization in synchro-paused mode...")
                             sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
                             if sysRun:
                                 paused = False
@@ -10496,12 +10785,13 @@ class MonitorTabb(ttk.Frame):
                     batch_PM += 1
 
                 elif uCalling == 2 or uCalling == 3 and mt_con:
+                    print('\n[PMP] Activating Asynchronous controller..')
                     if keyboard.is_pressed("Alt+Q"):
                         paused = True
 
                         while paused:
                             time.sleep(5)
-                            print("\n[PMP] Visualization in Paused Mode...")
+                            print("\n[PMP] Visualization in asynchronous-paused mode...")
                             sysRun, msctcp, msc_rt, cLayr = wd.rt_autoPausePlay()
                             if sysRun:
                                 paused = False
@@ -10514,7 +10804,7 @@ class MonitorTabb(ttk.Frame):
                         time.sleep(3)
                         if keyboard.is_pressed("Alt+Q"):  # Terminate file-fetch
                             mt_con.close()
-                            print('SQL End of File, connection closes after 30 mins...')
+                            print('SQL End of File, connection closes after 60 sec...')
                             time.sleep(60)
                             continue
                         else:
@@ -10524,9 +10814,9 @@ class MonitorTabb(ttk.Frame):
                         batch_PM += 1
                     else:
                         print('[PM] sorry, instance not granted, trying again..')
-                        mt_con = sq.check_SQL_Status(1, 12)
+                        mt_con = sq.check_SQL_Status(1, 2)
             else:
-                time.sleep(3)
+                time.sleep(60)
                 print('[PMP] standby mode, no active session...\n')
                 self.a1.text(0.400, 0.500, '--------- No Data Feed ---------', fontsize=12, ha='left',
                              transform=self.a1.transAxes)
