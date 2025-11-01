@@ -103,12 +103,25 @@ smcDescription = [ "No State or Undefined State ", "System health Check, please 
 				 "EoP Error State, please wait…", "StandBy State, Call Engineers ..."]
 
 # -------------------------------------------------------------------------------------[]
+# End of Library for M2M connectivity and PLC OPC UA Datablocks ------------#
+def errorLog(err):
+	fileName = datetime.now().strftime('WDELog '+"%Y-%m-%d")
+	event = datetime.now().strftime("%Y-%m-%d %H:%M.%S")
+	errorlogFile = str(fileName)
+	f = open('.\\RuntimeLog\\'+errorlogFile+".txt", "a")
+	f.write(event+' --- '+err+'\n')
+	f.close()
+
+
 _Plc = snap7.client.Client()	# Instantiate a PLC
 # _Plc.set_session_password('Robb13!L')
 # disable Allow PUT/Get download HW info and enable again
-
-pCon = _Plc.connect('192.168.100.100', 0, 1)  #:port number 4840
-db_number, start_offset, bit_offset = 89, 0, 0
+try:
+	pCon = _Plc.connect('192.168.100.100', 0, 1)  #:port number 4840
+	db_number, start_offset, bit_offset = 89, 0, 0
+except Exception as err:
+	print(f"Exception Error: '{err}'")
+	errorLog(f"{err}")
 
 
 # print('PLC Info:', _Plc.get_cpu_info())
@@ -166,16 +179,6 @@ def readString(db_number, start_offset, bit_offset):
 	return a
 
 # ---------------------------------------------------------------------------#
-
-# End of Library for M2M connectivity and PLC OPC UA Datablocks ------------#
-def errorLog(err):
-	fileName = datetime.now().strftime('WDELog '+"%Y-%m-%d")
-	event = datetime.now().strftime("%Y-%m-%d %H:%M.%S")
-	errorlogFile = str(fileName)
-	f = open('.\\RuntimeLog\\'+errorlogFile+".txt", "a")
-	f.write(event+' --- '+err+'\n')
-	f.close()
-
 
 def smc_status(rtc):			# Match MSC code with string description
 	rt_satus = dict(zip(machineCode_Data, smcDescription))

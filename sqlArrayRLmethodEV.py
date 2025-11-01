@@ -32,7 +32,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
         if last_ts is None:
             t1.execute('SELECT * FROM ' + str(T1) + ' ORDER BY cLayer ASC')
         else:
-            t1.execute('SELECT * FROM ' + str(T1) + ' WHERE tStamp > ? ORDER BY cLayer ASC', last_ts)
+            t1.execute('SELECT * FROM ' + str(T1) + ' WHERE id-col > ? ORDER BY cLayer ASC', last_ts)
         data1 = t1.fetchmany(n2fetch)
 
         # --------------- Re-assemble into dynamic buffer -----
@@ -40,7 +40,7 @@ def sqlExec(daq, nGZ, grp_step, T1, fetch_no):
             for result in data1:
                 result = list(result)
                 dL.append(result)
-            last_ts = data1[-1].tStamp
+            last_ts = data1[-1].id_col
         else:
             print('[cEV] Process EOF reached...')
             print('[cEV] Halting for 5 Minutes...')

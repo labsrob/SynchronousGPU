@@ -17,6 +17,7 @@ import time
 # Initialise relevant variables and load configuration settings ----------[]
 server_IP, db_ref, isAtho, yekref = tx.load_configSQL('C:\\synchronousGPU\\INI_Files\\checksumError.ini')
 # print('ServerUse Details:', server_IP, db_ref, isAtho, yekref)
+# server_IP = '10.0.3.174'
 Encrypt = 'no'                  # Added today 06/08/2024 [optional]
 Certify = 'yes'                 # DITTO
 
@@ -99,7 +100,7 @@ def sql_connectTT():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    resilenceN = 5
+    resilenceN = 2
     wait2retry = 2
     Certify = 'Certify'
     # ---------------------------------------------------------#
@@ -161,7 +162,7 @@ def sql_connectST():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    resilenceN = 5
+    resilenceN = 2
     wait2retry = 2
     Certify = 'Certify'
     # ---------------------------------------------------------#
@@ -224,7 +225,7 @@ def sql_connectRMP():   # Temperature Ramp Profile
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    max_retry = 5
+    max_retry = 1
     wait2retry = 2
     # ---------------------------------------------------------#
 
@@ -272,7 +273,7 @@ def sql_connectVMP():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    max_retry = 5
+    max_retry = 1
     wait2retry = 2
     # ---------------------------------------------------------#
 
@@ -332,7 +333,7 @@ def sql_connectTG():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    max_retry = 5
+    max_retry = 2
     wait2retry = 2
     # ---------------------------------------------------------#
 
@@ -384,7 +385,6 @@ def sql_connectTG():
 
 # -------------------------------------------------------------------------[TG Mapping]
 def sql_connectRTM():
-    # Real-Time Monitoring Parameters
     """
     Parallel connection call for Process Monitors Model - RL
     state: 1 connected, 0 Not connected
@@ -393,13 +393,13 @@ def sql_connectRTM():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    max_retry = 5
+    max_retry = 1
     wait2retry = 2
-    # ---------------------------------------------------------#
+    # --------------------------------------------------------#
 
     if conn == None:
-        print('[RTM] Connecting to SQL server...')
-        # Ensure connection is roboust enough ------
+        print('[PMP] Connecting to SQL server...')
+        # Ensure connection is robust enough ------
         for attempt in range(1, max_retry + 1):
 
             try:
@@ -412,31 +412,29 @@ def sql_connectRTM():
                                       'pwd=' + yekref + ';'
                                       'MultipleActiveResultSets=True', timeout=5, autocommit=True)
                 # conn = True
-                print('\n[RTM] SQL Server connection active!\n')
+                print('\n[PMP] SQL Server connection active!\n')
                 return conn
 
             except Exception as err:
                 wait_time = wait2retry * (2 ** (attempt - 1))
-                errorLog(f"[TM] Reconnect attempt {attempt}/{max_retry} failed: {err}") #(str(err))                      # Log the error in txt file
+                errorLog(f"[PMP] Reconnect attempt {attempt}/{max_retry} failed: {err}")
                 # -----------------------
                 if attempt < max_retry:
-                    #logging.info(f"Retrying in {wait_time} seconds...")
                     time.sleep(wait_time)
                 else:
-                    # logging.critical("Max retries reached. Exiting.")
                     # raise  # or return None if you prefer soft e
                     errorConnect()
-                    print('\n[RTM] Connection issue: SQL Server is inaccessible!')
+                    print('\n[PMP] Connection issue: SQL Server is inaccessible!')
         return None        # conn = False
 
     else:                                           # when connection = 1 and requires disconnect
         try:
             conn.close()
             errorNote()
-            print('\n[RTM] Active connection will be closed...')
+            print('\n[PMP] Active connection will be closed...')
 
         except Exception as err:
-            print(f"[RTM] Connection Error: {err}")       # catch whatever error raised
+            print(f"[PMP] Connection Error: {err}")       # catch whatever error raised
             # conn = False
             errorLog(err)
         print('\nConnection Summary:', conn)
@@ -453,7 +451,7 @@ def sql_connectLP():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    max_retry = 5
+    max_retry = 1
     wait2retry = 2
     # ---------------------------------------------------------#
 
@@ -501,7 +499,7 @@ def sql_connectEV():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    max_retry = 5
+    max_retry = 1
     wait2retry = 2
     # ---------------------------------------------------------#
 
@@ -561,7 +559,7 @@ def sql_connectVC():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    max_retry = 5
+    max_retry = 1
     wait2retry = 2
     # ---------------------------------------------------------#
 
@@ -621,7 +619,7 @@ def sql_connectRC():
     # print('\nDatasource Details:', server_IP, db_ref)
     # -------- Actual SQL Connection request -----------------#
     conn = None
-    max_retry = 5
+    max_retry = 1
     wait2retry = 2
     # ---------------------------------------------------------#
 
@@ -811,3 +809,65 @@ def rpt_SQLconnect():
             print('\n[EoL] Connection issue: SQL Server is inaccessible!')
 
     return None
+
+def sql_connectEoP():
+    # Substrate Temperature SQL Instance
+    """
+    Parallel connection call for Tape Temperature Model - RL
+    state: 1 connected, 0 Not connected
+    agent: 1 indicate SCADA remote call, 0 indicating SPC local User Call
+    """
+    # print('\nDatasource Details:', server_IP, db_ref)
+    # -------- Actual SQL Connection request -----------------#
+    conn = None
+    resilenceN = 1
+    wait2retry = 2
+    Certify = 'Certify'
+    # ---------------------------------------------------------#
+
+    if conn == None:
+        print('[ST] Connecting to SQL server...')
+        # Ensure connection is robust and resilience ------
+        for attempt in range(1, resilenceN + 1):
+            # Use pymssql or pyodbc
+            try:
+                conn = pyodbc.connect('Driver={SQL Server};'
+                                      'Server=' + server_IP + ';'
+                                      'Database=' + db_ref + ';'
+                                      'Encrypt=' + Encrypt + ';'
+                                      'TrustServerCertificate=' + Certify + ';'
+                                      'uid=' + isAtho + ';'
+                                      'pwd=' + yekref + ';'
+                                      'MultipleActiveResultSets=True', timeout=5, autocommit=True)
+                # conn = True
+                print('\n[ST] SQL Server connection active!\n')
+                return conn
+
+            except Exception as err:
+                wait_time = wait2retry * (2 ** (attempt - 1))
+                errorLog(f"[ST] Reconnect attempt {attempt}/{resilenceN} failed: {err}") #(str(err))                      # Log the error in txt file
+                # -----------------------
+                if attempt < resilenceN:
+                    #logging.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                else:
+                    # logging.critical("Max retries reached. Exiting.")
+                    # raise  # or return None if you prefer soft e
+                    errorConnect()
+                    print('\n[ST] Connection issue: Server is inaccessible!')
+        return None        # conn = False
+
+    else:                                           # when connection = 1 and requires disconnect
+        try:
+            conn.close()
+            errorNote()
+            print('\n[ST] Active connection will be closed...')
+
+        except Exception as err:
+            print(f"[ST] Connection Error: {err}")       # catch whatever error raised
+            # conn = False
+            errorLog(err)
+        print('\nConnection Summary:', conn)
+
+    return None
+# ------------------------------------------------------------[]Ramp Mapping]

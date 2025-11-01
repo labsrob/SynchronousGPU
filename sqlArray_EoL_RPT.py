@@ -21,7 +21,7 @@ now = datetime.now()
 
 dataList0 = []
 rLP, rLA, rRP, rTT, rST, rTG, rWA, rWS, rPP = [], [], [], [], [], [], [], [], []
-
+reg = 0.2
 st_id  = 0                                               # SQL start index unless otherwise tracker!
 eol_sr = 0.5
 # ------------ PDF Generator Method ---------------------------------------------------------
@@ -56,6 +56,7 @@ def rpt_SQLconnect():
 
     return None
 
+# ---------------------------- END OF LAYER REPORT GENERATION -----------------------#
 
 def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     """
@@ -80,6 +81,7 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     NOTE: SQL Server Regression Issues acknowledge by Microsoft.
     Table level resampling enabled. 
     """
+    print('Processing Layer Number:', layerNo)
     lpSR = t1.execute('Select count([R1SP]) AS ValidTotal from ' + str(T1) +' where [cLyr] = ' + str(layerNo)).fetchone()
     # close sel link -------[ZLP_]
     ttSR = t2.execute('Select count([R1SP]) AS ValidTotal from ' + str(T2) +' where [cLyr] = ' + str(layerNo)).fetchone()
@@ -92,14 +94,14 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
     # close sel link -------[ZWS_]
 
     # --- Compute random sampling regime based on data volume -------[TODO: recheck the sampler method]
-    regm1 = round(lpSR[0] * 0.3, )
-    regm2 = round(ttSR[0] * 0.3, )
-    regm3 = round(stSR[0] * 0.3, )      # % 60?  # Modulo evaluation TG?
-    regm4 = round(tgSR[0] * 0.3, )
-    regm5 = round(wsSR[0] * 0.3, )
+    regm1 = round(lpSR[0] * reg, )
+    regm2 = round(ttSR[0] * reg, )
+    regm3 = round(stSR[0] * reg, )      # % 60?  # Modulo evaluation TG?
+    regm4 = round(tgSR[0] * reg, )
+    regm5 = round(wsSR[0] * reg, )
     print('TP0002', regm1, regm2, regm3,regm4, regm5)
 
-    # ------------------ Load randomised samples --------[TODO: Evaluate the impact oA]f these two methods on sys perf
+    # ------------------ Load randomised samples --------[]
     dataLP = t1.execute('Select TOP ' + str(regm1) + ' * FROM ' + str(T1) + ' where [cLyr] = '+ str(layerNo) + ' order by NEWID()').fetchall()
     if len(dataLP) != 0:
         for result in dataLP:
@@ -113,7 +115,6 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
         # print("Step List1:", len(dL1), dL1)       FIXME:
 
     else:
-        print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
@@ -132,10 +133,8 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
                 now = time.strftime("%H:%M:%S")
                 dataList0.append(time.strftime(now))
             rTT.append(result)
-        # print("Step List1:", len(dL1), dL1)       FIXME:
 
     else:
-        print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
@@ -155,7 +154,6 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
             rST.append(result)
 
     else:
-        print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
@@ -175,7 +173,6 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
             rTG.append(result)
 
     else:
-        print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
@@ -195,7 +192,6 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
             rWS.append(result)
 
     else:
-        print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 
@@ -215,7 +211,6 @@ def dnv_sqlExec(sq_con, T1, T2, T3, T4, T5, T6, layerNo):
             rPP.append(result)
 
     else:
-        print('Process EOF reached...')
         print('SPC Halting for 5 Minutes...')
         time.sleep(5)
 

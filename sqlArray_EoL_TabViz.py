@@ -12,7 +12,7 @@ last_t4 = None
 
 st_id = 0
 dL1, dL2, dL3, dL4 = [], [], [], []                                              # SQL start index unless otherwise stated by the index tracker!
-# Plot visualisation for EoL Report only-------
+# ------------------------------------ EoL VISUALISATION TAB ---------------------#
 
 def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
     global last_t1, last_t2, last_t3, last_t4
@@ -29,6 +29,7 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
         slideType = 'Smooth Edge'
     else:
         slideType = 'Non-overlapping'
+
     print('\n[EoL Viz] SAMPLE SIZE:', nGZ, '| SLIDE Mode:', slideType, '| BATCH:', fetch_no)
     print('='*60)
 
@@ -51,12 +52,11 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
                 last_t1 = data1[-1].id_col
 
         else:
-            print('[vTT] Process EOF reached...')
-            print('[vTT] Halting for 5 Minutes...')
-            time.sleep(3)
+            print('[zTT] Halting for 30 sec...')
+            time.sleep(30)
 
     except Exception as e:
-        print("[vTT Error] Data is trickling...")  # , e)
+        print("[zTT Error] Data is trickling...")  # , e)
         time.sleep(2)
     t1.close()
 
@@ -78,12 +78,11 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
             else:
                 last_t2 = data2[-1].id_col
         else:
-            print('[vST] Process EOF reached...')
-            print('[vST] Halting for 5 Minutes...')
+            print('[zST] Halting for 30 sec...')
             time.sleep(3)
 
     except Exception as e:
-        print("[vST Error] Data is trickling...")  # , e)
+        print("[zST Error] Data is trickling...")  # , e)
         time.sleep(2)
     t2.close()
 
@@ -105,12 +104,11 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
             else:
                 last_t3 = data3[-1].id_col
         else:
-            print('[vTG] Process EOF reached...')
-            print('[vTG] Halting for 5 Minutes...')
+            print('[zTG] Halting for 30 sec...')
             time.sleep(3)
 
     except Exception as e:
-        print("[vTG Error] Data is trickling...")  # , e)
+        print("[zTG Error] Data is trickling...")  # , e)
         time.sleep(2)
     t3.close()
 
@@ -132,12 +130,11 @@ def dnv_sqlExec(daq, nGZ, grp_step, T1, T2, T3, T4, fetch_no):
             else:
                 last_t4 = data4[-1].id_col
         else:
-            print('[vWS] Process EOF reached...')
-            print('[vWS] Halting for 5 Minutes...')
+            print('[zWS] Halting for 30 sec...')
             time.sleep(3)
 
     except Exception as e:
-        print("[vWS Error] Data is trickling...")  # , e)
+        print("[zWS Error] Data is trickling...")  # , e)
         time.sleep(2)
 
     t4.close()

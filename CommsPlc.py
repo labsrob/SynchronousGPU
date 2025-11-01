@@ -74,8 +74,8 @@ def errorLog(err):
 
 
 def successNote():
-	plc_info2 = pCon.get_connected()  # Return connection status
-	print(f'\nConnection Successfully established:, {plc_info2}')
+	# plc_info2 = pCon.get_connected()  # Return connection status
+	print('\nConnection Successfully established!')
 
 	plc_info = pCon.get_cpu_info()  # Retrieves CPU State from Client
 	print(f'Module Type:,{plc_info.ModuleTypeName}')
@@ -84,12 +84,17 @@ def successNote():
 
 
 def check_PLC_Status():
-	if conPlc:
-		active_conn = 'True'
-		successNote()
-	else:
+	try:
+		pCon.connect(TCP01_IP, RACK, SLOT)
+		conPlc = pCon.get_connected()
+		if conPlc:
+			active_conn = 'True'
+			successNote()
+
+	except Exception as e:
 		active_conn = 'False'
 		errorLog(active_conn)
+
 	return active_conn
 
 

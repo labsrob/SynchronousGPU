@@ -22,7 +22,7 @@ WON_Array = []
 
 # Perform connection with PLC in real time ------[]
 if not autoCONN:
-    pCon.connectM2M()
+    pCon.connectM2M(1, 1)
 autoCONN = True
 
 

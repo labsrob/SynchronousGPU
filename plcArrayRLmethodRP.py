@@ -1,7 +1,13 @@
-# This script is called in from Main program to load SQL execution syntax command and return a list in LisDat5
-# Autho: Dr Labs, RB
+# This script is called in from Main program to load SQL execution syntax command and return a liRP in LisDat
+# Author: Dr Labs, RB
 # --------------------------------------------------------------------------------------------------------------------[]
+import time
+import snap7
+import cupy as cp
+from snap7.util import get_int
+from collections import deque
 import OPC_UA_settings as ld
+
 configP = 'C:\\synchronousGPU\\INI_Files\\checksumError.ini'
 ip, name, User, Pswd = ld.load_configPLC(configP)
 ip = '192.168.100.100'
@@ -15,15 +21,10 @@ ip = '192.168.100.100'
 | PLC reads        | low         | low        | constant      | bounded by deque  |
 | Rolling mean/std | small burst | negligible | constant      | safe for 10 Hz    |
 | Printing         | moderate    | moderate   | none          | batching on deque |
-Author: Robert Labs
+| Author: Robert Labs
 """
-# ---------------------------------------------------------------------------------------------------[]
-import time
-import snap7
-import cupy as cp
-from snap7.util import get_int
-from collections import deque
 
+# ---------------------------------------------------------------------------------------------------[]
 
 def connect_plc(ip, rack=0, slot=1):
     client = snap7.client.Client()
@@ -37,14 +38,14 @@ def read_block(client, db_number, num_ints=17):
     return [get_int(raw, i * 2) for i in range(num_ints)]
 
 
-def plcExec(ip, db_number, sample_size, window, rate_hz, batch_No):
+def plcExec(ip, db_number, sample_size, batch_No, rate_hz=10, window=5):
     delay = 1.0 / rate_hz
     client = connect_plc(ip)
 
     # Using deque with maxlen to prevent balloon effect
-    data = deque(maxlen=sample_size)	# discard old samples
+    data = deque(maxlen=sample_size)  # discard old samples
 
-    print(f"[Live TT] Collecting {sample_size} samples from DB{db_number}, Batch #{batch_No}")
+    print(f"[Live RP] Collecting {sample_size} samples from DB{db_number}, Batch #{batch_No}")
 
     # Precompute rolling kernel once
     kernel = cp.ones(window) / window
@@ -54,7 +55,7 @@ def plcExec(ip, db_number, sample_size, window, rate_hz, batch_No):
             vals = read_block(client, db_number)
             timestamp = time.time()
             data.append([timestamp] + vals)
-            print(f"Sample {i+1}/{sample_size}: {vals}")
+            print(f"Sample {i + 1}/{sample_size}: {vals}")
             time.sleep(delay)
 
             # Compute rolling mean/std on GPU once window is full
@@ -88,17 +89,11 @@ def plcExec(ip, db_number, sample_size, window, rate_hz, batch_No):
     finally:
         client.disconnect()
         client.destroy()
-        print("[Live TT] Done.")
-        print('\nTP01', list(data))
+        print("[Live RP] Done.")
+        print('\nTP01-Mean', list(mean_last))
+        print('\nTP01-Std', list(std_last))
 
     return list(mean_last), list(std_last)
 
-# --- Alarm detection ---
-# alarms = mean_last > THRESHOLDS[: len(mean_last)]
-# if any(alarms):
-# 	print(Fore.RED + f"[ALARM @Sample {i + 1}] Channels: {np.where(alarms)[0].tolist()}")
-# 	print(Fore.RED + f"  Mean: {mean_last}")
-# else:
-# 	print(Style.DIM + f"[OK @Sample {i + 1}] Mean: {mean_last}")
 
-# plcExec(ip, 152, 30, 30,10, 1)
+# plcExec(ip, 151, 30, 1, 10, 30)
